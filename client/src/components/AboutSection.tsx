@@ -1,52 +1,161 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Youtube, Twitter, Instagram, Twitch } from "lucide-react";
+import castData from "@/data/cast.json";
+
+interface SocialLinks {
+  youtube?: string;
+  twitter?: string;
+  instagram?: string;
+  twitch?: string;
+}
 
 interface CastMember {
   id: string;
   name: string;
   role: string;
-  character: string;
+  characters: string[];
+  isCurrent: boolean;
   avatar: string;
+  socialLinks: SocialLinks;
 }
 
 export default function AboutSection() {
-  //todo: remove mock functionality - Replace with actual cast data
-  const castMembers: CastMember[] = [
-    {
-      id: "1",
-      name: "Alex Rivera",
-      role: "Game Master",
-      character: "The Storyteller",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop",
-    },
-    {
-      id: "2",
-      name: "Jordan Chen",
-      role: "Player",
-      character: "Lyra Shadowmancer",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop",
-    },
-    {
-      id: "3",
-      name: "Sam Martinez",
-      role: "Player",
-      character: "Theron Ironheart",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop",
-    },
-    {
-      id: "4",
-      name: "Casey Williams",
-      role: "Player",
-      character: "Aria Moonwhisper",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&auto=format&fit=crop",
-    },
-  ];
+  const allCast: CastMember[] = castData.cast;
+  const currentCast = allCast.filter(member => member.isCurrent);
+  const pastCast = allCast.filter(member => !member.isCurrent);
 
   const stats = [
     { label: "Episodes", value: "50+" },
     { label: "Subscribers", value: "25K" },
     { label: "Watch Hours", value: "150K" },
   ];
+
+  const renderSocialLinks = (member: CastMember) => {
+    const links = [];
+    
+    if (member.socialLinks.youtube) {
+      links.push(
+        <Button
+          key="youtube"
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(member.socialLinks.youtube, '_blank', 'noopener,noreferrer');
+          }}
+          data-testid={`button-social-youtube-${member.id}`}
+          aria-label={`${member.name}'s YouTube channel`}
+        >
+          <Youtube className="h-4 w-4" />
+        </Button>
+      );
+    }
+    
+    if (member.socialLinks.twitter) {
+      links.push(
+        <Button
+          key="twitter"
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(member.socialLinks.twitter, '_blank', 'noopener,noreferrer');
+          }}
+          data-testid={`button-social-twitter-${member.id}`}
+          aria-label={`${member.name}'s Twitter profile`}
+        >
+          <Twitter className="h-4 w-4" />
+        </Button>
+      );
+    }
+    
+    if (member.socialLinks.instagram) {
+      links.push(
+        <Button
+          key="instagram"
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(member.socialLinks.instagram, '_blank', 'noopener,noreferrer');
+          }}
+          data-testid={`button-social-instagram-${member.id}`}
+          aria-label={`${member.name}'s Instagram profile`}
+        >
+          <Instagram className="h-4 w-4" />
+        </Button>
+      );
+    }
+    
+    if (member.socialLinks.twitch) {
+      links.push(
+        <Button
+          key="twitch"
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(member.socialLinks.twitch, '_blank', 'noopener,noreferrer');
+          }}
+          data-testid={`button-social-twitch-${member.id}`}
+          aria-label={`${member.name}'s Twitch channel`}
+        >
+          <Twitch className="h-4 w-4" />
+        </Button>
+      );
+    }
+    
+    return links.length > 0 ? (
+      <div className="flex items-center justify-center gap-1 mt-3" data-testid={`social-links-${member.id}`}>
+        {links}
+      </div>
+    ) : null;
+  };
+
+  const renderCastCard = (member: CastMember) => (
+    <Card
+      key={member.id}
+      className="overflow-hidden hover-elevate transition-all"
+      data-testid={`card-cast-${member.id}`}
+    >
+      <CardContent className="p-6 text-center">
+        <Avatar className="w-24 h-24 mx-auto mb-4">
+          <AvatarImage src={member.avatar} alt={`${member.name} - ${member.role}`} />
+          <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+        </Avatar>
+        <h4 className="font-semibold text-lg mb-1" data-testid={`text-cast-name-${member.id}`}>
+          {member.name}
+        </h4>
+        <p className="text-sm text-muted-foreground mb-3" data-testid={`text-cast-role-${member.id}`}>
+          {member.role}
+        </p>
+        <div className="space-y-1">
+          {member.characters.slice(0, 3).map((character, idx) => (
+            <p 
+              key={idx} 
+              className="text-xs text-primary font-medium" 
+              data-testid={`text-cast-character-${member.id}-${idx}`}
+            >
+              {character}
+            </p>
+          ))}
+          {member.characters.length > 3 && (
+            <Badge variant="secondary" className="text-xs mt-2" data-testid={`badge-more-characters-${member.id}`}>
+              +{member.characters.length - 3} more
+            </Badge>
+          )}
+        </div>
+        {renderSocialLinks(member)}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <section id="about" className="py-20 lg:py-32 bg-card">
@@ -75,37 +184,25 @@ export default function AboutSection() {
           </div>
         </div>
 
-        <div>
-          <h3 className="font-serif text-3xl font-semibold mb-8 text-center" data-testid="text-cast-title">
-            Meet the Cast
+        <div className="mb-16">
+          <h3 className="font-serif text-3xl font-semibold mb-8 text-center" data-testid="text-current-cast-title">
+            Current Cast
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {castMembers.map((member) => (
-              <Card
-                key={member.id}
-                className="overflow-hidden hover-elevate cursor-pointer transition-all"
-                data-testid={`card-cast-${member.id}`}
-                onClick={() => console.log(`Cast member ${member.name} clicked`)}
-              >
-                <CardContent className="p-6 text-center">
-                  <Avatar className="w-24 h-24 mx-auto mb-4">
-                    <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <h4 className="font-semibold text-lg mb-1" data-testid={`text-cast-name-${member.id}`}>
-                    {member.name}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-2" data-testid={`text-cast-role-${member.id}`}>
-                    {member.role}
-                  </p>
-                  <p className="text-sm text-primary font-medium" data-testid={`text-cast-character-${member.id}`}>
-                    {member.character}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            {currentCast.map(renderCastCard)}
           </div>
         </div>
+
+        {pastCast.length > 0 && (
+          <div>
+            <h3 className="font-serif text-2xl font-semibold mb-8 text-center text-muted-foreground" data-testid="text-past-cast-title">
+              Past Cast Members
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {pastCast.map(renderCastCard)}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

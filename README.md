@@ -48,20 +48,48 @@ The application is already running! Just refresh your browser to see the changes
 
 ### Update Cast Members
 
-Edit `client/src/components/AboutSection.tsx` and modify the `castMembers` array:
+Cast members are managed in a simple JSON file at `client/src/data/cast.json`. This makes it easy to add, remove, or update cast information without touching any code.
 
-```typescript
-const castMembers = [
-  {
-    id: "1",
-    name: "Your Name",
-    role: "Game Master",
-    character: "The Storyteller",
-    avatar: "url-to-image",
-  },
-  // Add more cast members...
-];
+**To add or update a cast member:**
+
+1. Open `client/src/data/cast.json`
+2. Add or modify an entry:
+
+```json
+{
+  "id": "unique-id-lowercase",
+  "name": "Full Name",
+  "role": "Game Master" or "Player",
+  "characters": ["Character Name 1", "Character Name 2"],
+  "isCurrent": true,
+  "avatar": "https://url-to-headshot.jpg",
+  "socialLinks": {
+    "youtube": "https://youtube.com/@yourhandle",
+    "twitter": "https://twitter.com/yourhandle",
+    "instagram": "https://instagram.com/yourhandle",
+    "twitch": "https://twitch.tv/yourhandle"
+  }
+}
 ```
+
+**Field Explanations:**
+- `id`: Unique identifier (use lowercase with dashes, e.g., "john-smith")
+- `name`: Full name as displayed on the site
+- `role`: Either "Game Master" or "Player"
+- `characters`: Array of character names they've played (can list multiple)
+- `isCurrent`: Set to `true` for current cast, `false` for past cast members
+- `avatar`: URL to profile image (leave empty `""` for default initials)
+- `socialLinks`: Include any/all social platforms (leave empty `""` if they don't have an account)
+
+**Current Cast vs Past Cast:**
+- Current cast members appear in the main "Current Cast" section
+- Past cast members appear separately below in "Past Cast Members"
+- Both are automatically sorted and displayed based on the `isCurrent` field
+
+**Social Media Links:**
+- Only platforms with URLs will show icon buttons
+- Links open in new tabs with proper security attributes
+- Each link includes accessible labels for screen readers (SEO best practice)
 
 ### Update Social Media Links
 

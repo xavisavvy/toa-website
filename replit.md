@@ -6,9 +6,13 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 ## Recent Changes (January 2025)
 - Created comprehensive landing page design with fantasy-themed aesthetics
 - Integrated YouTube Data API v3 for fetching real playlist videos
+- Implemented RSS podcast feed parser with audio player support
 - Implemented responsive navigation, hero section, and content sections
-- Added mock data placeholders for podcast feeds, WorldAnvil integration, and Etsy products
-- Set up environment variable configuration for YouTube playlist ID
+- Added mock data placeholders for WorldAnvil integration and Etsy products
+- Set up environment variable configuration for YouTube playlist ID and podcast RSS feed
+- Created cast.json data file for easy cast member management
+- Implemented current vs past cast member distinction
+- Added social media links for cast members with SEO best practices
 
 ## Project Architecture
 
@@ -61,10 +65,46 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Google YouTube Data API v3
 - Replit YouTube connector for OAuth
 
+## Cast Member Management
+
+Cast members are managed via `client/src/data/cast.json`:
+
+### JSON Structure
+```json
+{
+  "id": "unique-id",
+  "name": "Full Name",
+  "role": "Game Master" or "Player",
+  "characters": ["Character 1", "Character 2"],
+  "isCurrent": true/false,
+  "avatar": "url-to-image",
+  "socialLinks": {
+    "youtube": "https://youtube.com/@handle",
+    "twitter": "https://twitter.com/handle",
+    "instagram": "https://instagram.com/handle",
+    "twitch": "https://twitch.tv/handle"
+  }
+}
+```
+
+### Current Cast
+- Cory Avis (Game Master) - The Storyteller
+- Preston Farr (Player) - Wayne the Archivist of Lies, Victor Udonta, Locke Lirian, and more
+- Torrey Woolsey (Player) - Winnifred "Fred" Blodbane, Maggie Bramblecheeks
+- Scott Avis (Player) - Carine Sol, Bolt, Cilin Meekmarrow
+- Dallin Rogers (Player) - Erys Leandorian, Aramis, Ezra
+- Ian (Player) - Titheus Cillbrost
+- Jake (Player) - Porphan Valaritas
+
+### Past Cast
+- Colby Poulsen (Player) - Seredan Fallowshield, Alomah Stargazer (early season)
+
 ## Next Steps
-1. Configure `VITE_YOUTUBE_PLAYLIST_ID` environment variable with actual playlist
-2. Add RSS feed parser for podcast integration
-3. Implement WorldAnvil API integration for lore content
-4. Connect Etsy API or static product links
-5. Add analytics tracking
-6. Implement newsletter subscription backend
+1. ✅ Configure `VITE_YOUTUBE_PLAYLIST_ID` environment variable with actual playlist
+2. ✅ Add RSS feed parser for podcast integration
+3. Add cast member photos to `cast.json`
+4. Add cast member social media links to `cast.json`
+5. Implement WorldAnvil API integration for lore content
+6. Connect Etsy API or static product links
+7. Add analytics tracking
+8. Implement newsletter subscription backend

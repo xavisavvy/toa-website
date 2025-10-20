@@ -1,0 +1,142 @@
+{
+  "cast": [
+    {
+      "id": "cory-avis",
+      "name": "Cory Avis",
+      "role": "Game Master",
+      "characters": ["The Storyteller"],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "preston-farr",
+      "name": "Preston Farr",
+      "role": "Player",
+      "characters": [
+        "Wayne the Archivist of Lies",
+        "Victor Udonta",
+        "Locke Lirian",
+        "Zeff the Bastard",
+        "Tazer Face",
+        "Hu Mungus",
+        "Ahri Flowers"
+      ],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "torrey-woolsey",
+      "name": "Torrey Woolsey",
+      "role": "Player",
+      "characters": [
+        "Winnifred \"Fred\" Blodbane",
+        "Maggie Bramblecheeks"
+      ],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "scott-avis",
+      "name": "Scott Avis",
+      "role": "Player",
+      "characters": [
+        "Carine Sol",
+        "Bolt",
+        "Cilin Meekmarrow"
+      ],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "dallin-rogers",
+      "name": "Dallin Rogers",
+      "role": "Player",
+      "characters": [
+        "Erys Leandorian",
+        "Aramis",
+        "Ezra"
+      ],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "colby-poulsen",
+      "name": "Colby Poulsen",
+      "role": "Player",
+      "characters": [
+        "Seredan Fallowshield",
+        "Alomah Stargazer"
+      ],
+      "isCurrent": false,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "ian",
+      "name": "Ian",
+      "role": "Player",
+      "characters": [
+        "Titheus Cillbrost"
+      ],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "jake",
+      "name": "Jake",
+      "role": "Player",
+      "characters": [
+        "Porphan Valaritas"
+      ],
+      "isCurrent": true,
+      "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    }
+  ]
+}
