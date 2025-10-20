@@ -10,11 +10,13 @@ import CommunitySection from "@/components/CommunitySection";
 import Footer from "@/components/Footer";
 
 export default function Home() {
+  const YOUTUBE_PLAYLIST_ID = import.meta.env.VITE_YOUTUBE_PLAYLIST_ID;
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <Hero />
-      <LatestEpisodes />
+      <LatestEpisodes playlistId={YOUTUBE_PLAYLIST_ID} />
       <PodcastSection />
       <WorldSection />
       <PromotionsSection />
