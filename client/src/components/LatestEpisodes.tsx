@@ -23,7 +23,7 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
     enabled: !!playlistId,
   });
 
-  const displayEpisodes = episodes?.slice(0, 3) || [];
+  const displayEpisodes = episodes ? [...episodes].reverse().slice(0, 3) : [];
   
   const playlistUrl = playlistId 
     ? `https://www.youtube.com/playlist?list=${playlistId}`
@@ -93,7 +93,7 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
                     </div>
                   </div>
                   <Badge className="absolute top-3 left-3" data-testid={`badge-episode-number-${episode.id}`}>
-                    Episode {index + 1}
+                    Episode {episodes ? episodes.length - index : index + 1}
                   </Badge>
                 </div>
                 <CardContent className="p-6">
