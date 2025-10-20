@@ -1,47 +1,36 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, ExternalLink } from "lucide-react";
+import { ShoppingBag, ExternalLink, AlertCircle } from "lucide-react";
 import socialLinksData from "@/data/social-links.json";
+import { useQuery } from "@tanstack/react-query";
 
 interface Product {
   id: string;
   name: string;
   price: string;
   image: string;
-  badge?: string;
+  url: string;
+  inStock: boolean;
 }
 
 export default function ShopSection() {
-  //todo: remove mock functionality - Replace with actual Etsy integration
-  const products: Product[] = [
-    {
-      id: "1",
-      name: "Aneria Campaign Guide",
-      price: "$29.99",
-      image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop",
-      badge: "Bestseller",
+  // Extract shop name from Etsy URL
+  const etsyShopName = socialLinksData.etsy.split('/shop/')[1];
+  
+  const { data: products, isLoading, error } = useQuery<Product[]>({
+    queryKey: ['/api/etsy/shop', etsyShopName, 'listings'],
+    queryFn: async () => {
+      const response = await fetch(`/api/etsy/shop/${etsyShopName}/listings?limit=8`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      return response.json();
     },
-    {
-      id: "2",
-      name: "Character Portrait Prints",
-      price: "$15.99",
-      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500&auto=format&fit=crop",
-    },
-    {
-      id: "3",
-      name: "Tales of Aneria T-Shirt",
-      price: "$24.99",
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop",
-      badge: "New",
-    },
-    {
-      id: "4",
-      name: "Map of Aneria Poster",
-      price: "$19.99",
-      image: "https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=500&auto=format&fit=crop",
-    },
-  ];
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  const displayProducts = products?.slice(0, 4) || [];
 
   return (
     <section id="shop" className="py-20 lg:py-32 bg-background">
@@ -55,37 +44,79 @@ export default function ShopSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {products.map((product) => (
-            <Card
-              key={product.id}
-              className="overflow-hidden hover-elevate cursor-pointer transition-all"
-              data-testid={`card-product-${product.id}`}
-              onClick={() => console.log(`Product ${product.id} clicked`)}
-            >
-              <div className="relative aspect-square overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="object-cover w-full h-full"
-                />
-                {product.badge && (
-                  <Badge className="absolute top-3 right-3" data-testid={`badge-product-${product.id}`}>
-                    {product.badge}
-                  </Badge>
-                )}
-              </div>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-2" data-testid={`text-product-name-${product.id}`}>
-                  {product.name}
-                </h3>
-                <p className="text-primary font-semibold" data-testid={`text-product-price-${product.id}`}>
-                  {product.price}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="overflow-hidden">
+                <div className="aspect-square bg-muted animate-pulse" />
+                <CardContent className="p-4">
+                  <div className="h-5 bg-muted rounded animate-pulse mb-2" />
+                  <div className="h-4 bg-muted rounded animate-pulse w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : error ? (
+          <Card className="mb-12">
+            <CardContent className="p-12 text-center">
+              <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">
+                Unable to load products from our Etsy shop.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Please visit our store directly to see our latest items!
+              </p>
+            </CardContent>
+          </Card>
+        ) : displayProducts.length === 0 ? (
+          <Card className="mb-12">
+            <CardContent className="p-12 text-center">
+              <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">
+                Check out our Etsy store to see all our amazing products!
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {displayProducts.map((product) => (
+              <Card
+                key={product.id}
+                className="overflow-hidden hover-elevate cursor-pointer transition-all"
+                data-testid={`card-product-${product.id}`}
+                onClick={() => window.open(product.url, '_blank', 'noopener,noreferrer')}
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="object-cover w-full h-full"
+                  />
+                  {!product.inStock && (
+                    <Badge 
+                      variant="secondary" 
+                      className="absolute top-3 right-3" 
+                      data-testid={`badge-product-${product.id}`}
+                    >
+                      Sold Out
+                    </Badge>
+                  )}
+                </div>
+                <CardContent className="p-4">
+                  <h3 
+                    className="font-semibold mb-2 line-clamp-2" 
+                    data-testid={`text-product-name-${product.id}`}
+                  >
+                    {product.name}
+                  </h3>
+                  <p className="text-primary font-semibold" data-testid={`text-product-price-${product.id}`}>
+                    {product.price}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         <div className="text-center">
           <Button 

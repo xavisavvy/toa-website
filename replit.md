@@ -106,10 +106,9 @@ Cast members are managed via `client/src/data/cast.json`:
 1. ✅ Configure `VITE_YOUTUBE_PLAYLIST_ID` environment variable with actual playlist
 2. ✅ Add RSS feed parser for podcast integration
 3. ✅ Fix YouTube OAuth2 authentication for playlist fetching
-4. Add cast member photos to `cast.json`
-5. Add cast member social media links to `cast.json`
-6. Add podcast RSS feed URL to environment variables
-7. Implement WorldAnvil API integration for lore content
-8. Connect Etsy API or static product links
+4. ✅ Connect Etsy API for real product listings
+5. Add cast member photos to `cast.json`
+6. Add cast member social media links to `cast.json`
+7. Add podcast RSS feed URL to environment variables
+8. Implement WorldAnvil API integration for lore content
 9. Add analytics tracking
-10. Implement newsletter subscription backend
