@@ -1,45 +1,64 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, MapPin, Swords, Scroll, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 
-interface WorldAspect {
-  id: string;
-  icon: React.ReactNode;
-  title: string;
+interface Campaign {
+  name: string;
   description: string;
+}
+
+interface CampaignWorld {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  description: string;
+  campaigns: Campaign[];
+  comingSoon?: boolean;
   link: string;
 }
 
 export default function WorldSection() {
   const worldAnvilUrl = "https://www.worldanvil.com/w/aneria-niburu";
   
-  const worldAspects: WorldAspect[] = [
+  const campaignWorlds: CampaignWorld[] = [
     {
-      id: "characters",
-      icon: <Users className="h-8 w-8" />,
-      title: "Characters",
-      description: "Meet the heroes, villains, and legendary figures that shape the fate of Aneria",
+      id: "aneria",
+      name: "Aneria",
+      icon: <Globe className="h-8 w-8" />,
+      description: "A realm steeped in magic and mystery, where ancient powers awaken and heroes rise to face unimaginable challenges",
+      campaigns: [
+        {
+          name: "The Wayward Watch",
+          description: "The primary campaign spanning Seasons 1 & 2"
+        },
+        {
+          name: "Littlest Hopes",
+          description: "Side quest campaign with overlapping storylines"
+        }
+      ],
       link: worldAnvilUrl,
     },
     {
-      id: "locations",
-      icon: <MapPin className="h-8 w-8" />,
-      title: "Locations",
-      description: "Explore mystical cities, ancient ruins, and hidden sanctuaries across the realm",
+      id: "pterrordale",
+      name: "Pterrordale",
+      icon: <Skull className="h-8 w-8" />,
+      description: "A modern Halloween special setting filled with magic, intrigue, and horror in the unfortunate town of Pterrordale",
+      campaigns: [
+        {
+          name: "S.A.S.S",
+          description: "High school students investigating the supernatural"
+        }
+      ],
       link: worldAnvilUrl,
     },
     {
-      id: "factions",
-      icon: <Swords className="h-8 w-8" />,
-      title: "Factions",
-      description: "Discover the powerful organizations vying for control of Aneria's destiny",
-      link: worldAnvilUrl,
-    },
-    {
-      id: "lore",
-      icon: <Scroll className="h-8 w-8" />,
-      title: "Lore & History",
-      description: "Uncover the rich tapestry of myths, legends, and historical events",
+      id: "taebrin",
+      name: "Journeys Through Taebrin",
+      icon: <Sparkles className="h-8 w-8" />,
+      description: "A bronze age themed land inhabited by the ancient Saurian people, where dinosaur civilizations thrive",
+      campaigns: [],
+      comingSoon: true,
       link: worldAnvilUrl,
     },
   ];
@@ -51,10 +70,10 @@ export default function WorldSection() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="font-serif text-4xl md:text-5xl font-semibold mb-4" data-testid="text-world-title">
-            The World of Aneria
+            Our Campaign Worlds
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
-            A realm steeped in magic and mystery, where ancient powers awaken and heroes rise to face unimaginable challenges
+            Explore the diverse realms and campaigns that make up the Tales of Aneria universe
           </p>
           <Button 
             variant="outline"
@@ -66,24 +85,55 @@ export default function WorldSection() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {worldAspects.map((aspect) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {campaignWorlds.map((world) => (
             <Card
-              key={aspect.id}
-              className="hover-elevate cursor-pointer transition-all"
-              data-testid={`card-world-${aspect.id}`}
-              onClick={() => window.open(aspect.link, '_blank', 'noopener,noreferrer')}
+              key={world.id}
+              className="hover-elevate cursor-pointer transition-all relative"
+              data-testid={`card-world-${world.id}`}
+              onClick={() => !world.comingSoon && window.open(world.link, '_blank', 'noopener,noreferrer')}
             >
-              <CardContent className="p-6 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
-                  {aspect.icon}
+              {world.comingSoon && (
+                <div className="absolute top-4 right-4 z-10">
+                  <Badge variant="secondary" data-testid={`badge-coming-soon-${world.id}`}>
+                    Coming Soon
+                  </Badge>
                 </div>
-                <h3 className="font-semibold text-xl mb-3" data-testid={`text-world-${aspect.id}-title`}>
-                  {aspect.title}
-                </h3>
-                <p className="text-muted-foreground text-sm" data-testid={`text-world-${aspect.id}-description`}>
-                  {aspect.description}
+              )}
+              <CardHeader>
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                  {world.icon}
+                </div>
+                <CardTitle className="font-serif text-2xl" data-testid={`text-world-${world.id}-title`}>
+                  {world.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground text-sm" data-testid={`text-world-${world.id}-description`}>
+                  {world.description}
                 </p>
+                
+                {world.campaigns.length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+                      Campaigns
+                    </h4>
+                    {world.campaigns.map((campaign, idx) => (
+                      <div 
+                        key={idx} 
+                        className="space-y-1"
+                        data-testid={`campaign-${world.id}-${idx}`}
+                      >
+                        <div className="font-semibold text-sm text-foreground">
+                          {campaign.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {campaign.description}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

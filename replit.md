@@ -1,16 +1,15 @@
 # Tales of Aneria - TTRPG Live Play Landing Page
 
 ## Overview
-A professional landing page for the "Tales of Aneria" TTRPG live play series. This website serves as a central hub for YouTube episodes, podcast content, world lore, merchandise, and community engagement.
+A professional landing page for the "Tales of Aneria" TTRPG live play series. This website serves as a central hub for YouTube episodes, podcast content, world lore, merchandise, and community engagement. The site now represents multiple campaign worlds under the Tales of Aneria umbrella: Aneria (Seasons 1/2 with Wayward Watch and Littlest Hopes), Pterrordale (Halloween special), and Journeys Through Taebrin (coming soon).
 
-## Recent Changes (January 2025)
+## Recent Changes (October 2025)
 - Created comprehensive landing page design with fantasy-themed aesthetics
 - Integrated YouTube Data API v3 for fetching real playlist videos
 - Implemented RSS podcast feed parser with audio player support
 - Implemented responsive navigation, hero section, and content sections
 - Added official Tales of Aneria logo (logo-TOA.svg) to navigation header
 - Added cast member photos: Preston Farr, Brigette S, and Dallin Rogers
-- Added mock data placeholders for WorldAnvil integration and Etsy products
 - Set up environment variable configuration for YouTube playlist ID and podcast RSS feed
 - Created cast.json data file for easy cast member management
 - Implemented current vs past cast member distinction
@@ -18,6 +17,8 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Created centralized social-links.json for site-wide social media links
 - Replaced newsletter signup with Patreon call-to-action
 - Connected all social media buttons across site to real URLs
+- Restructured World Section to showcase 3 campaign worlds: Aneria, Pterrordale, and Taebrin
+- Added campaign details for each world with "Coming Soon" badge for Taebrin
 
 ## Project Architecture
 
@@ -29,7 +30,7 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Smooth 1-second fade transitions
 - **Latest Episodes**: YouTube playlist integration displaying video thumbnails, duration, and view counts
 - **Podcast Section**: RSS feed integration with featured/recent episodes and audio player
-- **World Section**: Links to WorldAnvil content (characters, locations, factions, lore)
+- **World Section**: Showcases 3 campaign worlds (Aneria, Pterrordale, Taebrin) with campaign details and WorldAnvil links
 - **Promotions**: Highlight special events and limited-time offers
 - **Shop**: Etsy storefront integration showing featured products
 - **About**: Cast member profiles with photos and series statistics
