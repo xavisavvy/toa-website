@@ -11,35 +11,36 @@ interface WorldAspect {
 }
 
 export default function WorldSection() {
-  //todo: remove mock functionality - Replace with actual WorldAnvil integration
+  const worldAnvilUrl = "https://www.worldanvil.com/w/aneria-niburu";
+  
   const worldAspects: WorldAspect[] = [
     {
       id: "characters",
       icon: <Users className="h-8 w-8" />,
       title: "Characters",
       description: "Meet the heroes, villains, and legendary figures that shape the fate of Aneria",
-      link: "#",
+      link: worldAnvilUrl,
     },
     {
       id: "locations",
       icon: <MapPin className="h-8 w-8" />,
       title: "Locations",
       description: "Explore mystical cities, ancient ruins, and hidden sanctuaries across the realm",
-      link: "#",
+      link: worldAnvilUrl,
     },
     {
       id: "factions",
       icon: <Swords className="h-8 w-8" />,
       title: "Factions",
       description: "Discover the powerful organizations vying for control of Aneria's destiny",
-      link: "#",
+      link: worldAnvilUrl,
     },
     {
       id: "lore",
       icon: <Scroll className="h-8 w-8" />,
       title: "Lore & History",
       description: "Uncover the rich tapestry of myths, legends, and historical events",
-      link: "#",
+      link: worldAnvilUrl,
     },
   ];
 
@@ -58,7 +59,7 @@ export default function WorldSection() {
           <Button 
             variant="outline"
             data-testid="button-worldanvil"
-            onClick={() => console.log('Visit WorldAnvil page')}
+            onClick={() => window.open(worldAnvilUrl, '_blank', 'noopener,noreferrer')}
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Explore on WorldAnvil
@@ -71,7 +72,7 @@ export default function WorldSection() {
               key={aspect.id}
               className="hover-elevate cursor-pointer transition-all"
               data-testid={`card-world-${aspect.id}`}
-              onClick={() => console.log(`${aspect.title} clicked`)}
+              onClick={() => window.open(aspect.link, '_blank', 'noopener,noreferrer')}
             >
               <CardContent className="p-6 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">

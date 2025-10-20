@@ -116,10 +116,10 @@ Cast members are managed via `client/src/data/cast.json`:
 5. ✅ Add Preston Farr's headshot to cast.json
 6. ✅ Add Brigette S's photo to cast.json
 7. ✅ Add Dallin Rogers' photo to cast.json
-8. Add remaining cast member photos to `cast.json`
-9. Add cast member social media links to `cast.json`
-10. Add podcast RSS feed URL to environment variables
-11. Implement WorldAnvil API integration for lore content
+8. ✅ Connect WorldAnvil links to Aneria world page
+9. Add remaining cast member photos to `cast.json`
+10. Add cast member social media links to `cast.json`
+11. Add podcast RSS feed URL to environment variables
 12. Add analytics tracking
 
 ## Etsy Integration Note
