@@ -14,6 +14,15 @@ export default function Navigation() {
     { label: "About", href: "#about" },
   ];
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const sectionId = href.replace('#', '');
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -34,10 +43,7 @@ export default function Navigation() {
                 href={item.href}
                 className="text-foreground/80 hover:text-foreground transition-colors"
                 data-testid={`link-nav-${item.label.toLowerCase()}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log(`Navigate to ${item.label}`);
-                }}
+                onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.label}
               </a>
@@ -66,9 +72,8 @@ export default function Navigation() {
                 className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
                 data-testid={`link-mobile-${item.label.toLowerCase()}`}
                 onClick={(e) => {
-                  e.preventDefault();
+                  handleNavClick(e, item.href);
                   setIsOpen(false);
-                  console.log(`Navigate to ${item.label}`);
                 }}
               >
                 {item.label}
