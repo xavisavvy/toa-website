@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Youtube, Twitter, Instagram, Twitch } from "lucide-react";
+import { Youtube, Twitter, Instagram, Twitch, Globe } from "lucide-react";
 import castData from "@/data/cast.json";
 import prestonAvatar from "@assets/cast-preston.jpg";
 import brigetteAvatar from "@assets/cast-brigette.png";
@@ -19,6 +19,7 @@ interface SocialLinks {
   twitter?: string;
   instagram?: string;
   twitch?: string;
+  website?: string;
 }
 
 interface CastMember {
@@ -141,6 +142,28 @@ export default function AboutSection() {
           aria-label={`${member.name}'s Twitch channel`}
         >
           <Twitch className="h-4 w-4" />
+        </Button>,
+      );
+    }
+
+    if (member.socialLinks.website) {
+      links.push(
+        <Button
+          key="website"
+          size="icon"
+          variant="ghost"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(
+              member.socialLinks.website,
+              "_blank",
+              "noopener,noreferrer",
+            );
+          }}
+          data-testid={`button-social-website-${member.id}`}
+          aria-label={`${member.name}'s website`}
+        >
+          <Globe className="h-4 w-4" />
         </Button>,
       );
     }
