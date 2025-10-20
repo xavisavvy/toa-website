@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { Link } from "wouter";
 import charactersData from "@/data/characters.json";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 interface CharacterImage {
   id: string;
@@ -94,8 +96,10 @@ export default function Characters() {
   );
 
   return (
-    <div className="min-h-screen py-20 lg:py-32">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-6">
             <Users className="h-8 w-8" />
@@ -150,6 +154,8 @@ export default function Characters() {
           </div>
         )}
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

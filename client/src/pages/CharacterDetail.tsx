@@ -11,6 +11,8 @@ import {
   Heart,
 } from "lucide-react";
 import charactersData from "@/data/characters.json";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 interface CharacterImage {
   id: string;
@@ -48,18 +50,22 @@ export default function CharacterDetail() {
 
   if (!character) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-serif font-bold mb-4">
-            Character Not Found
-          </h1>
-          <Link href="/characters">
-            <Button data-testid="button-back-to-characters">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Characters
-            </Button>
-          </Link>
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <h1 className="text-4xl font-serif font-bold mb-4">
+              Character Not Found
+            </h1>
+            <Link href="/characters">
+              <Button data-testid="button-back-to-characters">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Characters
+              </Button>
+            </Link>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -68,7 +74,8 @@ export default function CharacterDetail() {
   const galleryImages = character.images.filter((img) => !img.isFeatured);
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen bg-background">
+      <Navigation />
       {/* Hero Section */}
       <div className="relative h-96 bg-gradient-to-b from-primary/20 to-background overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
@@ -261,6 +268,7 @@ export default function CharacterDetail() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
