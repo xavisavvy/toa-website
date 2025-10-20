@@ -63,7 +63,6 @@ export default function AboutSection() {
           key="youtube"
           size="icon"
           variant="ghost"
-          className="h-8 w-8"
           onClick={(e) => {
             e.stopPropagation();
             window.open(
@@ -86,7 +85,6 @@ export default function AboutSection() {
           key="twitter"
           size="icon"
           variant="ghost"
-          className="h-8 w-8"
           onClick={(e) => {
             e.stopPropagation();
             window.open(
@@ -109,7 +107,6 @@ export default function AboutSection() {
           key="instagram"
           size="icon"
           variant="ghost"
-          className="h-8 w-8"
           onClick={(e) => {
             e.stopPropagation();
             window.open(
@@ -132,7 +129,6 @@ export default function AboutSection() {
           key="twitch"
           size="icon"
           variant="ghost"
-          className="h-8 w-8"
           onClick={(e) => {
             e.stopPropagation();
             window.open(
