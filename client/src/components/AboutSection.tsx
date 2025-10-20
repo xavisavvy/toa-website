@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Youtube, Twitter, Instagram, Twitch } from "lucide-react";
 import castData from "@/data/cast.json";
+import prestonAvatar from "@assets/0057 edit small_1760981097324.jpg";
 
 interface SocialLinks {
   youtube?: string;
@@ -26,6 +27,10 @@ export default function AboutSection() {
   const allCast: CastMember[] = castData.cast;
   const currentCast = allCast.filter(member => member.isCurrent);
   const pastCast = allCast.filter(member => !member.isCurrent);
+
+  const avatarImages: Record<string, string> = {
+    "0057 edit small_1760981097324.jpg": prestonAvatar,
+  };
 
   const stats = [
     { label: "Episodes", value: "50+" },
@@ -119,43 +124,47 @@ export default function AboutSection() {
     ) : null;
   };
 
-  const renderCastCard = (member: CastMember) => (
-    <Card
-      key={member.id}
-      className="overflow-hidden hover-elevate transition-all"
-      data-testid={`card-cast-${member.id}`}
-    >
-      <CardContent className="p-6 text-center">
-        <Avatar className="w-24 h-24 mx-auto mb-4">
-          <AvatarImage src={member.avatar} alt={`${member.name} - ${member.role}`} />
-          <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-        </Avatar>
-        <h4 className="font-semibold text-lg mb-1" data-testid={`text-cast-name-${member.id}`}>
-          {member.name}
-        </h4>
-        <p className="text-sm text-muted-foreground mb-3" data-testid={`text-cast-role-${member.id}`}>
-          {member.role}
-        </p>
-        <div className="space-y-1">
-          {member.characters.slice(0, 3).map((character, idx) => (
-            <p 
-              key={idx} 
-              className="text-xs text-primary font-medium" 
-              data-testid={`text-cast-character-${member.id}-${idx}`}
-            >
-              {character}
-            </p>
-          ))}
-          {member.characters.length > 3 && (
-            <Badge variant="secondary" className="text-xs mt-2" data-testid={`badge-more-characters-${member.id}`}>
-              +{member.characters.length - 3} more
-            </Badge>
-          )}
-        </div>
-        {renderSocialLinks(member)}
-      </CardContent>
-    </Card>
-  );
+  const renderCastCard = (member: CastMember) => {
+    const avatarSrc = member.avatar && avatarImages[member.avatar] ? avatarImages[member.avatar] : member.avatar;
+    
+    return (
+      <Card
+        key={member.id}
+        className="overflow-hidden hover-elevate transition-all"
+        data-testid={`card-cast-${member.id}`}
+      >
+        <CardContent className="p-6 text-center">
+          <Avatar className="w-24 h-24 mx-auto mb-4">
+            <AvatarImage src={avatarSrc} alt={`${member.name} - ${member.role}`} />
+            <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+          </Avatar>
+          <h4 className="font-semibold text-lg mb-1" data-testid={`text-cast-name-${member.id}`}>
+            {member.name}
+          </h4>
+          <p className="text-sm text-muted-foreground mb-3" data-testid={`text-cast-role-${member.id}`}>
+            {member.role}
+          </p>
+          <div className="space-y-1">
+            {member.characters.slice(0, 3).map((character, idx) => (
+              <p 
+                key={idx} 
+                className="text-xs text-primary font-medium" 
+                data-testid={`text-cast-character-${member.id}-${idx}`}
+              >
+                {character}
+              </p>
+            ))}
+            {member.characters.length > 3 && (
+              <Badge variant="secondary" className="text-xs mt-2" data-testid={`badge-more-characters-${member.id}`}>
+                +{member.characters.length - 3} more
+              </Badge>
+            )}
+          </div>
+          {renderSocialLinks(member)}
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <section id="about" className="py-20 lg:py-32 bg-card">
