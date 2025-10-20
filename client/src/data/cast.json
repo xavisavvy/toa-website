@@ -6,7 +6,7 @@
       "role": "Game Master",
       "characters": ["The Storyteller"],
       "isCurrent": true,
-      "avatar": "",
+      "avatar": "cast-cory.jpg",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -30,7 +30,7 @@
       "isCurrent": true,
       "avatar": "cast-preston.jpg",
       "socialLinks": {
-        "youtube": "",
+        "youtube": "https://www.youtube.com/@fuzzysquirrel",
         "twitter": "",
         "instagram": "",
         "twitch": ""
