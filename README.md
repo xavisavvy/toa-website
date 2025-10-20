@@ -1,0 +1,156 @@
+# Tales of Aneria - TTRPG Live Play Landing Page
+
+A professional landing page for your TTRPG Live Play series, featuring YouTube integration, podcast feeds, world lore, and merchandise showcase.
+
+## Features
+
+✨ **YouTube Integration** - Automatically fetches and displays your latest episodes from any YouTube playlist
+🎙️ **Podcast Feed** - Integrates with any RSS podcast feed to showcase your audio content
+🗺️ **World Building** - Links to WorldAnvil pages for characters, locations, factions, and lore
+🛍️ **Merchandise** - Showcase products and link to your Etsy storefront
+👥 **Cast & Community** - Highlight your team and connect with fans through social media
+📱 **Fully Responsive** - Beautiful design on desktop, tablet, and mobile devices
+
+## Quick Start
+
+### 1. Configure Environment Variables
+
+Create a `.env` file in the root directory and add:
+
+```env
+# YouTube Integration (Required for episode display)
+VITE_YOUTUBE_PLAYLIST_ID=your_playlist_id_here
+
+# Podcast Integration (Optional)
+VITE_PODCAST_FEED_URL=https://your-podcast-feed.com/rss
+```
+
+### 2. How to Get Your YouTube Playlist ID
+
+1. Go to your YouTube playlist
+2. Look at the URL: `https://www.youtube.com/playlist?list=PLxxxxxxxxxxxxx`
+3. Copy everything after `list=` - that's your playlist ID
+4. Example: If URL is `https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf`
+   Then your ID is: `PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf`
+
+### 3. Find Your Podcast RSS Feed
+
+Most podcast platforms provide an RSS feed URL:
+- **Spotify**: Use a service like Spotifeed or check your podcast settings
+- **Apple Podcasts**: Right-click your podcast and select "Copy RSS Feed"
+- **Anchor/Other hosting**: Check your podcast dashboard for the RSS feed URL
+
+### 4. Run the Application
+
+The application is already running! Just refresh your browser to see the changes after configuring environment variables.
+
+## Customization Guide
+
+### Update Cast Members
+
+Edit `client/src/components/AboutSection.tsx` and modify the `castMembers` array:
+
+```typescript
+const castMembers = [
+  {
+    id: "1",
+    name: "Your Name",
+    role: "Game Master",
+    character: "The Storyteller",
+    avatar: "url-to-image",
+  },
+  // Add more cast members...
+];
+```
+
+### Update Social Media Links
+
+Social media links appear in both `CommunitySection.tsx` and `Footer.tsx`. Update the click handlers to link to your actual profiles:
+
+```typescript
+onClick={() => window.open('https://youtube.com/@yourhandle', '_blank')}
+```
+
+### Add Real Promotions
+
+Edit `client/src/components/PromotionsSection.tsx` to showcase your current events and special offers.
+
+### Link Your Etsy Store
+
+Edit `client/src/components/ShopSection.tsx`:
+1. Update the "Visit Our Etsy Store" button with your actual Etsy shop URL
+2. Replace mock products with your real products
+3. Update product images and prices
+
+### WorldAnvil Integration
+
+Update the links in `client/src/components/WorldSection.tsx` to point to your actual WorldAnvil pages:
+
+```typescript
+onClick={() => window.open('https://www.worldanvil.com/your-world', '_blank')}
+```
+
+## API Endpoints
+
+### YouTube Episodes
+```
+GET /api/youtube/playlist/:playlistId?maxResults=10
+```
+Fetches videos from a YouTube playlist with thumbnails, duration, and view counts.
+
+### Podcast Feed
+```
+POST /api/podcast/feed
+Body: { feedUrl: string, limit?: number }
+```
+Parses an RSS podcast feed and returns episode information.
+
+## Technologies Used
+
+- **Frontend**: React 18, TypeScript, Tailwind CSS, Shadcn UI
+- **Backend**: Express.js, Node.js
+- **Integrations**: YouTube Data API v3, RSS Parser
+- **Styling**: Custom fantasy theme with purple and amber accents
+
+## Design System
+
+The site uses a fantasy-themed design:
+- **Primary Color**: Rich purple (#280 60% 55%)
+- **Accent Color**: Warm amber (#35 80% 50%)
+- **Typography**: Cinzel (serif) for headings, Inter for body text
+- **Dark Mode**: Deep charcoal background with elevated surfaces
+
+## Support & Troubleshooting
+
+### Episodes Not Showing?
+1. Check that `VITE_YOUTUBE_PLAYLIST_ID` is set correctly in `.env`
+2. Verify the playlist is public (not private or unlisted)
+3. Check browser console for API errors
+
+### Podcast Not Loading?
+1. Verify `VITE_PODCAST_FEED_URL` is a valid RSS feed URL
+2. Test the RSS feed URL in a browser to ensure it's accessible
+3. Check that the feed follows standard RSS/podcast feed format
+
+### Mobile Menu Not Working?
+The mobile menu automatically appears on screens smaller than 768px. Test by resizing your browser window or using browser DevTools mobile emulation.
+
+## Next Steps
+
+1. ✅ Configure environment variables
+2. ✅ Add your YouTube playlist ID
+3. ✅ Add your podcast RSS feed (optional)
+4. ✅ Update cast member information
+5. ✅ Link social media profiles
+6. ✅ Connect Etsy store
+7. ✅ Link WorldAnvil pages
+8. ✅ Test on mobile devices
+9. ✅ Share with your community!
+
+## License
+
+This project is built for Tales of Aneria. All content and branding specific to Tales of Aneria belongs to the creators.
+
+---
+
+Built with ❤️ for the TTRPG community
