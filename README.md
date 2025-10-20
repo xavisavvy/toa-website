@@ -15,15 +15,15 @@ A professional landing page for your TTRPG Live Play series, featuring YouTube i
 
 ### 1. Configure Environment Variables
 
-Create a `.env` file in the root directory and add:
+The YouTube playlist ID is already configured! Your latest episodes are displaying on the site.
 
-```env
-# YouTube Integration (Required for episode display)
-VITE_YOUTUBE_PLAYLIST_ID=your_playlist_id_here
+**Current Configuration:**
+- ✅ YouTube Playlist ID: `PLrmC8WonT9uaUoORXiAwGUo21Mp_N2u8v`
 
-# Podcast Integration (Optional)
-VITE_PODCAST_FEED_URL=https://your-podcast-feed.com/rss
-```
+**Optional Configuration:**
+To add podcast episodes, you can add the podcast RSS feed URL in the Replit Secrets panel:
+- Key: `VITE_PODCAST_FEED_URL`
+- Value: Your podcast RSS feed URL
 
 ### 2. How to Get Your YouTube Playlist ID
 
