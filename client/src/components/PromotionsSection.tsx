@@ -20,15 +20,15 @@ export default function PromotionsSection() {
       description:
         "Join us for a special live premiere event with exclusive behind-the-scenes content and Q&A",
       badge: "Coming Soon",
-      image: "",
+      image: "@a",
     },
-    {
-      id: "2",
-      title: "Limited Edition Dice Set",
-      description: "Coming Soon!",
-      badge: "Coming Soon",
-      image: "",
-    },
+    // {
+    //   id: "2",
+    //   title: "Limited Edition Dice Set",
+    //   description: "Coming Soon!",
+    //   badge: "Coming Soon",
+    //   image: "",
+    // },
   ];
 
   return (
