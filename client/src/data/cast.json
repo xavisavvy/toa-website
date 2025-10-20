@@ -42,7 +42,8 @@
       "role": "Player",
       "characters": [
         "Winnifred \"Fred\" Blodbane",
-        "Maggie Bramblecheeks"
+        "Maggie Bramblecheeks",
+        "Maybel Crosscore"
       ],
       "isCurrent": true,
       "avatar": "",
@@ -57,11 +58,7 @@
       "id": "scott-avis",
       "name": "Scott Avis",
       "role": "Player",
-      "characters": [
-        "Carine Sol",
-        "Bolt",
-        "Cilin Meekmarrow"
-      ],
+      "characters": ["Carine Sol", "Bolt", "Cilin Meekmarrow"],
       "isCurrent": true,
       "avatar": "",
       "socialLinks": {
@@ -75,11 +72,7 @@
       "id": "dallin-rogers",
       "name": "Dallin Rogers",
       "role": "Player",
-      "characters": [
-        "Erys Leandorian",
-        "Aramis",
-        "Ezra"
-      ],
+      "characters": ["Erys Leandorian", "Aramis", "Ezra"],
       "isCurrent": true,
       "avatar": "",
       "socialLinks": {
@@ -93,10 +86,7 @@
       "id": "colby-poulsen",
       "name": "Colby Poulsen",
       "role": "Player",
-      "characters": [
-        "Seredan Fallowshield",
-        "Alomah Stargazer"
-      ],
+      "characters": ["Seredan Fallowshield", "Alomah Stargazer"],
       "isCurrent": false,
       "avatar": "",
       "socialLinks": {
@@ -110,9 +100,7 @@
       "id": "ian",
       "name": "Ian",
       "role": "Player",
-      "characters": [
-        "Titheus Cillbrost"
-      ],
+      "characters": ["Titheus Cillbrost"],
       "isCurrent": true,
       "avatar": "",
       "socialLinks": {
@@ -126,11 +114,23 @@
       "id": "jake",
       "name": "Jake",
       "role": "Player",
-      "characters": [
-        "Porphan Valaritas"
-      ],
+      "characters": ["Porphan Valaritas"],
       "isCurrent": true,
       "avatar": "",
+      "socialLinks": {
+        "youtube": "",
+        "twitter": "",
+        "instagram": "",
+        "twitch": ""
+      }
+    },
+    {
+      "id": "brigette-streeper",
+      "name": "Brigette S",
+      "role": "Player",
+      "characters": ["Melly"],
+      "isCurrent": false,
+      "avatar": "image_1760981786111.png",
       "socialLinks": {
         "youtube": "",
         "twitter": "",

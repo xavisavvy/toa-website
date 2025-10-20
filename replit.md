@@ -101,6 +101,7 @@ Cast members are managed via `client/src/data/cast.json`:
 
 ### Past Cast
 - Colby Poulsen (Player) - Seredan Fallowshield, Alomah Stargazer (early season)
+- Brigette S (Player) - Melly
 
 ## Next Steps
 1. ✅ Configure `VITE_YOUTUBE_PLAYLIST_ID` environment variable with actual playlist
@@ -108,11 +109,12 @@ Cast members are managed via `client/src/data/cast.json`:
 3. ✅ Fix YouTube OAuth2 authentication for playlist fetching
 4. ✅ Connect Etsy API for real product listings
 5. ✅ Add Preston Farr's headshot to cast.json
-6. Add remaining cast member photos to `cast.json`
-7. Add cast member social media links to `cast.json`
-8. Add podcast RSS feed URL to environment variables
-9. Implement WorldAnvil API integration for lore content
-10. Add analytics tracking
+6. ✅ Add Brigette S's photo to cast.json
+7. Add remaining cast member photos to `cast.json`
+8. Add cast member social media links to `cast.json`
+9. Add podcast RSS feed URL to environment variables
+10. Implement WorldAnvil API integration for lore content
+11. Add analytics tracking
 
 ## Etsy Integration Note
 The Etsy API integration is fully implemented but requires valid credentials to display products. The site gracefully handles the API error and shows a friendly message with a working link to the Etsy store.
