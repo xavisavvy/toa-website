@@ -11,13 +11,14 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   const YOUTUBE_PLAYLIST_ID = import.meta.env.VITE_YOUTUBE_PLAYLIST_ID;
+  const PODCAST_FEED_URL = import.meta.env.VITE_PODCAST_FEED_URL;
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <Hero />
       <LatestEpisodes playlistId={YOUTUBE_PLAYLIST_ID} />
-      <PodcastSection />
+      <PodcastSection feedUrl={PODCAST_FEED_URL} />
       <WorldSection />
       <PromotionsSection />
       <ShopSection />
