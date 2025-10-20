@@ -19,6 +19,10 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Connected all social media buttons across site to real URLs
 - Restructured World Section to showcase 3 campaign worlds: Aneria, Pterrordale, and Taebrin
 - Added campaign details for each world with "Coming Soon" badge for Taebrin
+- Implemented background image support for campaign world cards with subtle 10% opacity
+- Added feat-pterrordale.png as background image for Pterrordale card
+- Moved "Explore on WorldAnvil" button into Aneria campaign card
+- Made Tales of Aneria logo clickable to navigate back to homepage
 - **Implemented Characters section with detailed character pages:**
   - Created characters.json data structure supporting multiple images per character
   - Built CharactersSection component for homepage with 4-column character grid
@@ -53,6 +57,10 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Same card layout as homepage section
   - Character status filtering (active/inactive)
 - **World Section**: Showcases 3 campaign worlds (Aneria, Pterrordale, Taebrin) with campaign details and WorldAnvil links
+  - Campaign world cards support optional background images at 10% opacity
+  - Pterrordale card features feat-pterrordale.png background
+  - WorldAnvil button integrated into Aneria card specifically
+  - Clickable cards open campaign links in new tabs
 - **Promotions**: Highlight special events and limited-time offers
 - **Shop**: Etsy storefront integration showing featured products
 - **About**: Cast member profiles with photos and series statistics

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
+import pterrordaleBg from "@assets/feat-pterrordale.png";
 
 interface Campaign {
   name: string;
@@ -16,6 +17,7 @@ interface CampaignWorld {
   campaigns: Campaign[];
   comingSoon?: boolean;
   link: string;
+  backgroundImage?: string;
 }
 
 export default function WorldSection() {
@@ -53,6 +55,7 @@ export default function WorldSection() {
         },
       ],
       link: "https://www.youtube.com/watch?v=GzMnW52hmP4",
+      backgroundImage: pterrordaleBg,
     },
     {
       id: "taebrin",
@@ -91,13 +94,22 @@ export default function WorldSection() {
           {campaignWorlds.map((world) => (
             <Card
               key={world.id}
-              className="hover-elevate cursor-pointer transition-all relative"
+              className="hover-elevate cursor-pointer transition-all relative overflow-hidden"
               data-testid={`card-world-${world.id}`}
               onClick={() =>
                 !world.comingSoon &&
                 window.open(world.link, "_blank", "noopener,noreferrer")
               }
             >
+              {world.backgroundImage && (
+                <div className="absolute inset-0">
+                  <img
+                    src={world.backgroundImage}
+                    alt={`${world.name} background`}
+                    className="w-full h-full object-cover opacity-10"
+                  />
+                </div>
+              )}
               {world.comingSoon && (
                 <div className="absolute top-4 right-4 z-10">
                   <Badge
@@ -108,7 +120,7 @@ export default function WorldSection() {
                   </Badge>
                 </div>
               )}
-              <CardHeader>
+              <CardHeader className="relative z-10">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
                   {world.icon}
                 </div>
@@ -119,7 +131,7 @@ export default function WorldSection() {
                   {world.name}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 relative z-10">
                 <p
                   className="text-muted-foreground text-sm"
                   data-testid={`text-world-${world.id}-description`}
