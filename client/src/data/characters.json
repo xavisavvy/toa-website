@@ -1,0 +1,104 @@
+{
+  "characters": [
+    {
+      "id": "wayne-archivist",
+      "name": "Wayne the Archivist of Lies",
+      "player": "Preston Farr",
+      "playerId": "preston-farr",
+      "campaign": "The Wayward Watch",
+      "race": "Human",
+      "class": "Wizard",
+      "level": 12,
+      "alignment": "Chaotic Neutral",
+      "featuredImage": "",
+      "images": [
+        {
+          "id": "1",
+          "url": "",
+          "caption": "Character Portrait",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A cunning wizard with a penchant for deception and a mysterious past. Wayne seeks knowledge at any cost, often bending the truth to serve his purposes.",
+      "personality": "Witty, sarcastic, and morally ambiguous. Wayne is known for his quick thinking and silver tongue.",
+      "dndbeyond": "",
+      "status": "active"
+    },
+    {
+      "id": "fred-blodbane",
+      "name": "Winnifred 'Fred' Blodbane",
+      "player": "Torrey Woolsey",
+      "playerId": "torrey-woolsey",
+      "campaign": "The Wayward Watch",
+      "race": "Half-Orc",
+      "class": "Barbarian",
+      "level": 12,
+      "alignment": "Chaotic Good",
+      "featuredImage": "",
+      "images": [
+        {
+          "id": "1",
+          "url": "",
+          "caption": "Character Portrait",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A fierce warrior with a heart of gold. Fred left her tribe to forge her own path and prove her worth beyond her lineage.",
+      "personality": "Brave, loyal, and fiercely protective of her friends. Quick to anger but quicker to forgive.",
+      "dndbeyond": "",
+      "status": "active"
+    },
+    {
+      "id": "carine-sol",
+      "name": "Carine Sol",
+      "player": "Scott Avis",
+      "playerId": "scott-avis",
+      "campaign": "The Wayward Watch",
+      "race": "Tiefling",
+      "class": "Paladin",
+      "level": 12,
+      "alignment": "Lawful Good",
+      "featuredImage": "",
+      "images": [
+        {
+          "id": "1",
+          "url": "",
+          "caption": "Character Portrait",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A noble paladin sworn to protect the innocent and uphold justice. Despite her infernal heritage, Carine fights tirelessly against evil.",
+      "personality": "Honorable, compassionate, and driven by a strong moral compass.",
+      "dndbeyond": "",
+      "status": "active"
+    },
+    {
+      "id": "erys-leandorian",
+      "name": "Erys Leandorian",
+      "player": "Dallin Rogers",
+      "playerId": "dallin-rogers",
+      "campaign": "The Wayward Watch",
+      "race": "Elf",
+      "class": "Ranger",
+      "level": 12,
+      "alignment": "Neutral Good",
+      "featuredImage": "",
+      "images": [
+        {
+          "id": "1",
+          "url": "",
+          "caption": "Character Portrait",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A skilled tracker and archer from the ancient forests of Aneria. Erys left his home to uncover the truth about a growing darkness.",
+      "personality": "Calm, observant, and deeply connected to nature.",
+      "dndbeyond": "",
+      "status": "active"
+    }
+  ]
+}
