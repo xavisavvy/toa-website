@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import socialLinksData from "@/data/social-links.json";
 
@@ -132,17 +133,13 @@ export default function Footer() {
             </p>
           </div>
           <div className="flex gap-6">
-            <a
-              href="#"
+            <Link
+              href="/legal/privacy"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               data-testid="link-privacy"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Privacy Policy clicked');
-              }}
             >
               Privacy Policy
-            </a>
+            </Link>
             <a
               href="#"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"

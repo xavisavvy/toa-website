@@ -23,6 +23,13 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Added feat-pterrordale.png as background image for Pterrordale card
 - Moved "Explore on WorldAnvil" button into Aneria campaign card
 - Made Tales of Aneria logo clickable to navigate back to homepage
+- **Created Privacy Policy page at /legal/privacy:**
+  - Comprehensive privacy policy following 2025 best practices
+  - Covers GDPR and CCPA compliance
+  - Details third-party services (YouTube, Etsy, Patreon, Podcast, Social Media)
+  - Includes user rights, data security, and contact information
+  - Full-page layout with navigation header and footer
+  - Linked from footer on all pages
 - **Implemented Characters section with detailed character pages:**
   - Created characters.json data structure supporting multiple images per character
   - Built CharactersSection component for homepage with 4-column character grid
