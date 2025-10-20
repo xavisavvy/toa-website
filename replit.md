@@ -52,6 +52,10 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Manual controls via indicator dots
   - Smooth 1-second fade transitions
 - **Latest Episodes**: YouTube playlist integration displaying video thumbnails, duration, and view counts
+  - **Server-side caching**: YouTube data is cached locally in JSON format
+  - Cache duration: 24 hours
+  - Automatic refresh once per day
+  - Stale cache fallback if API quota is exceeded
 - **Podcast Section**: RSS feed integration with featured/recent episodes and audio player
 - **Characters Section**: Hero showcase with character cards
   - Homepage section displays active characters in 4-column grid
@@ -228,6 +232,31 @@ Characters are managed via `client/src/data/characters.json`:
 10. Add cast member social media links to `cast.json`
 11. Add podcast RSS feed URL to environment variables
 12. Add analytics tracking
+
+## YouTube Caching System
+The YouTube Data API integration now includes server-side caching to prevent quota exhaustion:
+
+### How It Works
+- **Cache Location**: `server/cache/youtube-playlist.json`
+- **Cache Duration**: 24 hours
+- **Automatic Refresh**: Data is fetched from YouTube API only once per day
+- **Stale Cache Fallback**: If API quota is exceeded, serves stale cached data
+- **Cache Invalidation**: Cache expires after 24 hours and fetches fresh data
+
+### Benefits
+- Prevents YouTube API quota exhaustion (10,000 units/day limit)
+- Faster page load times (serves from local cache)
+- Graceful degradation when API fails
+- Reduces API costs
+
+### Cache File Structure
+```json
+{
+  "playlistId": "PLrmC8WonT9uaUoORXiAwGUo21Mp_N2u8v",
+  "videos": [...],
+  "timestamp": 1234567890123
+}
+```
 
 ## Etsy Integration Note
 The Etsy API integration is fully implemented but requires valid credentials to display products. The site gracefully handles the API error and shows a friendly message with a working link to the Etsy store.
