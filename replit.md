@@ -8,6 +8,8 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Integrated YouTube Data API v3 for fetching real playlist videos
 - Implemented RSS podcast feed parser with audio player support
 - Implemented responsive navigation, hero section, and content sections
+- Added official Tales of Aneria logo (logo-TOA.svg) to navigation header
+- Added cast member photos: Preston Farr, Brigette S, and Dallin Rogers
 - Added mock data placeholders for WorldAnvil integration and Etsy products
 - Set up environment variable configuration for YouTube playlist ID and podcast RSS feed
 - Created cast.json data file for easy cast member management
