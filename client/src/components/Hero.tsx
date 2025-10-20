@@ -1,9 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Play, BookOpen } from "lucide-react";
-import heroImage from "@assets/generated_images/Fantasy_TTRPG_hero_background_186c3d57.png";
+import { useState, useEffect } from "react";
+import butterflyImage from "@assets/hero-butterfly.png";
+import cinderhearthImage from "@assets/hero-cinderhearth.png";
+import desertImage from "@assets/hero-desert.png";
+import spaceImage from "@assets/hero-space.png";
 import socialLinksData from "@/data/social-links.json";
 
+const heroImages = [
+  butterflyImage,
+  cinderhearthImage,
+  desertImage,
+  spaceImage,
+];
+
 export default function Hero() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    // Ensure we start at index 0
+    setCurrentImageIndex(0);
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const scrollToSection = (id: string) => {
     const element = document.querySelector(id);
     element?.scrollIntoView({ behavior: 'smooth' });
@@ -11,10 +35,15 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      />
+      {heroImages.map((image, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{ backgroundImage: `url(${image})` }}
+        />
+      ))}
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
       
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center py-20">
@@ -55,6 +84,22 @@ export default function Hero() {
         <div className="w-6 h-10 border-2 border-foreground/30 rounded-full p-1">
           <div className="w-1.5 h-3 bg-foreground/30 rounded-full mx-auto" />
         </div>
+      </div>
+
+      <div className="absolute bottom-8 right-8 flex gap-2 z-20">
+        {heroImages.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentImageIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              index === currentImageIndex 
+                ? 'bg-primary w-8' 
+                : 'bg-foreground/30 hover:bg-foreground/50'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+            data-testid={`button-carousel-${index}`}
+          />
+        ))}
       </div>
     </section>
   );

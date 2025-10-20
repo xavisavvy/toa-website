@@ -22,15 +22,18 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 ## Project Architecture
 
 ### Frontend (React + TypeScript)
-- **Navigation**: Fixed header with responsive mobile menu
-- **Hero**: Full-screen hero section with fantasy background image
+- **Navigation**: Fixed header with Tales of Aneria logo and responsive mobile menu
+- **Hero**: Full-screen hero section with auto-rotating image carousel (4 fantasy images: butterfly, cinderhearth sword, desert, space)
+  - Automatic rotation every 6 seconds
+  - Manual controls via indicator dots
+  - Smooth 1-second fade transitions
 - **Latest Episodes**: YouTube playlist integration displaying video thumbnails, duration, and view counts
-- **Podcast Section**: Placeholder for RSS feed integration with featured/recent episodes
+- **Podcast Section**: RSS feed integration with featured/recent episodes and audio player
 - **World Section**: Links to WorldAnvil content (characters, locations, factions, lore)
 - **Promotions**: Highlight special events and limited-time offers
 - **Shop**: Etsy storefront integration showing featured products
-- **About**: Cast member profiles and series statistics
-- **Community**: Newsletter signup, social media links, testimonials
+- **About**: Cast member profiles with photos and series statistics
+- **Community**: Patreon call-to-action, social media links
 - **Footer**: Multi-column layout with quick links and legal information
 
 ### Backend (Express + Node.js)
