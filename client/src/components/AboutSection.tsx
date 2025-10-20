@@ -7,12 +7,12 @@ import castData from "@/data/cast.json";
 import prestonAvatar from "@assets/cast-preston.jpg";
 import brigetteAvatar from "@assets/cast-brigette.png";
 import dallinAvatar from "@assets/cast-dallin.png";
-import coryAvatar from "@assets/cast-cory.jpg";
-import torreyAvatar from "@assets/cast-torrey.jpg";
-import scottAvatar from "@assets/cast-scott.jpg";
-import colbyAvatar from "@assets/cast-colby.jpg";
-import ianAvatar from "@assets/cast-ian.jpg";
-import jakeAvatar from "@assets/cast-jake.jpg";
+// import coryAvatar from "@assets/cast-cory.jpg";
+// import torreyAvatar from "@assets/cast-torrey.jpg";
+// import scottAvatar from "@assets/cast-scott.jpg";
+// import colbyAvatar from "@assets/cast-colby.jpg";
+// import ianAvatar from "@assets/cast-ian.jpg";
+// import jakeAvatar from "@assets/cast-jake.jpg";
 
 interface SocialLinks {
   youtube?: string;
@@ -40,12 +40,12 @@ export default function AboutSection() {
     "cast-preston.jpg": prestonAvatar,
     "cast-brigette.png": brigetteAvatar,
     "cast-dallin.png": dallinAvatar,
-    "cast-cory.jpg": coryAvatar,
-    "cast-torrey.jpg": torreyAvatar,
-    "cast-scott.jpg": scottAvatar,
-    "cast-colby.jpg": colbyAvatar,
-    "cast-ian.jpg": ianAvatar,
-    "cast-jake.jpg": jakeAvatar,
+    // "cast-cory.jpg": coryAvatar,
+    // "cast-torrey.jpg": torreyAvatar,
+    // "cast-scott.jpg": scottAvatar,
+    // "cast-colby.jpg": colbyAvatar,
+    // "cast-ian.jpg": ianAvatar,
+    // "cast-jake.jpg": jakeAvatar,
   };
 
   const stats = [
