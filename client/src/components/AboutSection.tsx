@@ -6,6 +6,7 @@ import { Youtube, Twitter, Instagram, Twitch } from "lucide-react";
 import castData from "@/data/cast.json";
 import prestonAvatar from "@assets/0057 edit small_1760981097324.jpg";
 import brigetteAvatar from "@assets/image_1760981786111.png";
+import dallinAvatar from "@assets/image_1760982315157.png";
 
 interface SocialLinks {
   youtube?: string;
@@ -32,6 +33,7 @@ export default function AboutSection() {
   const avatarImages: Record<string, string> = {
     "0057 edit small_1760981097324.jpg": prestonAvatar,
     "image_1760981786111.png": brigetteAvatar,
+    "image_1760982315157.png": dallinAvatar,
   };
 
   const stats = [
