@@ -19,6 +19,12 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Connected all social media buttons across site to real URLs
 - Restructured World Section to showcase 3 campaign worlds: Aneria, Pterrordale, and Taebrin
 - Added campaign details for each world with "Coming Soon" badge for Taebrin
+- **Implemented Characters section with detailed character pages:**
+  - Created characters.json data structure supporting multiple images per character
+  - Built CharactersSection component for homepage with 4-column character grid
+  - Added dedicated character detail pages (/characters/:id) with backstory, personality, image gallery, and D&D Beyond integration
+  - Created all characters index page (/characters) with active/past character distinction
+  - Integrated character navigation with smooth scrolling and routing
 
 ## Project Architecture
 
@@ -30,6 +36,22 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Smooth 1-second fade transitions
 - **Latest Episodes**: YouTube playlist integration displaying video thumbnails, duration, and view counts
 - **Podcast Section**: RSS feed integration with featured/recent episodes and audio player
+- **Characters Section**: Hero showcase with character cards
+  - Homepage section displays active characters in 4-column grid
+  - Character cards show featured image, name, class/race, player, and backstory snippet
+  - Links to individual character detail pages
+  - "View All Characters" button navigates to full character roster
+- **Character Detail Pages**: Individual character profiles at /characters/:id
+  - Hero section with character name and key stats (level, race, class, alignment)
+  - Backstory and personality sections
+  - Image gallery supporting multiple images per character
+  - Character info sidebar with player, campaign, and stats
+  - D&D Beyond integration (when link provided)
+  - Back navigation to character index
+- **All Characters Page**: Complete character roster at /characters
+  - Separate sections for active and past characters
+  - Same card layout as homepage section
+  - Character status filtering (active/inactive)
 - **World Section**: Showcases 3 campaign worlds (Aneria, Pterrordale, Taebrin) with campaign details and WorldAnvil links
 - **Promotions**: Highlight special events and limited-time offers
 - **Shop**: Etsy storefront integration showing featured products
@@ -108,6 +130,54 @@ Cast members are managed via `client/src/data/cast.json`:
 ### Past Cast
 - Colby Poulsen (Player) - Seredan Fallowshield, Alomah Stargazer (early season)
 - Brigette S (Player) - Melly
+
+## Character Management
+
+Characters are managed via `client/src/data/characters.json`:
+
+### JSON Structure
+```json
+{
+  "id": "unique-slug",
+  "name": "Character Full Name",
+  "player": "Player Name",
+  "playerId": "player-id-from-cast.json",
+  "campaign": "Campaign Name",
+  "race": "Character Race",
+  "class": "Character Class",
+  "level": 12,
+  "alignment": "Alignment",
+  "featuredImage": "url-to-featured-image",
+  "images": [
+    {
+      "id": "unique-id",
+      "url": "image-url",
+      "caption": "Image Caption",
+      "type": "portrait|reference|fanart",
+      "isFeatured": true/false
+    }
+  ],
+  "backstory": "Character backstory text",
+  "personality": "Character personality description",
+  "dndbeyond": "https://www.dndbeyond.com/characters/...",
+  "status": "active|inactive"
+}
+```
+
+### Character Image Types
+- **portrait**: Main character artwork
+- **reference**: Reference images for character design
+- **fanart**: Fan-created artwork
+
+### Featured Image
+- One image per character should have `isFeatured: true`
+- The featured image URL should also be set in `featuredImage` field
+- Featured image appears on character cards and detail page hero
+
+### Routes
+- Homepage section: Displays active characters only
+- `/characters`: All characters (active and inactive)
+- `/characters/:id`: Individual character detail page
 
 ## Next Steps
 1. ✅ Configure `VITE_YOUTUBE_PLAYLIST_ID` environment variable with actual playlist
