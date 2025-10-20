@@ -52,7 +52,7 @@ export default function CharacterDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-20 pt-24">
           <div className="text-center">
             <h1 className="text-4xl font-serif font-bold mb-4">
               Character Not Found
@@ -77,7 +77,7 @@ export default function CharacterDetail() {
     <div className="min-h-screen bg-background">
       <Navigation />
       {/* Hero Section */}
-      <div className="relative h-96 bg-gradient-to-b from-primary/20 to-background overflow-hidden">
+      <div className="relative h-96 bg-gradient-to-b from-primary/20 to-background overflow-hidden pt-24">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
         {character.featuredImage && (
           <img
@@ -121,7 +121,7 @@ export default function CharacterDetail() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 -mt-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 -mt-8 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
