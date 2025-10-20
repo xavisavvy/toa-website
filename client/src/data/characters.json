@@ -2,52 +2,28 @@
   "characters": [
     {
       "id": "wayne-archivist",
-      "name": "Wayne the Archivist of Lies",
+      "name": "Wayne \"Archivist of Lies\"",
       "player": "Preston Farr",
       "playerId": "preston-farr",
       "campaign": "The Wayward Watch",
-      "race": "Human",
+      "race": "Changeling",
       "class": "Wizard",
-      "level": 12,
-      "alignment": "Chaotic Neutral",
-      "featuredImage": "",
+      "level": 5,
+      "alignment": "Lawful Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/51217/265/1581111423-151530168.jpeg",
       "images": [
         {
           "id": "1",
-          "url": "",
-          "caption": "Character Portrait",
+          "url": "https://www.dndbeyond.com/avatars/51217/265/1581111423-151530168.jpeg",
+          "caption": "Wayne - The Archivist of Lies",
           "type": "portrait",
           "isFeatured": true
         }
       ],
-      "backstory": "A cunning wizard with a penchant for deception and a mysterious past. Wayne seeks knowledge at any cost, often bending the truth to serve his purposes.",
-      "personality": "Witty, sarcastic, and morally ambiguous. Wayne is known for his quick thinking and silver tongue.",
-      "dndbeyond": "",
-      "status": "active"
-    },
-    {
-      "id": "fred-blodbane",
-      "name": "Winnifred 'Fred' Blodbane",
-      "player": "Torrey Woolsey",
-      "playerId": "torrey-woolsey",
-      "campaign": "The Wayward Watch",
-      "race": "Half-Orc",
-      "class": "Barbarian",
-      "level": 12,
-      "alignment": "Chaotic Good",
-      "featuredImage": "",
-      "images": [
-        {
-          "id": "1",
-          "url": "",
-          "caption": "Character Portrait",
-          "type": "portrait",
-          "isFeatured": true
-        }
-      ],
-      "backstory": "A fierce warrior with a heart of gold. Fred left her tribe to forge her own path and prove her worth beyond her lineage.",
-      "personality": "Brave, loyal, and fiercely protective of her friends. Quick to anger but quicker to forgive.",
-      "dndbeyond": "",
+      "backstory": "Wayne is a scholar-illusionist who records legends but can't stop fabricating them. Some lies come true, some lies get him in trouble. Even though he is a changeling, he typically sticks to Wayne (he/him even if in female form). He is both an earnest scholar and a compulsive storyteller, collecting 'true versions' of events but telling everyone different ones.",
+      "personality": "Witty, sarcastic, and morally ambiguous. Wayne is known for his quick thinking and silver tongue. A cunning wizard with a penchant for deception and a mysterious past, he seeks knowledge at any cost, often bending the truth to serve his purposes.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/151530168",
+      "dndbeyondId": "151530168",
       "status": "active"
     },
     {
@@ -56,23 +32,24 @@
       "player": "Scott Avis",
       "playerId": "scott-avis",
       "campaign": "The Wayward Watch",
-      "race": "Tiefling",
-      "class": "Paladin",
-      "level": 12,
+      "race": "Astral Elf",
+      "class": "Sorcerer",
+      "level": 5,
       "alignment": "Lawful Good",
-      "featuredImage": "",
+      "featuredImage": "https://www.dndbeyond.com/avatars/51458/75/1581111423-151527820.jpeg",
       "images": [
         {
           "id": "1",
-          "url": "",
-          "caption": "Character Portrait",
+          "url": "https://www.dndbeyond.com/avatars/51458/75/1581111423-151527820.jpeg",
+          "caption": "Carine Sol - Astral Elf Sorcerer",
           "type": "portrait",
           "isFeatured": true
         }
       ],
-      "backstory": "A noble paladin sworn to protect the innocent and uphold justice. Despite her infernal heritage, Carine fights tirelessly against evil.",
-      "personality": "Honorable, compassionate, and driven by a strong moral compass.",
-      "dndbeyond": "",
+      "backstory": "A 22-year-old Astral Elf with fiery orange hair and eyes black like a sunspot with orange around the iris. His skin is lightly tanned with crisscrossing lines that tell the story of his journey. As a Wayfarer, he grew up on the streets surrounded by ill-fated castoffs, sleeping where he could and doing odd jobs for food. Though hunger sometimes drove him to theft, he never lost his pride or abandoned hope.",
+      "personality": "Honorable and driven by a strong moral compass. Despite his difficult past, Carine fights tirelessly to protect others and uphold justice. His astral heritage grants him unique magical abilities.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/151527820",
+      "dndbeyondId": "151527820",
       "status": "active"
     },
     {
@@ -83,21 +60,100 @@
       "campaign": "The Wayward Watch",
       "race": "Elf",
       "class": "Ranger",
-      "level": 12,
+      "level": 5,
       "alignment": "Neutral Good",
-      "featuredImage": "",
+      "featuredImage": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg",
       "images": [
         {
           "id": "1",
-          "url": "",
-          "caption": "Character Portrait",
+          "url": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg",
+          "caption": "Erys Leandorian - Elven Ranger",
           "type": "portrait",
           "isFeatured": true
         }
       ],
-      "backstory": "A skilled tracker and archer from the ancient forests of Aneria. Erys left his home to uncover the truth about a growing darkness.",
-      "personality": "Calm, observant, and deeply connected to nature.",
-      "dndbeyond": "",
+      "backstory": "A skilled tracker and archer from the ancient forests. As a Scribe, Erys spent formative years in a scriptorium learning to write with a clear hand and produce finely written texts. He has a careful attention to detail and a keen appreciation for knowledge. Erys left his home to uncover the truth about a growing darkness threatening the realm.",
+      "personality": "Calm, observant, and deeply connected to nature. Erys combines the precision of a scholar with the instincts of a wilderness survivalist.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/153687176",
+      "dndbeyondId": "153687176",
+      "status": "active"
+    },
+    {
+      "id": "freya-fenrir",
+      "name": "Freya Fenrir",
+      "player": "Torrey Woolsey",
+      "playerId": "torrey-woolsey",
+      "campaign": "The Wayward Watch",
+      "race": "Human",
+      "class": "Druid",
+      "level": 5,
+      "alignment": "Lawful Good",
+      "featuredImage": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg",
+          "caption": "Freya Fenrir - Human Druid",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "Freya grew up close to the land, spending years tending animals and cultivating the earth. This upbringing rewarded her with patience, good health, and a deep appreciation for nature's bounty alongside a healthy respect for nature's wrath. She also trained as a soldier, learning the ways of battle to protect the natural world she holds dear.",
+      "personality": "Brave, loyal, and fiercely protective. Freya combines the nurturing spirit of a farmer with the discipline of a warrior. She is quick to defend those who cannot defend themselves.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/147130895",
+      "dndbeyondId": "147130895",
+      "status": "active"
+    },
+    {
+      "id": "porphan-valaritas",
+      "name": "Porphan Valaritas",
+      "player": "Jake",
+      "playerId": "jake",
+      "campaign": "The Wayward Watch",
+      "race": "Satyr",
+      "class": "Bard",
+      "level": 5,
+      "alignment": "Neutral Good",
+      "featuredImage": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg",
+          "caption": "Porphan Valaritas - Satyr Bard",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A 25-year-old Satyr with brown hair, blue eyes, and fair skin standing 5'8\" tall. Porphan spent much of his youth following roving fairs and carnivals, performing odd jobs for musicians and acrobats in exchange for lessons. He learned to walk tightropes, play instruments in distinct styles, and recite poetry with impeccable diction. To this day, he thrives on applause and longs for the stage. His faith in art and creativity drives everything he does.",
+      "personality": "Charismatic, playful, and devoted to his craft. As an embodiment of revelry, Porphan brings joy and music wherever he goes. He values performance and persuasion, always seeking to entertain and inspire.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/151498356",
+      "dndbeyondId": "151498356",
+      "status": "active"
+    },
+    {
+      "id": "titheus-cillbrost",
+      "name": "Titheus Cillbrost",
+      "player": "Ian",
+      "playerId": "ian",
+      "campaign": "The Wayward Watch",
+      "race": "Gnome",
+      "class": "Rogue",
+      "level": 5,
+      "alignment": "Chaotic Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg",
+          "caption": "Titheus Cillbrost - Gnome Rogue",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A 28-year-old Gnome standing just 3'9\" tall with dark red hair, green eyes, and brown skin. Titheus eked out a living in dark alleyways, cutting purses and burgling shops. Whether part of a small gang of like-minded wrongdoers or a lone wolf fending for himself against the local thieves' guild, he learned to survive through cunning and stealth.",
+      "personality": "Clever, resourceful, and morally flexible. Titheus is quick on his feet and even quicker with his hands. His criminal background has taught him to think several steps ahead and always have an escape route.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/151508871",
+      "dndbeyondId": "151508871",
       "status": "active"
     }
   ]

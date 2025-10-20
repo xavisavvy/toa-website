@@ -250,17 +250,17 @@ export default function CharacterDetail() {
                   <Button
                     className="w-full"
                     variant="outline"
-                    onClick={() =>
-                      window.open(
-                        character.dndbeyond,
-                        "_blank",
-                        "noopener,noreferrer"
-                      )
-                    }
+                    asChild
                     data-testid="button-dndbeyond"
                   >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View on D&D Beyond
+                    <a
+                      href={character.dndbeyond}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View on D&D Beyond
+                    </a>
                   </Button>
                 </CardContent>
               </Card>

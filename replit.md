@@ -36,6 +36,12 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Added dedicated character detail pages (/characters/:id) with backstory, personality, image gallery, and D&D Beyond integration
   - Created all characters index page (/characters) with active/past character distinction
   - Integrated character navigation with smooth scrolling and routing
+- **Integrated D&D Beyond character data:**
+  - Fetched real character data from D&D Beyond API for all 6 active characters
+  - Updated characters.json with authentic character information (race, class, level, alignment, avatars)
+  - Added D&D Beyond character IDs and links for: Wayne (151530168), Carine Sol (151527820), Erys Leandorian (153687176), Freya Fenrir (147130895), Porphan Valaritas (151498356), Titheus Cillbrost (151508871)
+  - Integrated character avatars directly from D&D Beyond CDN
+  - Added detailed backstories and personality descriptions from character sheets
 
 ## Project Architecture
 
@@ -136,7 +142,7 @@ Cast members are managed via `client/src/data/cast.json`:
 ### Current Cast
 - Cory Avis (Game Master) - The Storyteller
 - Preston Farr (Player) - Wayne the Archivist of Lies, Victor Udonta, Locke Lirian, and more
-- Torrey Woolsey (Player) - Winnifred "Fred" Blodbane, Maggie Bramblecheeks
+- Torrey Woolsey (Player) - Freya Fenrir, Winnifred "Fred" Blodbane, Maggie Bramblecheeks
 - Scott Avis (Player) - Carine Sol, Bolt, Cilin Meekmarrow
 - Dallin Rogers (Player) - Erys Leandorian, Aramis, Ezra
 - Ian (Player) - Titheus Cillbrost
@@ -175,9 +181,24 @@ Characters are managed via `client/src/data/characters.json`:
   "backstory": "Character backstory text",
   "personality": "Character personality description",
   "dndbeyond": "https://www.dndbeyond.com/characters/...",
+  "dndbeyondId": "character-id-number",
   "status": "active|inactive"
 }
 ```
+
+### D&D Beyond Integration
+- All active characters now have D&D Beyond character IDs stored in `dndbeyondId` field
+- Character data (race, class, level, alignment, avatars) fetched from D&D Beyond API
+- Character avatars are sourced directly from D&D Beyond CDN
+- Backstories and personality descriptions include details from character sheets
+
+### Active Characters with D&D Beyond Integration
+- **Wayne "Archivist of Lies"** (151530168) - Changeling Wizard
+- **Carine Sol** (151527820) - Astral Elf Sorcerer  
+- **Erys Leandorian** (153687176) - Elf Ranger
+- **Freya Fenrir** (147130895) - Human Druid
+- **Porphan Valaritas** (151498356) - Satyr Bard
+- **Titheus Cillbrost** (151508871) - Gnome Rogue
 
 ### Character Image Types
 - **portrait**: Main character artwork
