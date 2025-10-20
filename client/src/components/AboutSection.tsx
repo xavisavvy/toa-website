@@ -12,7 +12,7 @@ import torreyAvatar from "@assets/cast-torrey.png";
 import scottAvatar from "@assets/cast-scott.jpg";
 import colbyAvatar from "@assets/cast-colby.png";
 // import ianAvatar from "@assets/cast-ian.jpg";
-// import jakeAvatar from "@assets/cast-jake.jpg";
+import jakeAvatar from "@assets/cast-jake.jpg";
 
 interface SocialLinks {
   youtube?: string;
@@ -46,7 +46,7 @@ export default function AboutSection() {
     "cast-scott.jpg": scottAvatar,
     "cast-colby.png": colbyAvatar,
     // "cast-ian.jpg": ianAvatar,
-    // "cast-jake.jpg": jakeAvatar,
+    "cast-jake.jpg": jakeAvatar,
   };
 
   const stats = [
