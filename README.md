@@ -13,7 +13,39 @@ A professional landing page for your TTRPG Live Play series, featuring YouTube i
 
 ## Quick Start
 
-### 1. Configure Environment Variables
+### 1. Environment Setup
+
+This project uses environment variables for configuration. To get started:
+
+1. **Copy the environment template:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit the `.env` file** with your actual values:
+   ```bash
+   # Environment Configuration
+   NODE_ENV=development
+   
+   # Database Configuration
+   DATABASE_URL=your_database_url_here
+   
+   # API Keys
+   YOUTUBE_API_KEY=your_youtube_api_key_here
+   ETSY_API_KEY=your_etsy_api_key_here
+   
+   # Session Secret
+   SESSION_SECRET=your_session_secret_here
+   
+   # Server Configuration
+   PORT=5000
+   ```
+
+3. **Cross-Platform Support:**
+   - The npm scripts now use `cross-env` for Windows, macOS, and Linux compatibility
+   - Environment variables are loaded automatically using `dotenv`
+
+### 2. Configure Environment Variables
 
 The YouTube playlist ID is already configured! Your latest episodes are displaying on the site.
 
