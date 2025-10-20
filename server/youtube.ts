@@ -57,54 +57,77 @@ export interface VideoItem {
   description?: string;
 }
 
-export async function getPlaylistVideos(playlistId: string, maxResults: number = 10): Promise<VideoItem[]> {
+export async function getPlaylistVideos(playlistId: string, maxResults: number = 50): Promise<VideoItem[]> {
   try {
     const youtube = await getUncachableYouTubeClient();
     
-    const response = await youtube.playlistItems.list({
-      part: ['snippet', 'contentDetails'],
-      playlistId: playlistId,
-      maxResults: maxResults,
-    });
+    let allVideoIds: string[] = [];
+    let nextPageToken: string | undefined = undefined;
+    
+    // Fetch all pages of playlist items
+    do {
+      const response = await youtube.playlistItems.list({
+        part: ['snippet', 'contentDetails'],
+        playlistId: playlistId,
+        maxResults: 50, // YouTube API max per page
+        pageToken: nextPageToken,
+      });
 
-    if (!response.data.items || response.data.items.length === 0) {
+      if (!response.data.items || response.data.items.length === 0) {
+        break;
+      }
+
+      const videoIds = response.data.items
+        .map((item: any) => item.contentDetails?.videoId)
+        .filter(Boolean) as string[];
+      
+      allVideoIds.push(...videoIds);
+      nextPageToken = response.data.nextPageToken as string | undefined;
+      
+    } while (nextPageToken);
+
+    if (allVideoIds.length === 0) {
       return [];
     }
 
-    const videoIds = response.data.items
-      .map(item => item.contentDetails?.videoId)
-      .filter(Boolean) as string[];
-
-    const videosResponse = await youtube.videos.list({
-      part: ['snippet', 'contentDetails', 'statistics'],
-      id: videoIds,
-    });
-
-    const videos: VideoItem[] = (videosResponse.data.items || []).map((video, index) => {
-      const snippet = video.snippet;
-      const statistics = video.statistics;
-      const contentDetails = video.contentDetails;
+    // Fetch video details in batches of 50 (API limit)
+    const allVideos: VideoItem[] = [];
+    for (let i = 0; i < allVideoIds.length; i += 50) {
+      const batchIds = allVideoIds.slice(i, i + 50);
       
-      const viewCount = statistics?.viewCount 
-        ? formatViewCount(parseInt(statistics.viewCount))
-        : undefined;
+      const videosResponse = await youtube.videos.list({
+        part: ['snippet', 'contentDetails', 'statistics'],
+        id: batchIds,
+      });
 
-      const duration = contentDetails?.duration 
-        ? formatDuration(contentDetails.duration)
-        : '0:00';
+      const videos: VideoItem[] = (videosResponse.data.items || []).map((video) => {
+        const snippet = video.snippet;
+        const statistics = video.statistics;
+        const contentDetails = video.contentDetails;
+        
+        const viewCount = statistics?.viewCount 
+          ? formatViewCount(parseInt(statistics.viewCount))
+          : undefined;
 
-      return {
-        id: video.id || `video-${index}`,
-        title: snippet?.title || 'Untitled',
-        thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
-        duration: duration,
-        publishedAt: snippet?.publishedAt || '',
-        viewCount: viewCount,
-        description: snippet?.description || undefined,
-      };
-    });
+        const duration = contentDetails?.duration 
+          ? formatDuration(contentDetails.duration)
+          : '0:00';
 
-    return videos;
+        return {
+          id: video.id || '',
+          title: snippet?.title || 'Untitled',
+          thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
+          duration: duration,
+          publishedAt: snippet?.publishedAt || '',
+          viewCount: viewCount,
+          description: snippet?.description || undefined,
+        };
+      });
+      
+      allVideos.push(...videos);
+    }
+
+    return allVideos;
   } catch (error) {
     console.error('Error fetching YouTube playlist:', error);
     throw error;
