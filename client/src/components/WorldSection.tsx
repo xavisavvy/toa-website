@@ -52,6 +52,7 @@ export default function WorldSection() {
           description: "High school students investigating the supernatural",
         },
       ],
+      comingSoon: true,
       link: "",
     },
     {
