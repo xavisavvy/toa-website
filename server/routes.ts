@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { getPlaylistVideos } from "./youtube";
 import { getPodcastFeed } from "./podcast";
+import { getShopListings } from "./etsy";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/youtube/playlist/:playlistId", async (req, res) => {
@@ -31,6 +32,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching podcast feed:', error);
       res.status(500).json({ error: 'Failed to fetch podcast feed' });
+    }
+  });
+
+  app.get("/api/etsy/shop/:shopId/listings", async (req, res) => {
+    try {
+      const { shopId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 8;
+      
+      const products = await getShopListings(shopId, limit);
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching Etsy listings:', error);
+      res.status(500).json({ error: 'Failed to fetch Etsy products' });
     }
   });
 
