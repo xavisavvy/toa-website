@@ -114,9 +114,23 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground" data-testid="text-copyright">
-            © {currentYear} Tales of Aneria. All rights reserved.
-          </p>
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <p className="text-sm text-muted-foreground" data-testid="text-copyright">
+              © {currentYear} Tales of Aneria. All rights reserved.
+            </p>
+            <p className="text-sm text-muted-foreground" data-testid="text-made-by">
+              Made with ❤️ by{" "}
+              <a
+                href="https://prestonfarr.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground hover:text-primary transition-colors"
+                data-testid="link-preston-farr"
+              >
+                Preston Farr
+              </a>
+            </p>
+          </div>
           <div className="flex gap-6">
             <a
               href="#"

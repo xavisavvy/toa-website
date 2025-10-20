@@ -52,8 +52,7 @@ export default function WorldSection() {
           description: "High school students investigating the supernatural",
         },
       ],
-      comingSoon: true,
-      link: "",
+      link: "https://www.youtube.com/watch?v=GzMnW52hmP4",
     },
     {
       id: "taebrin",
