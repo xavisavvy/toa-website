@@ -33,9 +33,9 @@ export default function AboutSection() {
   };
 
   const stats = [
-    { label: "Episodes", value: "50+" },
-    { label: "Subscribers", value: "25K" },
-    { label: "Watch Hours", value: "150K" },
+    { label: "Episodes", value: "187+" },
+    { label: "Subscribers", value: "5K" },
+    { label: "Watch Hours", value: "92.2K" },
   ];
 
   const renderSocialLinks = (member: CastMember) => {
