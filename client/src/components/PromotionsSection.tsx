@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Sparkles } from "lucide-react";
+import creepyForest from "@assets/creepy-forest.png";
 
 interface Promotion {
   id: string;
@@ -20,7 +21,7 @@ export default function PromotionsSection() {
       description:
         "Join us for a special live premiere event with exclusive behind-the-scenes content and Q&A",
       badge: "Coming Soon",
-      image: "@a",
+      image: creepyForest,
     },
     // {
     //   id: "2",
