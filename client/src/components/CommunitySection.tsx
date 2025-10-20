@@ -1,25 +1,41 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { SiYoutube, SiX, SiDiscord, SiPatreon } from "react-icons/si";
-import { Mail } from "lucide-react";
-import { useState } from "react";
+import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
+import socialLinksData from "@/data/social-links.json";
 
 export default function CommunitySection() {
-  const [email, setEmail] = useState("");
-
   const socialLinks = [
-    { icon: <SiYoutube className="h-6 w-6" />, name: "YouTube", testId: "youtube" },
-    { icon: <SiX className="h-6 w-6" />, name: "X", testId: "x" },
-    { icon: <SiDiscord className="h-6 w-6" />, name: "Discord", testId: "discord" },
-    { icon: <SiPatreon className="h-6 w-6" />, name: "Patreon", testId: "patreon" },
+    { 
+      icon: <SiYoutube className="h-6 w-6" />, 
+      name: "YouTube", 
+      testId: "youtube",
+      url: socialLinksData.youtube 
+    },
+    { 
+      icon: <SiX className="h-6 w-6" />, 
+      name: "X", 
+      testId: "x",
+      url: socialLinksData.twitter 
+    },
+    { 
+      icon: <SiDiscord className="h-6 w-6" />, 
+      name: "Discord", 
+      testId: "discord",
+      url: socialLinksData.discord 
+    },
+    { 
+      icon: <SiReddit className="h-6 w-6" />, 
+      name: "Reddit", 
+      testId: "reddit",
+      url: socialLinksData.reddit 
+    },
+    { 
+      icon: <SiPatreon className="h-6 w-6" />, 
+      name: "Patreon", 
+      testId: "patreon",
+      url: socialLinksData.patreon 
+    },
   ];
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Newsletter subscription:', email);
-    setEmail("");
-  };
 
   return (
     <section className="py-20 lg:py-32 bg-background">
@@ -31,33 +47,29 @@ export default function CommunitySection() {
             </h2>
             <p className="text-lg text-muted-foreground mb-8" data-testid="text-community-description">
               Connect with fellow adventurers, get exclusive updates, and be part of the Tales of Aneria community. 
-              Subscribe to our newsletter for behind-the-scenes content and early access to new episodes.
+              Support us on Patreon for behind-the-scenes content, early access to episodes, and exclusive perks!
             </p>
 
-            <Card className="mb-8">
-              <CardContent className="p-6">
-                <form onSubmit={handleSubscribe} className="space-y-4">
-                  <div>
-                    <label htmlFor="email" className="text-sm font-medium mb-2 block">
-                      Email Address
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        data-testid="input-newsletter-email"
-                        required
-                      />
-                      <Button type="submit" data-testid="button-subscribe">
-                        <Mail className="h-4 w-4 mr-2" />
-                        Subscribe
-                      </Button>
-                    </div>
-                  </div>
-                </form>
+            <Card className="mb-8 bg-primary/5 border-primary/20">
+              <CardContent className="p-8 text-center">
+                <div className="flex items-center justify-center mb-4">
+                  <SiPatreon className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="font-serif text-2xl font-semibold mb-3" data-testid="text-patreon-title">
+                  Support Us on Patreon
+                </h3>
+                <p className="text-muted-foreground mb-6" data-testid="text-patreon-description">
+                  Get exclusive content, early access, and help us create more amazing episodes!
+                </p>
+                <Button 
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  data-testid="button-join-patreon"
+                  onClick={() => window.open(socialLinksData.patreon, '_blank', 'noopener,noreferrer')}
+                >
+                  <SiPatreon className="h-5 w-5 mr-2" />
+                  Join Our Patreon
+                </Button>
               </CardContent>
             </Card>
 
@@ -73,7 +85,7 @@ export default function CommunitySection() {
                     size="lg"
                     className="flex-1 min-w-[140px]"
                     data-testid={`button-social-${link.testId}`}
-                    onClick={() => console.log(`${link.name} clicked`)}
+                    onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
                   >
                     {link.icon}
                     <span className="ml-2">{link.name}</span>

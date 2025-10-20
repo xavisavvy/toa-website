@@ -24,6 +24,10 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
   });
 
   const displayEpisodes = episodes?.slice(0, 3) || [];
+  
+  const playlistUrl = playlistId 
+    ? `https://www.youtube.com/playlist?list=${playlistId}`
+    : 'https://www.youtube.com/@TalesOfAneria';
 
   return (
     <section id="episodes" className="py-20 lg:py-32 bg-background">
@@ -40,7 +44,7 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
           <Button 
             variant="outline"
             data-testid="button-view-all-episodes"
-            onClick={() => console.log('View all episodes clicked')}
+            onClick={() => window.open(playlistUrl, '_blank', 'noopener,noreferrer')}
           >
             View All Episodes
           </Button>

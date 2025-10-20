@@ -93,11 +93,18 @@ Cast members are managed in a simple JSON file at `client/src/data/cast.json`. T
 
 ### Update Social Media Links
 
-Social media links appear in both `CommunitySection.tsx` and `Footer.tsx`. Update the click handlers to link to your actual profiles:
+All social media links across the site are managed in a single JSON file: `client/src/data/social-links.json`
 
-```typescript
-onClick={() => window.open('https://youtube.com/@yourhandle', '_blank')}
-```
+**Current Links:**
+- ✅ YouTube: `https://www.youtube.com/@TalesOfAneria`
+- ✅ X (Twitter): `https://x.com/TalesOfAneria`
+- ✅ Discord: `https://discord.gg/br9UhyXtWp`
+- ✅ Reddit: `https://www.reddit.com/r/TalesOfAneria/`
+- ✅ Patreon: `https://www.patreon.com/TalesofAneria`
+- ✅ Etsy: `https://www.etsy.com/shop/talesofaneria`
+- ✅ Email: `TalesOfAneria@gmail.com`
+
+To update any link, simply edit the `social-links.json` file. All components (Footer, CommunitySection, Hero, etc.) automatically use these links.
 
 ### Add Real Promotions
 

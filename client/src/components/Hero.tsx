@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Play, BookOpen } from "lucide-react";
 import heroImage from "@assets/generated_images/Fantasy_TTRPG_hero_background_186c3d57.png";
+import socialLinksData from "@/data/social-links.json";
 
 export default function Hero() {
+  const scrollToSection = (id: string) => {
+    const element = document.querySelector(id);
+    element?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div 
@@ -27,7 +33,7 @@ export default function Hero() {
             size="lg" 
             className="text-lg px-8 min-h-12"
             data-testid="button-watch-latest"
-            onClick={() => console.log('Watch Latest Episode clicked')}
+            onClick={() => window.open(socialLinksData.youtube, '_blank', 'noopener,noreferrer')}
           >
             <Play className="mr-2 h-5 w-5" />
             Watch Latest Episode
@@ -37,7 +43,7 @@ export default function Hero() {
             variant="outline"
             className="text-lg px-8 min-h-12 backdrop-blur-sm bg-background/20"
             data-testid="button-explore-world"
-            onClick={() => console.log('Explore the World clicked')}
+            onClick={() => scrollToSection('#lore')}
           >
             <BookOpen className="mr-2 h-5 w-5" />
             Explore the World

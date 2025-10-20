@@ -13,6 +13,9 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
 - Created cast.json data file for easy cast member management
 - Implemented current vs past cast member distinction
 - Added social media links for cast members with SEO best practices
+- Created centralized social-links.json for site-wide social media links
+- Replaced newsletter signup with Patreon call-to-action
+- Connected all social media buttons across site to real URLs
 
 ## Project Architecture
 

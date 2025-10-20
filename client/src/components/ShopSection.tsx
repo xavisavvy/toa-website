@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, ExternalLink } from "lucide-react";
+import socialLinksData from "@/data/social-links.json";
 
 interface Product {
   id: string;
@@ -91,7 +92,7 @@ export default function ShopSection() {
             size="lg"
             className="text-lg px-8"
             data-testid="button-visit-store"
-            onClick={() => console.log('Visit Etsy store')}
+            onClick={() => window.open(socialLinksData.etsy, '_blank', 'noopener,noreferrer')}
           >
             <ShoppingBag className="mr-2 h-5 w-5" />
             Visit Our Etsy Store

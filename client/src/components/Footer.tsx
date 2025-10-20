@@ -1,4 +1,5 @@
-import { SiYoutube, SiX, SiDiscord, SiPatreon } from "react-icons/si";
+import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
+import socialLinksData from "@/data/social-links.json";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -7,7 +8,7 @@ export default function Footer() {
     About: [
       { label: "Our Story", href: "#about" },
       { label: "The Cast", href: "#about" },
-      { label: "Contact", href: "#" },
+      { label: "Contact", href: `mailto:${socialLinksData.email}` },
     ],
     Content: [
       { label: "Episodes", href: "#episodes" },
@@ -16,16 +17,42 @@ export default function Footer() {
     ],
     Shop: [
       { label: "Merchandise", href: "#shop" },
-      { label: "Etsy Store", href: "#shop" },
-      { label: "Campaign Guides", href: "#shop" },
+      { label: "Etsy Store", href: socialLinksData.etsy },
+      { label: "Support on Patreon", href: socialLinksData.patreon },
     ],
   };
 
   const socialLinks = [
-    { icon: <SiYoutube className="h-5 w-5" />, label: "YouTube", testId: "youtube" },
-    { icon: <SiX className="h-5 w-5" />, label: "X", testId: "x" },
-    { icon: <SiDiscord className="h-5 w-5" />, label: "Discord", testId: "discord" },
-    { icon: <SiPatreon className="h-5 w-5" />, label: "Patreon", testId: "patreon" },
+    { 
+      icon: <SiYoutube className="h-5 w-5" />, 
+      label: "YouTube", 
+      testId: "youtube",
+      url: socialLinksData.youtube
+    },
+    { 
+      icon: <SiX className="h-5 w-5" />, 
+      label: "X", 
+      testId: "x",
+      url: socialLinksData.twitter
+    },
+    { 
+      icon: <SiDiscord className="h-5 w-5" />, 
+      label: "Discord", 
+      testId: "discord",
+      url: socialLinksData.discord
+    },
+    { 
+      icon: <SiReddit className="h-5 w-5" />, 
+      label: "Reddit", 
+      testId: "reddit",
+      url: socialLinksData.reddit
+    },
+    { 
+      icon: <SiPatreon className="h-5 w-5" />, 
+      label: "Patreon", 
+      testId: "patreon",
+      url: socialLinksData.patreon
+    },
   ];
 
   return (
@@ -45,7 +72,7 @@ export default function Footer() {
                   key={link.testId}
                   className="w-10 h-10 rounded-md bg-background hover-elevate flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                   data-testid={`button-footer-${link.testId}`}
-                  onClick={() => console.log(`${link.label} clicked`)}
+                  onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
                   aria-label={link.label}
                 >
                   {link.icon}
@@ -67,9 +94,15 @@ export default function Footer() {
                       className="text-muted-foreground hover:text-foreground transition-colors"
                       data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                       onClick={(e) => {
+                        if (link.href.startsWith('http') || link.href.startsWith('mailto:')) {
+                          return;
+                        }
                         e.preventDefault();
-                        console.log(`${link.label} clicked`);
+                        const element = document.querySelector(link.href);
+                        element?.scrollIntoView({ behavior: 'smooth' });
                       }}
+                      target={link.href.startsWith('http') ? '_blank' : undefined}
+                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                     >
                       {link.label}
                     </a>
