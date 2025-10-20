@@ -81,20 +81,10 @@ export default function WorldSection() {
           >
             Our Campaign Worlds
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Explore the diverse realms and campaigns that make up the Tales of
             Aneria universe
           </p>
-          <Button
-            variant="outline"
-            data-testid="button-worldanvil"
-            onClick={() =>
-              window.open(worldAnvilUrl, "_blank", "noopener,noreferrer")
-            }
-          >
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Explore on WorldAnvil
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,6 +146,24 @@ export default function WorldSection() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {world.id === "aneria" && (
+                  <div className="pt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      data-testid="button-worldanvil"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(worldAnvilUrl, "_blank", "noopener,noreferrer");
+                      }}
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Explore on WorldAnvil
+                    </Button>
                   </div>
                 )}
               </CardContent>

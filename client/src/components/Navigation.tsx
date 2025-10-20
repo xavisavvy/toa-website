@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "wouter";
 import logoSvg from "@assets/logo-TOA.svg";
 
 export default function Navigation() {
@@ -28,14 +29,14 @@ export default function Navigation() {
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <a href="#hero" className="flex items-center gap-3" data-testid="link-nav-home">
+          <Link href="/" className="flex items-center gap-3" data-testid="link-nav-home">
             <img 
               src={logoSvg} 
               alt="Tales of Aneria" 
               className="h-8 md:h-10 w-auto dark:invert"
               data-testid="img-nav-logo"
             />
-          </a>
+          </Link>
 
           <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
