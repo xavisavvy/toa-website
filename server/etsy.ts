@@ -39,7 +39,8 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
   const accessToken = process.env.ETSY_ACCESS_TOKEN;
 
   if (!apiKey || !accessToken) {
-    throw new Error('Etsy API credentials not configured');
+    console.log('Etsy API credentials not configured - returning empty product list');
+    return [];
   }
 
   const url = `https://openapi.etsy.com/v3/application/shops/${shopId}/listings`;
@@ -61,7 +62,8 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Etsy API error:', response.status, errorText);
-      throw new Error(`Etsy API error: ${response.status}`);
+      console.log('Returning empty product list due to API error');
+      return [];
     }
 
     const data: EtsyResponse = await response.json();
@@ -89,6 +91,7 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
     });
   } catch (error) {
     console.error('Error fetching Etsy listings:', error);
-    throw error;
+    console.log('Returning empty product list due to error');
+    return [];
   }
 }
