@@ -2,6 +2,7 @@ import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import LatestEpisodes from "@/components/LatestEpisodes";
 import PodcastSection from "@/components/PodcastSection";
+import CharactersSection from "@/components/CharactersSection";
 import WorldSection from "@/components/WorldSection";
 import PromotionsSection from "@/components/PromotionsSection";
 import ShopSection from "@/components/ShopSection";
@@ -19,6 +20,7 @@ export default function Home() {
       <Hero />
       <LatestEpisodes playlistId={YOUTUBE_PLAYLIST_ID} />
       <PodcastSection feedUrl={PODCAST_FEED_URL} />
+      <CharactersSection />
       <WorldSection />
       <PromotionsSection />
       <ShopSection />

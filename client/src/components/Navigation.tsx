@@ -9,6 +9,7 @@ export default function Navigation() {
   const navItems = [
     { label: "Episodes", href: "#episodes" },
     { label: "Podcast", href: "#podcast" },
+    { label: "Characters", href: "#characters" },
     { label: "Lore", href: "#lore" },
     { label: "Shop", href: "#shop" },
     { label: "About", href: "#about" },
