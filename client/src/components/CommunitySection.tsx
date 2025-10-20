@@ -159,13 +159,28 @@ export default function CommunitySection() {
                     like we are just chilling in the room with y'all as you
                     play. Thank you so much for this campaign and the Time y'all
                     put into it. Can't wait to see what y'all have in store for
-                    us later!
+                    us later!"
                   </p>
                   <p
                     className="text-sm font-medium"
                     data-testid="text-testimonial-author-2"
                   >
                     - @boscobubbles8839
+                  </p>
+                </div>
+                <div className="border-l-2 border-primary pl-4">
+                  <p
+                    className="text-muted-foreground mb-2 italic"
+                    data-testid="text-testimonial-2"
+                  >
+                    "☠ This world is amazing. Love exploring it with you
+                    guys."... "Shenanigans abound!"
+                  </p>
+                  <p
+                    className="text-sm font-medium"
+                    data-testid="text-testimonial-author-2"
+                  >
+                    - @spacemanpack
                   </p>
                 </div>
               </div>
