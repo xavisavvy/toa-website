@@ -11,7 +11,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -53,7 +54,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -67,7 +69,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -81,7 +84,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -93,9 +97,10 @@
       "avatar": "cast-colby.png",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@DnDDeepDive",
-        "twitter": "",
-        "instagram": "",
-        "twitch": ""
+        "twitter": "https://x.com/ColbyPoulson",
+        "instagram": "https://www.instagram.com/dndoptimized",
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -109,7 +114,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -123,7 +129,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     },
     {
@@ -137,7 +144,8 @@
         "youtube": "",
         "twitter": "",
         "instagram": "",
-        "twitch": ""
+        "twitch": "",
+        "website": ""
       }
     }
   ]
