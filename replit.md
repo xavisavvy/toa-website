@@ -61,6 +61,151 @@ All character images include proper copyright attribution and artist credits:
 - **Patreon**: Call-to-action for community support.
 - **WorldAnvil**: Links for exploring campaign lore.
 - **Social Media**: Links for YouTube, Twitter, Instagram, Twitch, etc.
+
+## Security Architecture (OWASP Top 10:2021 Compliance)
+
+This application implements enterprise-grade security following **OWASP Top 10:2021** best practices.
+
+### Security Middleware (`server/security.ts`)
+
+All security configurations are centralized in `server/security.ts` and applied before any routes.
+
+#### A02: Cryptographic Failures - Security Headers (Helmet)
+
+**Content Security Policy (CSP)**: Prevents XSS attacks by controlling which resources can be loaded.
+- `defaultSrc`: Self only
+- `scriptSrc`: Self, YouTube, Google APIs (unsafe-inline/eval for Vite dev mode)
+- `styleSrc`: Self, Google Fonts (unsafe-inline for Tailwind)
+- `imgSrc`: Self, data URIs, HTTPS (for external images)
+- `connectSrc`: Self, Google APIs, D&D Beyond, Etsy
+- `frameSrc`: YouTube, Spotify embeds
+- `upgradeInsecureRequests`: Forces HTTPS in production
+
+**HTTP Strict Transport Security (HSTS)**: Forces HTTPS connections.
+- Max age: 1 year (31536000 seconds)
+- Includes subdomains
+- Preload enabled
+
+**Other Headers**:
+- `X-Frame-Options`: SAMEORIGIN (prevents clickjacking)
+- `X-Content-Type-Options`: nosniff (prevents MIME sniffing)
+- `X-DNS-Prefetch-Control`: Disabled
+- `Referrer-Policy`: strict-origin-when-cross-origin
+
+#### A05: Security Misconfiguration - CORS
+
+**Development**: Allows all origins for local development.
+
+**Production**: Whitelist-based origin validation.
+- Configurable via `ALLOWED_ORIGINS` environment variable (comma-separated)
+- Auto-allows `.replit.app` and `.repl.co` domains
+- Credentials enabled for session management
+- Allowed methods: GET, POST, PUT, DELETE, OPTIONS
+- Max age: 24 hours
+
+#### A05: Rate Limiting (DoS Prevention)
+
+**General API Rate Limit**: 100 requests per 15 minutes per IP.
+- Applied to all `/api/*` routes
+- Returns 429 status with clear message when exceeded
+- Disabled in development mode
+
+**Strict Rate Limit**: 30 requests per 15 minutes per IP.
+- Applied to expensive external API calls:
+  - `/api/youtube/*`
+  - `/api/etsy/*`
+  - `/api/podcast/*`
+- Prevents API quota exhaustion and abuse
+
+#### A03: Injection Prevention - Input Validation
+
+**YouTube Playlist Endpoint** (`/api/youtube/playlist/:playlistId`):
+- Validates `playlistId` format (alphanumeric, hyphens, underscores only)
+- Validates `maxResults` parameter (1-100 range)
+- Logs suspicious activity
+
+**Podcast Feed Endpoint** (`/api/podcast/feed`):
+- **A10: SSRF Protection** - Validates feed URLs to prevent Server-Side Request Forgery:
+  - Blocks localhost and 127.0.0.1
+  - Blocks private IP ranges (10.x.x.x, 172.16-31.x.x, 192.168.x.x, 169.254.x.x)
+  - Blocks link-local IPv6 addresses (fc, fd, fe80)
+  - Blocks AWS metadata service (169.254.169.254)
+  - Requires valid HTTP/HTTPS protocols
+- Validates `limit` parameter (1-50 range)
+- Logs SSRF attempts with IP address
+
+**Etsy Shop Endpoint** (`/api/etsy/shop/:shopId/listings`):
+- Validates `shopId` format (alphanumeric only)
+- Validates `limit` parameter (1-50 range)
+- Logs suspicious activity
+
+#### A07: Error Handling - Information Disclosure Prevention
+
+**Production Mode**:
+- Generic error messages for 500 errors
+- No stack traces or implementation details exposed
+
+**Development Mode**:
+- Detailed error messages with stack traces
+- Full debugging information
+
+**All Modes**:
+- Structured error logging with timestamps
+- IP address tracking for security events
+- Sanitized error responses
+
+#### A09: Security Logging and Monitoring
+
+**Security Events Logged**:
+- Invalid input attempts (playlist IDs, shop IDs)
+- SSRF attack attempts with IP addresses
+- Rate limit violations
+- Server errors with full context
+
+**Log Format**:
+```json
+{
+  "timestamp": "2025-10-21T12:00:00.000Z",
+  "event": "SSRF_ATTEMPT",
+  "feedUrl": "http://169.254.169.254/metadata",
+  "ip": "1.2.3.4",
+  "error": "Access to metadata service is not allowed"
+}
+```
+
+### Additional Security Measures
+
+#### Request Body Size Limits
+- JSON payload limit: 1MB
+- URL-encoded payload limit: 1MB
+- Prevents memory exhaustion attacks
+
+#### YouTube Playlist Caching
+- 24-hour cache duration
+- Prevents API quota exhaustion
+- Graceful degradation with stale cache fallback
+
+### Security Configuration
+
+**Environment Variables** (`.env.example`):
+```bash
+# Security Configuration (OWASP Best Practices)
+# Comma-separated list of allowed origins for CORS (production only)
+ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+```
+
+### Security Best Practices Summary
+
+✅ **A01: Broken Access Control** - N/A (public content website)
+✅ **A02: Cryptographic Failures** - HSTS, security headers, HTTPS enforcement
+✅ **A03: Injection** - Input validation, parameterized queries (Drizzle ORM), XSS prevention (React auto-escaping)
+✅ **A04: Insecure Design** - Secure architecture with defense in depth
+✅ **A05: Security Misconfiguration** - Helmet, CORS, rate limiting, secure defaults
+✅ **A06: Vulnerable Components** - Regular dependency updates, audit checks
+✅ **A07: Identification/Authentication** - N/A (public content website)
+✅ **A08: Software/Data Integrity** - CSP, SRI for external resources
+✅ **A09: Security Logging** - Comprehensive security event logging
+✅ **A10: Server-Side Request Forgery** - URL validation, IP blocking, whitelist validation
 ## Character Playlist Feature
 
 Each character can have an associated music playlist (Spotify or YouTube) that captures their theme and personality.
