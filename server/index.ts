@@ -2,10 +2,16 @@ import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { configureSecurity } from "./security";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// A05: Security Misconfiguration - Apply security middleware FIRST
+configureSecurity(app);
+
+// Body parsing middleware (with size limits)
+app.use(express.json({ limit: '1mb' })); // A05: Limit request body size
+app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -40,12 +46,26 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  // A07: Enhanced error handling - Don't leak sensitive information
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    
+    // A09: Security Logging - Log errors for monitoring
+    console.error('[ERROR]', {
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      path: req.path,
+      status,
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    });
 
-    res.status(status).json({ message });
-    throw err;
+    // A07: Don't expose internal error details in production
+    const message = status === 500 && process.env.NODE_ENV === 'production'
+      ? 'Internal Server Error'
+      : err.message || 'Internal Server Error';
+
+    res.status(status).json({ error: message });
   });
 
   // importantly only setup vite in development and after
