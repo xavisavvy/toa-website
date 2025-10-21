@@ -51,7 +51,7 @@ function CharacterCarousel({ worldId }: CharacterCarouselProps) {
 
   const campaignNames = getCampaignMatch(worldId);
   const characters = (charactersData.characters as Character[]).filter((char) =>
-    campaignNames.includes(char.campaign)
+    campaignNames.includes(char.campaign),
   );
 
   if (characters.length === 0) {
@@ -133,7 +133,7 @@ export default function WorldSection() {
         },
       ],
       link: worldAnvilUrl,
-      backgroundImage: 
+      backgroundImage: aneriaBg,
     },
     {
       id: "pterrordale",
@@ -263,7 +263,11 @@ export default function WorldSection() {
                       data-testid="button-worldanvil"
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(worldAnvilUrl, "_blank", "noopener,noreferrer");
+                        window.open(
+                          worldAnvilUrl,
+                          "_blank",
+                          "noopener,noreferrer",
+                        );
                       }}
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
