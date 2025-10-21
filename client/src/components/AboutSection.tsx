@@ -195,6 +195,7 @@ export default function AboutSection() {
             <AvatarImage
               src={avatarSrc}
               alt={`${member.name} - ${member.role}`}
+              loading="lazy"
             />
             <AvatarFallback>
               {member.name
