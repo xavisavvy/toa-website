@@ -155,6 +155,284 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151508871",
       "dndbeyondId": "151508871",
       "status": "active"
+    },
+    {
+      "id": "bolt",
+      "name": "Bolt",
+      "player": "Scott",
+      "playerId": "scott-avis",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Warforged",
+      "class": "Artificer",
+      "level": 18,
+      "alignment": "Lawful Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/16125/376/1581111423-45818629.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/16125/376/1581111423-45818629.jpeg",
+          "caption": "Bolt - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A legendary hero from the Wayward Watch, Bolt ventured through the realm of Aneria.",
+      "personality": "A brave adventurer with a rich history.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/45818629",
+      "dndbeyondId": "45818629",
+      "status": "inactive"
+    },
+    {
+      "id": "victor-udonta",
+      "name": "Victor Udonta",
+      "player": "Preston",
+      "playerId": "preston-farr",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Custom Lineage",
+      "class": "Rogue",
+      "level": 18,
+      "alignment": "Lawful Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/17207/125/1581111423-46268811.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/17207/125/1581111423-46268811.jpeg",
+          "caption": "Victor Udonta - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "“Oh merciful Blade in the Shadows, and keepers of the creed.\nGrant me swiftness, silence, and a target who trips on his own sword.\nMay their armor be decorative, their aim laughable,\nAnd their final words deeply ironic.\nBless this mess, sharpen my wit—\nAnd may the bloodstains come out of my cloak th",
+      "personality": "I would rather make a new friend than a new enemy.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/46268811",
+      "dndbeyondId": "46268811",
+      "status": "inactive"
+    },
+    {
+      "id": "winifred-fred-blodbane",
+      "name": "Winifred (Fred) Blodbane",
+      "player": "Torrey",
+      "playerId": "torrey-woolsey",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Drow Half-Elf",
+      "class": "Warlock",
+      "level": 18,
+      "alignment": "Unknown",
+      "featuredImage": "https://www.dndbeyond.com/avatars/32625/858/1581111423-94493888.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/32625/858/1581111423-94493888.jpeg",
+          "caption": "Winifred (Fred) Blodbane - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A legendary hero from the Wayward Watch, Winifred (Fred) Blodbane ventured through the realm of Aneria.",
+      "personality": "A brave adventurer with a rich history.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/94493888",
+      "dndbeyondId": "94493888",
+      "status": "inactive"
+    },
+    {
+      "id": "alomah-stargazer",
+      "name": "Alomah Stargazer",
+      "player": "Colby",
+      "playerId": "colby-poulsen",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Custom Lineage",
+      "class": "Cleric",
+      "level": 13,
+      "alignment": "Neutral Good",
+      "featuredImage": "https://www.dndbeyond.com/avatars/28162/132/1581111423-79518285.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/28162/132/1581111423-79518285.jpeg",
+          "caption": "Alomah Stargazer - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "Alomah Stargazer\n\n \n\nTwenty one years ago…\n\n \n\nAlomah cracked open one eye and looked around expectantly. After 3 hours, he thought surely there would be *some* sign of the spirits of one of his ancestors. As a Kitsune of 13, he was *finally* undergoing his Skulk Stone ceremony, or “chasing his tail",
+      "personality": "I can find common ground between the fiercest enemies, empathizing with them and always working toward peace.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/79518285",
+      "dndbeyondId": "79518285",
+      "status": "inactive"
+    },
+    {
+      "id": "aramis-alderhelm",
+      "name": "Aramis Alderhelm",
+      "player": "Dallin",
+      "playerId": "dallin-rogers",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Wood Half-Elf",
+      "class": "Paladin",
+      "level": 14,
+      "alignment": "Lawful Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/27438/71/1581111423-79078434.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/27438/71/1581111423-79078434.jpeg",
+          "caption": "Aramis Alderhelm - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A legendary hero from the Wayward Watch, Aramis Alderhelm ventured through the realm of Aneria.",
+      "personality": "I judge people by their actions, not their words.\nIf someone is in trouble, I will always help them.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/79078434",
+      "dndbeyondId": "79078434",
+      "status": "inactive"
+    },
+    {
+      "id": "locke-lirien",
+      "name": "Locke Lirien",
+      "player": "Preston",
+      "playerId": "preston-farr",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Half-Elf",
+      "class": "Warlock",
+      "level": 17,
+      "alignment": "Neutral Evil",
+      "featuredImage": "https://www.dndbeyond.com/avatars/44686/720/1581111423-133741834.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/44686/720/1581111423-133741834.jpeg",
+          "caption": "Locke Lirien - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "Locke Lirien\nYoungest son of the Lirian Family from Manaport\n\nBackstory: The Architect of Bloodlines\nBorn into the prestigious Lirien family of elves and half-elves sorcerers living in Manaport, Locke was expected to carry the legacy of magical prowess that ran through their bloodline for generation",
+      "personality": "I idolize a particular hero of my faith, and constantly refer to that person’s deeds and example.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/133741834",
+      "dndbeyondId": "133741834",
+      "status": "inactive"
+    },
+    {
+      "id": "s-redan-fallowshield",
+      "name": "Séredan Fallowshield",
+      "player": "Colby",
+      "playerId": "colby-poulsen",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Custom Lineage",
+      "class": "Sorcerer",
+      "level": 11,
+      "alignment": "Chaotic Good",
+      "featuredImage": "https://www.dndbeyond.com/avatars/25730/35/1581111423-47697687.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/25730/35/1581111423-47697687.jpeg",
+          "caption": "Séredan Fallowshield - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "“That’s odd,” Seredan said out loud, though she was, as usual, alone. “I was hoping to dig up a corpse or some sort of buried treasure or something.” Looking down at the instrument, half exhumed in the dirt, she scratched the left side of her head; shaved to the skin after the fashion of the Vanguar",
+      "personality": "A brave adventurer with a rich history.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/47697687",
+      "dndbeyondId": "47697687",
+      "status": "inactive"
+    },
+    {
+      "id": "whu-mungus",
+      "name": "Whu Mungus ",
+      "player": "Preston",
+      "playerId": "preston-farr",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Owlin",
+      "class": "Barbarian",
+      "level": 8,
+      "alignment": "Chaotic Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/24964/277/1581111423-67943311.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/24964/277/1581111423-67943311.jpeg",
+          "caption": "Whu Mungus  - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A legendary hero from the Wayward Watch, Whu Mungus  ventured through the realm of Aneria.",
+      "personality": "When I see others struggling, I offer to help.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/67943311",
+      "dndbeyondId": "67943311",
+      "status": "inactive"
+    },
+    {
+      "id": "maggie-bramblecheeks",
+      "name": "Maggie Bramblecheeks",
+      "player": "Torrey",
+      "playerId": "torrey-woolsey",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Lightfoot Halfling",
+      "class": "Bard",
+      "level": 8,
+      "alignment": "Chaotic Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/19773/411/1581111423-56077210.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/19773/411/1581111423-56077210.jpeg",
+          "caption": "Maggie Bramblecheeks - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A legendary hero from the Wayward Watch, Maggie Bramblecheeks ventured through the realm of Aneria.",
+      "personality": "I always have a plan for what to do when things go wrong.\nI don’t pay attention to the risks in a situation. Never tell me the odds.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/56077210",
+      "dndbeyondId": "56077210",
+      "status": "inactive"
+    },
+    {
+      "id": "cilin-meekmarrow",
+      "name": "Cilin Meekmarrow",
+      "player": "Scott",
+      "playerId": "scott-avis",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Custom Lineage",
+      "class": "Rogue",
+      "level": 8,
+      "alignment": "Chaotic Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/19779/85/1581111423-56497643.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/19779/85/1581111423-56497643.jpeg",
+          "caption": "Cilin Meekmarrow - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A legendary hero from the Wayward Watch, Cilin Meekmarrow ventured through the realm of Aneria.",
+      "personality": "A brave adventurer with a rich history.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/56497643",
+      "dndbeyondId": "56497643",
+      "status": "inactive"
+    },
+    {
+      "id": "ezra",
+      "name": "Ezra",
+      "player": "Dallin",
+      "playerId": "dallin-rogers",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Unknown",
+      "class": "Unknown",
+      "level": 1,
+      "alignment": "Unknown",
+      "featuredImage": "",
+      "images": [],
+      "backstory": "A member of the legendary Wayward Watch adventuring party from the Aneria campaign.",
+      "personality": "A brave adventurer with a mysterious past.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/52932329",
+      "dndbeyondId": "52932329",
+      "status": "inactive"
     }
   ]
 }

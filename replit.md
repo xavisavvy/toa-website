@@ -47,7 +47,13 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Campaign filter buttons on /characters page for easy filtering
   - Dynamically generated filters based on unique campaigns in character data
   - Active/inactive character distinction maintained when filtering
-  - Currently all active characters are in "Journeys Through Taebrin" campaign
+  - Current campaigns: "Journeys Through Taebrin" (6 active) and "Aneria - Wayward Watch" (11 past)
+- **Added Wayward Watch characters from Seasons 1/2:**
+  - Integrated 11 characters from the Aneria campaign using D&D Beyond API
+  - High-level characters (levels 8-18) with complete character data
+  - Characters: Bolt, Victor Udonta, Winifred Blodbane, Alomah Stargazer, Ezra, Aramis Alderhelm, Locke Lirien, Séredan Fallowshield, Whu Mungus, Maggie Bramblecheeks, Cilin Meekmarrow
+  - All characters set to "inactive" status as past campaign members
+  - Character avatars and data stored from D&D Beyond CDN
 - **Implemented YouTube caching system:**
   - Server-side caching in `server/cache/youtube-playlist.json`
   - 24-hour cache duration to prevent API quota exhaustion
@@ -157,18 +163,22 @@ Cast members are managed via `client/src/data/cast.json`:
 }
 ```
 
-### Current Cast
+### Current Cast (Journeys Through Taebrin)
 - Cory Avis (Game Master) - The Storyteller
-- Preston Farr (Player) - Wayne the Archivist of Lies, Victor Udonta, Locke Lirian, and more
-- Torrey Woolsey (Player) - Freya Fenrir, Winnifred "Fred" Blodbane, Maggie Bramblecheeks
-- Scott Avis (Player) - Carine Sol, Bolt, Cilin Meekmarrow
-- Dallin Rogers (Player) - Erys Leandorian, Aramis, Ezra
+- Preston Farr (Player) - Wayne "Archivist of Lies"
+- Torrey Woolsey (Player) - Freya Fenrir
+- Scott Avis (Player) - Carine Sol
+- Dallin Rogers (Player) - Erys Leandorian
 - Ian (Player) - Titheus Cillbrost
 - Jake (Player) - Porphan Valaritas
 
-### Past Cast
-- Colby Poulsen (Player) - Seredan Fallowshield, Alomah Stargazer (early season)
-- Brigette S (Player) - Melly
+### Past Cast (Aneria - Wayward Watch, Seasons 1/2)
+- Preston Farr - Victor Udonta, Locke Lirien, Whu Mungus
+- Torrey Woolsey - Winifred "Fred" Blodbane, Maggie Bramblecheeks
+- Scott Avis - Bolt, Cilin Meekmarrow
+- Dallin Rogers - Aramis Alderhelm, Ezra
+- Colby Poulsen - Séredan Fallowshield, Alomah Stargazer
+- Brigette S - Melly (data pending)
 
 ## Character Management
 
