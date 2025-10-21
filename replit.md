@@ -47,6 +47,17 @@ A dedicated press kit page provides downloadable brand assets (logo, social prev
 ### Image Attribution System
 All character images include proper copyright attribution, artist credits, and optional AI-generated indicators, adhering to legal best practices and SEO compliance.
 
+### Performance Optimizations
+The site implements comprehensive performance optimizations to ensure fast loading times:
+-   **Smart Hero Carousel**: Preloads only the current and next image, reducing initial load from 15+ MB to ~1.1 MB.
+-   **Lazy Loading**: All non-critical images (campaign backgrounds, cast photos, promotion images) use `loading="lazy"` to defer loading until scrolled into view.
+-   **Production Bundle**: Optimized production build produces:
+    -   JavaScript: 125.53 KB (gzipped)
+    -   CSS: 12.85 KB (gzipped)
+    -   Initial hero image: ~1.1 MB
+    -   **Total initial load: ~1.25 MB**
+-   **Future Optimization**: Phase 2 will convert PNG images to WebP format for ~80% file size reduction.
+
 ## External Dependencies
 -   **Google YouTube Data API v3**: For fetching YouTube playlist and video details.
 -   **Replit YouTube connector**: For OAuth authentication with YouTube (Replit only).
