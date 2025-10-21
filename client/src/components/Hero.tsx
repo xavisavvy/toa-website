@@ -16,6 +16,7 @@ const heroImages = [
 
 export default function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0]));
 
   useEffect(() => {
     // Ensure we start at index 0
@@ -28,6 +29,22 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  // Preload current and next image
+  useEffect(() => {
+    const nextIndex = (currentImageIndex + 1) % heroImages.length;
+    const imagesToLoad = [currentImageIndex, nextIndex];
+    
+    imagesToLoad.forEach((index) => {
+      if (!loadedImages.has(index)) {
+        const img = new Image();
+        img.src = heroImages[index];
+        img.onload = () => {
+          setLoadedImages((prev) => new Set([...prev, index]));
+        };
+      }
+    });
+  }, [currentImageIndex, loadedImages]);
+
   const scrollToSection = (id: string) => {
     const element = document.querySelector(id);
     element?.scrollIntoView({ behavior: 'smooth' });
@@ -35,15 +52,21 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {heroImages.map((image, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
-            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ backgroundImage: `url(${image})` }}
-        />
-      ))}
+      {heroImages.map((image, index) => {
+        // Only render images that have been loaded or are currently visible
+        const shouldRender = loadedImages.has(index) || index === currentImageIndex;
+        if (!shouldRender) return null;
+
+        return (
+          <div
+            key={index}
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ backgroundImage: `url(${image})` }}
+          />
+        );
+      })}
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
       
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center py-20">
