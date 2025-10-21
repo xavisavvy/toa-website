@@ -140,17 +140,13 @@ export default function Footer() {
             >
               Privacy Policy
             </Link>
-            <a
-              href="#"
+            <Link
+              href="/legal/tos"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               data-testid="link-terms"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Terms of Service clicked');
-              }}
             >
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
       </div>
