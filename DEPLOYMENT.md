@@ -1,5 +1,7 @@
 # Deploying Tales of Aneria to Vercel
 
+> **⚠️ UPDATED GUIDE AVAILABLE:** This file contains older deployment instructions. For the **latest Vercel deployment setup** (updated January 2025 with Express framework support), see **`VERCEL_SETUP.md`**.
+
 This guide walks you through deploying the Tales of Aneria website to Vercel with all necessary configurations.
 
 ## 📋 Prerequisites
