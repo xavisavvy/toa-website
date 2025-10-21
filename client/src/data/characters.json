@@ -433,6 +433,128 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/52932329",
       "dndbeyondId": "52932329",
       "status": "inactive"
+    },
+    {
+      "id": "ahri-flowers",
+      "name": "Ahri Flowers",
+      "player": "Preston",
+      "playerId": "preston-farr",
+      "campaign": "Pterrordale",
+      "race": "Variant Human",
+      "class": "Warlock",
+      "level": 7,
+      "alignment": "Neutral Good",
+      "featuredImage": "https://www.dndbeyond.com/avatars/20613/950/1581111423-58907127.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/20613/950/1581111423-58907127.jpeg",
+          "caption": "Ahri Flowers - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A hero from the Pterrordale Halloween special campaign, Ahri Flowers faced supernatural horrors.",
+      "personality": "Good music makes me weep like a baby.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/58907127",
+      "dndbeyondId": "58907127",
+      "status": "inactive"
+    },
+    {
+      "id": "alan-mcmichaelson",
+      "name": "Alan McMichaelson",
+      "player": "Scott",
+      "playerId": "scott-avis",
+      "campaign": "Pterrordale",
+      "race": "Variant Human",
+      "class": "Ranger",
+      "level": 7,
+      "alignment": "Neutral Good",
+      "featuredImage": "",
+      "images": [
+        {
+          "id": "1",
+          "url": "",
+          "caption": "Alan McMichaelson - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A hero from the Pterrordale Halloween special campaign, Alan McMichaelson faced supernatural horrors.",
+      "personality": "A brave adventurer who ventured into the mysterious realm of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/58917752",
+      "dndbeyondId": "58917752",
+      "status": "inactive"
+    },
+    {
+      "id": "mabel-crosscore",
+      "name": "Mabel Crosscore",
+      "player": "Torrey",
+      "playerId": "torrey-woolsey",
+      "campaign": "Pterrordale",
+      "race": "Hill Dwarf",
+      "class": "Barbarian",
+      "level": 7,
+      "alignment": "Unknown",
+      "featuredImage": "https://www.dndbeyond.com/avatars/37668/838/1581111423-111107998.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/37668/838/1581111423-111107998.jpeg",
+          "caption": "Mabel Crosscore - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A hero from the Pterrordale Halloween special campaign, Mabel Crosscore faced supernatural horrors.",
+      "personality": "A brave adventurer who ventured into the mysterious realm of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/111107998",
+      "dndbeyondId": "111107998",
+      "status": "inactive"
+    },
+    {
+      "id": "melly",
+      "name": "Melly",
+      "player": "Brigette",
+      "playerId": "brigette-s",
+      "campaign": "Pterrordale",
+      "race": "Half-Elf",
+      "class": "Sorcerer",
+      "level": 7,
+      "alignment": "Unknown",
+      "featuredImage": "https://www.dndbeyond.com/avatars/37573/465/1581111423-111110601.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/37573/465/1581111423-111110601.jpeg",
+          "caption": "Melly - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true
+        }
+      ],
+      "backstory": "A hero from the Pterrordale Halloween special campaign, Melly faced supernatural horrors.",
+      "personality": "A brave adventurer who ventured into the mysterious realm of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/111110601",
+      "dndbeyondId": "111110601",
+      "status": "inactive"
+    },
+    {
+      "id": "buck-calhoun",
+      "name": "Buck Calhoun",
+      "player": "Dallin",
+      "playerId": "dallin-rogers",
+      "campaign": "Pterrordale",
+      "race": "Unknown",
+      "class": "Unknown",
+      "level": 7,
+      "alignment": "Unknown",
+      "featuredImage": "",
+      "images": [],
+      "backstory": "A brave hero from the Pterrordale Halloween special campaign who faced supernatural horrors in the cursed town.",
+      "personality": "A courageous adventurer who ventured into the mysterious realm of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/134997127",
+      "dndbeyondId": "134997127",
+      "status": "inactive"
     }
   ]
 }
