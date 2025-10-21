@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 import pterrordaleBg from "@assets/feat-pterrordale.png";
+import charactersData from "@/data/characters.json";
 
 interface Campaign {
   name: string;
@@ -18,6 +20,95 @@ interface CampaignWorld {
   comingSoon?: boolean;
   link: string;
   backgroundImage?: string;
+}
+
+interface Character {
+  id: string;
+  name: string;
+  campaign: string;
+  featuredImage: string;
+  status: string;
+}
+
+interface CharacterCarouselProps {
+  worldId: string;
+}
+
+function CharacterCarousel({ worldId }: CharacterCarouselProps) {
+  const getCampaignMatch = (worldId: string): string[] => {
+    switch (worldId) {
+      case "aneria":
+        return ["Aneria - Wayward Watch"];
+      case "pterrordale":
+        return ["Pterrordale"];
+      case "taebrin":
+        return ["Journeys Through Taebrin"];
+      default:
+        return [];
+    }
+  };
+
+  const campaignNames = getCampaignMatch(worldId);
+  const characters = (charactersData.characters as Character[]).filter((char) =>
+    campaignNames.includes(char.campaign)
+  );
+
+  if (characters.length === 0) {
+    return null;
+  }
+
+  const shouldScroll = characters.length > 5;
+  const displayCharacters = shouldScroll
+    ? [...characters, ...characters]
+    : characters;
+
+  return (
+    <div className="pt-4 border-t border-border/50">
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 mb-3">
+        Characters
+      </h4>
+      <div className="relative overflow-hidden">
+        <div
+          className={`flex gap-2 ${shouldScroll ? "animate-scroll" : "flex-wrap"}`}
+          style={{
+            animation: shouldScroll ? "scroll 20s linear infinite" : "none",
+          }}
+        >
+          {displayCharacters.map((char, idx) => (
+            <div
+              key={`${char.id}-${idx}`}
+              className="flex-shrink-0"
+              data-testid={`avatar-${worldId}-${char.id}`}
+            >
+              <Avatar className="w-12 h-12 border-2 border-border">
+                <AvatarImage src={char.featuredImage} alt={char.name} />
+                <AvatarFallback className="text-xs">
+                  {char.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .substring(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-scroll:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+    </div>
+  );
 }
 
 export default function WorldSection() {
@@ -178,6 +269,8 @@ export default function WorldSection() {
                     </Button>
                   </div>
                 )}
+
+                <CharacterCarousel worldId={world.id} />
               </CardContent>
             </Card>
           ))}
