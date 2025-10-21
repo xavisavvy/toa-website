@@ -27,7 +27,8 @@ The frontend is built with React 18 and TypeScript, utilizing Wouter for routing
     - **Shop**: Etsy storefront integration.
     - **About**: Cast member profiles with photos and series statistics.
     - **Community**: Patreon call-to-action and social media links.
-- **Legal**: Includes a Privacy Policy page (`/legal/privacy`) detailing third-party services and user rights, linked from the footer.
+- **Legal**: Includes Privacy Policy (`/legal/privacy`) and Terms of Service (`/legal/tos`) pages detailing third-party services, user rights, intellectual property, and usage terms. Both are linked from the footer.
+- **Branding**: Custom D20 die favicon (`client/public/favicon.png`) representing the TTRPG theme.
 
 ### Backend (Express + Node.js)
 An Express.js backend handles API integrations.
