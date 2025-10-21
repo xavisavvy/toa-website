@@ -454,14 +454,24 @@
       "player": "Dallin",
       "playerId": "dallin-rogers",
       "campaign": "Aneria - Wayward Watch",
-      "race": "Unknown",
-      "class": "Unknown",
-      "level": 1,
-      "alignment": "Unknown",
-      "featuredImage": "",
-      "images": [],
-      "backstory": "A member of the legendary Wayward Watch adventuring party from the Aneria campaign.",
-      "personality": "A brave adventurer with a mysterious past.",
+      "race": "Custom Lineage",
+      "class": "Fighter",
+      "level": 11,
+      "alignment": "Lawful Neutral",
+      "featuredImage": "https://www.dndbeyond.com/avatars/19060/856/1581111423-52932329.jpeg",
+      "images": [
+        {
+          "id": "1",
+          "url": "https://www.dndbeyond.com/avatars/19060/856/1581111423-52932329.jpeg",
+          "caption": "Ezra - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
+        }
+      ],
+      "backstory": "A skilled fighter from the legendary Wayward Watch adventuring party. Ezra fought alongside his companions through countless battles in the realm of Aneria.",
+      "personality": "I’m confident in my own abilities and do what I can to instill confidence in others.\nIf someone is in trouble, I’m always ready to lend help.",
       "dndbeyond": "https://www.dndbeyond.com/characters/52932329",
       "dndbeyondId": "52932329",
       "status": "inactive"
