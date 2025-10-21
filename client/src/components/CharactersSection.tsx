@@ -51,15 +51,15 @@ export default function CharactersSection() {
             className="font-serif text-4xl md:text-5xl font-semibold mb-6"
             data-testid="text-characters-title"
           >
-            Meet the Heroes
+            Meet the Characters
           </h2>
           <p
             className="text-lg text-muted-foreground max-w-3xl mx-auto"
             data-testid="text-characters-description"
           >
-            Follow the adventures of these brave souls as they navigate the
-            perils and mysteries of Aneria. Each hero brings unique skills,
-            personalities, and stories to the journey.
+            Explore our diverse cast of heroes, NPCs, villains, and homebrew creatures. 
+            Each character brings unique abilities, personalities, and stories that shape 
+            the epic tales unfolding across our campaigns.
           </p>
         </div>
 
@@ -131,7 +131,7 @@ export default function CharactersSection() {
         <div className="text-center">
           <Link href="/characters">
             <Button size="lg" data-testid="button-view-all-characters">
-              View All Characters
+              View All Characters & NPCs
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

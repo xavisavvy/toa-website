@@ -131,10 +131,10 @@ export default function Characters() {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="All Characters - Tales of Aneria TTRPG"
-        description="Explore the full roster of heroes from Tales of Aneria. Meet active adventurers and legendary figures who have ventured through the realms of Aneria, Pterrordale, and Taebrin."
+        title="Meet the Characters - Tales of Aneria TTRPG"
+        description="Explore our diverse cast of heroes, NPCs, villains, and homebrew creatures from Tales of Aneria. Discover active adventurers and legendary figures across Aneria, Pterrordale, and Taebrin."
         canonical="https://talesofaneria.com/characters"
-        keywords="D&D characters, TTRPG heroes, Dungeons and Dragons adventurers, fantasy characters, Aneria heroes, character roster"
+        keywords="D&D characters, TTRPG heroes, NPCs, villains, homebrew creatures, Dungeons and Dragons adventurers, fantasy characters, Aneria characters"
         jsonLd={breadcrumbData}
       />
       <Navigation />
@@ -148,15 +148,15 @@ export default function Characters() {
             className="font-serif text-4xl md:text-5xl font-semibold mb-6"
             data-testid="text-page-title"
           >
-            All Characters
+            Meet the Characters
           </h1>
           <p
             className="text-lg text-muted-foreground max-w-3xl mx-auto"
             data-testid="text-page-description"
           >
-            Explore the full roster of heroes who have ventured through the
-            realms of Aneria, from active adventurers to legendary figures of
-            the past.
+            Discover our diverse cast of heroes, NPCs, villains, and homebrew creatures 
+            who shape the stories across our campaigns. From active adventurers to legendary 
+            figures of the past, explore the characters that bring our worlds to life.
           </p>
         </div>
 
