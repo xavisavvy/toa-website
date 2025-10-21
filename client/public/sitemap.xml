@@ -18,6 +18,22 @@
     <lastmod>2025-10-21</lastmod>
   </url>
   
+  <!-- Sponsors Page -->
+  <url>
+    <loc>https://talesofaneria.com/sponsors</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2025-10-21</lastmod>
+  </url>
+  
+  <!-- Press Kit Page -->
+  <url>
+    <loc>https://talesofaneria.com/press-kit</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2025-10-21</lastmod>
+  </url>
+  
   <!-- Character Detail Pages -->
   <url>
     <loc>https://talesofaneria.com/characters/wayne-archivist</loc>

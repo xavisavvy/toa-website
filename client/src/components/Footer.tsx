@@ -21,6 +21,11 @@ export default function Footer() {
       { label: "Etsy Store", href: socialLinksData.etsy },
       { label: "Support on Patreon", href: socialLinksData.patreon },
     ],
+    Resources: [
+      { label: "Press Kit", href: "/press-kit" },
+      { label: "Sponsors", href: "/sponsors" },
+      { label: "Characters", href: "/characters" },
+    ],
   };
 
   const socialLinks = [
@@ -59,7 +64,7 @@ export default function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-8">
           <div className="lg:col-span-2">
             <h3 className="font-serif text-2xl font-bold mb-4" data-testid="text-footer-logo">
               Tales of Aneria
@@ -90,23 +95,33 @@ export default function Footer() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                      data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
-                      onClick={(e) => {
-                        if (link.href.startsWith('http') || link.href.startsWith('mailto:')) {
-                          return;
-                        }
-                        e.preventDefault();
-                        const element = document.querySelector(link.href);
-                        element?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      target={link.href.startsWith('http') ? '_blank' : undefined}
-                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith('/') ? (
+                      <Link
+                        href={link.href}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+                        onClick={(e) => {
+                          if (link.href.startsWith('http') || link.href.startsWith('mailto:')) {
+                            return;
+                          }
+                          e.preventDefault();
+                          const element = document.querySelector(link.href);
+                          element?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        target={link.href.startsWith('http') ? '_blank' : undefined}
+                        rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
