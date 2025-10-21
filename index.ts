@@ -4,6 +4,7 @@ import { registerRoutes } from "./server/routes";
 import { configureSecurity } from "./server/security";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createServer } from "http";
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +15,15 @@ configureSecurity(app);
 // Body parsing middleware (with size limits)
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
+
+// Health check endpoint for Autoscale Deployments
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    service: 'Tales of Aneria',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -46,7 +56,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Register API routes
+// Register API routes and start server
 (async () => {
   await registerRoutes(app);
 
@@ -72,10 +82,13 @@ app.use((req, res, next) => {
     res.status(status).json({ error: message });
   });
 
-  // Serve static files from dist/public in production (Vercel)
-  // Note: Vercel will automatically serve files from public/ directory via CDN
-  if (process.env.VERCEL) {
-    // On Vercel, serve the built client from dist
+  // Determine environment and setup accordingly
+  const isVercel = !!process.env.VERCEL;
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // Setup static file serving for production builds
+  if (isProduction || isVercel) {
     const distPath = path.join(__dirname, 'dist', 'public');
     app.use(express.static(distPath));
     
@@ -83,22 +96,49 @@ app.use((req, res, next) => {
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
+    
+    console.log(`Serving static files from: ${distPath}`);
+  }
+
+  // For Vercel serverless, just export the app
+  if (isVercel) {
+    console.log('Running on Vercel - exporting Express app for serverless');
+  } 
+  // For development and Replit production, start the server
+  else {
+    const server = createServer(app);
+    
+    // Setup Vite in development mode
+    if (isDevelopment) {
+      const { setupVite } = await import('./server/vite');
+      await setupVite(app, server);
+    }
+    
+    const port = parseInt(process.env.PORT || '5000', 10);
+    
+    // Start the server and keep it running
+    server.listen(port, '0.0.0.0', () => {
+      console.log(`Server running on port ${port} (${process.env.NODE_ENV || 'production'} mode)`);
+    });
+
+    // Handle graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, closing server gracefully...');
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    });
+
+    process.on('SIGINT', () => {
+      console.log('SIGINT received, closing server gracefully...');
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    });
   }
 })();
 
-// Export for Vercel (Vercel will handle the server startup)
+// Export for Vercel serverless
 export default app;
-
-// Local development server (only runs when not on Vercel)
-if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') {
-  const { setupVite } = await import('./server/vite');
-  const { createServer } = await import('http');
-  
-  const server = createServer(app);
-  await setupVite(app, server);
-  
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen(port, '0.0.0.0', () => {
-    console.log(`Development server running on port ${port}`);
-  });
-}
