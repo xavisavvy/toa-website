@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import pterrordaleBg from "@assets/feat-pterrordale.png";
 import aneriaBg from "@assets/feat-aneria.png";
 import taebrinBg from "@assets/creepy-forest.png";
@@ -83,7 +84,7 @@ function CharacterCarousel({ worldId }: CharacterCarouselProps) {
               data-testid={`avatar-${worldId}-${char.id}`}
             >
               <Avatar className="w-12 h-12 border-2 border-border">
-                <AvatarImage src={char.featuredImage} alt={char.name} />
+                <AvatarImage src={char.featuredImage} alt={char.name} loading="lazy" />
                 <AvatarFallback className="text-xs">
                   {char.name
                     .split(" ")
@@ -109,6 +110,60 @@ function CharacterCarousel({ worldId }: CharacterCarouselProps) {
           animation-play-state: paused;
         }
       `}</style>
+    </div>
+  );
+}
+
+interface LazyBackgroundImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+}
+
+function LazyBackgroundImage({ src, alt, className }: LazyBackgroundImageProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!imgRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: "200px", // Start loading 200px before element enters viewport
+      }
+    );
+
+    observer.observe(imgRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (isInView && !isLoaded) {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => setIsLoaded(true);
+    }
+  }, [isInView, isLoaded, src]);
+
+  return (
+    <div ref={imgRef} className="absolute inset-0">
+      {isLoaded && (
+        <img
+          src={src}
+          alt={alt}
+          className={className}
+        />
+      )}
     </div>
   );
 }
@@ -197,13 +252,11 @@ export default function WorldSection() {
               }
             >
               {world.backgroundImage && (
-                <div className="absolute inset-0">
-                  <img
-                    src={world.backgroundImage}
-                    alt={`${world.name} background`}
-                    className="w-full h-full object-cover opacity-10"
-                  />
-                </div>
+                <LazyBackgroundImage
+                  src={world.backgroundImage}
+                  alt={`${world.name} background`}
+                  className="w-full h-full object-cover opacity-10"
+                />
               )}
               {world.comingSoon && (
                 <div className="absolute top-4 right-4 z-10">
@@ -256,20 +309,16 @@ export default function WorldSection() {
                   </div>
                 )}
 
-                {world.id === "aneria" && (
-                  <div className="pt-4">
+                {!world.comingSoon && world.link === worldAnvilUrl && (
+                  <div className="pt-2">
                     <Button
                       variant="outline"
                       size="sm"
                       className="w-full"
-                      data-testid="button-worldanvil"
+                      data-testid={`button-explore-${world.id}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(
-                          worldAnvilUrl,
-                          "_blank",
-                          "noopener,noreferrer",
-                        );
+                        window.open(world.link, "_blank", "noopener,noreferrer");
                       }}
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
