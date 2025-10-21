@@ -67,13 +67,41 @@ All character images include proper copyright attribution and artist credits:
 
 ## External Dependencies
 - **Google YouTube Data API v3**: For fetching YouTube playlist and video details.
-- **Replit YouTube connector**: For OAuth authentication with YouTube.
+- **Replit YouTube connector**: For OAuth authentication with YouTube (Replit only).
 - **D&D Beyond API**: For fetching character data (race, class, level, alignment) and avatars.
 - **RSS Feed Parser**: For podcast integration.
 - **Etsy**: Integration for displaying featured products (requires API credentials).
 - **Patreon**: Call-to-action for community support.
 - **WorldAnvil**: Links for exploring campaign lore.
 - **Social Media**: Links for YouTube, Twitter, Instagram, Twitch, etc.
+
+## Deployment
+
+### Environment Variables
+All environment variables are documented in `.env.example`. See `DEPLOYMENT.md` for comprehensive Vercel deployment guide.
+
+**Required Variables:**
+- `NODE_ENV` - Application environment (production/development)
+- `DATABASE_URL` - PostgreSQL connection string
+- `ALLOWED_ORIGINS` - CORS allowed origins (comma-separated)
+- `SESSION_SECRET` - Session encryption secret
+- `YOUTUBE_API_KEY` - YouTube Data API v3 key
+- `VITE_YOUTUBE_PLAYLIST_ID` - YouTube playlist ID (frontend)
+- `VITE_PODCAST_FEED_URL` - Podcast RSS feed URL (frontend)
+
+**Optional Variables:**
+- `ETSY_API_KEY` - Etsy API credentials
+- `ETSY_ACCESS_TOKEN` - Etsy access token
+- `PORT` - Server port (default: 5000)
+
+### Vercel Deployment
+See `DEPLOYMENT.md` for step-by-step deployment instructions including:
+- Database setup (Vercel Postgres, Neon, Supabase, Railway)
+- API key configuration (YouTube, Etsy, etc.)
+- Custom domain setup
+- Security configuration
+- SSL/HTTPS setup
+- Continuous deployment
 
 ## Security Architecture (OWASP Top 10:2021 Compliance)
 

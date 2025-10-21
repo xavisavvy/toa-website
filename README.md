@@ -15,35 +15,37 @@ A professional landing page for your TTRPG Live Play series, featuring YouTube i
 
 ### 1. Environment Setup
 
-This project uses environment variables for configuration. To get started:
+This project uses environment variables for configuration. All required and optional variables are documented in `.env.example`.
+
+**For Local Development:**
 
 1. **Copy the environment template:**
    ```bash
    cp .env.example .env
    ```
 
-2. **Edit the `.env` file** with your actual values:
-   ```bash
-   # Environment Configuration
-   NODE_ENV=development
-   
-   # Database Configuration
-   DATABASE_URL=your_database_url_here
-   
-   # API Keys
-   YOUTUBE_API_KEY=your_youtube_api_key_here
-   ETSY_API_KEY=your_etsy_api_key_here
-   
-   # Session Secret
-   SESSION_SECRET=your_session_secret_here
-   
-   # Server Configuration
-   PORT=5000
-   ```
+2. **Edit the `.env` file** with your actual values - See `.env.example` for detailed documentation of each variable
 
-3. **Cross-Platform Support:**
-   - The npm scripts now use `cross-env` for Windows, macOS, and Linux compatibility
-   - Environment variables are loaded automatically using `dotenv`
+3. **Required Variables:**
+   - `DATABASE_URL` - PostgreSQL connection string
+   - `YOUTUBE_API_KEY` - YouTube Data API v3 key
+   - `VITE_YOUTUBE_PLAYLIST_ID` - Your YouTube playlist ID
+   - `VITE_PODCAST_FEED_URL` - Your podcast RSS feed URL
+   - `SESSION_SECRET` - Random secret for session encryption
+   - `ALLOWED_ORIGINS` - CORS allowed origins (production only)
+
+4. **Optional Variables:**
+   - `ETSY_API_KEY` - For Etsy shop integration
+   - `ETSY_ACCESS_TOKEN` - For Etsy shop integration
+
+**For Vercel Deployment:**
+
+See `DEPLOYMENT.md` for comprehensive step-by-step deployment instructions including:
+- Database setup options (Vercel Postgres, Neon, Supabase, Railway)
+- Getting all required API keys
+- Custom domain configuration
+- Security best practices
+- Troubleshooting guide
 
 ### 2. Configure Environment Variables
 
@@ -187,20 +189,58 @@ The site uses a fantasy-themed design:
 - **Typography**: Cinzel (serif) for headings, Inter for body text
 - **Dark Mode**: Deep charcoal background with elevated surfaces
 
+## Deployment
+
+### Deploy to Vercel
+
+This application is optimized for Vercel deployment. See `DEPLOYMENT.md` for complete instructions.
+
+**Quick Deploy:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
+
+1. Click the button above or connect your repository to Vercel
+2. Configure environment variables (see `DEPLOYMENT.md` for details)
+3. Deploy!
+
+**Required Environment Variables for Production:**
+- `NODE_ENV=production`
+- `DATABASE_URL` - PostgreSQL connection string
+- `ALLOWED_ORIGINS` - Your production domain(s)
+- `SESSION_SECRET` - Secure random string
+- `YOUTUBE_API_KEY` - YouTube API credentials
+- `VITE_YOUTUBE_PLAYLIST_ID` - Your playlist ID
+- `VITE_PODCAST_FEED_URL` - Your podcast RSS feed
+
+**Documentation:**
+- See `.env.example` for detailed variable documentation
+- See `DEPLOYMENT.md` for complete deployment guide
+- See `replit.md` for architecture and technical details
+
 ## Support & Troubleshooting
 
 ### Episodes Not Showing?
-1. Check that `VITE_YOUTUBE_PLAYLIST_ID` is set correctly in `.env`
+1. Check that `VITE_YOUTUBE_PLAYLIST_ID` is set correctly
 2. Verify the playlist is public (not private or unlisted)
 3. Check browser console for API errors
+4. Verify `YOUTUBE_API_KEY` is valid and has YouTube Data API v3 enabled
 
 ### Podcast Not Loading?
 1. Verify `VITE_PODCAST_FEED_URL` is a valid RSS feed URL
 2. Test the RSS feed URL in a browser to ensure it's accessible
 3. Check that the feed follows standard RSS/podcast feed format
 
-### Mobile Menu Not Working?
-The mobile menu automatically appears on screens smaller than 768px. Test by resizing your browser window or using browser DevTools mobile emulation.
+### CORS Errors in Production?
+1. Ensure `ALLOWED_ORIGINS` includes your production domain
+2. Include both www and non-www versions
+3. Use HTTPS URLs only
+
+### Database Connection Issues?
+1. Verify `DATABASE_URL` is correct and includes `?sslmode=require`
+2. Check database is accessible from your deployment platform
+3. Ensure SSL certificates are valid
+
+For more troubleshooting, see `DEPLOYMENT.md`.
 
 ## Next Steps
 
