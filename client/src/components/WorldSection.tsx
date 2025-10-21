@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 import pterrordaleBg from "@assets/feat-pterrordale.png";
+import aneriaBg from "@assets/feat-aneria.png";
 import charactersData from "@/data/characters.json";
 
 interface Campaign {
@@ -132,6 +133,7 @@ export default function WorldSection() {
         },
       ],
       link: worldAnvilUrl,
+      backgroundImage: 
     },
     {
       id: "pterrordale",
