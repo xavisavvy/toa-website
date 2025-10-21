@@ -16,8 +16,8 @@ configureSecurity(app);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
-// Health check endpoint for Autoscale Deployments
-app.get('/', (req, res) => {
+// Health check endpoint for Autoscale Deployments (on /health to not interfere with homepage)
+app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'ok', 
     service: 'Tales of Aneria',
@@ -60,7 +60,28 @@ app.use((req, res, next) => {
 (async () => {
   await registerRoutes(app);
 
+  // Determine environment and setup accordingly
+  const isVercel = !!process.env.VERCEL;
+  const isReplitDeployment = !!process.env.REPLIT_DEPLOYMENT;
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // Setup static file serving for production builds (Vercel, Replit Deployment, or production mode)
+  if (isProduction || isVercel || isReplitDeployment) {
+    // When running from dist/index.js, __dirname is 'dist', so we need 'public' not 'dist/public'
+    const distPath = path.join(__dirname, 'public');
+    app.use(express.static(distPath));
+    
+    // SPA fallback - serve index.html for all non-API routes
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+    
+    console.log(`Serving static files from: ${distPath}`);
+  }
+
   // A07: Enhanced error handling - Don't leak sensitive information
+  // IMPORTANT: Register error handler AFTER all routes
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     
@@ -81,24 +102,6 @@ app.use((req, res, next) => {
 
     res.status(status).json({ error: message });
   });
-
-  // Determine environment and setup accordingly
-  const isVercel = !!process.env.VERCEL;
-  const isProduction = process.env.NODE_ENV === 'production';
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  // Setup static file serving for production builds
-  if (isProduction || isVercel) {
-    const distPath = path.join(__dirname, 'dist', 'public');
-    app.use(express.static(distPath));
-    
-    // SPA fallback - serve index.html for all non-API routes
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-    
-    console.log(`Serving static files from: ${distPath}`);
-  }
 
   // For Vercel serverless, just export the app
   if (isVercel) {
