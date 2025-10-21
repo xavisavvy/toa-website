@@ -29,7 +29,18 @@ The frontend is built with React 18 and TypeScript, utilizing Wouter for routing
     - **Community**: Patreon call-to-action and social media links.
 - **Legal**: Includes Privacy Policy (`/legal/privacy`) and Terms of Service (`/legal/tos`) pages detailing third-party services, user rights, intellectual property, and usage terms. Both are linked from the footer.
 - **Branding**: Custom D20 die favicon (`client/public/favicon.png`) representing the TTRPG theme.
-- **SEO & Social Media**: Comprehensive Open Graph and Twitter Card meta tags for rich social media previews on Facebook, Twitter/X, LinkedIn, and messaging platforms. Includes custom preview image (`client/public/og-image.png`).
+- **SEO & Social Media**: 
+    - Comprehensive Open Graph and Twitter Card meta tags for rich social media previews on Facebook, Twitter/X, LinkedIn, WhatsApp, Discord, and messaging platforms
+    - Custom preview image (`client/public/og-image.png`) optimized for social sharing (1200x630px)
+    - Dynamic SEO component (`client/src/components/SEO.tsx`) for page-specific meta tags
+    - JSON-LD structured data for rich search engine results (Organization, WebSite, BreadcrumbList, CreativeWork schemas)
+    - XML sitemap (`client/public/sitemap.xml`) for search engine crawling
+    - Robots.txt (`client/public/robots.txt`) with proper directives
+    - Page-specific titles, descriptions, and keywords for all routes
+    - Canonical URLs to prevent duplicate content issues
+    - Semantic HTML with proper heading hierarchy (h1, h2, h3)
+    - Descriptive alt text for all images
+    - Mobile-friendly responsive design
 
 ### Backend (Express + Node.js)
 An Express.js backend handles API integrations.
