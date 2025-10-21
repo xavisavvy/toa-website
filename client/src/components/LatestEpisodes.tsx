@@ -21,6 +21,11 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
   const { data: episodes, isLoading } = useQuery<Episode[]>({
     queryKey: ['/api/youtube/playlist', playlistId],
     enabled: !!playlistId,
+    queryFn: async () => {
+      const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=100`);
+      if (!response.ok) throw new Error('Failed to fetch episodes');
+      return response.json();
+    },
   });
 
   const displayEpisodes = episodes ? [...episodes].reverse().slice(0, 3) : [];
