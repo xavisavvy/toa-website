@@ -105,11 +105,18 @@ export default function CharactersSection() {
                     Played by {character.player}
                   </p>
                   <p
-                    className="text-sm line-clamp-3"
+                    className="text-sm line-clamp-3 mb-3"
                     data-testid={`text-character-backstory-${character.id}`}
                   >
                     {character.backstory}
                   </p>
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs"
+                    data-testid={`badge-campaign-${character.id}`}
+                  >
+                    {character.campaign}
+                  </Badge>
                 </CardContent>
               </Card>
             </Link>

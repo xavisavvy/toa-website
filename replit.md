@@ -42,6 +42,17 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Added D&D Beyond character IDs and links for: Wayne (151530168), Carine Sol (151527820), Erys Leandorian (153687176), Freya Fenrir (147130895), Porphan Valaritas (151498356), Titheus Cillbrost (151508871)
   - Integrated character avatars directly from D&D Beyond CDN
   - Added detailed backstories and personality descriptions from character sheets
+- **Added campaign badges and filtering:**
+  - Campaign badges displayed on all character cards below backstory text
+  - Campaign filter buttons on /characters page for easy filtering
+  - Dynamically generated filters based on unique campaigns in character data
+  - Active/inactive character distinction maintained when filtering
+  - Currently all active characters are in "Journeys Through Taebrin" campaign
+- **Implemented YouTube caching system:**
+  - Server-side caching in `server/cache/youtube-playlist.json`
+  - 24-hour cache duration to prevent API quota exhaustion
+  - Stale cache fallback when API quota is exceeded
+  - Automatic cache refresh once per day
 
 ## Project Architecture
 
@@ -73,6 +84,9 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series. Th
   - Separate sections for active and past characters
   - Same card layout as homepage section
   - Character status filtering (active/inactive)
+  - Campaign badges on all character cards
+  - Campaign filter buttons for filtering by campaign
+  - Dynamically generated filters based on available campaigns
 - **World Section**: Showcases 3 campaign worlds (Aneria, Pterrordale, Taebrin) with campaign details and WorldAnvil links
   - Campaign world cards support optional background images at 10% opacity
   - Pterrordale card features feat-pterrordale.png background

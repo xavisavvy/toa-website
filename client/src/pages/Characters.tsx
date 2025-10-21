@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
 import { Link } from "wouter";
+import { useState } from "react";
 import charactersData from "@/data/characters.json";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -34,8 +36,20 @@ interface Character {
 
 export default function Characters() {
   const characters: Character[] = charactersData.characters;
-  const activeCharacters = characters.filter((char) => char.status === "active");
-  const inactiveCharacters = characters.filter(
+  const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
+
+  // Get unique campaigns
+  const campaigns = Array.from(
+    new Set(characters.map((char) => char.campaign))
+  ).sort();
+
+  // Filter characters by selected campaign
+  const filteredCharacters = selectedCampaign === "all" 
+    ? characters 
+    : characters.filter((char) => char.campaign === selectedCampaign);
+
+  const activeCharacters = filteredCharacters.filter((char) => char.status === "active");
+  const inactiveCharacters = filteredCharacters.filter(
     (char) => char.status !== "active"
   );
 
@@ -85,11 +99,18 @@ export default function Characters() {
             Played by {character.player}
           </p>
           <p
-            className="text-sm line-clamp-3"
+            className="text-sm line-clamp-3 mb-3"
             data-testid={`text-character-backstory-${character.id}`}
           >
             {character.backstory}
           </p>
+          <Badge 
+            variant="outline" 
+            className="text-xs"
+            data-testid={`badge-campaign-${character.id}`}
+          >
+            {character.campaign}
+          </Badge>
         </CardContent>
       </Card>
     </Link>
@@ -118,6 +139,31 @@ export default function Characters() {
             realms of Aneria, from active adventurers to legendary figures of
             the past.
           </p>
+        </div>
+
+        {/* Campaign Filter */}
+        <div className="mb-12">
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button
+              variant={selectedCampaign === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCampaign("all")}
+              data-testid="filter-all"
+            >
+              All Campaigns
+            </Button>
+            {campaigns.map((campaign) => (
+              <Button
+                key={campaign}
+                variant={selectedCampaign === campaign ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCampaign(campaign)}
+                data-testid={`filter-${campaign.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                {campaign}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Active Characters */}
