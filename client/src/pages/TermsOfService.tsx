@@ -1,12 +1,19 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SEO from "@/components/SEO";
 
 export default function TermsOfService() {
   const lastUpdated = "October 21, 2025";
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Terms of Service - Tales of Aneria"
+        description="Read the Terms of Service for Tales of Aneria. Learn about intellectual property rights, user conduct, disclaimers, and legal agreements governing website use."
+        canonical="https://talesofaneria.com/legal/tos"
+        noindex={true}
+      />
       <Navigation />
       
       <main className="pt-24 pb-20">

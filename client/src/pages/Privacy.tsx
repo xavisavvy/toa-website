@@ -1,12 +1,19 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SEO from "@/components/SEO";
 
 export default function Privacy() {
   const lastUpdated = "October 20, 2025";
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy - Tales of Aneria"
+        description="Learn how Tales of Aneria collects, uses, and protects your personal information. Read our comprehensive privacy policy covering data collection, cookies, and user rights."
+        canonical="https://talesofaneria.com/legal/privacy"
+        noindex={true}
+      />
       <Navigation />
       
       <main className="pt-24 pb-20">

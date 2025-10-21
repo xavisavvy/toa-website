@@ -14,6 +14,8 @@ import {
 import charactersData from "@/data/characters.json";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import { getCreativeWorkSchema, getBreadcrumbSchema } from "@/lib/structuredData";
 
 interface CharacterImage {
   id: string;
@@ -79,8 +81,36 @@ export default function CharacterDetail() {
   const featuredImage = character.images.find((img) => img.isFeatured);
   const galleryImages = character.images.filter((img) => !img.isFeatured);
 
+  const characterSchema = getCreativeWorkSchema({
+    name: character.name,
+    description: character.backstory,
+    creator: character.player,
+    image: character.featuredImage
+  });
+
+  const breadcrumbData = getBreadcrumbSchema([
+    { name: "Home", url: "https://talesofaneria.com/" },
+    { name: "Characters", url: "https://talesofaneria.com/characters" },
+    { name: character.name, url: `https://talesofaneria.com/characters/${character.id}` }
+  ]);
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [characterSchema, breadcrumbData]
+  };
+
+  const metaDescription = `Meet ${character.name}, a ${character.race} ${character.class} from ${character.campaign}. ${character.backstory.substring(0, 120)}...`;
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${character.name} - ${character.race} ${character.class} | Tales of Aneria`}
+        description={metaDescription}
+        canonical={`https://talesofaneria.com/characters/${character.id}`}
+        ogImage={character.featuredImage}
+        keywords={`${character.name}, ${character.race}, ${character.class}, ${character.campaign}, D&D character, TTRPG hero, ${character.player}`}
+        jsonLd={structuredData}
+      />
       <Navigation />
       {/* Hero Section */}
       <div className="relative h-96 bg-gradient-to-b from-primary/20 to-background overflow-hidden pt-24">

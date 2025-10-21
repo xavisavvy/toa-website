@@ -7,6 +7,8 @@ import { useState } from "react";
 import charactersData from "@/data/characters.json";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import { getBreadcrumbSchema } from "@/lib/structuredData";
 
 interface CharacterImage {
   id: string;
@@ -121,8 +123,20 @@ export default function Characters() {
     </Link>
   );
 
+  const breadcrumbData = getBreadcrumbSchema([
+    { name: "Home", url: "https://talesofaneria.com/" },
+    { name: "Characters", url: "https://talesofaneria.com/characters" }
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="All Characters - Tales of Aneria TTRPG"
+        description="Explore the full roster of heroes from Tales of Aneria. Meet active adventurers and legendary figures who have ventured through the realms of Aneria, Pterrordale, and Taebrin."
+        canonical="https://talesofaneria.com/characters"
+        keywords="D&D characters, TTRPG heroes, Dungeons and Dragons adventurers, fantasy characters, Aneria heroes, character roster"
+        jsonLd={breadcrumbData}
+      />
       <Navigation />
       <div className="py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
