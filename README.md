@@ -1,4 +1,4 @@
-# Tales of Aneria - TTRPG Live Play Landing Page
+# Tales of Aneria - TTRPG Live Play Landing Page 
 
 A professional landing page for our TTRPG Live Play series, featuring YouTube integration, podcast feeds, world lore, and merchandise showcase.
 
