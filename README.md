@@ -1,14 +1,14 @@
 # Tales of Aneria - TTRPG Live Play Landing Page
 
-A professional landing page for your TTRPG Live Play series, featuring YouTube integration, podcast feeds, world lore, and merchandise showcase.
+A professional landing page for our TTRPG Live Play series, featuring YouTube integration, podcast feeds, world lore, and merchandise showcase.
 
 ## Features
 
-✨ **YouTube Integration** - Automatically fetches and displays your latest episodes from any YouTube playlist
-🎙️ **Podcast Feed** - Integrates with any RSS podcast feed to showcase your audio content
+✨ **YouTube Integration** - Automatically fetches and displays our latest episodes from any YouTube playlist
+🎙️ **Podcast Feed** - Integrates with any RSS podcast feed to showcase our audio content
 🗺️ **World Building** - Links to WorldAnvil pages for characters, locations, factions, and lore
-🛍️ **Merchandise** - Showcase products and link to your Etsy storefront
-👥 **Cast & Community** - Highlight your team and connect with fans through social media
+🛍️ **Merchandise** - Showcase products and link to our Etsy storefront
+👥 **Cast & Community** - Highlight our team and connect with fans through social media
 📱 **Fully Responsive** - Beautiful design on desktop, tablet, and mobile devices
 
 ## Quick Start
@@ -24,13 +24,13 @@ This project uses environment variables for configuration. All required and opti
    cp .env.example .env
    ```
 
-2. **Edit the `.env` file** with your actual values - See `.env.example` for detailed documentation of each variable
+2. **Edit the `.env` file** with Our actual values - See `.env.example` for detailed documentation of each variable
 
 3. **Required Variables:**
    - `DATABASE_URL` - PostgreSQL connection string
    - `YOUTUBE_API_KEY` - YouTube Data API v3 key
-   - `VITE_YOUTUBE_PLAYLIST_ID` - Your YouTube playlist ID
-   - `VITE_PODCAST_FEED_URL` - Your podcast RSS feed URL
+   - `VITE_YOUTUBE_PLAYLIST_ID` - Our YouTube playlist ID
+   - `VITE_PODCAST_FEED_URL` - Our podcast RSS feed URL
    - `SESSION_SECRET` - Random secret for session encryption
    - `ALLOWED_ORIGINS` - CORS allowed origins (production only)
 
@@ -49,7 +49,7 @@ See `DEPLOYMENT.md` for comprehensive step-by-step deployment instructions inclu
 
 ### 2. Configure Environment Variables
 
-The YouTube playlist ID is already configured! Your latest episodes are displaying on the site.
+The YouTube playlist ID is already configured! Our latest episodes are displaying on the site.
 
 **Current Configuration:**
 - ✅ YouTube Playlist ID: `PLrmC8WonT9uaUoORXiAwGUo21Mp_N2u8v`
@@ -57,26 +57,26 @@ The YouTube playlist ID is already configured! Your latest episodes are displayi
 **Optional Configuration:**
 To add podcast episodes, you can add the podcast RSS feed URL in the Replit Secrets panel:
 - Key: `VITE_PODCAST_FEED_URL`
-- Value: Your podcast RSS feed URL
+- Value: Our podcast RSS feed URL
 
-### 2. How to Get Your YouTube Playlist ID
+### 2. How to Get Our YouTube Playlist ID
 
-1. Go to your YouTube playlist
+1. Go to our YouTube playlist
 2. Look at the URL: `https://www.youtube.com/playlist?list=PLxxxxxxxxxxxxx`
-3. Copy everything after `list=` - that's your playlist ID
+3. Copy everything after `list=` - that's our playlist ID
 4. Example: If URL is `https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf`
-   Then your ID is: `PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf`
+   Then our ID is: `PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf`
 
-### 3. Find Your Podcast RSS Feed
+### 3. Find Our Podcast RSS Feed
 
 Most podcast platforms provide an RSS feed URL:
-- **Spotify**: Use a service like Spotifeed or check your podcast settings
-- **Apple Podcasts**: Right-click your podcast and select "Copy RSS Feed"
-- **Anchor/Other hosting**: Check your podcast dashboard for the RSS feed URL
+- **Spotify**: Use a service like Spotifeed or check our podcast settings
+- **Apple Podcasts**: Right-click our podcast and select "Copy RSS Feed"
+- **Anchor/Other hosting**: Check our podcast dashboard for the RSS feed URL
 
 ### 4. Run the Application
 
-The application is already running! Just refresh your browser to see the changes after configuring environment variables.
+The application is already running! Just refresh our browser to see the changes after configuring environment variables.
 
 ## Customization Guide
 
@@ -142,21 +142,21 @@ To update any link, simply edit the `social-links.json` file. All components (Fo
 
 ### Add Real Promotions
 
-Edit `client/src/components/PromotionsSection.tsx` to showcase your current events and special offers.
+Edit `client/src/components/PromotionsSection.tsx` to showcase our current events and special offers.
 
-### Link Your Etsy Store
+### Link Our Etsy Store
 
 Edit `client/src/components/ShopSection.tsx`:
-1. Update the "Visit Our Etsy Store" button with your actual Etsy shop URL
-2. Replace mock products with your real products
+1. Update the "Visit Our Etsy Store" button with our actual Etsy shop URL
+2. Replace mock products with our real products
 3. Update product images and prices
 
 ### WorldAnvil Integration
 
-Update the links in `client/src/components/WorldSection.tsx` to point to your actual WorldAnvil pages:
+Update the links in `client/src/components/WorldSection.tsx` to point to our actual WorldAnvil pages:
 
 ```typescript
-onClick={() => window.open('https://www.worldanvil.com/your-world', '_blank')}
+onClick={() => window.open('https://www.worldanvil.com/our-world', '_blank')}
 ```
 
 ## API Endpoints
@@ -199,18 +199,18 @@ This application is optimized for Vercel deployment. See `DEPLOYMENT.md` for com
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
 
-1. Click the button above or connect your repository to Vercel
+1. Click the button above or connect our repository to Vercel
 2. Configure environment variables (see `DEPLOYMENT.md` for details)
 3. Deploy!
 
 **Required Environment Variables for Production:**
 - `NODE_ENV=production`
 - `DATABASE_URL` - PostgreSQL connection string
-- `ALLOWED_ORIGINS` - Your production domain(s)
+- `ALLOWED_ORIGINS` - Our production domain(s)
 - `SESSION_SECRET` - Secure random string
 - `YOUTUBE_API_KEY` - YouTube API credentials
-- `VITE_YOUTUBE_PLAYLIST_ID` - Your playlist ID
-- `VITE_PODCAST_FEED_URL` - Your podcast RSS feed
+- `VITE_YOUTUBE_PLAYLIST_ID` - Our playlist ID
+- `VITE_PODCAST_FEED_URL` - Our podcast RSS feed
 
 **Documentation:**
 - See `.env.example` for detailed variable documentation
@@ -231,13 +231,13 @@ This application is optimized for Vercel deployment. See `DEPLOYMENT.md` for com
 3. Check that the feed follows standard RSS/podcast feed format
 
 ### CORS Errors in Production?
-1. Ensure `ALLOWED_ORIGINS` includes your production domain
+1. Ensure `ALLOWED_ORIGINS` includes our production domain
 2. Include both www and non-www versions
 3. Use HTTPS URLs only
 
 ### Database Connection Issues?
 1. Verify `DATABASE_URL` is correct and includes `?sslmode=require`
-2. Check database is accessible from your deployment platform
+2. Check database is accessible from our deployment platform
 3. Ensure SSL certificates are valid
 
 For more troubleshooting, see `DEPLOYMENT.md`.
@@ -245,14 +245,14 @@ For more troubleshooting, see `DEPLOYMENT.md`.
 ## Next Steps
 
 1. ✅ Configure environment variables
-2. ✅ Add your YouTube playlist ID
-3. ✅ Add your podcast RSS feed (optional)
+2. ✅ Add our YouTube playlist ID
+3. ✅ Add our podcast RSS feed (optional)
 4. ✅ Update cast member information
 5. ✅ Link social media profiles
 6. ✅ Connect Etsy store
 7. ✅ Link WorldAnvil pages
 8. ✅ Test on mobile devices
-9. ✅ Share with your community!
+9. ✅ Share with our community!
 
 ## License
 
