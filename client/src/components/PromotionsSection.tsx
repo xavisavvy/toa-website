@@ -60,6 +60,7 @@ export default function PromotionsSection() {
                   src={promo.image}
                   alt={promo.title}
                   className="object-cover w-full h-full"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
                 <Badge
