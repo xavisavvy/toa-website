@@ -43,6 +43,15 @@ An Express.js backend handles API integrations.
 - **Cast Members**: Managed via `client/src/data/cast.json`, including roles, characters, current status, avatars, and social links.
 - **Characters**: Managed via `client/src/data/characters.json`, supporting multiple images, D&D Beyond integration (fetching real data for race, class, level, alignment, avatars), backstories, personality, and campaign affiliations.
 
+### Image Attribution System
+All character images include proper copyright attribution and artist credits:
+- **Copyright**: Displays "© [holder]" (e.g., "D&D Beyond / Wizards of the Coast") for all images
+- **Artist Credits**: Optional artist name with clickable link to portfolio/commissions page
+- **AI-Generated Indicators**: Amber-colored badges mark AI-generated artwork
+- **SEO Compliance**: Schema.org microdata (itemProp="copyrightHolder", itemProp="creator")
+- **Legal Best Practices**: Follows industry standards for copyright attribution
+- Current images from D&D Beyond are properly attributed to "D&D Beyond / Wizards of the Coast"
+
 ## External Dependencies
 - **Google YouTube Data API v3**: For fetching YouTube playlist and video details.
 - **Replit YouTube connector**: For OAuth authentication with YouTube.

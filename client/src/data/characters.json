@@ -17,7 +17,9 @@
           "url": "https://www.dndbeyond.com/avatars/51217/265/1581111423-151530168.jpeg",
           "caption": "Wayne - The Archivist of Lies",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "Wayne is a scholar-illusionist who records legends but can't stop fabricating them. Some lies come true, some lies get him in trouble. Even though he is a changeling, he typically sticks to Wayne unless assuming a character from one of his stories. He is both an earnest scholar and a compulsive storyteller, collecting 'true versions' of events but telling everyone different ones.",
@@ -43,7 +45,9 @@
           "url": "https://www.dndbeyond.com/avatars/51458/75/1581111423-151527820.jpeg",
           "caption": "Carine Sol - Astral Elf Sorcerer",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A 22-year-old Astral Elf with fiery orange hair and eyes black like a sunspot with orange around the iris. His skin is lightly tanned with crisscrossing lines that tell the story of his journey. As a Wayfarer, he grew up on the streets surrounded by ill-fated castoffs, sleeping where he could and doing odd jobs for food. Though hunger sometimes drove him to theft, he never lost his pride or abandoned hope.",
@@ -69,7 +73,9 @@
           "url": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg",
           "caption": "Erys Leandorian - Elven Ranger",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A skilled tracker and archer from the ancient forests. As a Scribe, Erys spent formative years in a scriptorium learning to write with a clear hand and produce finely written texts. He has a careful attention to detail and a keen appreciation for knowledge. Erys left his home to uncover the truth about a growing darkness threatening the realm.",
@@ -95,7 +101,9 @@
           "url": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg",
           "caption": "Freya Fenrir - Human Druid",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "Freya grew up close to the land, spending years tending animals and cultivating the earth. This upbringing rewarded her with patience, good health, and a deep appreciation for nature's bounty alongside a healthy respect for nature's wrath. She also trained as a soldier, learning the ways of battle to protect the natural world she holds dear.",
@@ -121,7 +129,9 @@
           "url": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg",
           "caption": "Porphan Valaritas - Satyr Bard",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A 25-year-old Satyr with brown hair, blue eyes, and fair skin standing 5'8\" tall. Porphan spent much of his youth following roving fairs and carnivals, performing odd jobs for musicians and acrobats in exchange for lessons. He learned to walk tightropes, play instruments in distinct styles, and recite poetry with impeccable diction. To this day, he thrives on applause and longs for the stage. His faith in art and creativity drives everything he does.",
@@ -147,7 +157,9 @@
           "url": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg",
           "caption": "Titheus Cillbrost - Gnome Rogue",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A 28-year-old Gnome standing just 3'9\" tall with dark red hair, green eyes, and brown skin. Titheus eked out a living in dark alleyways, cutting purses and burgling shops. Whether part of a small gang of like-minded wrongdoers or a lone wolf fending for himself against the local thieves' guild, he learned to survive through cunning and stealth.",
@@ -173,7 +185,9 @@
           "url": "https://www.dndbeyond.com/avatars/16125/376/1581111423-45818629.jpeg",
           "caption": "Bolt - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A legendary hero from the Wayward Watch, Bolt ventured through the realm of Aneria.",
@@ -199,7 +213,9 @@
           "url": "https://www.dndbeyond.com/avatars/17207/125/1581111423-46268811.jpeg",
           "caption": "Victor Udonta - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "“Oh merciful Blade in the Shadows, and keepers of the creed.\nGrant me swiftness, silence, and a target who trips on his own sword.\nMay their armor be decorative, their aim laughable,\nAnd their final words deeply ironic.\nBless this mess, sharpen my wit—\nAnd may the bloodstains come out of my cloak th",
@@ -225,7 +241,9 @@
           "url": "https://www.dndbeyond.com/avatars/32625/858/1581111423-94493888.jpeg",
           "caption": "Winifred (Fred) Blodbane - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A legendary hero from the Wayward Watch, Winifred (Fred) Blodbane ventured through the realm of Aneria.",
@@ -251,7 +269,9 @@
           "url": "https://www.dndbeyond.com/avatars/28162/132/1581111423-79518285.jpeg",
           "caption": "Alomah Stargazer - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "Alomah Stargazer\n\n \n\nTwenty one years ago…\n\n \n\nAlomah cracked open one eye and looked around expectantly. After 3 hours, he thought surely there would be *some* sign of the spirits of one of his ancestors. As a Kitsune of 13, he was *finally* undergoing his Skulk Stone ceremony, or “chasing his tail",
@@ -277,7 +297,9 @@
           "url": "https://www.dndbeyond.com/avatars/27438/71/1581111423-79078434.jpeg",
           "caption": "Aramis Alderhelm - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A legendary hero from the Wayward Watch, Aramis Alderhelm ventured through the realm of Aneria.",
@@ -303,7 +325,9 @@
           "url": "https://www.dndbeyond.com/avatars/44686/720/1581111423-133741834.jpeg",
           "caption": "Locke Lirien - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "Locke Lirien\nYoungest son of the Lirian Family from Manaport\n\nBackstory: The Architect of Bloodlines\nBorn into the prestigious Lirien family of elves and half-elves sorcerers living in Manaport, Locke was expected to carry the legacy of magical prowess that ran through their bloodline for generation",
@@ -329,7 +353,9 @@
           "url": "https://www.dndbeyond.com/avatars/25730/35/1581111423-47697687.jpeg",
           "caption": "Séredan Fallowshield - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "“That’s odd,” Seredan said out loud, though she was, as usual, alone. “I was hoping to dig up a corpse or some sort of buried treasure or something.” Looking down at the instrument, half exhumed in the dirt, she scratched the left side of her head; shaved to the skin after the fashion of the Vanguar",
@@ -355,7 +381,9 @@
           "url": "https://www.dndbeyond.com/avatars/24964/277/1581111423-67943311.jpeg",
           "caption": "Whu Mungus  - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A legendary hero from the Wayward Watch, Whu Mungus  ventured through the realm of Aneria.",
@@ -381,7 +409,9 @@
           "url": "https://www.dndbeyond.com/avatars/19773/411/1581111423-56077210.jpeg",
           "caption": "Maggie Bramblecheeks - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A legendary hero from the Wayward Watch, Maggie Bramblecheeks ventured through the realm of Aneria.",
@@ -407,7 +437,9 @@
           "url": "https://www.dndbeyond.com/avatars/19779/85/1581111423-56497643.jpeg",
           "caption": "Cilin Meekmarrow - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A legendary hero from the Wayward Watch, Cilin Meekmarrow ventured through the realm of Aneria.",
@@ -451,7 +483,9 @@
           "url": "https://www.dndbeyond.com/avatars/20613/950/1581111423-58907127.jpeg",
           "caption": "Ahri Flowers - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A hero from the Pterrordale Halloween special campaign, Ahri Flowers faced supernatural horrors.",
@@ -503,7 +537,9 @@
           "url": "https://www.dndbeyond.com/avatars/37668/838/1581111423-111107998.jpeg",
           "caption": "Mabel Crosscore - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A hero from the Pterrordale Halloween special campaign, Mabel Crosscore faced supernatural horrors.",
@@ -529,7 +565,9 @@
           "url": "https://www.dndbeyond.com/avatars/37573/465/1581111423-111110601.jpeg",
           "caption": "Melly - Official Character Art",
           "type": "portrait",
-          "isFeatured": true
+          "isFeatured": true,
+          "copyright": "D&D Beyond / Wizards of the Coast",
+          "isAiGenerated": false
         }
       ],
       "backstory": "A hero from the Pterrordale Halloween special campaign, Melly faced supernatural horrors.",

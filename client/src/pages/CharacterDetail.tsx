@@ -20,6 +20,10 @@ interface CharacterImage {
   caption: string;
   type: string;
   isFeatured: boolean;
+  artist?: string;
+  artistUrl?: string;
+  copyright?: string;
+  isAiGenerated?: boolean;
 }
 
 interface Character {
@@ -174,15 +178,49 @@ export default function CharacterDetail() {
                             <img
                               src={image.url}
                               alt={image.caption}
-                              className="object-cover w-full h-full hover:scale-105 transition-transform"
+                              className="object-cover w-full h-full"
+                              itemProp="image"
                             />
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                              <p className="text-white text-sm">
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
+                              <p className="text-white text-sm font-medium mb-1">
                                 {image.caption}
                               </p>
-                              <p className="text-white/60 text-xs capitalize">
-                                {image.type}
-                              </p>
+                              {image.isAiGenerated && (
+                                <p className="text-amber-300 text-xs mb-1 flex items-center gap-1">
+                                  <span className="inline-block w-1.5 h-1.5 bg-amber-300 rounded-full"></span>
+                                  AI Generated
+                                </p>
+                              )}
+                              {image.copyright && (
+                                <p 
+                                  className="text-white/70 text-xs" 
+                                  itemProp="copyrightHolder"
+                                  data-testid={`copyright-${image.id}`}
+                                >
+                                  © {image.copyright}
+                                </p>
+                              )}
+                              {image.artist && (
+                                <p className="text-white/70 text-xs mt-1">
+                                  {image.artistUrl ? (
+                                    <>
+                                      Art by{' '}
+                                      <a
+                                        href={image.artistUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary-foreground hover:text-white underline"
+                                        itemProp="creator"
+                                        data-testid={`artist-link-${image.id}`}
+                                      >
+                                        {image.artist}
+                                      </a>
+                                    </>
+                                  ) : (
+                                    <span itemProp="creator">Art by {image.artist}</span>
+                                  )}
+                                </p>
+                              )}
                             </div>
                           </>
                         ) : (

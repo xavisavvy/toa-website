@@ -14,6 +14,10 @@ interface CharacterImage {
   caption: string;
   type: string;
   isFeatured: boolean;
+  artist?: string;
+  artistUrl?: string;
+  copyright?: string;
+  isAiGenerated?: boolean;
 }
 
 interface Character {
