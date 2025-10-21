@@ -9,6 +9,7 @@ import {
   Sword,
   Shield,
   Heart,
+  Music,
 } from "lucide-react";
 import charactersData from "@/data/characters.json";
 import Navigation from "@/components/Navigation";
@@ -41,6 +42,7 @@ interface Character {
   backstory: string;
   personality: string;
   dndbeyond: string;
+  playlist?: string;
   status: string;
 }
 
@@ -298,6 +300,29 @@ export default function CharacterDetail() {
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
                       View on D&D Beyond
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Character Playlist */}
+            {character.playlist && (
+              <Card data-testid="card-playlist">
+                <CardContent className="pt-6">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    asChild
+                    data-testid="button-playlist"
+                  >
+                    <a
+                      href={character.playlist}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Music className="mr-2 h-4 w-4" />
+                      Character Playlist
                     </a>
                   </Button>
                 </CardContent>

@@ -41,7 +41,7 @@ An Express.js backend handles API integrations.
 
 ### Data Management
 - **Cast Members**: Managed via `client/src/data/cast.json`, including roles, characters, current status, avatars, and social links.
-- **Characters**: Managed via `client/src/data/characters.json`, supporting multiple images, D&D Beyond integration (fetching real data for race, class, level, alignment, avatars), backstories, personality, and campaign affiliations.
+- **Characters**: Managed via `client/src/data/characters.json`, supporting multiple images, D&D Beyond integration (fetching real data for race, class, level, alignment, avatars), backstories, personality, campaign affiliations, and optional music playlists.
 
 ### Image Attribution System
 All character images include proper copyright attribution and artist credits:
@@ -61,3 +61,29 @@ All character images include proper copyright attribution and artist credits:
 - **Patreon**: Call-to-action for community support.
 - **WorldAnvil**: Links for exploring campaign lore.
 - **Social Media**: Links for YouTube, Twitter, Instagram, Twitch, etc.
+## Character Playlist Feature
+
+Each character can have an associated music playlist (Spotify or YouTube) that captures their theme and personality.
+
+### Adding a Playlist
+To add a playlist to a character, edit `client/src/data/characters.json` and add the `playlist` field:
+
+```json
+{
+  "id": "wayne-archivist",
+  "name": "Wayne \"Archivist of Lies\"",
+  "playlist": "https://open.spotify.com/playlist/...",
+  ...
+}
+```
+
+### Supported Platforms
+- **Spotify**: Use full playlist URL (e.g., `https://open.spotify.com/playlist/...`)
+- **YouTube**: Use full playlist URL (e.g., `https://www.youtube.com/playlist?list=...`)
+- **YouTube Music**: Use full playlist URL (e.g., `https://music.youtube.com/playlist?list=...`)
+
+### Display
+- Playlist button appears on character detail page below the D&D Beyond button
+- Uses Music icon from Lucide React
+- Opens in new tab with proper security attributes
+- Only displays if playlist URL is provided

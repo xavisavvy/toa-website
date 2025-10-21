@@ -35,6 +35,7 @@ interface Character {
   backstory: string;
   personality: string;
   dndbeyond: string;
+  playlist?: string;
   status: string;
 }
 
