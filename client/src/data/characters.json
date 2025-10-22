@@ -65,15 +65,15 @@
       "images": [
         {
           "id": "1",
-          "caption": "Erys Leandorian - Elven Ranger",
+          "caption": "Erys Leandorian - Elven Cleric",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
           "isAiGenerated": false
         }
       ],
-      "backstory": "A skilled tracker and archer from the ancient forests. As a Scribe, Erys spent formative years in a scriptorium learning to write with a clear hand and produce finely written texts. He has a careful attention to detail and a keen appreciation for knowledge. Erys left his home to uncover the truth about a growing darkness threatening the realm.",
-      "personality": "Calm, observant, and deeply connected to nature. Erys combines the precision of a scholar with the instincts of a wilderness survivalist.",
+      "backstory": "A skilled cleric from the ancient forests. As a Scribe, Erys spent formative years in a scriptorium learning to write with a clear hand and produce finely written texts. He has a careful attention to detail and a keen appreciation for knowledge. Erys left his home to uncover the truth about a growing darkness threatening the realm, guided by divine wisdom.",
+      "personality": "Calm, observant, and deeply connected to both nature and the divine. Erys combines the precision of a scholar with the spiritual guidance of a cleric.",
       "dndbeyond": "https://www.dndbeyond.com/characters/153687176",
       "dndbeyondId": "153687176",
       "status": "active"
