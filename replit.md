@@ -43,6 +43,12 @@ A dedicated press kit page provides downloadable brand assets (logo, social prev
 ### Data Management
 -   **Cast Members**: Managed via `client/src/data/cast.json`.
 -   **Characters**: Managed via `client/src/data/characters.json`, supporting multiple images, D&D Beyond integration, backstories, personality, campaign affiliations, and optional music playlists (Spotify/YouTube).
+-   **D&D Beyond Character Sync**: Automated scripts fetch official character data (race, class, level, alignment, avatars) from D&D Beyond API:
+    -   `scripts/update-taebrin-characters.ts` - Updates 6 Journeys Through Taebrin characters
+    -   `scripts/update-aneria-characters.ts` - Updates 11 Aneria - Wayward Watch characters
+    -   `scripts/update-pterrordale-characters.ts` - Updates 5 Pterrordale characters
+    -   `scripts/update-all-characters.ts` - Updates all 22 characters across all campaigns
+    -   Run with: `tsx scripts/update-all-characters.ts`
 
 ### Image Attribution System
 All character images include proper copyright attribution, artist credits, and optional AI-generated indicators, adhering to legal best practices and SEO compliance.

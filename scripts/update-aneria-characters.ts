@@ -62,7 +62,7 @@ async function fetchCharacterData(characterId: string) {
       class: className,
       level: totalLevel,
       alignment: alignment,
-      avatarUrl: character.avatarUrl,
+      avatarUrl: character.decorations?.avatarUrl || character.avatarUrl,
     };
   } catch (error) {
     console.error(`Error fetching character ${characterId}:`, error);
@@ -109,9 +109,19 @@ async function main() {
         level: freshData.level,
         alignment: freshData.alignment,
         featuredImage: freshData.avatarUrl,
-        images: existingChar.images.map((img: any, idx: number) => 
-          idx === 0 ? { ...img, url: freshData.avatarUrl } : img
-        ),
+        images: existingChar.images.length > 0 
+          ? existingChar.images.map((img: any, idx: number) => 
+              idx === 0 ? { ...img, url: freshData.avatarUrl } : img
+            )
+          : [{
+              id: "1",
+              url: freshData.avatarUrl,
+              caption: `${freshData.name} - Official Character Art`,
+              type: "portrait",
+              isFeatured: true,
+              copyright: "D&D Beyond / Wizards of the Coast",
+              isAiGenerated: false
+            }],
       };
       
       updatedCount++;
