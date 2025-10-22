@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { getPlaylistVideos } from "./youtube";
 import { getPodcastFeed } from "./podcast";
 import { getShopListings } from "./etsy";
+import { getCharacterData } from "./dndbeyond";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -92,6 +93,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching Etsy listings:', error);
       res.status(500).json({ error: 'Failed to fetch Etsy products' });
+    }
+  });
+
+  // A03: Injection Prevention - Validate D&D Beyond character ID
+  app.get("/api/dndbeyond/character/:characterId", async (req, res) => {
+    try {
+      const { characterId } = req.params;
+      
+      // A03: Validate characterId format (D&D Beyond character IDs are numeric)
+      if (!/^\d+$/.test(characterId)) {
+        logSecurityEvent('INVALID_CHARACTER_ID', { characterId, ip: req.ip });
+        return res.status(400).json({ error: 'Invalid character ID format' });
+      }
+      
+      const characterData = await getCharacterData(characterId);
+      res.json(characterData);
+    } catch (error) {
+      console.error('Error fetching D&D Beyond character:', error);
+      res.status(500).json({ error: 'Failed to fetch character data' });
     }
   });
 
