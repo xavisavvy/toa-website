@@ -70,13 +70,25 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
       
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center py-20">
-        <h1 className="font-serif text-6xl md:text-7xl lg:text-8xl font-bold mb-6 text-foreground" data-testid="text-hero-title">
+        <h1 
+          className="font-serif text-6xl md:text-7xl lg:text-8xl font-bold mb-6 text-foreground" 
+          data-testid="text-hero-title"
+          style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5)' }}
+        >
           Tales of Aneria
         </h1>
-        <p className="text-xl md:text-2xl lg:text-3xl mb-8 text-muted-foreground font-light" data-testid="text-hero-tagline">
+        <p 
+          className="text-xl md:text-2xl lg:text-3xl mb-8 text-muted-foreground font-light" 
+          data-testid="text-hero-tagline"
+          style={{ textShadow: '0 2px 6px rgba(0, 0, 0, 0.7), 0 3px 12px rgba(0, 0, 0, 0.5)' }}
+        >
           An epic journey through a world of magic, mystery, and adventure
         </p>
-        <p className="text-lg md:text-xl mb-12 max-w-2xl mx-auto text-muted-foreground" data-testid="text-hero-description">
+        <p 
+          className="text-lg md:text-xl mb-12 max-w-2xl mx-auto text-muted-foreground" 
+          data-testid="text-hero-description"
+          style={{ textShadow: '0 2px 6px rgba(0, 0, 0, 0.7), 0 3px 12px rgba(0, 0, 0, 0.5)' }}
+        >
           Join our heroes as they unravel ancient secrets and forge their destiny in the mystical realm of Aneria
         </p>
         
