@@ -11,7 +11,7 @@ import coryAvatar from "@assets/cast-cory.jpg";
 import torreyAvatar from "@assets/cast-torrey.png";
 import scottAvatar from "@assets/cast-scott.jpg";
 import colbyAvatar from "@assets/cast-colby.png";
-// import ianAvatar from "@assets/cast-ian.jpg";
+import ianAvatar from "@assets/cast-ian.png";
 import jakeAvatar from "@assets/cast-jake.jpg";
 
 interface SocialLinks {
@@ -45,7 +45,7 @@ export default function AboutSection() {
     "cast-torrey.png": torreyAvatar,
     "cast-scott.jpg": scottAvatar,
     "cast-colby.png": colbyAvatar,
-    // "cast-ian.jpg": ianAvatar,
+    "cast-ian.png": ianAvatar,
     "cast-jake.jpg": jakeAvatar,
   };
 

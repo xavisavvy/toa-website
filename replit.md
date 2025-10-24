@@ -13,7 +13,7 @@ A professional landing page for the "Tales of Aneria" TTRPG live play series, se
 
 ### Frontend (React + TypeScript)
 The frontend is built with React 18, TypeScript, Wouter for routing, TanStack Query for data fetching, and Shadcn UI with Tailwind CSS for styling. Key features include:
--   **Navigation**: Fixed header with responsive mobile menu.
+-   **Navigation**: Fixed header with responsive mobile menu, automatic scroll-to-top on route changes for optimal UX.
 -   **Hero Section**: Full-screen hero with an auto-rotating image carousel.
 -   **Content Sections**: Dedicated sections for latest YouTube episodes (with server-side caching), podcast integration, character rosters (active/past, campaign filtering), individual character detail pages (linking D&D Beyond data), world lore, promotions, an Etsy shop, cast profiles, and community calls-to-action.
 -   **Legal**: Includes Privacy Policy and Terms of Service pages.
