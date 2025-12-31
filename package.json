@@ -20,6 +20,9 @@
     "test:load": "playwright test e2e/load-stress.spec.ts",
     "test:load:ui": "playwright test e2e/load-stress.spec.ts --ui",
     "test:all": "npm run test:coverage && npm run test:e2e",
+    "test:changed": "vitest --changed HEAD~1 --run",
+    "test:quick": "vitest --run --reporter=dot",
+    "test:watch": "vitest --watch --coverage",
     "test:mutation": "stryker run",
     "test:mutation:incremental": "stryker run --incremental",
     "db:push": "drizzle-kit push",
@@ -27,7 +30,8 @@
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as minor",
-    "release:patch": "standard-version --release-as patch"
+    "release:patch": "standard-version --release-as patch",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -140,6 +144,8 @@
     "esbuild": "^0.25.12",
     "fast-check": "^4.5.3",
     "happy-dom": "^20.0.11",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "msw": "^2.12.7",
     "pixelmatch": "^7.1.0",
     "playwright": "^1.57.0",
@@ -151,9 +157,21 @@
     "tsx": "^4.20.5",
     "typescript": "5.6.3",
     "vite": "^7.3.0",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.16",
+    "vitest-sonar-reporter": "^3.0.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run check -- --noEmit"
+    ],
+    "*.{ts,tsx}": [
+      "vitest related --run"
+    ],
+    "server/**/*.ts": [
+      "npm run test -- test/security/ --run"
+    ]
   }
 }

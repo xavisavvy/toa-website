@@ -1,0 +1,3 @@
+npm run check
+npx lint-staged
+npm run test:visual -- --reporter=dot

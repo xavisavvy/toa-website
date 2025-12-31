@@ -6,8 +6,13 @@ import { getPodcastFeed } from "./podcast";
 import { getShopListings } from "./etsy";
 import { getCharacterData } from "./dndbeyond";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
+import { metrics } from "./monitoring";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Metrics endpoint
+  app.get("/api/metrics", (req, res) => {
+    res.json(metrics.getMetrics());
+  });
   // A03: Injection Prevention - Validate YouTube playlist ID
   app.get("/api/youtube/playlist/:playlistId", async (req, res) => {
     try {

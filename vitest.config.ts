@@ -14,6 +14,15 @@ export default defineConfig({
       '**/e2e/**', // E2E tests run with Playwright, not Vitest
       '**/.stryker-tmp/**',
     ],
+    reporters: [
+      'default',
+      'json',
+      'html',
+    ],
+    outputFile: {
+      json: './reports/test-results.json',
+      html: './reports/index.html',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

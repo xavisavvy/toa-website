@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { configureSecurity } from "./security";
 import { validateEnvironment } from "./env-validator";
+import { metricsMiddleware } from "./monitoring";
 
 // Validate environment variables before starting
 validateEnvironment();
@@ -12,6 +13,9 @@ const app = express();
 
 // A05: Security Misconfiguration - Apply security middleware FIRST
 configureSecurity(app);
+
+// Add metrics middleware
+app.use(metricsMiddleware);
 
 // Body parsing middleware (with size limits)
 app.use(express.json({ limit: '1mb' })); // A05: Limit request body size
