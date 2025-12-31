@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/xavisavvy/toa-website/compare/v1.1.1...v1.1.2) (2025-12-31)
+
+
+### Bug Fixes
+
+* Fixed an issue with footer navigation when on sub-pages ([1005a4f](https://github.com/xavisavvy/toa-website/commit/1005a4fc7806e8d5a15b1b1a5a9f3cf2738ca970))
+
 ### [1.1.1](https://github.com/xavisavvy/toa-website/compare/v1.1.0...v1.1.1) (2025-12-31)
 
 ## [1.1.0](https://github.com/xavisavvy/toa-website/compare/v1.0.1...v1.1.0) (2025-12-31)
