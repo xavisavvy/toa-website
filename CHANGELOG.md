@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.7](https://github.com/xavisavvy/toa-website/compare/v1.1.6...v1.1.7) (2025-12-31)
+
+
+### Bug Fixes
+
+* add caching to podcast and etsy APIs to prevent 429 rate limit errors ([36ad518](https://github.com/xavisavvy/toa-website/commit/36ad5182938ee6ff17d4ad72cdeb8e2162424158))
+
 ### [1.1.6](https://github.com/xavisavvy/toa-website/compare/v1.1.5...v1.1.6) (2025-12-31)
 
 ### [1.1.5](https://github.com/xavisavvy/toa-website/compare/v1.1.4...v1.1.5) (2025-12-31)
