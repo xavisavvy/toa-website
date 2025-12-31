@@ -217,6 +217,13 @@ async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number
     allVideos.push(...videos);
   }
 
+  // Sort by publishedAt date (most recent first)
+  allVideos.sort((a, b) => {
+    const dateA = new Date(a.publishedAt).getTime();
+    const dateB = new Date(b.publishedAt).getTime();
+    return dateB - dateA;
+  });
+
   // Cache the fetched data
   writeCache(playlistId, allVideos);
 
@@ -319,6 +326,13 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
       
       allVideos.push(...videos);
     }
+
+    // Sort by publishedAt date (most recent first)
+    allVideos.sort((a, b) => {
+      const dateA = new Date(a.publishedAt).getTime();
+      const dateB = new Date(b.publishedAt).getTime();
+      return dateB - dateA;
+    });
 
     // Cache the fetched data
     writeCache(playlistId, allVideos);
