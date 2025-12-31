@@ -98,6 +98,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@playwright/test": "^1.57.0",
     "@replit/vite-plugin-cartographer": "^0.3.1",
     "@replit/vite-plugin-dev-banner": "^0.1.1",
@@ -122,6 +123,7 @@
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
     "autoprefixer": "^10.4.20",
+    "axe-core": "^4.11.0",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8",
