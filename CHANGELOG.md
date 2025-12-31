@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.5](https://github.com/xavisavvy/toa-website/compare/v1.1.4...v1.1.5) (2025-12-31)
+
+
+### Bug Fixes
+
+* fetch all YouTube playlist videos instead of limiting to 50 ([f7a93b7](https://github.com/xavisavvy/toa-website/commit/f7a93b73197fffca84d400ee6f2cc5d84918f48a))
+
 ### [1.1.4](https://github.com/xavisavvy/toa-website/compare/v1.1.3...v1.1.4) (2025-12-31)
 
 ### [1.1.3](https://github.com/xavisavvy/toa-website/compare/v1.1.2...v1.1.3) (2025-12-31)
