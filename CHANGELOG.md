@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/xavisavvy/toa-website/compare/v1.5.1...v1.6.0) (2025-12-31)
+
+
+### Features
+
+* add mutation testing infrastructure ([#6](https://github.com/xavisavvy/toa-website/issues/6)) ([ed46c17](https://github.com/xavisavvy/toa-website/commit/ed46c179972a3f7e1d4383209628a1f745b1eb7f))
+* add mutation testing infrastructure ([#6](https://github.com/xavisavvy/toa-website/issues/6)) ([31cbf56](https://github.com/xavisavvy/toa-website/commit/31cbf56560682d329980818587f8668c93ab9f30))
+
 ### [1.5.1](https://github.com/xavisavvy/toa-website/compare/v1.5.0...v1.5.1) (2025-12-31)
 
 ## [1.5.0](https://github.com/xavisavvy/toa-website/compare/v1.4.1...v1.5.0) (2025-12-31)
