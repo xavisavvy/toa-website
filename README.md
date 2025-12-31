@@ -208,6 +208,81 @@ Parses an RSS podcast feed and returns episode information.
 - **Integrations**: YouTube Data API v3, RSS Parser
 - **Styling**: Custom fantasy theme with purple and amber accents
 
+## Versioning
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning and changelog generation.
+
+### Commit Message Format
+
+When making commits, use the following format:
+
+```
+<type>(<scope>): <subject>
+```
+
+**Types:**
+- `feat:` - A new feature (bumps minor version)
+- `fix:` - A bug fix (bumps patch version)
+- `refactor:` - Code refactoring without feature changes
+- `perf:` - Performance improvements
+- `docs:` - Documentation changes only
+- `style:` - Code style changes (formatting, semicolons, etc.)
+- `test:` - Adding or updating tests
+- `chore:` - Maintenance tasks
+
+**Examples:**
+```bash
+feat: add character gallery section
+fix: resolve mobile navigation menu issues
+refactor: optimize YouTube API calls
+perf: improve image loading performance
+```
+
+### Breaking Changes
+
+For breaking changes, add `BREAKING CHANGE:` in the commit body or add `!` after the type:
+
+```bash
+feat!: redesign navigation menu
+
+BREAKING CHANGE: Navigation component API has changed
+```
+
+This will bump the major version (1.0.0 → 2.0.0).
+
+### Automatic Versioning
+
+When you push commits to the `main` branch:
+1. GitHub Actions automatically analyzes your commit messages
+2. Bumps the version in `package.json` based on commit types
+3. Generates/updates `CHANGELOG.md` with your changes
+4. Creates a git tag for the new version
+5. Pushes the changes back to the repository
+
+**Version Bump Rules:**
+- `fix:` commits → Patch version (1.0.0 → 1.0.1)
+- `feat:` commits → Minor version (1.0.0 → 1.1.0)
+- `BREAKING CHANGE:` → Major version (1.0.0 → 2.0.0)
+
+### Manual Versioning
+
+You can also manually trigger versioning:
+
+```bash
+# Automatic version bump based on commits
+npm run release
+
+# Force a specific version bump
+npm run release:patch  # 1.0.0 → 1.0.1
+npm run release:minor  # 1.0.0 → 1.1.0
+npm run release:major  # 1.0.0 → 2.0.0
+```
+
+Then push with tags:
+```bash
+git push --follow-tags origin main
+```
+
 ## Design System
 
 The site uses a fantasy-themed design:

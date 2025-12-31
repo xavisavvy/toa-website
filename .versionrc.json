@@ -1,0 +1,21 @@
+{
+  "types": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "chore", "hidden": true },
+    { "type": "docs", "hidden": true },
+    { "type": "style", "hidden": true },
+    { "type": "refactor", "section": "Code Refactoring" },
+    { "type": "perf", "section": "Performance Improvements" },
+    { "type": "test", "hidden": true }
+  ],
+  "commitUrlFormat": "https://github.com/xavisavvy/toa-website/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/xavisavvy/toa-website/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/xavisavvy/toa-website/issues/{{id}}",
+  "userUrlFormat": "https://github.com/{{user}}",
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+  "issuePrefixes": ["#"],
+  "skip": {
+    "tag": false
+  }
+}

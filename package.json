@@ -12,7 +12,11 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "db:push": "drizzle-kit push",
-    "update-taebrin-images": "tsx scripts/update-taebrin-with-custom-images.ts"
+    "update-taebrin-images": "tsx scripts/update-taebrin-with-custom-images.ts",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -119,6 +123,7 @@
     "esbuild": "^0.25.12",
     "happy-dom": "^20.0.11",
     "postcss": "^8.4.47",
+    "standard-version": "^9.5.0",
     "supertest": "^7.1.4",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.20.5",
