@@ -27,7 +27,7 @@ export default function LatestEpisodes({ playlistIds }: LatestEpisodesProps) {
       // Fetch from each playlist via server-side API (avoids referrer restrictions)
       const allVideosPromises = playlistIds!.map(async (playlistId) => {
         try {
-          const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=50`);
+          const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=10000`);
           if (!response.ok) {
             console.error(`Error fetching playlist ${playlistId}:`, response.statusText);
             return [];

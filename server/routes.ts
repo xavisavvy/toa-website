@@ -21,7 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // A03: Validate maxResults parameter
       const maxResultsInput = req.query.maxResults as string;
-      const validation = validateNumber(maxResultsInput || '10', 1, 100);
+      const validation = validateNumber(maxResultsInput || '1000', 1, 10000);
       
       if (!validation.valid) {
         return res.status(400).json({ error: validation.error });

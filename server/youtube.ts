@@ -227,15 +227,15 @@ async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number
   // Cache the fetched data
   writeCache(playlistId, allVideos);
 
-  return allVideos.slice(0, maxResults);
+  return allVideos;
 }
 
 
-export async function getPlaylistVideos(playlistId: string, maxResults: number = 50): Promise<VideoItem[]> {
+export async function getPlaylistVideos(playlistId: string, maxResults: number = 1000): Promise<VideoItem[]> {
   // Check cache first
   const cachedVideos = readCache(playlistId);
   if (cachedVideos !== null) {
-    return cachedVideos.slice(0, maxResults);
+    return cachedVideos;
   }
 
   // Cache miss or expired, fetch from API
@@ -352,7 +352,7 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
     // Cache the fetched data
     writeCache(playlistId, allVideos);
 
-    return allVideos.slice(0, maxResults);
+    return allVideos;
   } catch (error) {
     console.error('Error fetching YouTube playlist:', error);
     
@@ -363,7 +363,7 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
         const cachedData: CachedPlaylistData = JSON.parse(cacheContent);
         if (cachedData.playlistId === playlistId) {
           console.log('API failed, serving stale cache as fallback');
-          return cachedData.videos.slice(0, maxResults);
+          return cachedData.videos;
         }
       }
     } catch (cacheError) {
