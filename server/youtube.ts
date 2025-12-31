@@ -245,18 +245,33 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
       try {
         return await getPlaylistVideosDirectAPI(playlistId, maxResults);
       } catch (apiError: any) {
+        const errorMsg = apiError.message?.toLowerCase() || '';
         // If API key has referrer restrictions, fall through to try OAuth only if Replit env is available
-        if (apiError.message?.includes('API_KEY_HTTP_REFERRER_BLOCKED') || apiError.message?.includes('referer')) {
-          console.log('YouTube API key has referrer restrictions, falling back to OAuth connector...');
-          // In local development without Replit vars, return empty array instead of throwing
-          if (!process.env.REPLIT_CONNECTORS_HOSTNAME && process.env.NODE_ENV === 'development') {
-            console.log('⚠️  Running in local development without OAuth. Please configure a YouTube API key without referrer restrictions for local development.');
+        if (errorMsg.includes('referer') || errorMsg.includes('api_key_http_referrer_blocked') || errorMsg.includes('blocked')) {
+          console.log('YouTube API key has referrer restrictions, attempting OAuth fallback...');
+          
+          // Check if OAuth is available before attempting it
+          const hasOAuthSupport = process.env.REPLIT_CONNECTORS_HOSTNAME && 
+            (process.env.REPL_IDENTITY || process.env.WEB_REPL_RENEWAL);
+          
+          if (!hasOAuthSupport) {
+            console.log('⚠️  OAuth fallback not available. YouTube API key has referrer restrictions and OAuth is not configured.');
+            console.log('   To fix: Remove referrer restrictions from your YouTube API key in Google Cloud Console.');
             return [];
           }
         } else {
           throw apiError;
         }
       }
+    }
+    
+    // Check if OAuth is available before attempting
+    const hasOAuthSupport = process.env.REPLIT_CONNECTORS_HOSTNAME && 
+      (process.env.REPL_IDENTITY || process.env.WEB_REPL_RENEWAL);
+    
+    if (!hasOAuthSupport && !process.env.YOUTUBE_API_KEY) {
+      console.log('⚠️  No YouTube authentication available. Please configure YOUTUBE_API_KEY or connect YouTube via Replit.');
+      return [];
     }
     
     const youtube = await getUncachableYouTubeClient();
@@ -355,7 +370,9 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
       console.error('Failed to read stale cache:', cacheError);
     }
     
-    throw error;
+    // Return empty array instead of throwing to prevent page crashes
+    console.log('⚠️  YouTube API unavailable, returning empty video list');
+    return [];
   }
 }
 
