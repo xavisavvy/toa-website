@@ -238,9 +238,14 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
       try {
         return await getPlaylistVideosDirectAPI(playlistId, maxResults);
       } catch (apiError: any) {
-        // If API key has referrer restrictions, fall through to try OAuth
+        // If API key has referrer restrictions, fall through to try OAuth only if Replit env is available
         if (apiError.message?.includes('API_KEY_HTTP_REFERRER_BLOCKED') || apiError.message?.includes('referer')) {
           console.log('YouTube API key has referrer restrictions, falling back to OAuth connector...');
+          // In local development without Replit vars, return empty array instead of throwing
+          if (!process.env.REPLIT_CONNECTORS_HOSTNAME && process.env.NODE_ENV === 'development') {
+            console.log('⚠️  Running in local development without OAuth. Please configure a YouTube API key without referrer restrictions for local development.');
+            return [];
+          }
         } else {
           throw apiError;
         }
