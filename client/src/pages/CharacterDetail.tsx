@@ -202,7 +202,7 @@ export default function CharacterDetail() {
                     {character.images.map((image) => (
                       <div
                         key={image.id}
-                        className="relative aspect-square bg-muted rounded-md overflow-hidden"
+                        className="relative aspect-[3/4] bg-muted rounded-md overflow-hidden"
                         data-testid={`gallery-image-${image.id}`}
                       >
                         {image.url ? (
