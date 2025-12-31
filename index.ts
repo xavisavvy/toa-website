@@ -61,13 +61,12 @@ app.use((req, res, next) => {
   await registerRoutes(app);
 
   // Determine environment and setup accordingly
-  const isVercel = !!process.env.VERCEL;
   const isReplitDeployment = !!process.env.REPLIT_DEPLOYMENT;
   const isProduction = process.env.NODE_ENV === 'production';
   const isDevelopment = process.env.NODE_ENV === 'development';
 
-  // Setup static file serving for production builds (Vercel, Replit Deployment, or production mode)
-  if (isProduction || isVercel || isReplitDeployment) {
+  // Setup static file serving for production builds (Replit Deployment or production mode)
+  if (isProduction || isReplitDeployment) {
     // When running from dist/index.js, __dirname is 'dist', so we need 'public' not 'dist/public'
     const distPath = path.join(__dirname, 'public');
     app.use(express.static(distPath));
@@ -103,13 +102,8 @@ app.use((req, res, next) => {
     res.status(status).json({ error: message });
   });
 
-  // For Vercel serverless, just export the app
-  if (isVercel) {
-    console.log('Running on Vercel - exporting Express app for serverless');
-  } 
-  // For development and Replit production, start the server
-  else {
-    const server = createServer(app);
+  // Start the server
+  const server = createServer(app);
     
     // Setup Vite in development mode
     if (isDevelopment) {
@@ -143,5 +137,4 @@ app.use((req, res, next) => {
   }
 })();
 
-// Export for Vercel serverless
 export default app;

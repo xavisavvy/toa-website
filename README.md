@@ -39,14 +39,7 @@ This project uses environment variables for configuration. All required and opti
    - `ETSY_API_KEY` - For Etsy shop integration
    - `ETSY_ACCESS_TOKEN` - For Etsy shop integration
 
-**For Vercel Deployment:**
 
-See `DEPLOYMENT.md` for comprehensive step-by-step deployment instructions including:
-- Database setup options (Vercel Postgres, Neon, Supabase, Railway)
-- Getting all required API keys
-- Custom domain configuration
-- Security best practices
-- Troubleshooting guide
 
 ### 2. Configure Environment Variables
 
@@ -293,17 +286,7 @@ The site uses a fantasy-themed design:
 
 ## Deployment
 
-### Deploy to Vercel
-
-This application is optimized for Vercel deployment. See `DEPLOYMENT.md` for complete instructions.
-
-**Quick Deploy:**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
-
-1. Click the button above or connect our repository to Vercel
-2. Configure environment variables (see `DEPLOYMENT.md` for details)
-3. Deploy!
+This application can be deployed to various platforms. Ensure you have:
 
 **Required Environment Variables for Production:**
 - `NODE_ENV=production`
