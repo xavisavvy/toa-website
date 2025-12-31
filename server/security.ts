@@ -26,6 +26,7 @@ export function configureSecurity(app: Express) {
             "https://www.google.com",
             "https://apis.google.com",
           ],
+          workerSrc: ["'self'", "blob:"], // Required for Vite HMR workers
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
           imgSrc: [
