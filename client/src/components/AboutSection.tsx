@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Youtube, Twitter, Instagram, Twitch, Globe } from "lucide-react";
 import castData from "@/data/cast.json";
-import prestonAvatar from "@assets/cast-preston.jpg";
-import brigetteAvatar from "@assets/cast-brigette.png";
-import dallinAvatar from "@assets/cast-dallin.png";
-import coryAvatar from "@assets/cast-cory.jpg";
-import torreyAvatar from "@assets/cast-torrey.png";
-import scottAvatar from "@assets/cast-scott.jpg";
-import colbyAvatar from "@assets/cast-colby.png";
-import ianAvatar from "@assets/cast-ian.png";
-import jakeAvatar from "@assets/cast-jake.jpg";
+import prestonAvatar from "@/assets/cast-preston.jpg";
+import brigetteAvatar from "@/assets/cast-brigette.png";
+import dallinAvatar from "@/assets/cast-dallin.png";
+import coryAvatar from "@/assets/cast-cory.jpg";
+import torreyAvatar from "@/assets/cast-torrey.png";
+import scottAvatar from "@/assets/cast-scott.jpg";
+import colbyAvatar from "@/assets/cast-colby.png";
+import ianAvatar from "@/assets/cast-ian.png";
+import jakeAvatar from "@/assets/cast-jake.jpg";
 
 interface SocialLinks {
   youtube?: string;
