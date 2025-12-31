@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Clock, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getPlaylistVideosClient } from "@/lib/youtube";
+import { getMultiplePlaylistVideosClient } from "@/lib/youtube";
 
 interface Episode {
   id: string;
@@ -15,15 +15,15 @@ interface Episode {
 }
 
 interface LatestEpisodesProps {
-  playlistId?: string;
+  playlistIds?: string[];
 }
 
-export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
+export default function LatestEpisodes({ playlistIds }: LatestEpisodesProps) {
   const { data: episodes, isLoading, error } = useQuery<Episode[]>({
-    queryKey: ['/api/youtube/playlist-client', playlistId],
-    enabled: !!playlistId,
+    queryKey: ['/api/youtube/playlists-client', playlistIds],
+    enabled: !!playlistIds && playlistIds.length > 0,
     queryFn: async () => {
-      console.log('Fetching YouTube playlist from client:', playlistId);
+      console.log('Fetching YouTube playlists from client:', playlistIds);
       
       const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
       if (!apiKey) {
@@ -31,18 +31,18 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
         throw new Error('YouTube API key not configured');
       }
       
-      console.log('Using client-side YouTube API');
-      const videos = await getPlaylistVideosClient(playlistId!, apiKey, 100);
-      console.log('Client-side response:', videos?.length, 'videos');
+      console.log('Using client-side YouTube API for multiple playlists');
+      const videos = await getMultiplePlaylistVideosClient(playlistIds!, apiKey, 100);
+      console.log('Client-side response:', videos?.length, 'videos from', playlistIds?.length, 'playlists');
       return videos;
     },
   });
 
-  const displayEpisodes = episodes ? [...episodes].reverse().slice(0, 3) : [];
+  // Videos are already sorted by most recent first from the API
+  const displayEpisodes = episodes ? episodes.slice(0, 3) : [];
   
-  const playlistUrl = playlistId 
-    ? `https://www.youtube.com/playlist?list=${playlistId}`
-    : 'https://www.youtube.com/@TalesOfAneria';
+  // Link to YouTube channel since we have multiple playlists
+  const channelUrl = 'https://www.youtube.com/@TalesOfAneria';
 
   return (
     <section id="episodes" className="py-20 lg:py-32 bg-background">
@@ -59,7 +59,7 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
           <Button 
             variant="outline"
             data-testid="button-view-all-episodes"
-            onClick={() => window.open(playlistUrl, '_blank', 'noopener,noreferrer')}
+            onClick={() => window.open(channelUrl, '_blank', 'noopener,noreferrer')}
           >
             View All Episodes
           </Button>
@@ -81,9 +81,9 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
           <Card>
             <CardContent className="p-12 text-center">
               <p className="text-muted-foreground">
-                {playlistId 
-                  ? "No episodes found in this playlist."
-                  : "Configure your YouTube playlist ID to display episodes."}
+                {playlistIds && playlistIds.length > 0
+                  ? "No episodes found in the playlists."
+                  : "Configure your YouTube playlist IDs to display episodes."}
               </p>
             </CardContent>
           </Card>
@@ -107,8 +107,8 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
                       <Play className="h-8 w-8 text-primary-foreground ml-1" />
                     </div>
                   </div>
-                  <Badge className="absolute top-3 left-3" data-testid={`badge-episode-number-${episode.id}`}>
-                    Episode {episodes ? episodes.length - index : index + 1}
+                  <Badge className="absolute top-3 left-3" data-testid={`badge-episode-new-${episode.id}`}>
+                    New
                   </Badge>
                 </div>
                 <CardContent className="p-6">

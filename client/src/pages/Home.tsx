@@ -13,7 +13,11 @@ import SEO from "@/components/SEO";
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/structuredData";
 
 export default function Home() {
-  const YOUTUBE_PLAYLIST_ID = import.meta.env.VITE_YOUTUBE_PLAYLIST_ID;
+  // Support multiple playlist IDs (comma-separated in env var)
+  const YOUTUBE_PLAYLIST_IDS_RAW = import.meta.env.VITE_YOUTUBE_PLAYLIST_IDS || import.meta.env.VITE_YOUTUBE_PLAYLIST_ID;
+  const YOUTUBE_PLAYLIST_IDS = YOUTUBE_PLAYLIST_IDS_RAW 
+    ? YOUTUBE_PLAYLIST_IDS_RAW.split(',').map((id: string) => id.trim()).filter(Boolean)
+    : [];
   const PODCAST_FEED_URL = import.meta.env.VITE_PODCAST_FEED_URL;
   const SPOTIFY_URL = import.meta.env.VITE_PODCAST_SPOTIFY_URL;
   const APPLE_PODCASTS_URL = import.meta.env.VITE_PODCAST_APPLE_URL;
@@ -38,7 +42,7 @@ export default function Home() {
       />
       <Navigation />
       <Hero />
-      <LatestEpisodes playlistId={YOUTUBE_PLAYLIST_ID} />
+      <LatestEpisodes playlistIds={YOUTUBE_PLAYLIST_IDS} />
       <PodcastSection 
         feedUrl={PODCAST_FEED_URL}
         spotifyUrl={SPOTIFY_URL}
