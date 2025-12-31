@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.9](https://github.com/xavisavvy/toa-website/compare/v1.1.8...v1.1.9) (2025-12-31)
+
+
+### Bug Fixes
+
+* support multiple playlist caching and secure production logging ([6fa89b8](https://github.com/xavisavvy/toa-website/commit/6fa89b80149c8ba4da8fa2e80a1e269923cb116b))
+
 ### [1.1.8](https://github.com/xavisavvy/toa-website/compare/v1.1.7...v1.1.8) (2025-12-31)
 
 ### [1.1.7](https://github.com/xavisavvy/toa-website/compare/v1.1.6...v1.1.7) (2025-12-31)
