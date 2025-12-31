@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Headphones } from "lucide-react";
-import { SiSpotify, SiApplepodcasts } from "react-icons/si";
+import { SiSpotify, SiApplepodcasts, SiYoutubemusic } from "react-icons/si";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -18,9 +18,12 @@ interface PodcastEpisode {
 
 interface PodcastSectionProps {
   feedUrl?: string;
+  spotifyUrl?: string;
+  applePodcastsUrl?: string;
+  youtubeMusicUrl?: string;
 }
 
-export default function PodcastSection({ feedUrl }: PodcastSectionProps) {
+export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, youtubeMusicUrl }: PodcastSectionProps) {
   const { data: episodes, isLoading } = useQuery<PodcastEpisode[]>({
     queryKey: ['/api/podcast/feed', feedUrl],
     queryFn: async () => {
@@ -121,8 +124,19 @@ export default function PodcastSection({ feedUrl }: PodcastSectionProps) {
                   )}
                 </div>
                 {featuredEpisode.audioUrl ? (
-                  <audio controls className="w-full mb-6">
-                    <source src={featuredEpisode.audioUrl} type="audio/mpeg" />
+                  <audio 
+                    controls 
+                    className="w-full mb-6"
+                    preload="metadata"
+                    onError={(e) => {
+                      console.error('Audio playback error:', e);
+                      console.log('Audio URL:', featuredEpisode.audioUrl);
+                    }}
+                    onLoadedMetadata={() => console.log('Audio loaded successfully')}
+                  >
+                    <source src={`/api/podcast/audio-proxy?url=${encodeURIComponent(featuredEpisode.audioUrl)}`} type="audio/mpeg" />
+                    <source src={`/api/podcast/audio-proxy?url=${encodeURIComponent(featuredEpisode.audioUrl)}`} type="audio/mp4" />
+                    <source src={`/api/podcast/audio-proxy?url=${encodeURIComponent(featuredEpisode.audioUrl)}`} type="audio/x-m4a" />
                     Your browser does not support the audio element.
                   </audio>
                 ) : (
@@ -136,7 +150,8 @@ export default function PodcastSection({ feedUrl }: PodcastSectionProps) {
                     size="sm" 
                     variant="outline"
                     data-testid="button-spotify"
-                    onClick={() => console.log('Open Spotify')}
+                    onClick={() => spotifyUrl && window.open(spotifyUrl, '_blank')}
+                    disabled={!spotifyUrl}
                   >
                     <SiSpotify className="h-4 w-4 mr-2" />
                     Spotify
@@ -145,10 +160,21 @@ export default function PodcastSection({ feedUrl }: PodcastSectionProps) {
                     size="sm" 
                     variant="outline"
                     data-testid="button-apple-podcasts"
-                    onClick={() => console.log('Open Apple Podcasts')}
+                    onClick={() => applePodcastsUrl && window.open(applePodcastsUrl, '_blank')}
+                    disabled={!applePodcastsUrl}
                   >
                     <SiApplepodcasts className="h-4 w-4 mr-2" />
                     Apple
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    data-testid="button-youtube-music"
+                    onClick={() => youtubeMusicUrl && window.open(youtubeMusicUrl, '_blank')}
+                    disabled={!youtubeMusicUrl}
+                  >
+                    <SiYoutubemusic className="h-4 w-4 mr-2" />
+                    YouTube Music
                   </Button>
                 </div>
               </CardContent>
@@ -168,39 +194,63 @@ export default function PodcastSection({ feedUrl }: PodcastSectionProps) {
                 recentEpisodes.map((episode: PodcastEpisode) => (
                   <Card 
                     key={episode.id}
-                    className="hover-elevate cursor-pointer transition-all"
+                    className="hover-elevate transition-all"
                     data-testid={`card-podcast-${episode.id}`}
-                    onClick={() => {
-                      if (episode.link) {
-                        window.open(episode.link, '_blank');
-                      } else {
-                        console.log(`Podcast episode ${episode.id} clicked`);
-                      }
-                    }}
                   >
                     <CardContent className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <h4 className="font-semibold mb-2 line-clamp-2" data-testid={`text-podcast-title-${episode.id}`}>
-                            {episode.title}
-                          </h4>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-                            <span data-testid={`text-podcast-date-${episode.id}`}>{formatDate(episode.pubDate)}</span>
-                            {episode.duration && (
-                              <>
-                                <span>•</span>
-                                <span data-testid={`text-podcast-duration-${episode.id}`}>{episode.duration}</span>
-                              </>
-                            )}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <h4 className="font-semibold mb-2 line-clamp-2" data-testid={`text-podcast-title-${episode.id}`}>
+                              {episode.title}
+                            </h4>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+                              <span data-testid={`text-podcast-date-${episode.id}`}>{formatDate(episode.pubDate)}</span>
+                              {episode.duration && (
+                                <>
+                                  <span>•</span>
+                                  <span data-testid={`text-podcast-duration-${episode.id}`}>{episode.duration}</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          data-testid={`button-play-podcast-${episode.id}`}
-                        >
-                          <Headphones className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs text-muted-foreground">Listen on:</span>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-7 text-xs"
+                            data-testid={`button-spotify-${episode.id}`}
+                            onClick={() => spotifyUrl && window.open(spotifyUrl, '_blank')}
+                            disabled={!spotifyUrl}
+                          >
+                            <SiSpotify className="h-3 w-3 mr-1" />
+                            Spotify
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-7 text-xs"
+                            data-testid={`button-apple-${episode.id}`}
+                            onClick={() => applePodcastsUrl && window.open(applePodcastsUrl, '_blank')}
+                            disabled={!applePodcastsUrl}
+                          >
+                            <SiApplepodcasts className="h-3 w-3 mr-1" />
+                            Apple
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-7 text-xs"
+                            data-testid={`button-youtube-music-${episode.id}`}
+                            onClick={() => youtubeMusicUrl && window.open(youtubeMusicUrl, '_blank')}
+                            disabled={!youtubeMusicUrl}
+                          >
+                            <SiYoutubemusic className="h-3 w-3 mr-1" />
+                            YouTube Music
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

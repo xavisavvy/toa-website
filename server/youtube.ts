@@ -43,6 +43,15 @@ async function getAccessToken() {
 }
 
 export async function getUncachableYouTubeClient() {
+  // Check if we have a standard YouTube API key (for non-Replit deployments)
+  if (process.env.YOUTUBE_API_KEY) {
+    return google.youtube({ 
+      version: 'v3', 
+      auth: process.env.YOUTUBE_API_KEY 
+    });
+  }
+  
+  // Fall back to Replit OAuth flow
   const accessToken = await getAccessToken();
   
   const oauth2Client = new google.auth.OAuth2();
@@ -120,6 +129,101 @@ function writeCache(playlistId: string, videos: VideoItem[]): void {
   }
 }
 
+async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number): Promise<VideoItem[]> {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  let allVideoIds: string[] = [];
+  let nextPageToken: string | undefined = undefined;
+  
+  // Fetch all pages of playlist items
+  do {
+    const url = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
+    url.searchParams.set('part', 'snippet,contentDetails');
+    url.searchParams.set('playlistId', playlistId);
+    url.searchParams.set('maxResults', '50');
+    url.searchParams.set('key', apiKey!);
+    if (nextPageToken) {
+      url.searchParams.set('pageToken', nextPageToken);
+    }
+    
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`YouTube API error: ${JSON.stringify(error)}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.items || data.items.length === 0) {
+      break;
+    }
+
+    const videoIds = data.items
+      .map((item: any) => item.contentDetails?.videoId)
+      .filter(Boolean) as string[];
+    
+    allVideoIds.push(...videoIds);
+    nextPageToken = data.nextPageToken;
+    
+  } while (nextPageToken);
+
+  if (allVideoIds.length === 0) {
+    return [];
+  }
+
+  // Fetch video details in batches of 50 (API limit)
+  const allVideos: VideoItem[] = [];
+  for (let i = 0; i < allVideoIds.length; i += 50) {
+    const batchIds = allVideoIds.slice(i, i + 50);
+    
+    const url = new URL('https://www.googleapis.com/youtube/v3/videos');
+    url.searchParams.set('part', 'snippet,contentDetails,statistics');
+    url.searchParams.set('id', batchIds.join(','));
+    url.searchParams.set('key', apiKey!);
+    
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`YouTube API error: ${JSON.stringify(error)}`);
+    }
+    
+    const data = await response.json();
+
+    const videos: VideoItem[] = (data.items || []).map((video: any) => {
+      const snippet = video.snippet;
+      const statistics = video.statistics;
+      const contentDetails = video.contentDetails;
+      
+      const viewCount = statistics?.viewCount 
+        ? formatViewCount(parseInt(statistics.viewCount))
+        : undefined;
+
+      const duration = contentDetails?.duration 
+        ? formatDuration(contentDetails.duration)
+        : '0:00';
+
+      return {
+        id: video.id || '',
+        title: snippet?.title || 'Untitled',
+        thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
+        duration: duration,
+        publishedAt: snippet?.publishedAt || '',
+        viewCount: viewCount,
+        description: snippet?.description || undefined,
+      };
+    });
+    
+    allVideos.push(...videos);
+  }
+
+  // Cache the fetched data
+  writeCache(playlistId, allVideos);
+
+  return allVideos.slice(0, maxResults);
+}
+
+
 export async function getPlaylistVideos(playlistId: string, maxResults: number = 50): Promise<VideoItem[]> {
   // Check cache first
   const cachedVideos = readCache(playlistId);
@@ -129,6 +233,21 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
 
   // Cache miss or expired, fetch from API
   try {
+    // Use direct fetch API for API key to avoid referrer issues
+    if (process.env.YOUTUBE_API_KEY) {
+      try {
+        return await getPlaylistVideosDirectAPI(playlistId, maxResults);
+      } catch (apiError: any) {
+        // If API key has referrer restrictions, log and fall through to return empty array
+        if (apiError.message?.includes('API_KEY_HTTP_REFERRER_BLOCKED') || apiError.message?.includes('referer')) {
+          console.log('YouTube API key has referrer restrictions. Configure a server-side API key or use client-side fetching.');
+          console.log('Returning empty playlist. The YouTube API should be called from the client-side with this API key.');
+          return [];
+        }
+        throw apiError;
+      }
+    }
+    
     const youtube = await getUncachableYouTubeClient();
     
     let allVideoIds: string[] = [];

@@ -5,9 +5,11 @@ import butterflyImage from "@assets/hero-butterfly.png";
 import cinderhearthImage from "@assets/hero-cinderhearth.png";
 import desertImage from "@assets/hero-desert.png";
 import spaceImage from "@assets/hero-space.png";
+import taebrinImage from "@assets/hero-taebrin.png";
 import socialLinksData from "@/data/social-links.json";
 
 const heroImages = [
+  taebrinImage,
   butterflyImage,
   cinderhearthImage,
   desertImage,

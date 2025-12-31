@@ -69,6 +69,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Audio proxy endpoint to bypass CORS restrictions
+  app.get("/api/podcast/audio-proxy", async (req, res) => {
+    try {
+      const { url } = req.query;
+      
+      if (!url || typeof url !== 'string') {
+        return res.status(400).json({ error: 'URL parameter is required' });
+      }
+
+      // Validate URL to prevent SSRF attacks
+      const urlValidation = validateUrl(url);
+      if (!urlValidation.valid) {
+        logSecurityEvent('SSRF_ATTEMPT', { 
+          url, 
+          ip: req.ip,
+          error: urlValidation.error 
+        });
+        return res.status(400).json({ error: urlValidation.error });
+      }
+
+      // Only allow audio from known podcast hosting domains
+      const allowedDomains = ['anchor.fm', 'cloudfront.net', 'spotify.com', 'apple.com'];
+      const urlObj = new URL(url);
+      const isAllowed = allowedDomains.some(domain => 
+        urlObj.hostname.endsWith(domain) || urlObj.hostname === domain
+      );
+
+      if (!isAllowed) {
+        logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN', { url, ip: req.ip });
+        return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
+      }
+
+      // Fetch the audio file
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        },
+        redirect: 'follow'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audio: ${response.statusText}`);
+      }
+
+      // Set appropriate headers
+      const contentType = response.headers.get('content-type') || 'audio/mpeg';
+      const contentLength = response.headers.get('content-length');
+      
+      res.setHeader('Content-Type', contentType);
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+
+      // Stream the audio data
+      if (response.body) {
+        const reader = response.body.getReader();
+        const stream = new ReadableStream({
+          async start(controller) {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+            controller.close();
+          }
+        });
+        
+        for await (const chunk of stream as any) {
+          res.write(chunk);
+        }
+        res.end();
+      } else {
+        res.end();
+      }
+    } catch (error) {
+      console.error('Error proxying audio:', error);
+      res.status(500).json({ error: 'Failed to proxy audio file' });
+    }
+  });
+
   // A03: Injection Prevention - Validate Etsy shop ID
   app.get("/api/etsy/shop/:shopId/listings", async (req, res) => {
     try {

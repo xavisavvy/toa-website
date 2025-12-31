@@ -80,6 +80,32 @@ The application is already running! Just refresh our browser to see the changes 
 
 ## Customization Guide
 
+### Update Character Images
+
+Character images can be customized with local files or automatically pulled from D&D Beyond.
+
+**To add custom character images:**
+
+1. Place your images in `client/public/characters/` using these filenames:
+   - `wayne-archivist.jpg` (or .png, .webp)
+   - `carine-sol.jpg`
+   - `erys-leandorian.jpg`
+   - `freya-fenrir.jpg`
+   - `porphan-valaritas.jpg`
+   - `titheus-cillbrost.jpg`
+
+2. Run the update script:
+   ```bash
+   npm run update-taebrin-images
+   ```
+
+**How it works:**
+- If a custom image exists → uses the local image
+- If no custom image → fetches the latest avatar from D&D Beyond
+- You can add custom images gradually - any character without a custom image will use their D&D Beyond avatar
+
+**Supported image formats:** .jpg, .jpeg, .png, .webp
+
 ### Update Cast Members
 
 Cast members are managed in a simple JSON file at `client/src/data/cast.json`. This makes it easy to add, remove, or update cast information without touching any code.

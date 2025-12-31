@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Clock, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { getPlaylistVideosClient } from "@/lib/youtube";
 
 interface Episode {
   id: string;
@@ -18,13 +19,22 @@ interface LatestEpisodesProps {
 }
 
 export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
-  const { data: episodes, isLoading } = useQuery<Episode[]>({
-    queryKey: ['/api/youtube/playlist', playlistId],
+  const { data: episodes, isLoading, error } = useQuery<Episode[]>({
+    queryKey: ['/api/youtube/playlist-client', playlistId],
     enabled: !!playlistId,
     queryFn: async () => {
-      const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=100`);
-      if (!response.ok) throw new Error('Failed to fetch episodes');
-      return response.json();
+      console.log('Fetching YouTube playlist from client:', playlistId);
+      
+      const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+      if (!apiKey) {
+        console.error('VITE_YOUTUBE_API_KEY not found in environment');
+        throw new Error('YouTube API key not configured');
+      }
+      
+      console.log('Using client-side YouTube API');
+      const videos = await getPlaylistVideosClient(playlistId, apiKey, 100);
+      console.log('Client-side response:', videos?.length, 'videos');
+      return videos;
     },
   });
 

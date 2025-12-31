@@ -8,17 +8,17 @@
       "campaign": "Journeys Through Taebrin",
       "race": "Changeling",
       "class": "Wizard",
-      "level": 4,
+      "level": 5,
       "alignment": "Chaotic Neutral",
       "images": [
         {
           "id": "1",
-          "caption": "Wayne - The Archivist of Lies",
+          "url": "https://www.dndbeyond.com/avatars/52915/166/1581111423-151530168.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "caption": "Wayne \"Archivist of Lies\" - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
-          "url": "https://www.dndbeyond.com/avatars/51217/265/1581111423-151530168.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+          "isAiGenerated": false
         }
       ],
       "backstory": "Wayne is a scholar-illusionist who records legends but can't stop fabricating them. Some lies come true, some lies get him in trouble. Even though he is a changeling, he typically sticks to Wayne unless assuming a character from one of his stories. He is both an earnest scholar and a compulsive storyteller, collecting 'true versions' of events but telling everyone different ones.",
@@ -26,7 +26,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151530168",
       "dndbeyondId": "151530168",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/51217/265/1581111423-151530168.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "https://www.dndbeyond.com/avatars/52915/166/1581111423-151530168.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
     },
     {
       "id": "carine-sol",
@@ -36,17 +36,17 @@
       "campaign": "Journeys Through Taebrin",
       "race": "Astral Elf",
       "class": "Sorcerer",
-      "level": 4,
+      "level": 5,
       "alignment": "Lawful Good",
       "images": [
         {
           "id": "1",
-          "caption": "Carine Sol - Astral Elf Sorcerer",
+          "url": "https://www.dndbeyond.com/avatars/53744/601/1581111423-151527820.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "caption": "Carine Sol - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
-          "url": "https://www.dndbeyond.com/avatars/51458/75/1581111423-151527820.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+          "isAiGenerated": false
         }
       ],
       "backstory": "A 22-year-old Astral Elf with fiery orange hair and eyes black like a sunspot with orange around the iris. His skin is lightly tanned with crisscrossing lines that tell the story of his journey. As a Wayfarer, he grew up on the streets surrounded by ill-fated castoffs, sleeping where he could and doing odd jobs for food. Though hunger sometimes drove him to theft, he never lost his pride or abandoned hope.",
@@ -54,7 +54,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151527820",
       "dndbeyondId": "151527820",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/51458/75/1581111423-151527820.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "https://www.dndbeyond.com/avatars/53744/601/1581111423-151527820.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
     },
     {
       "id": "erys-leandorian",
@@ -64,17 +64,17 @@
       "campaign": "Journeys Through Taebrin",
       "race": "Elf",
       "class": "Cleric",
-      "level": 4,
+      "level": 5,
       "alignment": "Unknown",
       "images": [
         {
           "id": "1",
-          "caption": "Erys Leandorian - Elven Cleric",
+          "url": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "caption": "Erys Leandorian - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
-          "url": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+          "isAiGenerated": false
         }
       ],
       "backstory": "A skilled cleric from the ancient forests. As a Scribe, Erys spent formative years in a scriptorium learning to write with a clear hand and produce finely written texts. He has a careful attention to detail and a keen appreciation for knowledge. Erys left his home to uncover the truth about a growing darkness threatening the realm, guided by divine wisdom.",
@@ -92,17 +92,17 @@
       "campaign": "Journeys Through Taebrin",
       "race": "Human",
       "class": "Druid",
-      "level": 4,
+      "level": 5,
       "alignment": "Lawful Good",
       "images": [
         {
           "id": "1",
-          "caption": "Freya Fenrir - Human Druid",
+          "url": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "caption": "Freya Fenrir - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
-          "url": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+          "isAiGenerated": false
         }
       ],
       "backstory": "Freya grew up close to the land, spending years tending animals and cultivating the earth. This upbringing rewarded her with patience, good health, and a deep appreciation for nature's bounty alongside a healthy respect for nature's wrath. She also trained as a soldier, learning the ways of battle to protect the natural world she holds dear.",
@@ -120,17 +120,17 @@
       "campaign": "Journeys Through Taebrin",
       "race": "Satyr",
       "class": "Bard",
-      "level": 4,
+      "level": 5,
       "alignment": "Chaotic Good",
       "images": [
         {
           "id": "1",
-          "caption": "Porphan Valaritas - Satyr Bard",
+          "url": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "caption": "Porphan Valaritas - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
-          "url": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+          "isAiGenerated": false
         }
       ],
       "backstory": "A 25-year-old Satyr with brown hair, blue eyes, and fair skin standing 5'8\" tall. Porphan spent much of his youth following roving fairs and carnivals, performing odd jobs for musicians and acrobats in exchange for lessons. He learned to walk tightropes, play instruments in distinct styles, and recite poetry with impeccable diction. To this day, he thrives on applause and longs for the stage. His faith in art and creativity drives everything he does.",
@@ -148,17 +148,17 @@
       "campaign": "Journeys Through Taebrin",
       "race": "Gnome",
       "class": "Rogue",
-      "level": 4,
+      "level": 5,
       "alignment": "Chaotic Neutral",
       "images": [
         {
           "id": "1",
-          "caption": "Titheus Cillbrost - Gnome Rogue",
+          "url": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "caption": "Titheus Cillbrost - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
-          "url": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+          "isAiGenerated": false
         }
       ],
       "backstory": "A 28-year-old Gnome standing just 3'9\" tall with dark red hair, green eyes, and brown skin. Titheus eked out a living in dark alleyways, cutting purses and burgling shops. Whether part of a small gang of like-minded wrongdoers or a lone wolf fending for himself against the local thieves' guild, he learned to survive through cunning and stealth.",

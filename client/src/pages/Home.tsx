@@ -15,6 +15,9 @@ import { getOrganizationSchema, getWebSiteSchema } from "@/lib/structuredData";
 export default function Home() {
   const YOUTUBE_PLAYLIST_ID = import.meta.env.VITE_YOUTUBE_PLAYLIST_ID;
   const PODCAST_FEED_URL = import.meta.env.VITE_PODCAST_FEED_URL;
+  const SPOTIFY_URL = import.meta.env.VITE_PODCAST_SPOTIFY_URL;
+  const APPLE_PODCASTS_URL = import.meta.env.VITE_PODCAST_APPLE_URL;
+  const YOUTUBE_MUSIC_URL = import.meta.env.VITE_PODCAST_YOUTUBE_MUSIC_URL;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -36,7 +39,12 @@ export default function Home() {
       <Navigation />
       <Hero />
       <LatestEpisodes playlistId={YOUTUBE_PLAYLIST_ID} />
-      <PodcastSection feedUrl={PODCAST_FEED_URL} />
+      <PodcastSection 
+        feedUrl={PODCAST_FEED_URL}
+        spotifyUrl={SPOTIFY_URL}
+        applePodcastsUrl={APPLE_PODCASTS_URL}
+        youtubeMusicUrl={YOUTUBE_MUSIC_URL}
+      />
       <CharactersSection />
       <WorldSection />
       <PromotionsSection />

@@ -9,6 +9,8 @@ import validator from 'validator';
  * Following OWASP Top 10:2021 best practices
  */
 export function configureSecurity(app: Express) {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
   // A02: Cryptographic Failures - Security Headers with Helmet
   app.use(
     helmet({
@@ -38,6 +40,14 @@ export function configureSecurity(app: Express) {
             "https://openapi.etsy.com",
             "https://character-service.dndbeyond.com",
             "wss:", // For WebSocket connections in development
+          ],
+          mediaSrc: [
+            "'self'",
+            "https://anchor.fm",
+            "https://*.cloudfront.net",
+            "https://*.spotify.com",
+            "https://*.apple.com",
+            ...(isDevelopment ? ["http://localhost:*", "http://127.0.0.1:*"] : []),
           ],
           frameSrc: ["'self'", "https://www.youtube.com", "https://open.spotify.com", "https://music.youtube.com"],
           objectSrc: ["'none'"],
