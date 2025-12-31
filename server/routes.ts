@@ -78,11 +78,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'URL parameter is required' });
       }
 
+      // Decode URL if it's double-encoded
+      let decodedUrl = url;
+      try {
+        // Try to decode once - if it still contains encoded characters, decode again
+        if (decodedUrl.includes('%25')) {
+          decodedUrl = decodeURIComponent(decodedUrl);
+        }
+      } catch {
+        // If decoding fails, use original
+      }
+
       // Validate URL to prevent SSRF attacks
-      const urlValidation = validateUrl(url);
+      const urlValidation = validateUrl(decodedUrl);
       if (!urlValidation.valid) {
         logSecurityEvent('SSRF_ATTEMPT', { 
-          url, 
+          url: decodedUrl, 
           ip: req.ip,
           error: urlValidation.error 
         });
@@ -90,47 +101,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Only allow audio from known podcast hosting domains
-      const allowedDomains = ['anchor.fm', 'cloudfront.net', 'spotify.com', 'apple.com'];
-      const urlObj = new URL(url);
+      const allowedDomains = ['anchor.fm', 'cloudfront.net', 'spotify.com', 'apple.com', 'spreaker.com', 'buzzsprout.com', 'libsyn.com', 'podbean.com', 'simplecast.com', 'transistor.fm', 'captivate.fm', 'megaphone.fm', 'omny.fm', 'acast.com'];
+      const urlObj = new URL(decodedUrl);
       const isAllowed = allowedDomains.some(domain => 
         urlObj.hostname.endsWith(domain) || urlObj.hostname === domain
       );
 
       if (!isAllowed) {
-        logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN', { url, ip: req.ip });
+        logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN', { url: decodedUrl, ip: req.ip });
         return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
       }
 
-      // Fetch the audio file
-      const response = await fetch(url, {
+      // Fetch the audio file with streaming
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      const response = await fetch(decodedUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'audio/*,*/*',
+          'Range': req.headers.range || 'bytes=0-',
         },
-        redirect: 'follow'
+        redirect: 'follow',
+        signal: controller.signal,
       });
 
-      if (!response.ok) {
+      clearTimeout(timeout);
+
+      if (!response.ok && response.status !== 206) {
+        console.error(`Audio fetch failed: ${response.status} ${response.statusText}`);
         throw new Error(`Failed to fetch audio: ${response.statusText}`);
       }
 
       // Set appropriate headers
       const contentType = response.headers.get('content-type') || 'audio/mpeg';
       const contentLength = response.headers.get('content-length');
+      const acceptRanges = response.headers.get('accept-ranges');
+      const contentRange = response.headers.get('content-range');
       
+      res.status(response.status);
       res.setHeader('Content-Type', contentType);
       if (contentLength) {
         res.setHeader('Content-Length', contentLength);
       }
-      res.setHeader('Accept-Ranges', 'bytes');
+      if (acceptRanges) {
+        res.setHeader('Accept-Ranges', acceptRanges);
+      }
+      if (contentRange) {
+        res.setHeader('Content-Range', contentRange);
+      }
       res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.setHeader('Access-Control-Allow-Origin', '*');
 
-      // Stream the audio data - Node.js compatible
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      res.send(buffer);
-    } catch (error) {
-      console.error('Error proxying audio:', error);
-      res.status(500).json({ error: 'Failed to proxy audio file' });
+      // Stream the response using Node.js Readable stream
+      if (response.body) {
+        const reader = response.body.getReader();
+        
+        const pushChunk = async () => {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                res.end();
+                break;
+              }
+              if (!res.write(Buffer.from(value))) {
+                // Backpressure - wait for drain
+                await new Promise(resolve => res.once('drain', resolve));
+              }
+            }
+          } catch (streamError) {
+            console.error('Stream error:', streamError);
+            if (!res.headersSent) {
+              res.status(500).json({ error: 'Stream failed' });
+            } else {
+              res.end();
+            }
+          }
+        };
+        
+        // Handle client disconnect
+        req.on('close', () => {
+          reader.cancel();
+        });
+        
+        await pushChunk();
+      } else {
+        // Fallback for environments without streaming body
+        const arrayBuffer = await response.arrayBuffer();
+        res.send(Buffer.from(arrayBuffer));
+      }
+    } catch (error: any) {
+      console.error('Error proxying audio:', error?.message || error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Failed to proxy audio file' });
+      }
     }
   });
 
