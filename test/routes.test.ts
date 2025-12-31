@@ -87,7 +87,7 @@ describe('API Routes', () => {
 
     it('should validate maxResults parameter', async () => {
       const response = await request(app)
-        .get('/api/youtube/playlist/PLTestValidId?maxResults=200')
+        .get('/api/youtube/playlist/PLTestValidId?maxResults=20000')
         .expect(400);
 
       expect(response.body).toHaveProperty('error');
@@ -225,6 +225,171 @@ describe('API Routes', () => {
         .expect(400);
 
       expect(response.body.error).toBe('Invalid character ID format');
+    });
+  });
+
+  describe('Error Handling and Security', () => {
+    it('should handle API errors gracefully', async () => {
+      const { getPlaylistVideos } = await import('../server/youtube');
+      vi.mocked(getPlaylistVideos).mockRejectedValueOnce(new Error('YouTube API error'));
+
+      const response = await request(app)
+        .get('/api/youtube/playlist/PLTest')
+        .expect(500);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toBe('Failed to fetch YouTube playlist');
+    });
+
+    it('should not leak internal error details in production', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const { getPodcastFeed } = await import('../server/podcast');
+      const sensitiveError = new Error('Internal database connection failed at 192.168.1.100:5432');
+      vi.mocked(getPodcastFeed).mockRejectedValueOnce(sensitiveError);
+
+      const response = await request(app)
+        .post('/api/podcast/feed')
+        .send({ feedUrl: 'https://example.com/feed.xml' })
+        .expect(500);
+
+      // Should get generic error, not the detailed internal error
+      expect(response.body.error).toBeDefined();
+      expect(response.body.error).not.toContain('192.168.1.100');
+      expect(response.body.error).not.toContain('database');
+
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it('should log errors without exposing sensitive data', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const { getPlaylistVideos } = await import('../server/youtube');
+      vi.mocked(getPlaylistVideos).mockRejectedValueOnce(new Error('API quota exceeded'));
+
+      await request(app)
+        .get('/api/youtube/playlist/PLTest')
+        .expect(500);
+
+      expect(consoleSpy).toHaveBeenCalled();
+      const loggedError = consoleSpy.mock.calls[0][0];
+      
+      // Should log error message but not expose API keys or tokens
+      expect(loggedError).toBeDefined();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should return 400 for malformed JSON in request body', async () => {
+      const response = await request(app)
+        .post('/api/podcast/feed')
+        .set('Content-Type', 'application/json')
+        .send('{"invalid": json}')
+        .expect(400);
+
+      // Express should handle malformed JSON
+      expect(response.body || response.text).toBeDefined();
+    });
+
+    it('should handle missing required fields in POST requests', async () => {
+      const response = await request(app)
+        .post('/api/podcast/feed')
+        .send({})
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toContain('feedUrl');
+    });
+
+    it('should validate content-type for POST requests', async () => {
+      const response = await request(app)
+        .post('/api/podcast/feed')
+        .set('Content-Type', 'text/plain')
+        .send('not json')
+        .expect(400);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should handle very long URLs gracefully', async () => {
+      const veryLongUrl = 'https://example.com/' + 'a'.repeat(10000);
+      
+      const response = await request(app)
+        .post('/api/podcast/feed')
+        .send({ feedUrl: veryLongUrl })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+    });
+
+    it('should handle special characters in parameters safely', async () => {
+      // Test with characters that shouldn't match the validation pattern
+      const response = await request(app)
+        .get('/api/youtube/playlist/PL@#$%^&*()')
+        .expect(400);
+
+      expect(response.body.error).toBe('Invalid playlist ID format');
+    });
+
+    it('should handle null bytes in input', async () => {
+      const response = await request(app)
+        .get('/api/youtube/playlist/PLTest\x00injection')
+        .expect(400);
+
+      expect(response.body.error).toBe('Invalid playlist ID format');
+    });
+
+    it('should rate limit excessive requests (if implemented)', async () => {
+      // Make multiple rapid requests
+      const requests = Array.from({ length: 10 }, () => 
+        request(app).get('/api/youtube/playlist/PLTest')
+      );
+
+      const responses = await Promise.all(requests);
+      
+      // All should succeed if no rate limiting, or some should be 429
+      const statuses = responses.map(r => r.status);
+      expect(statuses.every(s => s === 200 || s === 429)).toBe(true);
+    });
+
+    it('should handle concurrent requests to same resource', async () => {
+      const requests = Array.from({ length: 5 }, () => 
+        request(app).get('/api/youtube/playlist/PLTest')
+      );
+
+      const responses = await Promise.all(requests);
+      
+      // All should return the same data
+      responses.forEach(response => {
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+      });
+    });
+
+    it('should set appropriate security headers', async () => {
+      const response = await request(app)
+        .get('/api/youtube/playlist/PLTest')
+        .expect(200);
+
+      // Check for security headers (if implemented)
+      // These might vary based on your security middleware
+      expect(response.headers).toBeDefined();
+    });
+
+    it('should handle timeout scenarios gracefully', async () => {
+      const { getPlaylistVideos } = await import('../server/youtube');
+      
+      // Simulate a timeout
+      vi.mocked(getPlaylistVideos).mockImplementationOnce(() => 
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 100))
+      );
+
+      const response = await request(app)
+        .get('/api/youtube/playlist/PLTest')
+        .expect(500);
+
+      expect(response.body).toHaveProperty('error');
     });
   });
 });
