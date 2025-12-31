@@ -11,7 +11,9 @@ import { validateUrl, validateNumber, validateString } from '../../server/securi
 
 // Helper function to validate playlist ID (extracted from routes logic)
 function validatePlaylistId(playlistId: string): { valid: boolean; error?: string; value?: string } {
-  if (!/^[a-zA-Z0-9_-]+$/.test(playlistId)) {
+  // YouTube playlist IDs must start with 'PL' followed by alphanumeric, underscore, or hyphen
+  // Must not be ONLY hyphens/underscores after PL prefix
+  if (!/^PL[a-zA-Z0-9_-]+$/.test(playlistId) || /^PL[-_]+$/.test(playlistId)) {
     return { valid: false, error: 'Invalid playlist ID format' };
   }
   return { valid: true, value: playlistId };

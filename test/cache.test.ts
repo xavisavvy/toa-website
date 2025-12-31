@@ -22,7 +22,7 @@ describe('Generic Cache Behavior', () => {
       fs.unlinkSync(testCacheFile);
     }
     if (fs.existsSync(testCacheDir)) {
-      fs.rmdirSync(testCacheDir);
+      fs.rmSync(testCacheDir, { recursive: true, force: true });
     }
   });
 
