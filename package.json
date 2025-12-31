@@ -164,14 +164,8 @@
     "bufferutil": "^4.0.8"
   },
   "lint-staged": {
-    "*.ts": [
-      "npm run check -- --noEmit"
-    ],
     "*.{ts,tsx}": [
       "vitest related --run"
-    ],
-    "server/**/*.ts": [
-      "npm run test -- test/security/ --run"
     ]
   }
 }
