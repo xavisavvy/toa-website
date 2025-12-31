@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Ignore esbuild vulnerability in drizzle-kit dev dependency
+      # GHSA-67mh-4wv8-2f99: Only affects dev servers, not production
+      # Nested in @esbuild-kit/core-utils, would require breaking drizzle-kit downgrade
+      - dependency-name: "esbuild"
+        update-types: ["version-update:semver-patch", "version-update:semver-minor"]
+        versions: ["< 0.24.3"]

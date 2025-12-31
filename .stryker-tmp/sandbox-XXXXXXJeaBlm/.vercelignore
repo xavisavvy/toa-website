@@ -1,0 +1,36 @@
+# Development files
+server/
+client/src/
+node_modules/
+.git/
+.replit
+replit.nix
+
+# Keep only built files and necessary configs
+!dist/
+!index.ts
+!vercel.json
+!package.json
+!package-lock.json
+
+# Environment files
+.env
+.env.local
+.env.development
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.DS_Store
+*.swp
+*.swo
