@@ -31,6 +31,38 @@ function formatDuration(isoDuration: string): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+export async function getMultiplePlaylistVideosClient(playlistIds: string[], apiKey: string, maxResults: number = 50): Promise<VideoItem[]> {
+  // Fetch videos from all playlists in parallel
+  const allPlaylistPromises = playlistIds.map(playlistId => 
+    getPlaylistVideosClient(playlistId, apiKey, 100).catch(error => {
+      console.error(`Error fetching playlist ${playlistId}:`, error);
+      return [] as VideoItem[];
+    })
+  );
+  
+  const playlistResults = await Promise.all(allPlaylistPromises);
+  
+  // Flatten and dedupe by video ID
+  const videoMap = new Map<string, VideoItem>();
+  for (const videos of playlistResults) {
+    for (const video of videos) {
+      if (!videoMap.has(video.id)) {
+        videoMap.set(video.id, video);
+      }
+    }
+  }
+  
+  // Sort by publishedAt date (most recent first)
+  const allVideos = Array.from(videoMap.values());
+  allVideos.sort((a, b) => {
+    const dateA = new Date(a.publishedAt).getTime();
+    const dateB = new Date(b.publishedAt).getTime();
+    return dateB - dateA; // Most recent first
+  });
+  
+  return allVideos.slice(0, maxResults);
+}
+
 export async function getPlaylistVideosClient(playlistId: string, apiKey: string, maxResults: number = 50): Promise<VideoItem[]> {
   let allVideoIds: string[] = [];
   let nextPageToken: string | undefined = undefined;
