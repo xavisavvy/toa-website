@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/xavisavvy/toa-website/compare/v1.6.1...v1.7.0) (2025-12-31)
+
+
+### Features
+
+* add visual regression testing ([#7](https://github.com/xavisavvy/toa-website/issues/7)) ([2af5190](https://github.com/xavisavvy/toa-website/commit/2af51901ea55a8878235dc4e4fb5185a7ebb18e4))
+
 ### [1.6.1](https://github.com/xavisavvy/toa-website/compare/v1.6.0...v1.6.1) (2025-12-31)
 
 ## [1.6.0](https://github.com/xavisavvy/toa-website/compare/v1.5.1...v1.6.0) (2025-12-31)
