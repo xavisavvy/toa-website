@@ -15,3 +15,8 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Mutation testing
+.stryker-tmp/
+reports/mutation/
+stryker.log
