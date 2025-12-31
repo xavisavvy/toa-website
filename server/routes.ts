@@ -70,6 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Audio proxy endpoint to bypass CORS restrictions
+  // Uses redirect approach for better production reliability
   app.get("/api/podcast/audio-proxy", async (req, res) => {
     try {
       const { url } = req.query;
@@ -81,8 +82,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Decode URL if it's double-encoded
       let decodedUrl = url;
       try {
-        // Try to decode once - if it still contains encoded characters, decode again
-        if (decodedUrl.includes('%25')) {
+        // Handle multiple levels of encoding
+        while (decodedUrl.includes('%25')) {
           decodedUrl = decodeURIComponent(decodedUrl);
         }
       } catch {
@@ -112,84 +113,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
       }
 
-      // Fetch the audio file with streaming
+      // Follow redirects to get the final audio URL
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
-      const response = await fetch(decodedUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'audio/*,*/*',
-          'Range': req.headers.range || 'bytes=0-',
-        },
-        redirect: 'follow',
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
-
-      if (!response.ok && response.status !== 206) {
-        console.error(`Audio fetch failed: ${response.status} ${response.statusText}`);
-        throw new Error(`Failed to fetch audio: ${response.statusText}`);
-      }
-
-      // Set appropriate headers
-      const contentType = response.headers.get('content-type') || 'audio/mpeg';
-      const contentLength = response.headers.get('content-length');
-      const acceptRanges = response.headers.get('accept-ranges');
-      const contentRange = response.headers.get('content-range');
-      
-      res.status(response.status);
-      res.setHeader('Content-Type', contentType);
-      if (contentLength) {
-        res.setHeader('Content-Length', contentLength);
-      }
-      if (acceptRanges) {
-        res.setHeader('Accept-Ranges', acceptRanges);
-      }
-      if (contentRange) {
-        res.setHeader('Content-Range', contentRange);
-      }
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.setHeader('Access-Control-Allow-Origin', '*');
-
-      // Stream the response using Node.js Readable stream
-      if (response.body) {
-        const reader = response.body.getReader();
-        
-        const pushChunk = async () => {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                res.end();
-                break;
-              }
-              if (!res.write(Buffer.from(value))) {
-                // Backpressure - wait for drain
-                await new Promise(resolve => res.once('drain', resolve));
-              }
-            }
-          } catch (streamError) {
-            console.error('Stream error:', streamError);
-            if (!res.headersSent) {
-              res.status(500).json({ error: 'Stream failed' });
-            } else {
-              res.end();
-            }
-          }
-        };
-        
-        // Handle client disconnect
-        req.on('close', () => {
-          reader.cancel();
+      try {
+        const response = await fetch(decodedUrl, {
+          method: 'HEAD',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          redirect: 'follow',
+          signal: controller.signal,
         });
+
+        clearTimeout(timeout);
+
+        // Get the final URL after redirects
+        const finalUrl = response.url;
         
-        await pushChunk();
-      } else {
-        // Fallback for environments without streaming body
-        const arrayBuffer = await response.arrayBuffer();
-        res.send(Buffer.from(arrayBuffer));
+        // Redirect client to the actual audio source
+        res.redirect(302, finalUrl);
+      } catch (headError) {
+        clearTimeout(timeout);
+        // If HEAD request fails, try direct redirect
+        res.redirect(302, decodedUrl);
       }
     } catch (error: any) {
       console.error('Error proxying audio:', error?.message || error);
