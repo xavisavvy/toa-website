@@ -7,17 +7,17 @@ export default function Footer() {
 
   const footerLinks = {
     About: [
-      { label: "Our Story", href: "#about" },
-      { label: "The Cast", href: "#about" },
+      { label: "Our Story", href: "/#about" },
+      { label: "The Cast", href: "/#about" },
       { label: "Contact", href: `mailto:${socialLinksData.email}` },
     ],
     Content: [
-      { label: "Episodes", href: "#episodes" },
-      { label: "Podcast", href: "#podcast" },
-      { label: "World Lore", href: "#lore" },
+      { label: "Episodes", href: "/#episodes" },
+      { label: "Podcast", href: "/#podcast" },
+      { label: "World Lore", href: "/#lore" },
     ],
     Shop: [
-      { label: "Merchandise", href: "#shop" },
+      { label: "Merchandise", href: "/#shop" },
       { label: "Etsy Store", href: socialLinksData.etsy },
       { label: "Support on Patreon", href: socialLinksData.patreon },
     ],
