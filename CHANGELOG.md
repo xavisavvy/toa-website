@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/xavisavvy/toa-website/compare/v1.4.1...v1.5.0) (2025-12-31)
+
+
+### Features
+
+* add comprehensive security testing suite ([#10](https://github.com/xavisavvy/toa-website/issues/10)) ([f64297a](https://github.com/xavisavvy/toa-website/commit/f64297aeb2ea52d795b8d76fb13f0a1f79c007a1))
+
 ### [1.4.1](https://github.com/xavisavvy/toa-website/compare/v1.4.0...v1.4.1) (2025-12-31)
 
 ## [1.4.0](https://github.com/xavisavvy/toa-website/compare/v1.3.1...v1.4.0) (2025-12-31)
