@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/xavisavvy/toa-website/compare/v1.8.3...v1.9.0) (2025-12-31)
+
+
+### Features
+
+* implement agentic SDLC improvements - CI/CD, observability, and metrics ([abd0917](https://github.com/xavisavvy/toa-website/commit/abd09175ce5241e642198fc0d4450ac9ae62fa1c))
+
 ### [1.8.3](https://github.com/xavisavvy/toa-website/compare/v1.8.2...v1.8.3) (2025-12-31)
 
 
