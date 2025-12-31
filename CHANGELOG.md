@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/xavisavvy/toa-website/compare/v1.2.0...v1.3.0) (2025-12-31)
+
+
+### Features
+
+* add snapshot and property-based tests ([#3](https://github.com/xavisavvy/toa-website/issues/3) & [#4](https://github.com/xavisavvy/toa-website/issues/4)) ([ac64c70](https://github.com/xavisavvy/toa-website/commit/ac64c705a81475ec41e40712f6d8fce5aad6135a))
+
 ## [1.2.0](https://github.com/xavisavvy/toa-website/compare/v1.1.11...v1.2.0) (2025-12-31)
 
 
