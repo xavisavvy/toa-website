@@ -41,7 +41,7 @@ export default function Hero() {
         const img = new Image();
         img.src = heroImages[index];
         img.onload = () => {
-          setLoadedImages((prev) => new Set([...prev, index]));
+          setLoadedImages((prev) => new Set(Array.from(prev).concat(index)));
         };
       }
     });

@@ -32,7 +32,7 @@ export default function LatestEpisodes({ playlistId }: LatestEpisodesProps) {
       }
       
       console.log('Using client-side YouTube API');
-      const videos = await getPlaylistVideosClient(playlistId, apiKey, 100);
+      const videos = await getPlaylistVideosClient(playlistId!, apiKey, 100);
       console.log('Client-side response:', videos?.length, 'videos');
       return videos;
     },

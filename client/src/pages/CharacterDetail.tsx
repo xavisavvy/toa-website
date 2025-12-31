@@ -19,7 +19,7 @@ import { getCreativeWorkSchema, getBreadcrumbSchema } from "@/lib/structuredData
 
 interface CharacterImage {
   id: string;
-  url: string;
+  url?: string;
   caption: string;
   type: string;
   isFeatured: boolean;
@@ -39,7 +39,7 @@ interface Character {
   class: string;
   level: number;
   alignment: string;
-  featuredImage: string;
+  featuredImage?: string;
   images: CharacterImage[];
   backstory: string;
   personality: string;

@@ -3,6 +3,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { configureSecurity } from "./security";
+import { validateEnvironment } from "./env-validator";
+
+// Validate environment variables before starting
+validateEnvironment();
 
 const app = express();
 
