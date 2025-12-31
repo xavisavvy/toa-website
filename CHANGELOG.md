@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/xavisavvy/toa-website/compare/v1.8.1...v1.8.2) (2025-12-31)
+
+
+### Code Refactoring
+
+* remove Vercel deployment configuration ([d63d84e](https://github.com/xavisavvy/toa-website/commit/d63d84ecf76fed9f4d1ce49c9391973bd15f2cd5))
+
 ### [1.8.1](https://github.com/xavisavvy/toa-website/compare/v1.8.0...v1.8.1) (2025-12-31)
 
 ## [1.8.0](https://github.com/xavisavvy/toa-website/compare/v1.7.0...v1.8.0) (2025-12-31)
