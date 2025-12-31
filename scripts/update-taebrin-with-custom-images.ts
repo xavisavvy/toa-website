@@ -148,7 +148,7 @@ async function main() {
           caption: `${config.name} - Official Character Art`,
           type: "portrait",
           isFeatured: true,
-          copyright: customImagePath ? "The Order of Azara" : "D&D Beyond / Wizards of the Coast",
+          copyright: customImagePath ? "Tales of Aneria" : "D&D Beyond / Wizards of the Coast",
           isAiGenerated: false
         }],
       };

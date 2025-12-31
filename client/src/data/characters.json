@@ -13,11 +13,11 @@
       "images": [
         {
           "id": "1",
-          "url": "https://www.dndbeyond.com/avatars/52915/166/1581111423-151530168.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "url": "/characters/wayne-archivist.png",
           "caption": "Wayne \"Archivist of Lies\" - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
-          "copyright": "D&D Beyond / Wizards of the Coast",
+          "copyright": "Tales of Aneria",
           "isAiGenerated": false
         }
       ],
@@ -26,7 +26,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151530168",
       "dndbeyondId": "151530168",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/52915/166/1581111423-151530168.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "/characters/wayne-archivist.png"
     },
     {
       "id": "carine-sol",
@@ -41,11 +41,11 @@
       "images": [
         {
           "id": "1",
-          "url": "https://www.dndbeyond.com/avatars/53744/601/1581111423-151527820.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "url": "/characters/carine-sol.png",
           "caption": "Carine Sol - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
-          "copyright": "D&D Beyond / Wizards of the Coast",
+          "copyright": "Tales of Aneria",
           "isAiGenerated": false
         }
       ],
@@ -54,7 +54,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151527820",
       "dndbeyondId": "151527820",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/53744/601/1581111423-151527820.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "/characters/carine-sol.png"
     },
     {
       "id": "erys-leandorian",
@@ -69,11 +69,11 @@
       "images": [
         {
           "id": "1",
-          "url": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "url": "/characters/erys-leandorian.png",
           "caption": "Erys Leandorian - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
-          "copyright": "D&D Beyond / Wizards of the Coast",
+          "copyright": "Tales of Aneria",
           "isAiGenerated": false
         }
       ],
@@ -82,7 +82,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/153687176",
       "dndbeyondId": "153687176",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/52031/762/1581111423-153687176.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "/characters/erys-leandorian.png"
     },
     {
       "id": "freya-fenrir",
@@ -97,11 +97,11 @@
       "images": [
         {
           "id": "1",
-          "url": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "url": "/characters/freya-fenrir.png",
           "caption": "Freya Fenrir - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
-          "copyright": "D&D Beyond / Wizards of the Coast",
+          "copyright": "Tales of Aneria",
           "isAiGenerated": false
         }
       ],
@@ -110,7 +110,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/147130895",
       "dndbeyondId": "147130895",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/50918/537/1581111423-147130895.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "/characters/freya-fenrir.png"
     },
     {
       "id": "porphan-valaritas",
@@ -125,11 +125,11 @@
       "images": [
         {
           "id": "1",
-          "url": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "url": "/characters/porphan-valaritas.png",
           "caption": "Porphan Valaritas - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
-          "copyright": "D&D Beyond / Wizards of the Coast",
+          "copyright": "Tales of Aneria",
           "isAiGenerated": false
         }
       ],
@@ -138,7 +138,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151498356",
       "dndbeyondId": "151498356",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/51318/581/1581111423-151498356.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "/characters/porphan-valaritas.png"
     },
     {
       "id": "titheus-cillbrost",
@@ -153,11 +153,11 @@
       "images": [
         {
           "id": "1",
-          "url": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp",
+          "url": "/characters/titheus-cillbrost.png",
           "caption": "Titheus Cillbrost - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
-          "copyright": "D&D Beyond / Wizards of the Coast",
+          "copyright": "Tales of Aneria",
           "isAiGenerated": false
         }
       ],
@@ -166,7 +166,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151508871",
       "dndbeyondId": "151508871",
       "status": "active",
-      "featuredImage": "https://www.dndbeyond.com/avatars/51203/102/1581111423-151508871.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
+      "featuredImage": "/characters/titheus-cillbrost.png"
     },
     {
       "id": "bolt",
