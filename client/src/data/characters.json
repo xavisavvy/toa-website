@@ -13,7 +13,7 @@
       "images": [
         {
           "id": "1",
-          "url": "/characters/wayne-archivist.png",
+          "url": "/characters/wayne-archivist.webp",
           "caption": "Wayne \"Archivist of Lies\" - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
@@ -26,7 +26,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151530168",
       "dndbeyondId": "151530168",
       "status": "active",
-      "featuredImage": "/characters/wayne-archivist.png"
+      "featuredImage": "/characters/wayne-archivist.webp"
     },
     {
       "id": "carine-sol",
@@ -41,7 +41,7 @@
       "images": [
         {
           "id": "1",
-          "url": "/characters/carine-sol.png",
+          "url": "/characters/carine-sol.webp",
           "caption": "Carine Sol - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
@@ -54,7 +54,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151527820",
       "dndbeyondId": "151527820",
       "status": "active",
-      "featuredImage": "/characters/carine-sol.png"
+      "featuredImage": "/characters/carine-sol.webp"
     },
     {
       "id": "erys-leandorian",
@@ -69,7 +69,7 @@
       "images": [
         {
           "id": "1",
-          "url": "/characters/erys-leandorian.png",
+          "url": "/characters/erys-leandorian.webp",
           "caption": "Erys Leandorian - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
@@ -82,7 +82,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/153687176",
       "dndbeyondId": "153687176",
       "status": "active",
-      "featuredImage": "/characters/erys-leandorian.png"
+      "featuredImage": "/characters/erys-leandorian.webp"
     },
     {
       "id": "freya-fenrir",
@@ -97,7 +97,7 @@
       "images": [
         {
           "id": "1",
-          "url": "/characters/freya-fenrir.png",
+          "url": "/characters/freya-fenrir.webp",
           "caption": "Freya Fenrir - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
@@ -110,7 +110,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/147130895",
       "dndbeyondId": "147130895",
       "status": "active",
-      "featuredImage": "/characters/freya-fenrir.png"
+      "featuredImage": "/characters/freya-fenrir.webp"
     },
     {
       "id": "porphan-valaritas",
@@ -125,7 +125,7 @@
       "images": [
         {
           "id": "1",
-          "url": "/characters/porphan-valaritas.png",
+          "url": "/characters/porphan-valaritas.webp",
           "caption": "Porphan Valaritas - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
@@ -138,7 +138,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151498356",
       "dndbeyondId": "151498356",
       "status": "active",
-      "featuredImage": "/characters/porphan-valaritas.png"
+      "featuredImage": "/characters/porphan-valaritas.webp"
     },
     {
       "id": "titheus-cillbrost",
@@ -153,7 +153,7 @@
       "images": [
         {
           "id": "1",
-          "url": "/characters/titheus-cillbrost.png",
+          "url": "/characters/titheus-cillbrost.webp",
           "caption": "Titheus Cillbrost - Official Character Art",
           "type": "portrait",
           "isFeatured": true,
@@ -166,7 +166,7 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/151508871",
       "dndbeyondId": "151508871",
       "status": "active",
-      "featuredImage": "/characters/titheus-cillbrost.png"
+      "featuredImage": "/characters/titheus-cillbrost.webp"
     },
     {
       "id": "bolt",
