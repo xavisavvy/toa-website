@@ -56,3 +56,9 @@ waitForPort = 5000
 
 [agent]
 integrations = ["youtube:1.0.0"]
+
+[userenv]
+
+[userenv.production]
+NODE_ENV = "production"
+PORT = "5000"
