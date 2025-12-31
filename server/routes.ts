@@ -124,27 +124,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Accept-Ranges', 'bytes');
       res.setHeader('Cache-Control', 'public, max-age=3600');
 
-      // Stream the audio data
-      if (response.body) {
-        const reader = response.body.getReader();
-        const stream = new ReadableStream({
-          async start(controller) {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              controller.enqueue(value);
-            }
-            controller.close();
-          }
-        });
-        
-        for await (const chunk of stream as any) {
-          res.write(chunk);
-        }
-        res.end();
-      } else {
-        res.end();
-      }
+      // Stream the audio data - Node.js compatible
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      res.send(buffer);
     } catch (error) {
       console.error('Error proxying audio:', error);
       res.status(500).json({ error: 'Failed to proxy audio file' });
