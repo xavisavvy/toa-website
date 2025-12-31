@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/xavisavvy/toa-website/compare/v1.7.0...v1.8.0) (2025-12-31)
+
+
+### Features
+
+* add load and stress testing ([#8](https://github.com/xavisavvy/toa-website/issues/8)) ([7d631c1](https://github.com/xavisavvy/toa-website/commit/7d631c1995288c7c77e1b8f121a61b31630be548))
+
 ## [1.7.0](https://github.com/xavisavvy/toa-website/compare/v1.6.1...v1.7.0) (2025-12-31)
 
 
