@@ -28,13 +28,14 @@ This project uses environment variables for configuration. All required and opti
 
 3. **Required Variables:**
    - `DATABASE_URL` - PostgreSQL connection string
-   - `YOUTUBE_API_KEY` - YouTube Data API v3 key
+   - `YOUTUBE_API_KEY` - YouTube Data API v3 key (server-side)
    - `VITE_YOUTUBE_PLAYLIST_ID` - Our YouTube playlist ID
    - `VITE_PODCAST_FEED_URL` - Our podcast RSS feed URL
    - `SESSION_SECRET` - Random secret for session encryption
    - `ALLOWED_ORIGINS` - CORS allowed origins (production only)
 
 4. **Optional Variables:**
+   - `VITE_YOUTUBE_API_KEY` - YouTube API key for client-side access
    - `ETSY_API_KEY` - For Etsy shop integration
    - `ETSY_ACCESS_TOKEN` - For Etsy shop integration
 

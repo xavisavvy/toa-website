@@ -55,6 +55,7 @@ SESSION_SECRET=your-secure-random-32-char-string
 
 # YouTube Integration
 YOUTUBE_API_KEY=your_youtube_api_key_here
+VITE_YOUTUBE_API_KEY=your_youtube_api_key_here  # Optional: for client-side API access
 VITE_YOUTUBE_PLAYLIST_ID=your_playlist_id_here
 
 # Podcast Feed
