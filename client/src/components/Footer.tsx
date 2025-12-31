@@ -1,9 +1,10 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import socialLinksData from "@/data/social-links.json";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [location, setLocation] = useLocation();
 
   const footerLinks = {
     About: [
@@ -61,6 +62,30 @@ export default function Footer() {
     },
   ];
 
+  const handleHashNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const hash = href.substring(href.indexOf('#'));
+    const sectionId = hash.replace('#', '');
+    
+    // If we're not on the homepage, navigate to homepage with hash
+    if (location !== '/') {
+      setLocation(`/${hash}`);
+      // Wait for navigation, then scroll
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      // We're on homepage, just scroll
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
@@ -95,7 +120,16 @@ export default function Footer() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.label}>
-                    {link.href.startsWith('/') ? (
+                    {link.href.includes('#') ? (
+                      <a
+                        href={link.href}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+                        onClick={(e) => handleHashNavigation(e, link.href)}
+                      >
+                        {link.label}
+                      </a>
+                    ) : link.href.startsWith('/') ? (
                       <Link
                         href={link.href}
                         className="text-muted-foreground hover:text-foreground transition-colors"
@@ -108,14 +142,6 @@ export default function Footer() {
                         href={link.href}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                         data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={(e) => {
-                          if (link.href.startsWith('http') || link.href.startsWith('mailto:')) {
-                            return;
-                          }
-                          e.preventDefault();
-                          const element = document.querySelector(link.href);
-                          element?.scrollIntoView({ behavior: 'smooth' });
-                        }}
                         target={link.href.startsWith('http') ? '_blank' : undefined}
                         rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                       >
