@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/xavisavvy/toa-website/compare/v1.1.11...v1.2.0) (2025-12-31)
+
+
+### Features
+
+* add contract tests with MSW and implementation guide ([#2](https://github.com/xavisavvy/toa-website/issues/2)) ([5862589](https://github.com/xavisavvy/toa-website/commit/586258981e0a13010df5b1edb92218a717a8151c)), closes [#1](https://github.com/xavisavvy/toa-website/issues/1) [#3](https://github.com/xavisavvy/toa-website/issues/3) [#4](https://github.com/xavisavvy/toa-website/issues/4) [#5](https://github.com/xavisavvy/toa-website/issues/5)
+* add E2E tests with Playwright ([#1](https://github.com/xavisavvy/toa-website/issues/1)) ([17cfae7](https://github.com/xavisavvy/toa-website/commit/17cfae7843abca51f23c3aede6fa63fb6f49128b))
+
 ### [1.1.11](https://github.com/xavisavvy/toa-website/compare/v1.1.10...v1.1.11) (2025-12-31)
 
 ### [1.1.10](https://github.com/xavisavvy/toa-website/compare/v1.1.9...v1.1.10) (2025-12-31)
