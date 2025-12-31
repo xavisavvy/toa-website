@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Youtube, Twitter, Instagram, Twitch, Globe } from "lucide-react";
 import castData from "@/data/cast.json";
-import prestonAvatar from "@/assets/cast-preston.jpg";
-import brigetteAvatar from "@/assets/cast-brigette.png";
-import dallinAvatar from "@/assets/cast-dallin.png";
-import coryAvatar from "@/assets/cast-cory.jpg";
-import torreyAvatar from "@/assets/cast-torrey.png";
-import scottAvatar from "@/assets/cast-scott.jpg";
-import colbyAvatar from "@/assets/cast-colby.png";
-import ianAvatar from "@/assets/cast-ian.png";
-import jakeAvatar from "@/assets/cast-jake.jpg";
+import prestonAvatar from "@/assets/cast-preston.webp";
+import brigetteAvatar from "@/assets/cast-brigette.webp";
+import dallinAvatar from "@/assets/cast-dallin.webp";
+import coryAvatar from "@/assets/cast-cory.webp";
+import torreyAvatar from "@/assets/cast-torrey.webp";
+import scottAvatar from "@/assets/cast-scott.webp";
+import colbyAvatar from "@/assets/cast-colby.webp";
+import ianAvatar from "@/assets/cast-ian.webp";
+import jakeAvatar from "@/assets/cast-jake.webp";
 
 interface SocialLinks {
   youtube?: string;
@@ -38,15 +38,15 @@ export default function AboutSection() {
   const pastCast = allCast.filter((member) => !member.isCurrent);
 
   const avatarImages: Record<string, string> = {
-    "cast-preston.jpg": prestonAvatar,
-    "cast-brigette.png": brigetteAvatar,
-    "cast-dallin.png": dallinAvatar,
-    "cast-cory.jpg": coryAvatar,
-    "cast-torrey.png": torreyAvatar,
-    "cast-scott.jpg": scottAvatar,
-    "cast-colby.png": colbyAvatar,
-    "cast-ian.png": ianAvatar,
-    "cast-jake.jpg": jakeAvatar,
+    "cast-preston.webp": prestonAvatar,
+    "cast-brigette.webp": brigetteAvatar,
+    "cast-dallin.webp": dallinAvatar,
+    "cast-cory.webp": coryAvatar,
+    "cast-torrey.webp": torreyAvatar,
+    "cast-scott.webp": scottAvatar,
+    "cast-colby.webp": colbyAvatar,
+    "cast-ian.webp": ianAvatar,
+    "cast-jake.webp": jakeAvatar,
   };
 
   const stats = [

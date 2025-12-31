@@ -6,7 +6,7 @@
       "role": "Game Master",
       "characters": ["The Storyteller"],
       "isCurrent": true,
-      "avatar": "cast-cory.jpg",
+      "avatar": "cast-cory.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -29,7 +29,7 @@
         "Ahri Flowers"
       ],
       "isCurrent": true,
-      "avatar": "cast-preston.jpg",
+      "avatar": "cast-preston.webp",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@fuzzysquirrel",
         "twitter": "https://x.com/prestonbfarr",
@@ -49,7 +49,7 @@
         "Maybel Crosscore"
       ],
       "isCurrent": true,
-      "avatar": "cast-torrey.png",
+      "avatar": "cast-torrey.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -64,7 +64,7 @@
       "role": "Player",
       "characters": ["Carine Sol", "Bolt", "Cilin Meekmarrow"],
       "isCurrent": true,
-      "avatar": "cast-scott.jpg",
+      "avatar": "cast-scott.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -79,7 +79,7 @@
       "role": "Player",
       "characters": ["Erys Leandorian", "Aramis", "Ezra"],
       "isCurrent": true,
-      "avatar": "cast-dallin.png",
+      "avatar": "cast-dallin.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -94,7 +94,7 @@
       "role": "Player",
       "characters": ["Seredan Fallowshield", "Alomah Stargazer"],
       "isCurrent": false,
-      "avatar": "cast-colby.png",
+      "avatar": "cast-colby.webp",
       "socialLinks": {
         "youtube": "https://www.youtube.com/@DnDDeepDive",
         "twitter": "https://x.com/ColbyPoulson",
@@ -109,7 +109,7 @@
       "role": "Player",
       "characters": ["Titheus Cillbrost"],
       "isCurrent": true,
-      "avatar": "cast-ian.png",
+      "avatar": "cast-ian.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -124,7 +124,7 @@
       "role": "Player",
       "characters": ["Porphan Valaritas"],
       "isCurrent": true,
-      "avatar": "cast-jake.jpg",
+      "avatar": "cast-jake.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",
@@ -139,7 +139,7 @@
       "role": "Player",
       "characters": ["Melly"],
       "isCurrent": false,
-      "avatar": "cast-brigette.png",
+      "avatar": "cast-brigette.webp",
       "socialLinks": {
         "youtube": "",
         "twitter": "",

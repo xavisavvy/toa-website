@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Play, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
-import butterflyImage from "@/assets/hero-butterfly.png";
-import cinderhearthImage from "@/assets/hero-cinderhearth.png";
-import desertImage from "@/assets/hero-desert.png";
-import spaceImage from "@/assets/hero-space.png";
-import taebrinImage from "@/assets/hero-taebrin.png";
+import butterflyImage from "@/assets/hero-butterfly.webp";
+import cinderhearthImage from "@/assets/hero-cinderhearth.webp";
+import desertImage from "@/assets/hero-desert.webp";
+import spaceImage from "@/assets/hero-space.webp";
+import taebrinImage from "@/assets/hero-taebrin.webp";
 import socialLinksData from "@/data/social-links.json";
 
 const heroImages = [

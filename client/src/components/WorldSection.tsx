@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import pterrordaleBg from "@/assets/feat-pterrordale.png";
-import aneriaBg from "@/assets/feat-aneria.png";
-import taebrinBg from "@/assets/creepy-forest.png";
+import pterrordaleBg from "@/assets/feat-pterrordale.webp";
+import aneriaBg from "@/assets/feat-aneria.webp";
+import taebrinBg from "@/assets/creepy-forest.webp";
 import charactersData from "@/data/characters.json";
 
 interface Campaign {

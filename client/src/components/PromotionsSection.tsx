@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Sparkles } from "lucide-react";
-import creepyForest from "@/assets/creepy-forest.png";
+import creepyForest from "@/assets/creepy-forest.webp";
 
 interface Promotion {
   id: string;
