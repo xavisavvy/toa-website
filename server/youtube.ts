@@ -238,13 +238,12 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
       try {
         return await getPlaylistVideosDirectAPI(playlistId, maxResults);
       } catch (apiError: any) {
-        // If API key has referrer restrictions, log and fall through to return empty array
+        // If API key has referrer restrictions, fall through to try OAuth
         if (apiError.message?.includes('API_KEY_HTTP_REFERRER_BLOCKED') || apiError.message?.includes('referer')) {
-          console.log('YouTube API key has referrer restrictions. Configure a server-side API key or use client-side fetching.');
-          console.log('Returning empty playlist. The YouTube API should be called from the client-side with this API key.');
-          return [];
+          console.log('YouTube API key has referrer restrictions, falling back to OAuth connector...');
+        } else {
+          throw apiError;
         }
-        throw apiError;
       }
     }
     

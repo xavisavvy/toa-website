@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Clock, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getMultiplePlaylistVideosClient } from "@/lib/youtube";
 
 interface Episode {
   id: string;
@@ -20,21 +19,48 @@ interface LatestEpisodesProps {
 
 export default function LatestEpisodes({ playlistIds }: LatestEpisodesProps) {
   const { data: episodes, isLoading, error } = useQuery<Episode[]>({
-    queryKey: ['/api/youtube/playlists-client', playlistIds],
+    queryKey: ['/api/youtube/playlists', playlistIds],
     enabled: !!playlistIds && playlistIds.length > 0,
     queryFn: async () => {
-      console.log('Fetching YouTube playlists from client:', playlistIds);
+      console.log('Fetching YouTube playlists from server:', playlistIds);
       
-      const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-      if (!apiKey) {
-        console.error('VITE_YOUTUBE_API_KEY not found in environment');
-        throw new Error('YouTube API key not configured');
+      // Fetch from each playlist via server-side API (avoids referrer restrictions)
+      const allVideosPromises = playlistIds!.map(async (playlistId) => {
+        try {
+          const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=50`);
+          if (!response.ok) {
+            console.error(`Error fetching playlist ${playlistId}:`, response.statusText);
+            return [];
+          }
+          return await response.json();
+        } catch (error) {
+          console.error(`Error fetching playlist ${playlistId}:`, error);
+          return [];
+        }
+      });
+      
+      const playlistResults = await Promise.all(allVideosPromises);
+      
+      // Flatten and dedupe by video ID
+      const videoMap = new Map<string, Episode>();
+      for (const videos of playlistResults) {
+        for (const video of videos) {
+          if (!videoMap.has(video.id)) {
+            videoMap.set(video.id, video);
+          }
+        }
       }
       
-      console.log('Using client-side YouTube API for multiple playlists');
-      const videos = await getMultiplePlaylistVideosClient(playlistIds!, apiKey, 100);
-      console.log('Client-side response:', videos?.length, 'videos from', playlistIds?.length, 'playlists');
-      return videos;
+      // Sort by publishedAt date (most recent first)
+      const allVideos = Array.from(videoMap.values());
+      allVideos.sort((a, b) => {
+        const dateA = new Date(a.publishedAt).getTime();
+        const dateB = new Date(b.publishedAt).getTime();
+        return dateB - dateA;
+      });
+      
+      console.log('Server-side response:', allVideos.length, 'videos from', playlistIds?.length, 'playlists');
+      return allVideos;
     },
   });
 

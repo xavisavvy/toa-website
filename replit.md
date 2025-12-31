@@ -22,7 +22,7 @@ The frontend is built with React 18, TypeScript, Wouter for routing, TanStack Qu
 
 ### Backend (Express + Node.js)
 An Express.js backend handles API integrations, including:
--   **YouTube Integration**: `/api/youtube/playlist/:playlistId` endpoint with server-side caching (24-hour duration) to manage API quotas.
+-   **YouTube Integration**: `/api/youtube/playlist/:playlistId` endpoint with server-side caching (24-hour duration) to manage API quotas. Supports multiple playlists via `VITE_YOUTUBE_PLAYLIST_IDS` (comma-separated) environment variable. Falls back to Replit OAuth connector if API key has referrer restrictions.
 -   **Security Architecture**: Implements OWASP Top 10:2021 compliance, including:
     -   **Security Headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options via Helmet.
     -   **CORS**: Whitelist-based origin validation in production.
