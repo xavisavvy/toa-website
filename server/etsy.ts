@@ -131,11 +131,11 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
       if (process.env.NODE_ENV === 'development') {
-        console.log('⚠️  Etsy API error (expected in local dev):', response.status);
+        const errorText = await response.text();
+        console.log('⚠️  Etsy API error (expected in local dev):', response.status, errorText);
       } else {
-        console.error('Etsy API error:', response.status, errorText);
+        console.error('Etsy API error:', response.status);
       }
       console.log('Returning empty product list due to API error');
       return [];

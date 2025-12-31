@@ -72,18 +72,18 @@ export interface VideoItem {
   description?: string;
 }
 
-interface CachedPlaylistData {
-  playlistId: string;
+interface PlaylistCacheEntry {
   videos: VideoItem[];
   timestamp: number;
 }
 
-function isCacheValid(cachedData: CachedPlaylistData, playlistId: string): boolean {
-  if (cachedData.playlistId !== playlistId) {
-    return false;
-  }
+interface CachedPlaylistData {
+  [playlistId: string]: PlaylistCacheEntry;
+}
+
+function isCacheValid(cacheEntry: PlaylistCacheEntry): boolean {
   const now = Date.now();
-  const age = now - cachedData.timestamp;
+  const age = now - cacheEntry.timestamp;
   return age < CACHE_DURATION;
 }
 
@@ -96,13 +96,18 @@ function readCache(playlistId: string): VideoItem[] | null {
     const cacheContent = fs.readFileSync(CACHE_FILE, 'utf-8');
     const cachedData: CachedPlaylistData = JSON.parse(cacheContent);
 
-    if (isCacheValid(cachedData, playlistId)) {
-      const ageHours = Math.floor((Date.now() - cachedData.timestamp) / (1000 * 60 * 60));
-      console.log(`Using cached YouTube data (age: ${ageHours}h)`);
-      return cachedData.videos;
+    const cacheEntry = cachedData[playlistId];
+    if (!cacheEntry) {
+      return null;
     }
 
-    console.log('Cache expired, fetching fresh data');
+    if (isCacheValid(cacheEntry)) {
+      const ageHours = Math.floor((Date.now() - cacheEntry.timestamp) / (1000 * 60 * 60));
+      console.log(`Using cached YouTube data for playlist ${playlistId} (age: ${ageHours}h)`);
+      return cacheEntry.videos;
+    }
+
+    console.log(`Cache expired for playlist ${playlistId}, fetching fresh data`);
     return null;
   } catch (error) {
     console.error('Error reading cache:', error);
@@ -116,14 +121,25 @@ function writeCache(playlistId: string, videos: VideoItem[]): void {
       fs.mkdirSync(CACHE_DIR, { recursive: true });
     }
 
-    const cacheData: CachedPlaylistData = {
-      playlistId,
+    // Read existing cache to preserve other playlists
+    let cachedData: CachedPlaylistData = {};
+    if (fs.existsSync(CACHE_FILE)) {
+      try {
+        const existing = fs.readFileSync(CACHE_FILE, 'utf-8');
+        cachedData = JSON.parse(existing);
+      } catch (error) {
+        console.warn('Could not read existing cache, starting fresh:', error);
+      }
+    }
+
+    // Update or add this playlist's data
+    cachedData[playlistId] = {
       videos,
       timestamp: Date.now(),
     };
 
-    fs.writeFileSync(CACHE_FILE, JSON.stringify(cacheData, null, 2), 'utf-8');
-    console.log('YouTube data cached successfully');
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(cachedData, null, 2), 'utf-8');
+    console.log(`YouTube data cached successfully for playlist ${playlistId}`);
   } catch (error) {
     console.error('Error writing cache:', error);
   }
@@ -361,9 +377,10 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
       if (fs.existsSync(CACHE_FILE)) {
         const cacheContent = fs.readFileSync(CACHE_FILE, 'utf-8');
         const cachedData: CachedPlaylistData = JSON.parse(cacheContent);
-        if (cachedData.playlistId === playlistId) {
+        const cacheEntry = cachedData[playlistId];
+        if (cacheEntry) {
           console.log('API failed, serving stale cache as fallback');
-          return cachedData.videos;
+          return cacheEntry.videos;
         }
       }
     } catch (cacheError) {
