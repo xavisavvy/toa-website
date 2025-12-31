@@ -126,6 +126,7 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8",
     "esbuild": "^0.25.12",
+    "fast-check": "^4.5.3",
     "happy-dom": "^20.0.11",
     "msw": "^2.12.7",
     "postcss": "^8.4.47",
