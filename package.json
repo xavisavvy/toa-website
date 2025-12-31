@@ -127,6 +127,7 @@
     "drizzle-kit": "^0.31.8",
     "esbuild": "^0.25.12",
     "happy-dom": "^20.0.11",
+    "msw": "^2.12.7",
     "postcss": "^8.4.47",
     "standard-version": "^9.5.0",
     "supertest": "^7.1.4",
