@@ -55,14 +55,17 @@ All character images include proper copyright attribution, artist credits, and o
 
 ### Performance Optimizations
 The site implements comprehensive performance optimizations to ensure fast loading times:
--   **Smart Hero Carousel**: Preloads only the current and next image, reducing initial load from 15+ MB to ~1.1 MB.
--   **Lazy Loading**: All non-critical images (campaign backgrounds, cast photos, promotion images) use `loading="lazy"` to defer loading until scrolled into view.
--   **Production Bundle**: Optimized production build produces:
-    -   JavaScript: 125.53 KB (gzipped)
-    -   CSS: 12.85 KB (gzipped)
-    -   Initial hero image: ~1.1 MB
-    -   **Total initial load: ~1.25 MB**
--   **Future Optimization**: Phase 2 will convert PNG images to WebP format for ~80% file size reduction.
+-   **WebP Image Optimization**: All images converted to WebP format with appropriate sizing:
+    -   Hero images: max 1920px width, 80% quality (~80-220 KB each)
+    -   Feature images: max 1200px width, 80% quality (~11-122 KB each)
+    -   Cast photos: max 400px width, 85% quality (~16-35 KB each)
+    -   **Total image assets: 0.86 MB** (reduced from 40.23 MB - 97.9% savings)
+-   **Smart Hero Carousel**: Preloads only the current and next image for faster initial load.
+-   **Lazy Loading**: All non-critical images use `loading="lazy"` to defer loading.
+-   **Production Bundle**: Optimized production build:
+    -   JavaScript: ~125 KB (gzipped)
+    -   CSS: ~13 KB (gzipped)
+-   **Image Optimization Script**: `scripts/optimize-images.ts` using Sharp library for batch WebP conversion.
 
 ## External Dependencies
 -   **Google YouTube Data API v3**: For fetching YouTube playlist and video details.
