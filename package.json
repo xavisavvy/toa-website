@@ -14,6 +14,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "test:visual": "playwright test e2e/visual-regression.spec.ts",
+    "test:visual:update": "playwright test e2e/visual-regression.spec.ts --update-snapshots",
+    "test:visual:ui": "playwright test e2e/visual-regression.spec.ts --ui",
     "test:all": "npm run test:coverage && npm run test:e2e",
     "test:mutation": "stryker run",
     "test:mutation:incremental": "stryker run --incremental",
@@ -21,7 +24,7 @@
     "update-taebrin-images": "tsx scripts/update-taebrin-with-custom-images.ts",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
-    "release:major": "standard-version --release-as major",
+    "release:major": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch"
   },
   "dependencies": {
@@ -136,6 +139,9 @@
     "fast-check": "^4.5.3",
     "happy-dom": "^20.0.11",
     "msw": "^2.12.7",
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.57.0",
+    "pngjs": "^7.0.0",
     "postcss": "^8.4.47",
     "standard-version": "^9.5.0",
     "supertest": "^7.1.4",
