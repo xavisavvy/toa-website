@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  security-events: write
+  # security-events: write  # Only needed for CodeQL/Advanced Security (paid feature)
   pull-requests: write
 
 jobs:
@@ -95,12 +95,13 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM'
           exit-code: '0'
       
-      - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-          category: 'container-security'
+      # CodeQL SARIF upload disabled - requires GitHub Advanced Security
+      # - name: Upload Trivy results to GitHub Security
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   if: always()
+      #   with:
+      #     sarif_file: 'trivy-results.sarif'
+      #     category: 'container-security'
       
       - name: Run Trivy for JSON report
         uses: aquasecurity/trivy-action@master
@@ -116,39 +117,40 @@ jobs:
           name: trivy-results
           path: trivy-results.json
 
-  # 2. SAST with CodeQL
-  codeql:
-    name: CodeQL SAST Analysis
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['javascript']
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          queries: +security-and-quality
-      
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-      
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:${{ matrix.language }}"
+  # CodeQL SAST disabled - requires GitHub Advanced Security (paid feature)
+  # Uncomment when you have access to GitHub Advanced Security
+  # codeql:
+  #   name: CodeQL SAST Analysis
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     security-events: write
+  #     actions: read
+  #     contents: read
+  #   
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       language: ['javascript']
+  #   
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     
+  #     - name: Initialize CodeQL
+  #       uses: github/codeql-action/init@v3
+  #       with:
+  #         languages: ${{ matrix.language }}
+  #         queries: +security-and-quality
+  #     
+  #     - name: Autobuild
+  #       uses: github/codeql-action/autobuild@v3
+  #     
+  #     - name: Perform CodeQL Analysis
+  #       uses: github/codeql-action/analyze@v3
+  #       with:
+  #         category: "/language:${{ matrix.language }}"
 
-  # 3. Dependency Scanning with multiple tools
+  # 2. Dependency Scanning with multiple tools
   dependency-scan:
     name: Dependency Security Scan
     runs-on: ubuntu-latest
@@ -197,7 +199,7 @@ jobs:
           name: snyk-results
           path: snyk-results.json
 
-  # 4. Secret Scanning with Gitleaks
+  # 3. Secret Scanning with Gitleaks
   secret-scan:
     name: Secret Scanning
     runs-on: ubuntu-latest
