@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.11](https://github.com/xavisavvy/toa-website/compare/v1.13.10...v1.13.11) (2026-01-01)
+
+
+### Bug Fixes
+
+* property-based test for playlist ID validation ([50b5c5a](https://github.com/xavisavvy/toa-website/commit/50b5c5a88d310df17cd012609bdf5525c8582bc1))
+
 ### [1.13.10](https://github.com/xavisavvy/toa-website/compare/v1.13.9...v1.13.10) (2026-01-01)
 
 ### [1.13.9](https://github.com/xavisavvy/toa-website/compare/v1.13.8...v1.13.9) (2026-01-01)
