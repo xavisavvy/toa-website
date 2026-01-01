@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/xavisavvy/toa-website/compare/v1.15.0...v1.16.0) (2026-01-01)
+
+
+### Features
+
+* Docker image optimization & Kubernetes deployment ([#7](https://github.com/xavisavvy/toa-website/issues/7)) ([717c8dc](https://github.com/xavisavvy/toa-website/commit/717c8dc48a998519e8892fc63f86cfd4f70f418a))
+
 ## [1.15.0](https://github.com/xavisavvy/toa-website/compare/v1.14.0...v1.15.0) (2026-01-01)
 
 
