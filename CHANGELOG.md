@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.15.0](https://github.com/xavisavvy/toa-website/compare/v1.14.0...v1.15.0) (2026-01-01)
+
+
+### Features
+
+* implement enhanced health checks (Enterprise CI/CD [#13](https://github.com/xavisavvy/toa-website/issues/13)) ([1614001](https://github.com/xavisavvy/toa-website/commit/1614001737fd0e8b5d4842888c826ca09cc64bbe))
+
 ## [1.14.0](https://github.com/xavisavvy/toa-website/compare/v1.13.15...v1.14.0) (2026-01-01)
 
 
