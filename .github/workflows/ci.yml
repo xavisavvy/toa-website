@@ -86,14 +86,24 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner (JSON format)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: toa-website:${{ github.sha }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          format: 'json'
+          output: 'trivy-results.json'
           severity: 'CRITICAL,HIGH,MEDIUM'
           exit-code: '0'
+      
+      # SARIF format disabled - requires GitHub Advanced Security for upload
+      # - name: Run Trivy vulnerability scanner (SARIF format)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     image-ref: toa-website:${{ github.sha }}
+      #     format: 'sarif'
+      #     output: 'trivy-results.sarif'
+      #     severity: 'CRITICAL,HIGH,MEDIUM'
+      #     exit-code: '0'
       
       # CodeQL SARIF upload disabled - requires GitHub Advanced Security
       # - name: Upload Trivy results to GitHub Security
@@ -102,13 +112,6 @@ jobs:
       #   with:
       #     sarif_file: 'trivy-results.sarif'
       #     category: 'container-security'
-      
-      - name: Run Trivy for JSON report
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: toa-website:${{ github.sha }}
-          format: 'json'
-          output: 'trivy-results.json'
       
       - name: Upload Trivy JSON results
         uses: actions/upload-artifact@v4
