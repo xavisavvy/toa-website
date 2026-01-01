@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.21.0](https://github.com/xavisavvy/toa-website/compare/v1.20.0...v1.21.0) (2026-01-01)
+
+
+### Features
+
+* **cicd:** complete Phase 3 enterprise CI/CD implementation ([63091f8](https://github.com/xavisavvy/toa-website/commit/63091f8bfcae31fff57457218734f445273e09c2))
+
 ## [1.20.0](https://github.com/xavisavvy/toa-website/compare/v1.19.0...v1.20.0) (2026-01-01)
 
 
