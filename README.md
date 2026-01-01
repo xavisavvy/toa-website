@@ -27,6 +27,18 @@
 
 A professional landing page for our TTRPG Live Play series, featuring YouTube integration, podcast feeds, world lore, and merchandise showcase.
 
+## 📚 Documentation
+
+**Comprehensive documentation is available in the [docs/](./docs/) folder.**
+
+- 🔧 **[CI/CD Guides](./docs/ci-cd/)** - Enterprise CI/CD, build optimization, GitHub Actions
+- 🧪 **[Testing Documentation](./docs/testing/)** - Unit, E2E, mutation, accessibility, load, chaos testing
+- 🔒 **[Security Guides](./docs/security/)** - Security scanning, compliance, license review
+- 🚀 **[Deployment Guides](./docs/deployment/)** - Docker, Replit, health checks
+- 📘 **[Implementation Guides](./docs/guides/)** - Phase documentation and summaries
+
+👉 **Start here:** [Documentation Index](./docs/README.md)
+
 ## Features
 
 ✨ **YouTube Integration** - Automatically fetches and displays our latest episodes from any YouTube playlist

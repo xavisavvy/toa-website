@@ -14,16 +14,19 @@ import { join } from 'path';
 // Approved licenses (permissive and business-friendly)
 const APPROVED_LICENSES = [
   'MIT',
+  'MIT*', // MIT from package.json
   'ISC',
   'Apache-2.0',
   'BSD-2-Clause',
   'BSD-3-Clause',
+  'BSD*', // BSD from package.json
   'CC0-1.0',
   'CC-BY-3.0',
   'CC-BY-4.0',
   'Unlicense',
   '0BSD',
   'Python-2.0',
+  'BlueOak-1.0.0', // Permissive, OSI-approved
 ];
 
 // Risky licenses that require review
@@ -40,7 +43,10 @@ const RISKY_LICENSES = [
 
 // Known exceptions (packages we've reviewed and approved)
 const EXCEPTIONS = {
-  // Example: 'some-gpl-package@1.0.0': 'GPL-3.0',
+  // LGPL binary libraries - Safe for dynamic linking (not modifying source)
+  '@img/sharp-libvips-linux-x64@1.2.4': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-linuxmusl-x64@1.2.4': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-win32-x64@0.34.5': 'Apache-2.0 AND LGPL-3.0-or-later (binary library, dual-licensed)',
 };
 
 console.log('🔍 Scanning license compliance...\n');
