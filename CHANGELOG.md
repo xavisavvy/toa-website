@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.2](https://github.com/xavisavvy/toa-website/compare/v1.13.1...v1.13.2) (2026-01-01)
+
+
+### Bug Fixes
+
+* optimize deploy workflow and add deployment guide ([1d80a21](https://github.com/xavisavvy/toa-website/commit/1d80a2199139ed2a11bae3321c8eac8e09a4af73))
+
 ### [1.13.1](https://github.com/xavisavvy/toa-website/compare/v1.13.0...v1.13.1) (2026-01-01)
 
 
