@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/xavisavvy/toa-website/compare/v1.19.0...v1.20.0) (2026-01-01)
+
+
+### Features
+
+* Complete Phase 2 - Rate Limiting, Health Checks, and Automated Rollback ([db463f4](https://github.com/xavisavvy/toa-website/commit/db463f456915c025c526227d25f37a9fb9394929)), closes [#6](https://github.com/xavisavvy/toa-website/issues/6) [#15](https://github.com/xavisavvy/toa-website/issues/15) [#20](https://github.com/xavisavvy/toa-website/issues/20) [#15](https://github.com/xavisavvy/toa-website/issues/15) [#20](https://github.com/xavisavvy/toa-website/issues/20)
+
 ## [1.19.0](https://github.com/xavisavvy/toa-website/compare/v1.18.0...v1.19.0) (2026-01-01)
 
 
