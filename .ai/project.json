@@ -1,0 +1,108 @@
+{
+  "name": "toa-website",
+  "description": "Tales of Aneria TTRPG live play website",
+  "type": "full-stack-web-app",
+  "version": "1.22.10",
+  
+  "stack": {
+    "frontend": {
+      "framework": "react-18",
+      "language": "typescript",
+      "build_tool": "vite",
+      "styling": "tailwind-css",
+      "ui_library": "shadcn-ui"
+    },
+    "backend": {
+      "runtime": "node-20",
+      "framework": "express",
+      "language": "typescript",
+      "orm": "drizzle",
+      "validation": "zod"
+    },
+    "database": {
+      "type": "postgresql",
+      "provider": "neon-serverless"
+    },
+    "testing": {
+      "unit": "vitest",
+      "e2e": "playwright",
+      "mutation": "stryker",
+      "accessibility": "axe-core"
+    }
+  },
+  
+  "standards": {
+    "testing": {
+      "coverage_threshold": 80,
+      "mutation_score_threshold": 80,
+      "required_test_types": ["unit", "e2e", "accessibility"]
+    },
+    "code_style": {
+      "component_style": "functional-only",
+      "export_style": "named-preferred",
+      "validation_library": "zod-required",
+      "max_function_length": 50,
+      "type_safety": "strict-mode"
+    },
+    "accessibility": {
+      "standard": "wcag-2.1-aa",
+      "automated_testing": true
+    },
+    "security": {
+      "input_validation": "zod-all-inputs",
+      "rate_limiting": "all-public-endpoints",
+      "sql_injection_prevention": "drizzle-orm-only",
+      "secret_management": "env-variables-only"
+    }
+  },
+  
+  "architecture": {
+    "pattern": "monorepo",
+    "api_style": "rest",
+    "authentication": "session-based",
+    "deployment": "docker-containerized",
+    "ci_cd": "github-actions"
+  },
+  
+  "ai_context": {
+    "key_files": [
+      ".github/copilot-instructions.md",
+      "server/routes.ts",
+      "server/db/schema.ts",
+      "client/src/App.tsx",
+      ".ai/architecture.md"
+    ],
+    "common_patterns": [
+      "zod-validation",
+      "functional-components",
+      "drizzle-orm-queries",
+      "rate-limited-endpoints",
+      "error-handling-try-catch"
+    ],
+    "trigger_words": [
+      "enterprise test",
+      "secure endpoint",
+      "accessible component",
+      "database migration",
+      "ci pipeline",
+      "test on change"
+    ]
+  },
+  
+  "project_goals": {
+    "primary": "Showcase TTRPG live play content with enterprise-grade practices",
+    "secondary": [
+      "Demonstrate comprehensive testing strategies",
+      "Maintain high code quality standards",
+      "Ensure WCAG 2.1 AA accessibility",
+      "Implement security best practices"
+    ]
+  },
+  
+  "team_conventions": {
+    "commit_format": "conventional-commits",
+    "branching_strategy": "main-develop",
+    "code_review": "required-before-merge",
+    "documentation": "jsdoc-for-exports"
+  }
+}
