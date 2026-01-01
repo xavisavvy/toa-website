@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.9](https://github.com/xavisavvy/toa-website/compare/v1.13.8...v1.13.9) (2026-01-01)
+
+
+### Bug Fixes
+
+* remove SARIF generation from Trivy scanner ([10e1e9d](https://github.com/xavisavvy/toa-website/commit/10e1e9d58ae8bd1590c864a5f95f0499696abef4))
+
 ### [1.13.8](https://github.com/xavisavvy/toa-website/compare/v1.13.7...v1.13.8) (2026-01-01)
 
 
