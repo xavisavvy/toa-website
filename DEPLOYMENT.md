@@ -8,6 +8,17 @@ This guide explains the deployment process for Tales of Aneria website.
 
 ---
 
+## 📚 Platform-Specific Guides
+
+For detailed platform-specific deployment instructions:
+
+- **🔄 [Replit Automatic Deployment](./REPLIT_DEPLOYMENT.md)** - Webhook-based auto-deploy from GitHub
+- **☁️ Vercel** - See below
+- **☁️ Netlify** - See below
+- **🐳 Docker** - See [DOCKER.md](./DOCKER.md)
+
+---
+
 ## 🚀 Automated Deployment
 
 ### Current Setup
@@ -23,8 +34,9 @@ This guide explains the deployment process for Tales of Aneria website.
 3. ✅ Run quick smoke tests
 4. ✅ Build application
 5. ✅ Verify build artifacts
-6. 🔧 Deploy (placeholder - configure for your platform)
-7. ✅ Notify deployment success
+6. ✅ Trigger Replit webhook (if configured)
+7. 🔧 Deploy (placeholder - configure for your platform)
+8. ✅ Notify deployment success
 
 ### How It Works:
 
@@ -40,7 +52,27 @@ git push origin main
 
 ## 🔧 Deployment Platforms
 
-### Option 1: Vercel (Recommended for Full-Stack)
+### Option 1: Replit (Current Platform)
+
+**Automatic Deployment from GitHub**
+
+See **[REPLIT_DEPLOYMENT.md](./REPLIT_DEPLOYMENT.md)** for complete setup guide.
+
+**Quick Setup:**
+1. Connect GitHub to Replit
+2. Enable Auto-deploy from main branch
+3. Add `REPLIT_DEPLOY_WEBHOOK` to GitHub Secrets
+4. Push to main → Auto-deploy!
+
+**Features:**
+- ✅ Zero-downtime deployments
+- ✅ Automatic restarts
+- ✅ Built-in CI/CD integration
+- ✅ Free tier available
+
+---
+
+### Option 2: Vercel (Recommended for Full-Stack)
 
 **Setup:**
 ```bash

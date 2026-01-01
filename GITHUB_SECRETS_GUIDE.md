@@ -45,6 +45,36 @@ None! The application works without any secrets. However, you can add these for 
 
 **Status:** Optional - not required for core functionality
 
+### Deployment Secrets
+
+#### 4. REPLIT_DEPLOY_WEBHOOK
+**Purpose:** Enable automatic deployment to Replit from GitHub  
+**How to Get:**
+1. Open your Replit project
+2. Go to **Deployments** (left sidebar)
+3. Enable **Auto-deploy from GitHub**
+4. Copy the webhook URL provided
+5. Add to GitHub Secrets
+
+**Where to Use:** GitHub Actions deploy workflow  
+**Documentation:** See [REPLIT_DEPLOYMENT.md](./REPLIT_DEPLOYMENT.md) for complete setup
+
+**Example value:**
+```
+https://api.replit.com/v1/deployments/YOUR_REPL_ID/deploy
+```
+
+#### 5. GITHUB_WEBHOOK_SECRET (Optional)
+**Purpose:** Secure custom webhook endpoints  
+**How to Get:**
+1. Generate a random secret:
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+2. Use same value in both GitHub and Replit
+
+**Where to Use:** Custom webhook verification (advanced setup only)
+
 ---
 
 ## 📝 How to Add Secrets in GitHub

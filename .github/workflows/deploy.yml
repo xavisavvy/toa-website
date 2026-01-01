@@ -50,6 +50,20 @@ jobs:
           echo "This is a placeholder for your deployment script"
           echo "Add your deployment commands (e.g., Vercel, Netlify, AWS, etc.)"
           
+      # Replit Deployment Webhook
+      - name: Trigger Replit Deployment
+        if: success()
+        run: |
+          if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
+            echo "🚀 Triggering Replit deployment..."
+            curl -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
+              -H "Content-Type: application/json" \
+              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "actor": "${{ github.actor }}"}'
+            echo "✅ Replit deployment triggered!"
+          else
+            echo "ℹ️ REPLIT_DEPLOY_WEBHOOK not configured, skipping Replit deployment"
+          fi
+          
       - name: Notify deployment
         if: success()
         run: |
