@@ -35,6 +35,9 @@ jobs:
       - name: TypeScript type checking
         run: npm run check
         
+      - name: Build application
+        run: npm run build
+        
       - name: Run unit tests with coverage
         run: npm run test:coverage
         
