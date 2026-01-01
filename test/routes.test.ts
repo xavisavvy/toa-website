@@ -65,6 +65,21 @@ describe('API Routes', () => {
     server = await registerRoutes(app);
   });
 
+  describe('GET /api/metrics', () => {
+    it('should return application metrics', async () => {
+      const response = await request(app)
+        .get('/api/metrics')
+        .expect(200);
+
+      expect(response.body).toHaveProperty('uptime');
+      expect(response.body).toHaveProperty('requests');
+      expect(response.body).toHaveProperty('cache');
+      expect(response.body).toHaveProperty('errors');
+      expect(response.body.requests).toHaveProperty('total');
+      expect(response.body.cache).toHaveProperty('hitRate');
+    });
+  });
+
   describe('GET /api/youtube/playlist/:playlistId', () => {
     it('should return playlist videos with valid playlist ID', async () => {
       const response = await request(app)
@@ -198,6 +213,17 @@ describe('API Routes', () => {
 
       expect(response.body).toHaveProperty('error');
     });
+
+    it('should handle errors from Etsy API', async () => {
+      const { getShopListings } = await import('../server/etsy');
+      vi.mocked(getShopListings).mockRejectedValueOnce(new Error('Etsy API Error'));
+
+      const response = await request(app)
+        .get('/api/etsy/shop/TestShop123/listings')
+        .expect(500);
+
+      expect(response.body.error).toBe('Failed to fetch Etsy products');
+    });
   });
 
   describe('GET /api/dndbeyond/character/:characterId', () => {
@@ -225,6 +251,17 @@ describe('API Routes', () => {
         .expect(400);
 
       expect(response.body.error).toBe('Invalid character ID format');
+    });
+
+    it('should handle errors from D&D Beyond API', async () => {
+      const { getCharacterData } = await import('../server/dndbeyond');
+      vi.mocked(getCharacterData).mockRejectedValueOnce(new Error('D&D Beyond API Error'));
+
+      const response = await request(app)
+        .get('/api/dndbeyond/character/12345')
+        .expect(500);
+
+      expect(response.body.error).toBe('Failed to fetch character data');
     });
   });
 
