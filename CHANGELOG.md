@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.6](https://github.com/xavisavvy/toa-website/compare/v1.22.5...v1.22.6) (2026-01-01)
+
+
+### Bug Fixes
+
+* remove version pinning for Alpine packages in Dockerfile ([484c36e](https://github.com/xavisavvy/toa-website/commit/484c36e1b00d759d3de168cd07845ebeef52cd66))
+
 ### [1.22.5](https://github.com/xavisavvy/toa-website/compare/v1.22.4...v1.22.5) (2026-01-01)
 
 ### [1.22.4](https://github.com/xavisavvy/toa-website/compare/v1.22.3...v1.22.4) (2026-01-01)
