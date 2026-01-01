@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
+import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import socialLinksData from "@/data/social-links.json";
 
 export default function Footer() {
@@ -31,31 +32,31 @@ export default function Footer() {
 
   const socialLinks = [
     { 
-      icon: <SiYoutube className="h-5 w-5" />, 
+      Icon: SiYoutube, 
       label: "YouTube", 
       testId: "youtube",
       url: socialLinksData.youtube
     },
     { 
-      icon: <SiX className="h-5 w-5" />, 
+      Icon: SiX, 
       label: "X", 
       testId: "x",
       url: socialLinksData.twitter
     },
     { 
-      icon: <SiDiscord className="h-5 w-5" />, 
+      Icon: SiDiscord, 
       label: "Discord", 
       testId: "discord",
       url: socialLinksData.discord
     },
     { 
-      icon: <SiReddit className="h-5 w-5" />, 
+      Icon: SiReddit, 
       label: "Reddit", 
       testId: "reddit",
       url: socialLinksData.reddit
     },
     { 
-      icon: <SiPatreon className="h-5 w-5" />, 
+      Icon: SiPatreon, 
       label: "Patreon", 
       testId: "patreon",
       url: socialLinksData.patreon
@@ -98,17 +99,20 @@ export default function Footer() {
               An epic TTRPG live play series exploring the mystical realm of Aneria. Join us on our adventures every week.
             </p>
             <div className="flex gap-3">
-              {socialLinks.map((link) => (
-                <button
-                  key={link.testId}
-                  className="w-10 h-10 rounded-md bg-background hover-elevate flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                  data-testid={`button-footer-${link.testId}`}
-                  onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
-                  aria-label={link.label}
-                >
-                  {link.icon}
-                </button>
-              ))}
+              {socialLinks.map((link) => {
+                const Icon = link.Icon;
+                return (
+                  <button
+                    key={link.testId}
+                    className="w-10 h-10 rounded-md bg-background hover-elevate flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                    data-testid={`button-footer-${link.testId}`}
+                    onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
+                    aria-label={link.label}
+                  >
+                    <AccessibleIcon icon={Icon} className="h-5 w-5" />
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -166,7 +170,7 @@ export default function Footer() {
                 href="https://prestonfarr.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-primary hover:text-primary/80 underline transition-colors"
                 data-testid="link-preston-farr"
               >
                 Preston Farr

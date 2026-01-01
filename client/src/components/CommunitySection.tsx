@@ -1,36 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import socialLinksData from "@/data/social-links.json";
 
 export default function CommunitySection() {
   const socialLinks = [
     {
-      icon: <SiYoutube className="h-6 w-6" />,
+      Icon: SiYoutube,
       name: "YouTube",
       testId: "youtube",
       url: socialLinksData.youtube,
     },
     {
-      icon: <SiX className="h-6 w-6" />,
+      Icon: SiX,
       name: "X",
       testId: "x",
       url: socialLinksData.twitter,
     },
     {
-      icon: <SiDiscord className="h-6 w-6" />,
+      Icon: SiDiscord,
       name: "Discord",
       testId: "discord",
       url: socialLinksData.discord,
     },
     {
-      icon: <SiReddit className="h-6 w-6" />,
+      Icon: SiReddit,
       name: "Reddit",
       testId: "reddit",
       url: socialLinksData.reddit,
     },
     {
-      icon: <SiPatreon className="h-6 w-6" />,
+      Icon: SiPatreon,
       name: "Patreon",
       testId: "patreon",
       url: socialLinksData.patreon,
@@ -61,7 +62,7 @@ export default function CommunitySection() {
             <Card className="mb-8 bg-primary/5 border-primary/20">
               <CardContent className="p-8 text-center">
                 <div className="flex items-center justify-center mb-4">
-                  <SiPatreon className="h-12 w-12 text-primary" />
+                  <AccessibleIcon icon={SiPatreon} label="Patreon" className="h-12 w-12 text-primary" />
                 </div>
                 <h3
                   className="font-serif text-2xl font-semibold mb-3"
@@ -87,8 +88,9 @@ export default function CommunitySection() {
                       "noopener,noreferrer",
                     )
                   }
+                  aria-label="Join our Patreon"
                 >
-                  <SiPatreon className="h-5 w-5 mr-2" />
+                  <AccessibleIcon icon={SiPatreon} className="h-5 w-5 mr-2" />
                   Join Our Patreon
                 </Button>
               </CardContent>
@@ -102,21 +104,25 @@ export default function CommunitySection() {
                 Follow Us
               </h3>
               <div className="flex flex-wrap gap-3">
-                {socialLinks.map((link) => (
-                  <Button
-                    key={link.testId}
-                    variant="outline"
-                    size="lg"
-                    className="flex-1 min-w-[140px]"
-                    data-testid={`button-social-${link.testId}`}
-                    onClick={() =>
-                      window.open(link.url, "_blank", "noopener,noreferrer")
-                    }
-                  >
-                    {link.icon}
-                    <span className="ml-2">{link.name}</span>
-                  </Button>
-                ))}
+                {socialLinks.map((link) => {
+                  const Icon = link.Icon;
+                  return (
+                    <Button
+                      key={link.testId}
+                      variant="outline"
+                      size="lg"
+                      className="flex-1 min-w-[140px]"
+                      data-testid={`button-social-${link.testId}`}
+                      onClick={() =>
+                        window.open(link.url, "_blank", "noopener,noreferrer")
+                      }
+                      aria-label={`Follow us on ${link.name}`}
+                    >
+                      <AccessibleIcon icon={Icon} className="h-6 w-6" />
+                      <span className="ml-2">{link.name}</span>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           </div>

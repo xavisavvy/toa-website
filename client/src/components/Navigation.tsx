@@ -73,8 +73,9 @@ export default function Navigation() {
             className="md:hidden"
             onClick={() => setIsOpen(!isOpen)}
             data-testid="button-menu-toggle"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </Button>
         </div>
       </div>
