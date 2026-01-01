@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.14](https://github.com/xavisavvy/toa-website/compare/v1.13.13...v1.13.14) (2026-01-01)
+
+
+### Bug Fixes
+
+* accessibility improvements - SVG icons, link contrast, mobile menu ([767d4e7](https://github.com/xavisavvy/toa-website/commit/767d4e7c8c2b9147a77a69ac60b5a5264f14c024))
+
 ### [1.13.13](https://github.com/xavisavvy/toa-website/compare/v1.13.12...v1.13.13) (2026-01-01)
 
 ### [1.13.12](https://github.com/xavisavvy/toa-website/compare/v1.13.11...v1.13.12) (2026-01-01)
