@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/xavisavvy/toa-website/compare/v1.10.1...v1.11.0) (2026-01-01)
+
+
+### Features
+
+* Add chaos and resilience testing infrastructure ([df88067](https://github.com/xavisavvy/toa-website/commit/df8806755339ef0303e21de76ed00106b592150a))
+* Add comprehensive test reporting and observability ([efd7d95](https://github.com/xavisavvy/toa-website/commit/efd7d9597a91aa23076a0a55a8075641bc782829))
+
 ### [1.10.1](https://github.com/xavisavvy/toa-website/compare/v1.10.0...v1.10.1) (2026-01-01)
 
 ## [1.10.0](https://github.com/xavisavvy/toa-website/compare/v1.9.0...v1.10.0) (2026-01-01)
