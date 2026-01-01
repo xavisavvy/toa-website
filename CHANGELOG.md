@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.4](https://github.com/xavisavvy/toa-website/compare/v1.22.3...v1.22.4) (2026-01-01)
+
+
+### Bug Fixes
+
+* resolve tmp vulnerability (CVE) with package override ([184391f](https://github.com/xavisavvy/toa-website/commit/184391fd643cf3b45ca90b6db7ef77a4089f2816))
+
 ### [1.22.3](https://github.com/xavisavvy/toa-website/compare/v1.22.2...v1.22.3) (2026-01-01)
 
 ### [1.22.2](https://github.com/xavisavvy/toa-website/compare/v1.22.1...v1.22.2) (2026-01-01)
