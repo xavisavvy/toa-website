@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.22.0](https://github.com/xavisavvy/toa-website/compare/v1.21.0...v1.22.0) (2026-01-01)
+
+
+### Features
+
+* add Lighthouse CI and enhanced ESLint configuration ([3f6ec0b](https://github.com/xavisavvy/toa-website/commit/3f6ec0b1d134cfef4af85f3773e73d38478a44ba))
+
 ## [1.21.0](https://github.com/xavisavvy/toa-website/compare/v1.20.0...v1.21.0) (2026-01-01)
 
 
