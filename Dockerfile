@@ -126,8 +126,8 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Minimize attack surface by installing minimal packages
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
-    dumb-init=1.2.5-r3 \
-    curl=8.11.1-r0 \
+    dumb-init \
+    curl \
     ca-certificates && \
     # Remove package manager to prevent runtime modifications
     apk del apk-tools && \
