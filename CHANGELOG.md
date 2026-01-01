@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.8](https://github.com/xavisavvy/toa-website/compare/v1.13.7...v1.13.8) (2026-01-01)
+
+
+### Bug Fixes
+
+* disable CodeQL scanning for free tier compatibility ([b03231f](https://github.com/xavisavvy/toa-website/commit/b03231fb6258d02b73737df184dee98a763c851b))
+
 ### [1.13.7](https://github.com/xavisavvy/toa-website/compare/v1.13.6...v1.13.7) (2026-01-01)
 
 
