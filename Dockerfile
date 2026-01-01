@@ -132,9 +132,9 @@ USER expressjs
 # Expose port
 EXPOSE 5000
 
-# Health check with updated endpoint
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:5000/api/alive || exit 1
+# Health check with comprehensive monitoring
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:5000/api/health || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
