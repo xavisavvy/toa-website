@@ -1,0 +1,56 @@
+# Snyk Configuration
+# https://docs.snyk.io/snyk-cli/test-for-vulnerabilities/the-.snyk-file
+
+# Specify the language settings
+language-settings:
+  javascript:
+    # Enable automatic updates for patches
+    autoUpdate: true
+    
+# Define paths to exclude from scanning
+exclude:
+  global:
+    - node_modules/**
+    - dist/**
+    - coverage/**
+    - test-results/**
+    - playwright-report/**
+    - reports/**
+    - .stryker-tmp/**
+    - e2e/**
+    - test/**
+
+# Ignore specific vulnerabilities (with justification)
+ignore:
+  # Example: Ignore a specific vulnerability in a dev dependency
+  # SNYK-JS-EXAMPLE-123456:
+  #   - '*':
+  #       reason: Only affects dev dependencies, not production
+  #       expires: 2026-03-01T00:00:00.000Z
+
+# Patch settings
+patch: {}
+
+# Organization settings
+org: your-org-name
+
+# Project settings
+project:
+  name: toa-website
+  tags:
+    - production
+    - web-app
+    - nodejs
+    - react
+
+# Severity threshold
+failOnSeverity: high
+
+# License compliance
+license-policy:
+  severities:
+    AGPL-1.0: error
+    AGPL-3.0: error
+    GPL-2.0: warning
+    GPL-3.0: warning
+  default: none

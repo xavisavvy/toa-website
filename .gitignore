@@ -9,6 +9,7 @@ vite.config.ts.*
 .env
 .env.local
 .env.*.local
+.env.production
 
 # Test artifacts
 coverage/
@@ -20,3 +21,43 @@ playwright/.cache/
 .stryker-tmp/
 reports/mutation/
 stryker.log
+
+# Security scan results
+trivy-results.json
+trivy-results.sarif
+npm-audit.json
+snyk-results.json
+
+# Kubernetes secrets (encrypted versions are ok)
+k8s/**/secrets.yaml
+!k8s/**/secrets.enc.yaml
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# Docker build artifacts
+sbom.json
+sbom.xml
+
+# Log files
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

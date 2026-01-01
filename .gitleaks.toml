@@ -1,0 +1,63 @@
+# Gitleaks Configuration for Secret Scanning
+# https://github.com/gitleaks/gitleaks
+
+title = "Tales of Aneria - Secret Scanning Configuration"
+
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config:
+# https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+[allowlist]
+description = "Global allowlist"
+regexTarget = "match"
+
+# Allowlist for test files and examples
+paths = [
+  '''\.env\.example$''',
+  '''test/.*\.test\.ts$''',
+  '''test/.*\.spec\.ts$''',
+  '''e2e/.*\.spec\.ts$''',
+  '''\.github/workflows/.*\.yml$''',
+]
+
+# Allowlist specific patterns that are false positives
+regexes = [
+  # Example public keys or test tokens
+  '''test-api-key-[a-zA-Z0-9]+''',
+  '''EXAMPLE_SECRET''',
+  '''placeholder''',
+  '''your-.*-here''',
+  '''xxx+''',
+]
+
+# Custom rules for this project
+[[rules]]
+id = "postgres-connection-string"
+description = "PostgreSQL connection string"
+regex = '''postgresql://[a-zA-Z0-9]+:[a-zA-Z0-9]+@[a-zA-Z0-9.-]+:[0-9]+/[a-zA-Z0-9_]+'''
+tags = ["database", "connection-string"]
+
+[[rules]]
+id = "jwt-secret"
+description = "JWT Secret Key"
+regex = '''(?i)(jwt[_-]?secret|session[_-]?secret)["\s:=]+[a-zA-Z0-9+/=]{32,}'''
+tags = ["jwt", "session"]
+
+[[rules]]
+id = "api-key-generic"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey)["\s:=]+[a-zA-Z0-9]{20,}'''
+tags = ["api", "key"]
+
+[[rules]]
+id = "youtube-api-key"
+description = "YouTube API Key"
+regex = '''AIza[0-9A-Za-z\-_]{35}'''
+tags = ["youtube", "api"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key (Generic)"
+regex = '''-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----'''
+tags = ["private-key"]
