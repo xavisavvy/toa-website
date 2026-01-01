@@ -6,7 +6,7 @@ Last Updated: 2026-01-01
 
 ---
 
-## ✅ Implemented (Items 1-5)
+## ✅ Implemented (Items 1-5, 13)
 
 ### 1. Container Security Scanning with Trivy
 **Status:** ✅ Implemented in `.github/workflows/ci.yml`
@@ -162,7 +162,146 @@ cat sbom.json | jq
 
 ---
 
-## 📋 Planned Enhancements (Items 6-25)
+### 13. Enhanced Health Checks
+**Status:** ✅ Implemented in `server/health.ts`
+
+**What it does:**
+- Comprehensive system health monitoring
+- Kubernetes-compatible probes (liveness, readiness, startup)
+- Component-level health checks (storage, cache, memory, disk, CPU)
+- Detailed metrics and response times
+- Automatic degradation detection
+
+**Endpoints:**
+```typescript
+GET /api/health    // Comprehensive health check
+GET /api/ready     // Readiness probe (can accept traffic)
+GET /api/alive     // Liveness probe (should restart)
+GET /api/startup   // Startup probe (initialization complete)
+```
+
+**Response Format:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-01-01T09:00:00.000Z",
+  "uptime": 123.45,
+  "version": "1.0.0",
+  "environment": "production",
+  "checks": {
+    "storage": {
+      "status": "healthy",
+      "message": "Storage operational",
+      "responseTime": 2
+    },
+    "cache": {
+      "status": "healthy",
+      "message": "Cache operational",
+      "responseTime": 1,
+      "details": { "hitRate": "85.50%" }
+    },
+    "memory": {
+      "status": "healthy",
+      "message": "Memory usage normal",
+      "responseTime": 0,
+      "details": {
+        "heapUsed": "128MB",
+        "heapTotal": "256MB",
+        "heapUsedPercent": "50.00%"
+      }
+    },
+    "disk": {
+      "status": "healthy",
+      "message": "Disk I/O operational",
+      "responseTime": 12
+    },
+    "cpu": {
+      "status": "healthy",
+      "message": "CPU load normal",
+      "responseTime": 0,
+      "details": {
+        "loadAvg1m": "0.50",
+        "cpuCount": 8,
+        "normalizedLoad": "0.06"
+      }
+    }
+  }
+}
+```
+
+**Health Status Levels:**
+- `healthy` - All systems operational
+- `degraded` - Non-critical issues (high memory, slow I/O)
+- `unhealthy` - Critical issues (storage down, memory exhausted)
+
+**How to use:**
+```bash
+# Check application health
+curl http://localhost:5000/api/health
+
+# Kubernetes liveness probe
+curl http://localhost:5000/api/alive
+
+# Kubernetes readiness probe
+curl http://localhost:5000/api/ready
+
+# Startup probe
+curl http://localhost:5000/api/startup
+```
+
+**Docker/Kubernetes Configuration:**
+```yaml
+# docker-compose.yml
+services:
+  app:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Kubernetes deployment
+livenessProbe:
+  httpGet:
+    path: /api/alive
+    port: 5000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /api/ready
+    port: 5000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+startupProbe:
+  httpGet:
+    path: /api/startup
+    port: 5000
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  failureThreshold: 30
+```
+
+**Tests:**
+- ✅ 10 comprehensive test cases in `test/integration/health.test.ts`
+- ✅ All probes tested
+- ✅ Concurrent request handling
+- ✅ Response time validation
+- ✅ Kubernetes compatibility
+
+**Benefits:**
+- Real-time system health visibility
+- Automatic restart on failures (liveness)
+- Traffic routing based on readiness
+- Detailed component-level diagnostics
+- Production-ready monitoring
+
+---
+
+## 📋 Planned Enhancements (Items 6-12, 14-25)
 
 ### 6. Multi-Environment Pipeline
 **Priority:** High
@@ -462,71 +601,6 @@ npm install @sentry/node @sentry/profiling-node
 - Release tracking
 - User feedback
 - Breadcrumbs
-
----
-
-### 13. Enhanced Health Checks
-**Priority:** High
-**Effort:** Low
-
-**Current:** Basic health endpoint
-**Goal:** Comprehensive system health
-
-**Implementation:**
-```typescript
-// server/health.ts
-interface HealthCheck {
-  status: 'healthy' | 'degraded' | 'unhealthy';
-  timestamp: string;
-  uptime: number;
-  version: string;
-  checks: {
-    database: HealthStatus;
-    cache: HealthStatus;
-    memory: HealthStatus;
-    disk: HealthStatus;
-  };
-}
-
-app.get('/api/health', async (req, res) => {
-  const health: HealthCheck = {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    version: process.env.npm_package_version,
-    checks: {
-      database: await checkDatabase(),
-      cache: await checkCache(),
-      memory: checkMemory(),
-      disk: await checkDisk()
-    }
-  };
-
-  const overallStatus = Object.values(health.checks)
-    .some(c => c.status === 'unhealthy') ? 'unhealthy' : 
-    Object.values(health.checks)
-    .some(c => c.status === 'degraded') ? 'degraded' : 'healthy';
-
-  health.status = overallStatus;
-
-  res.status(overallStatus === 'healthy' ? 200 : 503).json(health);
-});
-
-// Readiness probe (can accept traffic)
-app.get('/api/ready', async (req, res) => {
-  const dbOk = await checkDatabase();
-  if (dbOk.status === 'healthy') {
-    res.status(200).json({ ready: true });
-  } else {
-    res.status(503).json({ ready: false });
-  }
-});
-
-// Liveness probe (should restart)
-app.get('/api/alive', (req, res) => {
-  res.status(200).json({ alive: true });
-});
-```
 
 ---
 

@@ -7,8 +7,12 @@ import { getShopListings } from "./etsy";
 import { getCharacterData } from "./dndbeyond";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { metrics } from "./monitoring";
+import { registerHealthRoutes } from "./health";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoints (for Kubernetes, Docker, monitoring)
+  registerHealthRoutes(app);
+  
   // Metrics endpoint
   app.get("/api/metrics", (req, res) => {
     res.json(metrics.getMetrics());
