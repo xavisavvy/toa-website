@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/xavisavvy/toa-website/compare/v1.13.15...v1.14.0) (2026-01-01)
+
+
+### Features
+
+* add Replit automatic deployment integration ([36a98b9](https://github.com/xavisavvy/toa-website/commit/36a98b9276910524093d8ff298e4a638bffda500))
+
 ### [1.13.15](https://github.com/xavisavvy/toa-website/compare/v1.13.14...v1.13.15) (2026-01-01)
 
 ### [1.13.14](https://github.com/xavisavvy/toa-website/compare/v1.13.13...v1.13.14) (2026-01-01)
