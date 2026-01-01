@@ -25,7 +25,9 @@ describe('Property-Based Validator Tests', () => {
       fc.assert(
         fc.property(
           // Generate valid playlist IDs: PL + alphanumeric + underscore + hyphen
-          fc.stringMatching(/^PL[a-zA-Z0-9_-]{10,50}$/),
+          // Must contain at least one alphanumeric character (not just -_)
+          fc.stringMatching(/^PL[a-zA-Z0-9_-]{10,50}$/)
+            .filter(id => /[a-zA-Z0-9]/.test(id.substring(2))), // Ensure at least one alphanumeric after PL
           (playlistId) => {
             const result = validatePlaylistId(playlistId);
             expect(result.valid).toBe(true);
@@ -50,6 +52,22 @@ describe('Property-Based Validator Tests', () => {
           }
         ),
         { numRuns: 500 }
+      );
+    });
+
+    it('rejects playlist IDs with only hyphens and underscores', () => {
+      fc.assert(
+        fc.property(
+          // Generate PL + only hyphens/underscores
+          fc.stringMatching(/^PL[-_]{1,50}$/),
+          (invalidId) => {
+            const result = validatePlaylistId(invalidId);
+            expect(result.valid).toBe(false);
+            expect(result.value).toBeUndefined();
+            expect(result.error).toBeTruthy();
+          }
+        ),
+        { numRuns: 200 }
       );
     });
 
