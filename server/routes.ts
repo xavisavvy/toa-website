@@ -8,8 +8,12 @@ import { getCharacterData } from "./dndbeyond";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { metrics } from "./monitoring";
 import { registerHealthRoutes } from "./health";
+import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply API rate limiting to all /api routes
+  app.use("/api", apiLimiter);
+
   // Health check endpoints (for Kubernetes, Docker, monitoring)
   registerHealthRoutes(app);
   
@@ -45,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // A10: SSRF Prevention - Validate and sanitize podcast feed URL
-  app.post("/api/podcast/feed", async (req, res) => {
+  app.post("/api/podcast/feed", expensiveLimiter, async (req, res) => {
     try {
       const { feedUrl, limit } = req.body;
       

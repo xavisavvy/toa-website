@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch: # Allow manual triggers
+    inputs:
+      rollback_to:
+        description: 'Rollback to specific commit SHA (leave empty for normal deployment)'
+        required: false
+        type: string
     
 jobs:
   deploy:
@@ -14,25 +19,40 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Checkout specific commit if rolling back
+          ref: ${{ github.event.inputs.rollback_to || github.sha }}
+          fetch-depth: 10 # Get history for rollback reference
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+      
+      # Save previous deployment info for potential rollback
+      - name: Save deployment metadata
+        run: |
+          mkdir -p deployment-metadata
+          echo "${{ github.sha }}" > deployment-metadata/current-sha.txt
+          echo "${{ github.event.inputs.rollback_to || 'normal-deployment' }}" > deployment-metadata/rollback-info.txt
+          git log -1 --format="%H %s" > deployment-metadata/commit-info.txt
           
       - name: Install dependencies
         run: npm ci
         
       # Quick smoke tests instead of full coverage
       - name: Run quick tests
+        id: tests
         run: npm run test:quick
         continue-on-error: true
         
       - name: Build application
+        id: build
         run: npm run build
         
       - name: Verify build artifacts
+        id: verify
         run: |
           if [ ! -d "dist" ]; then
             echo "❌ Build failed - dist directory not found"
@@ -43,8 +63,27 @@ jobs:
             exit 1
           fi
           echo "✅ Build artifacts verified"
+      
+      # Health check before deployment
+      - name: Pre-deployment health check
+        id: pre_health
+        run: |
+          echo "🏥 Checking current production health..."
+          if [ -n "${{ secrets.PRODUCTION_URL }}" ]; then
+            HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
+            echo "health_status=$HEALTH_STATUS" >> $GITHUB_OUTPUT
+            if [ "$HEALTH_STATUS" = "200" ]; then
+              echo "✅ Pre-deployment health check passed"
+            else
+              echo "⚠️ Current production health: $HEALTH_STATUS"
+            fi
+          else
+            echo "ℹ️ PRODUCTION_URL not configured, skipping health check"
+            echo "health_status=skip" >> $GITHUB_OUTPUT
+          fi
           
       - name: Deploy
+        id: deploy
         run: |
           echo "Deploy to your hosting platform here"
           echo "This is a placeholder for your deployment script"
@@ -52,17 +91,117 @@ jobs:
           
       # Replit Deployment Webhook
       - name: Trigger Replit Deployment
+        id: replit_deploy
         if: success()
         run: |
           if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
             echo "🚀 Triggering Replit deployment..."
-            curl -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
               -H "Content-Type: application/json" \
-              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "actor": "${{ github.actor }}"}'
-            echo "✅ Replit deployment triggered!"
+              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "actor": "${{ github.actor }}"}')
+            
+            STATUS_CODE=$(echo "$RESPONSE" | tail -n1)
+            if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
+              echo "✅ Replit deployment triggered successfully!"
+              echo "deployment_triggered=true" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Replit deployment failed with status code: $STATUS_CODE"
+              echo "deployment_triggered=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
           else
             echo "ℹ️ REPLIT_DEPLOY_WEBHOOK not configured, skipping Replit deployment"
+            echo "deployment_triggered=skip" >> $GITHUB_OUTPUT
           fi
+      
+      # Post-deployment health check with automated rollback
+      - name: Post-deployment health check
+        id: post_health
+        if: success()
+        run: |
+          if [ -n "${{ secrets.PRODUCTION_URL }}" ]; then
+            echo "⏳ Waiting 30s for deployment to stabilize..."
+            sleep 30
+            
+            echo "🏥 Checking post-deployment health..."
+            MAX_RETRIES=5
+            RETRY_COUNT=0
+            HEALTH_OK=false
+            
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
+              echo "Health check attempt $((RETRY_COUNT+1)): $HEALTH_STATUS"
+              
+              if [ "$HEALTH_STATUS" = "200" ]; then
+                # Verify response body contains expected fields
+                HEALTH_BODY=$(curl -s "${{ secrets.PRODUCTION_URL }}/api/health")
+                if echo "$HEALTH_BODY" | grep -q '"status"'; then
+                  HEALTH_OK=true
+                  echo "✅ Post-deployment health check passed!"
+                  break
+                fi
+              fi
+              
+              RETRY_COUNT=$((RETRY_COUNT+1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⏳ Retrying in 10s..."
+                sleep 10
+              fi
+            done
+            
+            if [ "$HEALTH_OK" = false ]; then
+              echo "❌ Post-deployment health check failed after $MAX_RETRIES attempts"
+              echo "health_passed=false" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "health_passed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "ℹ️ PRODUCTION_URL not configured, skipping post-deployment health check"
+            echo "health_passed=skip" >> $GITHUB_OUTPUT
+          fi
+      
+      # Automated rollback on failure
+      - name: Automated Rollback
+        if: failure() && steps.post_health.outcome == 'failure'
+        run: |
+          echo "🔄 INITIATING AUTOMATED ROLLBACK"
+          echo "Deployment failed health checks, rolling back to previous version"
+          
+          # Get previous commit
+          PREVIOUS_SHA=$(git rev-parse HEAD~1)
+          echo "Previous SHA: $PREVIOUS_SHA"
+          
+          # Trigger rollback deployment
+          if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
+            echo "🚀 Triggering rollback deployment..."
+            curl -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"ref\": \"$PREVIOUS_SHA\", \"rollback\": true, \"failed_sha\": \"${{ github.sha }}\"}"
+            
+            echo "⏳ Waiting for rollback to complete..."
+            sleep 30
+            
+            # Verify rollback health
+            ROLLBACK_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
+            if [ "$ROLLBACK_HEALTH" = "200" ]; then
+              echo "✅ Rollback successful - application healthy"
+            else
+              echo "❌ Rollback health check failed: $ROLLBACK_HEALTH"
+              echo "⚠️ MANUAL INTERVENTION REQUIRED"
+            fi
+          else
+            echo "❌ Cannot perform automated rollback - REPLIT_DEPLOY_WEBHOOK not configured"
+            echo "⚠️ MANUAL ROLLBACK REQUIRED"
+          fi
+          
+      - name: Upload deployment metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-metadata
+          path: deployment-metadata/
+          retention-days: 30
           
       - name: Notify deployment
         if: success()
@@ -70,3 +209,17 @@ jobs:
           echo "✅ Deployment successful!"
           echo "Deployed commit: ${{ github.sha }}"
           echo "Deployed by: ${{ github.actor }}"
+          if [ -n "${{ github.event.inputs.rollback_to }}" ]; then
+            echo "🔄 This was a ROLLBACK to: ${{ github.event.inputs.rollback_to }}"
+          fi
+      
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Failed commit: ${{ github.sha }}"
+          echo "Check logs above for details"
+          if [ "${{ steps.post_health.outputs.health_passed }}" = "false" ]; then
+            echo "Failure reason: Post-deployment health check failed"
+            echo "Automated rollback should have been triggered"
+          fi
