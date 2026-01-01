@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/xavisavvy/toa-website/compare/v1.12.0...v1.13.0) (2026-01-01)
+
+
+### Features
+
+* enterprise security implementation and cleanup ([27853b1](https://github.com/xavisavvy/toa-website/commit/27853b14e0e8f12459f99e9e2191511023a1feca))
+
 ## [1.12.0](https://github.com/xavisavvy/toa-website/compare/v1.11.0...v1.12.0) (2026-01-01)
 
 
