@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/xavisavvy/toa-website/compare/v1.11.0...v1.12.0) (2026-01-01)
+
+
+### Features
+
+* **docker:** add production-ready Docker containerization ([756fd20](https://github.com/xavisavvy/toa-website/commit/756fd20ac8a72c428b3b7834ad308100194f5071))
+
 ## [1.11.0](https://github.com/xavisavvy/toa-website/compare/v1.10.1...v1.11.0) (2026-01-01)
 
 
