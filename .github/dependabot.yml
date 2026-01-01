@@ -1,9 +1,52 @@
 version: 2
 updates:
+  # npm dependencies
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "America/Denver"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "automated"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    
+    # Group related updates together
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      radix:
+        patterns:
+          - "@radix-ui/*"
+      testing:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@vitest/*"
+          - "@playwright/*"
+          - "playwright"
+      build-tools:
+        patterns:
+          - "vite*"
+          - "@vitejs/*"
+          - "esbuild"
+          - "typescript"
+      linting:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "prettier"
+    
     ignore:
       # Ignore esbuild vulnerability in drizzle-kit dev dependency
       # GHSA-67mh-4wv8-2f99: Only affects dev servers, not production
@@ -11,3 +54,37 @@ updates:
       - dependency-name: "esbuild"
         update-types: ["version-update:semver-patch", "version-update:semver-minor"]
         versions: ["< 0.24.3"]
+      # Ignore major version bumps for stability (can be enabled per package basis)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    
+    # Allow specific major updates
+    allow:
+      - dependency-name: "@types/*"
+        update-types: ["version-update:semver-major"]
+  
+  # Docker base images
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "security"
+  
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci-cd"
+    commit-message:
+      prefix: "chore(ci)"
