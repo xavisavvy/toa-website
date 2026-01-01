@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.1](https://github.com/xavisavvy/toa-website/compare/v1.13.0...v1.13.1) (2026-01-01)
+
+
+### Performance Improvements
+
+* optimize build performance and add parallel builds ([b56368b](https://github.com/xavisavvy/toa-website/commit/b56368b944ecde6c7296c20d774abc1b431c6d88))
+
 ## [1.13.0](https://github.com/xavisavvy/toa-website/compare/v1.12.0...v1.13.0) (2026-01-01)
 
 
