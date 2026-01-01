@@ -1,5 +1,30 @@
 # Tales of Aneria - TTRPG Live Play Landing Page 
 
+## 📊 Project Status
+
+### CI/CD Pipeline
+[![CI Pipeline](https://github.com/xavisavvy/toa-website/actions/workflows/ci.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/ci.yml)
+[![Deploy](https://github.com/xavisavvy/toa-website/actions/workflows/deploy.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/deploy.yml)
+[![Versioning](https://github.com/xavisavvy/toa-website/actions/workflows/version.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/version.yml)
+
+### Security & Compliance
+[![SBOM Generation](https://github.com/xavisavvy/toa-website/actions/workflows/sbom.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/sbom.yml)
+![Security Scanning](https://img.shields.io/badge/security-Trivy%20%7C%20Snyk%20%7C%20npm%20audit-success)
+![License Compliance](https://img.shields.io/badge/license-compliant-success)
+
+### Code Quality
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)
+![Test Coverage](https://img.shields.io/badge/coverage-80%2B%25-brightgreen)
+![Mutation Score](https://img.shields.io/badge/mutation%20score-80%2B%25-brightgreen)
+
+### Standards & Testing
+![WCAG 2.1](https://img.shields.io/badge/WCAG-2.1%20AA-success)
+![E2E Tests](https://img.shields.io/badge/e2e-Playwright-green?logo=playwright)
+![Unit Tests](https://img.shields.io/badge/unit-Vitest-green?logo=vitest)
+![Contract Tests](https://img.shields.io/badge/contract-Pact-orange)
+
+---
+
 A professional landing page for our TTRPG Live Play series, featuring YouTube integration, podcast feeds, world lore, and merchandise showcase.
 
 ## Features
@@ -338,6 +363,136 @@ For more troubleshooting, see `DEPLOYMENT.md`.
 7. ✅ Link WorldAnvil pages
 8. ✅ Test on mobile devices
 9. ✅ Share with our community!
+
+## 🚀 CI/CD Pipeline
+
+This project implements enterprise-grade CI/CD practices with comprehensive testing, security scanning, and automated deployments.
+
+### Continuous Integration (CI)
+
+**Workflow:** `.github/workflows/ci.yml`  
+**Trigger:** Push to `main`/`develop`, Pull Requests
+
+**Pipeline Stages:**
+
+1. **Tests & Coverage** 
+   - ✅ Unit tests (Vitest)
+   - ✅ E2E tests (Playwright)  
+   - ✅ Contract tests (Pact)
+   - ✅ Coverage reporting (80%+ threshold)
+   - ✅ Accessibility tests (WCAG 2.1 AA)
+
+2. **Code Quality**
+   - ✅ TypeScript type checking
+   - ✅ Linting (ESLint)
+   - ✅ Code formatting (Prettier)
+   - ✅ Pre-commit hooks (Husky + lint-staged)
+
+3. **Security Scanning**
+   - ✅ Trivy container scanning
+   - ✅ Snyk dependency scanning  
+   - ✅ npm audit for vulnerabilities
+   - ✅ Secret detection (GitLeaks)
+
+4. **Mutation Testing**
+   - ✅ Stryker.js mutation testing
+   - ✅ 80%+ mutation score threshold
+   - ✅ Critical path validation
+
+5. **Load Testing**
+   - ✅ Autocannon performance tests
+   - ✅ Response time monitoring
+   - ✅ Throughput validation
+
+6. **Container Security**
+   - ✅ Docker image scanning
+   - ✅ SARIF report generation
+   - ✅ Vulnerability remediation tracking
+
+### Continuous Deployment (CD)
+
+**Workflow:** `.github/workflows/deploy.yml`  
+**Trigger:** Push to `main`, Manual dispatch
+
+**Deployment Stages:**
+
+1. **Build Artifacts**
+   - Production-optimized bundles
+   - Asset optimization
+   - Source maps generation
+
+2. **Security Validation**
+   - Pre-deployment security scan
+   - Container image signing
+   - Dependency verification
+
+3. **Deploy to Production**
+   - Zero-downtime deployment
+   - Health check validation
+   - Rollback on failure
+
+4. **Post-Deployment**
+   - Smoke tests
+   - Performance monitoring
+   - Error tracking
+
+### Versioning & Releases
+
+**Workflow:** `.github/workflows/version.yml`  
+**Trigger:** Push to `main`
+
+- 🏷️ Automatic semantic versioning
+- 📝 Changelog generation
+- 🔖 Git tag creation
+- 📦 Release artifact publishing
+
+### SBOM Generation
+
+**Workflow:** `.github/workflows/sbom.yml`  
+**Trigger:** Push to `main`, Tags, Releases
+
+- 📋 Software Bill of Materials (SBOM) generation
+- 🔍 Dependency tracking
+- 🛡️ Vulnerability correlation
+- 📊 Compliance reporting
+
+### Test Coverage Metrics
+
+| Test Type | Coverage | Threshold |
+|-----------|----------|-----------|
+| Unit Tests | 80%+ | 80% |
+| E2E Tests | Full user flows | N/A |
+| Contract Tests | API contracts | 100% |
+| Mutation Score | 80%+ | 80% |
+| Accessibility | WCAG 2.1 AA | 100% |
+
+### Quality Gates
+
+All pull requests must pass:
+- ✅ All tests passing
+- ✅ 80%+ code coverage
+- ✅ 80%+ mutation score
+- ✅ No high/critical security vulnerabilities
+- ✅ TypeScript type checking
+- ✅ Linting & formatting
+- ✅ Accessibility standards (WCAG 2.1 AA)
+
+### Security Scanning Tools
+
+| Tool | Purpose | Frequency |
+|------|---------|-----------|
+| Trivy | Container vulnerabilities | Every push |
+| Snyk | Dependency vulnerabilities | Every push |
+| npm audit | Package vulnerabilities | Every push |
+| GitLeaks | Secret detection | Every commit |
+
+### Documentation
+
+- 📖 [CI/CD Quick Start](./QUICK_START_CICD.md) - Get started quickly
+- 🏢 [Enterprise CI/CD Guide](./ENTERPRISE_CICD_GUIDE.md) - Complete guide
+- 🔒 [Security Scanning](./SECURITY_SCANNING.md) - Security practices
+- 🧪 [Testing Guide](./TESTING.md) - Testing strategies
+- 🐳 [Docker Guide](./DOCKER.md) - Container practices
 
 ## License
 
