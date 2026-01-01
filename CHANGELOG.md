@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.11](https://github.com/xavisavvy/toa-website/compare/v1.22.10...v1.22.11) (2026-01-01)
+
+
+### Performance Improvements
+
+* optimize CI build time with caching and parallel execution ([bf2a0f9](https://github.com/xavisavvy/toa-website/commit/bf2a0f91b8006ac2f1ccc4d5049577c588f73734))
+
 ### [1.22.10](https://github.com/xavisavvy/toa-website/compare/v1.22.9...v1.22.10) (2026-01-01)
 
 ### [1.22.9](https://github.com/xavisavvy/toa-website/compare/v1.22.8...v1.22.9) (2026-01-01)
