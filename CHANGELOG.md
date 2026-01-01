@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/xavisavvy/toa-website/compare/v1.17.0...v1.18.0) (2026-01-01)
+
+
+### Features
+
+* implement enterprise Docker image optimization ([5207a15](https://github.com/xavisavvy/toa-website/commit/5207a15424c214ed671971241cba4f8bf1f583d1)), closes [#10](https://github.com/xavisavvy/toa-website/issues/10)
+
 ## [1.17.0](https://github.com/xavisavvy/toa-website/compare/v1.16.4...v1.17.0) (2026-01-01)
 
 
