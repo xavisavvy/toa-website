@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.3](https://github.com/xavisavvy/toa-website/compare/v1.13.2...v1.13.3) (2026-01-01)
+
+
+### Bug Fixes
+
+* adjust performance test thresholds for CI environment ([8751baf](https://github.com/xavisavvy/toa-website/commit/8751bafe24c64c2bd6b54cb809dc2567f3dcd3b2))
+
 ### [1.13.2](https://github.com/xavisavvy/toa-website/compare/v1.13.1...v1.13.2) (2026-01-01)
 
 
