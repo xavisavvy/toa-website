@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/xavisavvy/toa-website/compare/v1.9.0...v1.10.0) (2026-01-01)
+
+
+### Features
+
+* implement contract testing and load testing infrastructure ([bf093b9](https://github.com/xavisavvy/toa-website/commit/bf093b9740fee318f0d956e2dfbb1f11023163be))
+
 ## [1.9.0](https://github.com/xavisavvy/toa-website/compare/v1.8.3...v1.9.0) (2025-12-31)
 
 
