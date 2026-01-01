@@ -1,0 +1,82 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+reports
+.stryker-tmp
+
+# Build artifacts
+dist
+.vite
+.cache
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# IDE and Editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+
+# Documentation
+*.md
+!README.md
+CHANGELOG.md
+TESTING.md
+SECURITY.md
+design_guidelines.md
+replit.md
+
+# Replit specific
+.replit
+.upm
+replit.nix
+
+# Logs
+logs
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Testing configs
+vitest.config.ts
+vitest.report.config.ts
+playwright.config.ts
+stryker*.conf.json
+
+# Misc
+.husky
+attached_assets
+hero-*.png
+*.png
+*.jpg
+*.jpeg
+*.gif
+.npmrc
+.versionrc.json

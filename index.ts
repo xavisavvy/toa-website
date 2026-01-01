@@ -104,37 +104,36 @@ app.use((req, res, next) => {
 
   // Start the server
   const server = createServer(app);
-    
-    // Setup Vite in development mode
-    if (isDevelopment) {
-      const { setupVite } = await import('./server/vite');
-      await setupVite(app, server);
-    }
-    
-    const port = parseInt(process.env.PORT || '5000', 10);
-    
-    // Start the server and keep it running
-    server.listen(port, '0.0.0.0', () => {
-      console.log(`Server running on port ${port} (${process.env.NODE_ENV || 'production'} mode)`);
-    });
-
-    // Handle graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('SIGTERM received, closing server gracefully...');
-      server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-      });
-    });
-
-    process.on('SIGINT', () => {
-      console.log('SIGINT received, closing server gracefully...');
-      server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-      });
-    });
+  
+  // Setup Vite in development mode
+  if (isDevelopment) {
+    const { setupVite } = await import('./server/vite');
+    await setupVite(app, server);
   }
+  
+  const port = parseInt(process.env.PORT || '5000', 10);
+  
+  // Start the server and keep it running
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on port ${port} (${process.env.NODE_ENV || 'production'} mode)`);
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, closing server gracefully...');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, closing server gracefully...');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
 })();
 
 export default app;
