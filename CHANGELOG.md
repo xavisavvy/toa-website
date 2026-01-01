@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/xavisavvy/toa-website/compare/v1.16.4...v1.17.0) (2026-01-01)
+
+
+### Features
+
+* add comprehensive health check tests and update Docker healthcheck ([5c889f4](https://github.com/xavisavvy/toa-website/commit/5c889f484b44654d74978a443d7e3b12c9f1b555))
+
 ### [1.16.4](https://github.com/xavisavvy/toa-website/compare/v1.16.3...v1.16.4) (2026-01-01)
 
 ### [1.16.3](https://github.com/xavisavvy/toa-website/compare/v1.16.2...v1.16.3) (2026-01-01)
