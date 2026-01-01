@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.7](https://github.com/xavisavvy/toa-website/compare/v1.13.6...v1.13.7) (2026-01-01)
+
+
+### Bug Fixes
+
+* add Playwright browser installation to CI workflow ([4d98c28](https://github.com/xavisavvy/toa-website/commit/4d98c289bc010e59c03ce8ec448ebe6b8224366c))
+
 ### [1.13.6](https://github.com/xavisavvy/toa-website/compare/v1.13.5...v1.13.6) (2026-01-01)
 
 ### [1.13.5](https://github.com/xavisavvy/toa-website/compare/v1.13.4...v1.13.5) (2026-01-01)
