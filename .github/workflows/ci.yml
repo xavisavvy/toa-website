@@ -243,6 +243,74 @@ jobs:
       - name: Run security tests
         run: npm run test:security
         
+  # 9. License Compliance Scanning
+  license-compliance:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run license compliance check
+        run: npm run license:check
+      
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: license-compliance-report
+          path: reports/license-compliance.json
+
+  # 8. Performance Testing in CI
+  performance:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: [test]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Start application
+        run: |
+          npm start &
+          sleep 10
+      
+      - name: Run load tests
+        run: npm run test:load
+        continue-on-error: true
+      
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-results
+          path: |
+            playwright-report/
+            test-results/
+
   mutation:
     name: Mutation Testing
     runs-on: ubuntu-latest

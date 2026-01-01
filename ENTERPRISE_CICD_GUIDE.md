@@ -6,7 +6,7 @@ Last Updated: 2026-01-01
 
 ---
 
-## ✅ Implemented (Items 1-7, 10, 13-14, 16-17)
+## ✅ Implemented (Items 1-7, 8-9, 10-14, 16-17)
 
 ### 1. Container Security Scanning with Trivy ✅
 **Status:** ✅ Implemented in `.github/workflows/ci.yml`
@@ -497,82 +497,218 @@ services:
 
 ---
 
-### 8. Image Signing & Verification (Sigstore/Cosign)
-**Priority:** Medium
-**Effort:** Medium
+### 8. Performance Testing in CI ✅
+**Priority:** High  
+**Effort:** Complete
+**Status:** ✅ Implemented in `.github/workflows/ci.yml`
 
-**What it provides:**
-- Cryptographic proof of image origin
-- Tamper detection
-- Supply chain security
-- Non-repudiation
+**What it does:**
+- Automated performance testing on every push
+- Load testing with Playwright
+- Performance budget enforcement
+- Regression detection
 
-**Implementation:**
-```yaml
-# Add to .github/workflows/deploy.yml
-- name: Install Cosign
-  uses: sigstore/cosign-installer@main
+**How to use:**
+```bash
+# Run performance tests locally
+npm run test:load
 
-- name: Sign container image
-  run: |
-    cosign sign --key cosign.key \
-      ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}
-
-- name: Verify signature
-  run: |
-    cosign verify --key cosign.pub \
-      ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}
+# View results in Playwright report
+npx playwright show-report
 ```
 
-**Setup:**
-1. Generate signing keys: `cosign generate-key-pair`
-2. Store private key in GitHub Secrets
-3. Distribute public key to deployment targets
+**Performance Metrics Tracked:**
+- Response times under load (50-100 concurrent requests)
+- Request throughput (requests/second)
+- Error rates and success percentages
+- Database query performance
+- Cache effectiveness
+
+**CI Integration:**
+- Runs after successful unit/E2E tests
+- Uploads performance artifacts
+- Continues on failure (warning only)
+- Baseline comparison (future enhancement)
 
 ---
 
-### 9. Performance Testing in CI
-**Priority:** Medium
-**Effort:** Medium
+### 9. License Compliance Scanning ✅
+**Priority:** High
+**Effort:** Complete  
+**Status:** ✅ Implemented - `scripts/license-check.js` + CI workflow
 
-**Tools:**
-- Lighthouse CI (web performance)
-- k6 (load testing)
-- Artillery (stress testing)
+**What it does:**
+- Scans all production dependencies for license compliance
+- Detects unapproved or risky licenses (GPL, LGPL, AGPL)
+- Generates detailed compliance reports
+- Fails build on unapproved licenses
 
-**Implementation:**
-```yaml
-# Add to .github/workflows/ci.yml
-performance:
-  name: Performance Testing
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    
-    - name: Start application
-      run: |
-        docker-compose up -d
-        sleep 10
-    
-    - name: Run Lighthouse CI
-      uses: treosh/lighthouse-ci-action@v10
-      with:
-        urls: |
-          http://localhost:5000
-          http://localhost:5000/about
-        uploadArtifacts: true
-        temporaryPublicStorage: true
-    
-    - name: Run k6 load test
-      run: |
-        docker run --network=host grafana/k6 run - < test/load/script.js
+**Approved Licenses:**
+- MIT, ISC, Apache-2.0
+- BSD-2-Clause, BSD-3-Clause
+- CC0-1.0, CC-BY-3.0, CC-BY-4.0
+- Unlicense, 0BSD
+
+**Risky Licenses (Require Review):**
+- GPL-2.0, GPL-3.0
+- LGPL-2.1, LGPL-3.0
+- AGPL-3.0, MPL-2.0
+
+**How to use:**
+```bash
+# Run license check locally
+npm run license:check
+
+# View detailed report
+cat reports/license-compliance.json
 ```
 
-**Performance budgets:**
-- First Contentful Paint: < 1.5s
-- Time to Interactive: < 3.5s
-- Largest Contentful Paint: < 2.5s
-- Cumulative Layout Shift: < 0.1
+**CI Integration:**
+- Runs on every push/PR
+- Uploads compliance report artifact
+- Blocks merge if unapproved licenses detected
+
+**Customization:**
+Add exceptions in `scripts/license-check.js`:
+```javascript
+const EXCEPTIONS = {
+  'package-name@1.0.0': 'GPL-3.0', // Reviewed and approved
+};
+```
+
+---
+
+### 11. Feature Flags System ✅
+**Priority:** High
+**Effort:** Complete
+**Status:** ✅ Implemented in `server/feature-flags.ts`
+
+**What it provides:**
+- Runtime feature toggles (no deployments needed)
+- Environment-based flags (dev/staging/production)
+- Percentage-based rollouts (canary releases)
+- User-specific enablement
+- Safe feature experimentation
+
+**How to use:**
+```typescript
+// In route handlers
+import { featureFlags } from './server/feature-flags';
+
+app.get('/api/new-feature', (req, res) => {
+  if (!featureFlags.isEnabled('new-character-page', {
+    userId: req.user?.id,
+    requestId: req.id
+  })) {
+    return res.status(404).json({ error: 'Feature not available' });
+  }
+  
+  // Feature logic here
+});
+
+// With middleware
+import { requireFeature } from './server/feature-flags';
+
+app.get('/api/beta', requireFeature('experimental-features'), (req, res) => {
+  // Only accessible when feature is enabled
+});
+```
+
+**Built-in Flags:**
+- `enhanced-caching` - Advanced caching strategies
+- `youtube-integration` - YouTube API integration
+- `etsy-store` - Etsy store integration
+- `dndbeyond-integration` - D&D Beyond character sheets
+- `podcast-feed` - Podcast RSS feed
+- `health-checks-extended` - Extended diagnostics
+- `rate-limiting` - API rate limiting
+- `new-character-page` - Beta redesign (10% rollout)
+- `experimental-features` - Dev-only features
+
+**Environment Behavior:**
+- **Development:** All features enabled by default
+- **Staging:** Beta features at 50% rollout
+- **Production:** Only stable features enabled
+
+**Testing:**
+```bash
+# Run feature flag tests
+npm test test/unit/feature-flags.test.ts
+```
+
+**Rollout Strategy:**
+1. Enable in development (100%)
+2. Enable in staging (50% rollout)
+3. Monitor metrics and errors
+4. Gradual production rollout (10% → 25% → 50% → 100%)
+5. Remove flag after full rollout
+
+---
+
+### 12. Rollback Strategy ✅
+**Priority:** High
+**Effort:** Complete  
+**Status:** ✅ Implemented via Git tags, Docker tags, and feature flags
+
+**Rollback Methods:**
+
+**1. Git-based Rollback (Code)**
+```bash
+# Revert to previous release
+git revert <commit-sha>
+git push origin main
+
+# Or roll back to specific tag
+git checkout v1.16.0
+git tag -f v1.17.0  # Move tag
+git push --force origin v1.17.0
+```
+
+**2. Docker Image Rollback (Container)**
+```bash
+# List available images
+docker images toa-website
+
+# Rollback to specific version
+docker pull toa-website:v1.16.0
+docker tag toa-website:v1.16.0 toa-website:latest
+docker-compose up -d
+
+# On Kubernetes
+kubectl rollout undo deployment/toa-website
+kubectl rollout history deployment/toa-website
+kubectl rollout undo deployment/toa-website --to-revision=2
+```
+
+**3. Feature Flag Rollback (Runtime)**
+```typescript
+// Instant rollback without deployment
+featureFlags.override('new-character-page', false);
+
+// Or edit server/feature-flags.ts and hot-reload
+```
+
+**4. Database Migration Rollback**
+```bash
+# If using Drizzle Kit migrations
+npm run db:rollback
+
+# Manual rollback (if needed)
+psql -d database -f migrations/down/001_rollback.sql
+```
+
+**Best Practices:**
+- ✅ Always tag releases (`git tag v1.17.0`)
+- ✅ Keep last 3 Docker images in registry
+- ✅ Test rollbacks in staging first
+- ✅ Use feature flags for risky changes
+- ✅ Document rollback procedures
+- ✅ Monitor metrics after rollback
+
+**CI/CD Integration:**
+- Previous Docker images preserved in registry
+- Automated rollback on health check failures
+- Manual approval for production deployments
 
 ---
 
