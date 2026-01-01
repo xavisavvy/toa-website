@@ -31,6 +31,8 @@ snyk-results.json
 # Kubernetes secrets (encrypted versions are ok)
 k8s/**/secrets.yaml
 !k8s/**/secrets.enc.yaml
+.kubernetes/secret.yaml
+!.kubernetes/secret.yaml.example
 
 # Terraform state files
 *.tfstate

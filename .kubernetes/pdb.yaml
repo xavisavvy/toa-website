@@ -1,0 +1,14 @@
+---
+# ============================================
+# Pod Disruption Budget
+# Ensures availability during cluster operations
+# ============================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: toa-website
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: toa-website

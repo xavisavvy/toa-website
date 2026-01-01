@@ -346,45 +346,57 @@ jobs:
 
 ---
 
-### 7. Docker Image Optimization
+### 7. Docker Image Optimization ✅
 **Priority:** Medium
-**Effort:** Low
+**Effort:** 2-3 hours
+**Status:** Complete
 
 **Current Implementation:**
 - ✅ Multi-stage builds
 - ✅ Specific package versions
 - ✅ Non-root user
 - ✅ Security labels
+- ✅ Resource limits in docker-compose (512M memory, 1 CPU)
+- ✅ Security hardening (no-new-privileges, cap-drop ALL)
+- ✅ Tmpfs mounts for temporary storage
+- ✅ Read-only permissions on dist/node_modules
+- ✅ Optimized Node.js flags
 
-**Additional Optimizations:**
-```dockerfile
-# Read-only filesystem
-docker run --read-only --tmpfs /tmp toa-website
+**Kubernetes Deployment:**
+- ✅ Production-ready K8s manifests (`.kubernetes/`)
+- ✅ Horizontal Pod Autoscaler (2-10 replicas based on CPU/Memory)
+- ✅ Pod security policies (non-root, capability drops, seccomp)
+- ✅ Network policies for traffic control
+- ✅ Pod Disruption Budget for high availability
+- ✅ Resource requests and limits
+- ✅ Health probes (startup, liveness, readiness)
+- ✅ Complete deployment guide
 
-# Resource limits
-docker run --memory="512m" --cpus="0.5" toa-website
+**Files Added:**
+- `.kubernetes/deployment.yaml` - Main K8s deployment
+- `.kubernetes/service.yaml` - ClusterIP service
+- `.kubernetes/hpa.yaml` - Autoscaling configuration
+- `.kubernetes/configmap.yaml` - Non-sensitive config
+- `.kubernetes/secret.yaml.example` - Secret template
+- `.kubernetes/pdb.yaml` - Disruption budget
+- `.kubernetes/networkpolicy.yaml` - Network security
+- `.kubernetes/README.md` - Complete deployment guide
 
-# Drop capabilities
-docker run --cap-drop=ALL toa-website
-
-# Security options
-docker run --security-opt=no-new-privileges toa-website
-```
-
-**docker-compose.yml additions:**
+**Docker Compose Enhancements:**
 ```yaml
 services:
   app:
-    read_only: true
-    tmpfs:
-      - /tmp:size=64M
-      - /app/server/cache:size=128M
-    cap_drop:
-      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
     security_opt:
       - no-new-privileges:true
-    mem_limit: 512m
-    cpus: 0.5
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:noexec,nosuid,size=50M
 ```
 
 ---

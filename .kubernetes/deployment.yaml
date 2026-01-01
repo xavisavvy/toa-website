@@ -1,0 +1,154 @@
+---
+# ============================================
+# Kubernetes Deployment for Tales of Aneria
+# Enterprise-ready with security hardening
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toa-website
+  labels:
+    app: toa-website
+    version: v1
+    tier: frontend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: toa-website
+  template:
+    metadata:
+      labels:
+        app: toa-website
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/api/health"
+    spec:
+      # Security: Run as non-root
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      
+      # Optimize DNS lookups
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      
+      containers:
+      - name: toa-website
+        image: ghcr.io/your-org/toa-website:latest
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - name: http
+          containerPort: 5000
+          protocol: TCP
+        
+        # Environment variables from ConfigMap and Secrets
+        envFrom:
+        - configMapRef:
+            name: toa-config
+        - secretRef:
+            name: toa-secrets
+        
+        # Resource limits (critical for production)
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        
+        # Startup probe - gives app time to initialize
+        startupProbe:
+          httpGet:
+            path: /api/startup
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 12  # 60 seconds total
+        
+        # Liveness probe - restart if unhealthy
+        livenessProbe:
+          httpGet:
+            path: /api/alive
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Readiness probe - remove from load balancer if not ready
+        readinessProbe:
+          httpGet:
+            path: /api/ready
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        
+        # Security hardening
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false  # App needs /tmp and cache writes
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+        
+        # Volume mounts
+        volumeMounts:
+        - name: cache
+          mountPath: /app/server/cache
+        - name: tmp
+          mountPath: /tmp
+      
+      volumes:
+      - name: cache
+        emptyDir:
+          sizeLimit: 100Mi
+      - name: tmp
+        emptyDir:
+          sizeLimit: 50Mi
+      
+      # Topology spread for high availability
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: toa-website
+      
+      # Anti-affinity - spread across nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - toa-website
+              topologyKey: kubernetes.io/hostname

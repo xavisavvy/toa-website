@@ -1,0 +1,17 @@
+---
+# ============================================
+# ConfigMap for non-sensitive configuration
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: toa-config
+data:
+  NODE_ENV: "production"
+  PORT: "5000"
+  # Public configuration values
+  VITE_YOUTUBE_PLAYLIST_ID: "PLzOgCaUMvY31MFDMF6yRWTBWPE2tQPIxY"
+  VITE_PODCAST_FEED_URL: "https://anchor.fm/s/your-podcast/podcast/rss"
+  VITE_PODCAST_SPOTIFY_URL: "https://open.spotify.com/show/your-show"
+  VITE_PODCAST_APPLE_URL: "https://podcasts.apple.com/us/podcast/your-podcast"
+  VITE_PODCAST_YOUTUBE_MUSIC_URL: "https://music.youtube.com/playlist?list=your-playlist"

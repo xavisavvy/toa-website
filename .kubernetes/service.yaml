@@ -1,0 +1,20 @@
+---
+# ============================================
+# Kubernetes Service for Tales of Aneria
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: toa-website
+  labels:
+    app: toa-website
+spec:
+  type: ClusterIP
+  selector:
+    app: toa-website
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  sessionAffinity: None

@@ -90,10 +90,13 @@ RUN apk upgrade --no-cache && \
 
 WORKDIR /app
 
-# Set to production
+# Set to production with optimized Node.js flags
 ENV NODE_ENV=production \
-    NODE_OPTIONS="--max-old-space-size=512" \
-    PORT=5000
+    NODE_OPTIONS="--max-old-space-size=512 --max-http-header-size=16384" \
+    PORT=5000 \
+    # Security hardening
+    NODE_DISABLE_COLORS=1 \
+    NPM_CONFIG_LOGLEVEL=error
 
 # Copy production dependencies
 COPY --from=deps --chown=expressjs:nodejs /app/node_modules ./node_modules
@@ -110,12 +113,18 @@ COPY --from=sbom --chown=expressjs:nodejs /app/sbom.xml ./sbom.xml
 COPY --from=builder --chown=expressjs:nodejs /app/drizzle.config.ts ./
 
 # Create cache directory with proper permissions
-RUN mkdir -p /app/server/cache && \
-    chown -R expressjs:nodejs /app/server/cache && \
-    chmod 755 /app/server/cache
+RUN mkdir -p /app/server/cache /tmp/app && \
+    chown -R expressjs:nodejs /app/server/cache /tmp/app && \
+    chmod 755 /app/server/cache && \
+    chmod 1777 /tmp/app
 
 # Remove unnecessary files for security
 RUN rm -rf /tmp/* /var/tmp/* /root/.npm
+
+# Security: Set file permissions to read-only where possible
+RUN chmod -R 555 /app/node_modules /app/dist && \
+    chmod 444 /app/package*.json /app/drizzle.config.ts /app/sbom.* && \
+    chmod 755 /app
 
 # Switch to non-root user
 USER expressjs
@@ -123,12 +132,12 @@ USER expressjs
 # Expose port
 EXPOSE 5000
 
-# Health check
+# Health check with updated endpoint
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:5000/api/health || exit 1
+  CMD curl -f http://localhost:5000/api/alive || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Start the application
-CMD ["node", "dist/index.js"]
+# Start the application with production optimizations
+CMD ["node", "--enable-source-maps", "dist/index.js"]
