@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.12](https://github.com/xavisavvy/toa-website/compare/v1.13.11...v1.13.12) (2026-01-01)
+
 ### [1.13.11](https://github.com/xavisavvy/toa-website/compare/v1.13.10...v1.13.11) (2026-01-01)
 
 
