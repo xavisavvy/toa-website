@@ -33,6 +33,9 @@ RUN npm ci --omit=dev --ignore-scripts && \
 # ============================================
 FROM node:20-alpine AS builder
 
+# Enable BuildKit caching
+ENV BUILDKIT_INLINE_CACHE=1
+
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -40,13 +43,16 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package*.json ./
 
 # Install ALL dependencies (including devDependencies for build)
-RUN npm ci --ignore-scripts
+# Use --prefer-offline for faster installs
+RUN npm ci --ignore-scripts --prefer-offline
 
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application with optimizations
 # Frontend (Vite) and Backend (esbuild)
+ENV NODE_ENV=production
+ENV VITE_BUILD_CACHE=true
 RUN npm run build
 
 # ============================================
