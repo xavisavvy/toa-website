@@ -1,7 +1,8 @@
 /* eslint-disable no-undef */
-import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
 
 import { 
   getPrintfulSyncProducts,
@@ -340,15 +341,13 @@ describe('Printful API Contract Tests', () => {
         json: async () => ({
           code: 200,
           result: {
-            sync_variant: {
-              id: 5130270457,
-              external_id: 'ext-123',
-              variant_id: 12345, // Catalog variant ID
-              product: {
-                variant_id: 12345,
-                product_id: 71,
-                name: 'Bella + Canvas 3001',
-              }
+            id: 5130270457,
+            external_id: 'ext-123',
+            variant_id: 12345, // Catalog variant ID
+            product: {
+              variant_id: 12345,
+              product_id: 71,
+              name: 'Bella + Canvas 3001',
             }
           }
         }),
@@ -402,14 +401,12 @@ describe('Printful API Contract Tests', () => {
         json: async () => ({
           code: 200,
           result: {
-            sync_variant: {
-              id: 5130270457,
-              external_id: 'ext-123',
-              // variant_id is missing
-              product: {
-                variant_id: 67890, // Fallback location
-                product_id: 71,
-              }
+            id: 5130270457,
+            external_id: 'ext-123',
+            // variant_id is missing
+            product: {
+              variant_id: 67890, // Fallback location
+              product_id: 71,
             }
           }
         }),

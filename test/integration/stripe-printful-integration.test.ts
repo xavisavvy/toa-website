@@ -1,9 +1,9 @@
 /* eslint-disable no-undef, @typescript-eslint/no-non-null-assertion */
-import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import type Stripe from 'stripe';
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 
-import { createPrintfulOrderFromSession, createPrintfulOrder } from '../../server/stripe';
 import { getCatalogVariantId } from '../../server/printful';
+import { createPrintfulOrderFromSession, createPrintfulOrder } from '../../server/stripe';
 
 /**
  * Integration tests for Stripe → Printful order flow
@@ -39,15 +39,13 @@ describe('Stripe → Printful Integration', () => {
           json: () => Promise.resolve({
             code: 200,
             result: {
-              sync_variant: {
-                id: 5130270457,
-                external_id: 'test-external-id',
-                variant_id: 12345, // This is the catalog variant ID
-                product: {
-                  variant_id: 12345,
-                  product_id: 71,
-                  name: 'Test Product',
-                }
+              id: 5130270457,
+              external_id: 'test-external-id',
+              variant_id: 12345, // This is the catalog variant ID
+              product: {
+                variant_id: 12345,
+                product_id: 71,
+                name: 'Test Product',
               }
             }
           }),
@@ -322,10 +320,8 @@ describe('Stripe → Printful Integration', () => {
             json: () => Promise.resolve({
               code: 200,
               result: {
-                sync_variant: {
-                  id: 5130270457,
-                  variant_id: 12345, // Catalog ID
-                }
+                id: 5130270457,
+                variant_id: 12345, // Catalog ID
               }
             }),
           } as Response)
