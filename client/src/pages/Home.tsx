@@ -6,7 +6,7 @@ import PodcastSection from "@/components/PodcastSection";
 import CharactersSection from "@/components/CharactersSection";
 import WorldSection from "@/components/WorldSection";
 import PromotionsSection from "@/components/PromotionsSection";
-import ShopSection from "@/components/ShopSection";
+import PrintfulShop from "@/components/PrintfulShop";
 import AboutSection from "@/components/AboutSection";
 import CommunitySection from "@/components/CommunitySection";
 import Footer from "@/components/Footer";
@@ -58,7 +58,7 @@ export default function Home() {
       <CharactersSection />
       <WorldSection />
       <PromotionsSection />
-      <ShopSection />
+      <PrintfulShop enableCheckout={true} />
       <AboutSection />
       <CommunitySection />
       <Footer />
