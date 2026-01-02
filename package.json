@@ -205,6 +205,9 @@
     "tmp": "^0.2.4"
   },
   "lint-staged": {
+    ".env.example": [
+      "node scripts/check-env-changes.mjs"
+    ],
     "*.{ts,tsx}": [
       "eslint --fix",
       "vitest related --run"

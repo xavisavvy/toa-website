@@ -191,3 +191,98 @@ export function createPrintfulOrderFromSession(
     ],
   };
 }
+
+/**
+ * Submit order to Printful
+ */
+export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise<{
+  success: boolean;
+  orderId?: number;
+  error?: string;
+}> {
+  const apiKey = process.env.PRINTFUL_API_KEY;
+
+  if (!apiKey) {
+    console.error('Printful API key not configured');
+    return { success: false, error: 'Printful not configured' };
+  }
+
+  try {
+    const response = await fetch('https://api.printful.com/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Printful order creation failed:', response.status, errorText);
+      return { 
+        success: false, 
+        error: `Printful API error: ${response.status}` 
+      };
+    }
+
+    const data = await response.json();
+    const orderId = data.result?.id;
+
+    if (!orderId) {
+      console.error('No order ID returned from Printful');
+      return { success: false, error: 'No order ID returned' };
+    }
+
+    console.log(`✅ Printful order created successfully: ${orderId}`);
+    return { success: true, orderId };
+
+  } catch (error) {
+    console.error('Error creating Printful order:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}
+
+/**
+ * Get Printful order status
+ */
+export async function getPrintfulOrderStatus(orderId: number): Promise<{
+  status: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+} | null> {
+  const apiKey = process.env.PRINTFUL_API_KEY;
+
+  if (!apiKey) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`https://api.printful.com/orders/${orderId}`, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    const order = data.result;
+
+    return {
+      status: order.status,
+      trackingNumber: order.shipments?.[0]?.tracking_number,
+      trackingUrl: order.shipments?.[0]?.tracking_url,
+    };
+
+  } catch (error) {
+    console.error('Error fetching Printful order status:', error);
+    return null;
+  }
+}

@@ -11,7 +11,7 @@ import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { metrics } from "./monitoring";
 import { registerHealthRoutes } from "./health";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
-import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, STRIPE_CONFIG } from "./stripe";
+import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply API rate limiting to all /api routes
@@ -377,27 +377,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       switch (event.type) {
         case 'checkout.session.completed':
           const session = event.data.object as any;
-          console.log('Payment successful:', session.id);
+          console.log('✅ Payment successful:', session.id);
+          console.log('Customer email:', session.customer_details?.email);
+          console.log('Amount paid:', session.amount_total / 100, session.currency.toUpperCase());
           
-          // TODO: Create Printful order here
+          // Create Printful order automatically
           const orderData = createPrintfulOrderFromSession(session);
           if (orderData) {
-            console.log('Order data ready for Printful:', JSON.stringify(orderData, null, 2));
-            // In Phase 2, we'll actually create the Printful order here
+            console.log('📦 Creating Printful order...');
+            console.log('Recipient:', orderData.recipient.name, orderData.recipient.email);
+            console.log('Items:', orderData.items);
+            
+            const result = await createPrintfulOrder(orderData);
+            
+            if (result.success) {
+              console.log(`✅ Printful order created successfully! Order ID: ${result.orderId}`);
+              console.log(`Order will be fulfilled and shipped by Printful`);
+              // TODO: Send confirmation email to customer
+              // TODO: Store order in database for tracking
+            } else {
+              console.error(`❌ Failed to create Printful order: ${result.error}`);
+              console.error('Order data:', JSON.stringify(orderData, null, 2));
+              // TODO: Alert admin about failed order creation
+              // TODO: Store failed order for manual processing
+            }
+          } else {
+            console.error('❌ Could not extract order data from Stripe session');
+            console.error('Session ID:', session.id);
           }
           
           break;
 
         case 'checkout.session.async_payment_succeeded':
-          console.log('Async payment succeeded');
+          console.log('✅ Async payment succeeded');
+          // Handle delayed payment methods (bank transfers, etc.)
+          const asyncSession = event.data.object as any;
+          const asyncOrderData = createPrintfulOrderFromSession(asyncSession);
+          if (asyncOrderData) {
+            await createPrintfulOrder(asyncOrderData);
+          }
           break;
 
         case 'checkout.session.async_payment_failed':
-          console.log('Async payment failed');
+          console.log('❌ Async payment failed');
+          const failedSession = event.data.object as any;
+          console.log('Failed session ID:', failedSession.id);
+          // TODO: Notify customer that payment failed
           break;
 
         default:
-          console.log(`Unhandled event type: ${event.type}`);
+          console.log(`ℹ️  Unhandled event type: ${event.type}`);
       }
 
       res.json({ received: true });

@@ -1,16 +1,16 @@
-import Navigation from "@/components/Navigation";
+import AboutSection from "@/components/AboutSection";
+import CharactersSection from "@/components/CharactersSection";
+import CommunitySection from "@/components/CommunitySection";
+import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import LatestEpisodes from "@/components/LatestEpisodes";
 import LatestShorts from "@/components/LatestShorts";
+import Navigation from "@/components/Navigation";
 import PodcastSection from "@/components/PodcastSection";
-import CharactersSection from "@/components/CharactersSection";
-import WorldSection from "@/components/WorldSection";
-import PromotionsSection from "@/components/PromotionsSection";
 import PrintfulShop from "@/components/PrintfulShop";
-import AboutSection from "@/components/AboutSection";
-import CommunitySection from "@/components/CommunitySection";
-import Footer from "@/components/Footer";
+import PromotionsSection from "@/components/PromotionsSection";
 import SEO from "@/components/SEO";
+import WorldSection from "@/components/WorldSection";
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/structuredData";
 
 export default function Home() {
