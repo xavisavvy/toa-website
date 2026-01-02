@@ -609,6 +609,30 @@
       "dndbeyond": "https://www.dndbeyond.com/characters/134997127",
       "dndbeyondId": "134997127",
       "status": "inactive"
+    },
+    {
+      "id": "holiday-special-1",
+      "name": "Holiday Special Character",
+      "player": "TBD",
+      "playerId": "tbd",
+      "campaign": "Aneria Holiday Specials",
+      "race": "TBD",
+      "class": "TBD",
+      "level": 1,
+      "alignment": "Neutral Good",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Holiday Special Character - Official Character Art",
+          "type": "portrait",
+          "isFeatured": true,
+          "copyright": "Tales of Aneria",
+          "isAiGenerated": false
+        }
+      ],
+      "backstory": "A festive hero ready for holiday adventures in the world of Aneria.",
+      "personality": "Filled with holiday cheer and adventuring spirit.",
+      "status": "pending"
     }
   ]
 }
