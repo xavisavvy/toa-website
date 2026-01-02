@@ -75,11 +75,22 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
     
     let filtered = products;
 
-    // Apply search filter
+    // Apply search filter - search in product name and variants
     if (searchQuery) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product => {
+        // Search in main product name
+        if (product.name.toLowerCase().includes(query)) {
+          return true;
+        }
+        // Also search in variant names if they exist
+        if (product.variants) {
+          return product.variants.some(variant => 
+            variant.name.toLowerCase().includes(query)
+          );
+        }
+        return false;
+      });
     }
 
     // Apply type filter
