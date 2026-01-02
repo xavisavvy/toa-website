@@ -51,6 +51,7 @@ interface Character {
   backstory: string;
   personality: string;
   dndbeyond: string;
+  dndbeyondId?: string;
   playlist?: string;
   status: string;
 }
@@ -86,6 +87,20 @@ export default function CharacterDetail() {
   }
 
   const featuredImage = character.images.find((img) => img.isFeatured);
+
+  // Combine local images with D&D Beyond avatar if available
+  const allImages = [...character.images];
+  if (character.dndbeyondId) {
+    allImages.push({
+      id: 'dndbeyond-avatar',
+      url: `https://www.dndbeyond.com/avatars/${character.dndbeyondId}/avatar.jpg`,
+      caption: `${character.name} - D&D Beyond Character Portrait`,
+      type: 'portrait',
+      isFeatured: false,
+      copyright: 'D&D Beyond',
+      isAiGenerated: false
+    });
+  }
 
   const characterSchema = getCreativeWorkSchema({
     name: character.name,
@@ -219,14 +234,14 @@ export default function CharacterDetail() {
             </Card>
 
             {/* Image Gallery */}
-            {character.images.length > 0 && (
+            {allImages.length > 0 && (
               <Card data-testid="card-gallery">
                 <CardHeader>
                   <CardTitle>Gallery</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {character.images.map((image) => (
+                    {allImages.map((image) => (
                       <div
                         key={image.id}
                         className="relative aspect-[3/4] bg-muted rounded-md overflow-hidden"
