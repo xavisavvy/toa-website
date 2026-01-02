@@ -15,52 +15,71 @@ interface Episode {
 
 interface LatestEpisodesProps {
   playlistIds?: string[];
+  channelId?: string;
 }
 
-export default function LatestEpisodes({ playlistIds }: LatestEpisodesProps) {
+export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisodesProps) {
+  // Prefer channel over playlists if both are provided
+  const useChannel = !!channelId;
+  
   const { data: episodes, isLoading, error } = useQuery<Episode[]>({
-    queryKey: ['/api/youtube/playlists', playlistIds],
-    enabled: !!playlistIds && playlistIds.length > 0,
+    queryKey: useChannel 
+      ? ['/api/youtube/channel', channelId]
+      : ['/api/youtube/playlists', playlistIds],
+    enabled: useChannel ? !!channelId : (!!playlistIds && playlistIds.length > 0),
     queryFn: async () => {
-      console.log('Fetching YouTube playlists from server:', playlistIds);
-      
-      // Fetch from each playlist via server-side API (avoids referrer restrictions)
-      const allVideosPromises = playlistIds!.map(async (playlistId) => {
-        try {
-          const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=10000`);
-          if (!response.ok) {
-            console.error(`Error fetching playlist ${playlistId}:`, response.statusText);
-            return [];
-          }
-          return await response.json();
-        } catch (error) {
-          console.error(`Error fetching playlist ${playlistId}:`, error);
+      if (useChannel) {
+        // Fetch all videos from channel
+        console.log('Fetching YouTube channel videos:', channelId);
+        const response = await fetch(`/api/youtube/channel/${channelId}?maxResults=50`);
+        if (!response.ok) {
+          console.error('Error fetching channel videos:', response.statusText);
           return [];
         }
-      });
-      
-      const playlistResults = await Promise.all(allVideosPromises);
-      
-      // Flatten and dedupe by video ID
-      const videoMap = new Map<string, Episode>();
-      for (const videos of playlistResults) {
-        for (const video of videos) {
-          if (!videoMap.has(video.id)) {
-            videoMap.set(video.id, video);
+        const videos = await response.json();
+        console.log('Channel response:', videos.length, 'videos');
+        return videos;
+      } else {
+        // Fetch from playlists (existing logic)
+        console.log('Fetching YouTube playlists from server:', playlistIds);
+        
+        const allVideosPromises = playlistIds!.map(async (playlistId) => {
+          try {
+            const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=10000`);
+            if (!response.ok) {
+              console.error(`Error fetching playlist ${playlistId}:`, response.statusText);
+              return [];
+            }
+            return await response.json();
+          } catch (error) {
+            console.error(`Error fetching playlist ${playlistId}:`, error);
+            return [];
+          }
+        });
+        
+        const playlistResults = await Promise.all(allVideosPromises);
+        
+        // Flatten and dedupe by video ID
+        const videoMap = new Map<string, Episode>();
+        for (const videos of playlistResults) {
+          for (const video of videos) {
+            if (!videoMap.has(video.id)) {
+              videoMap.set(video.id, video);
+            }
           }
         }
+        
+        // Sort by publishedAt date (most recent first)
+        const allVideos = Array.from(videoMap.values());
+        allVideos.sort((a, b) => {
+          const dateA = new Date(a.publishedAt).getTime();
+          const dateB = new Date(b.publishedAt).getTime();
+          return dateB - dateA;
+        });
+        
+        console.log('Server-side response:', allVideos.length, 'videos from', playlistIds?.length, 'playlists');
+        return allVideos;
       }
-      
-      // Sort by publishedAt date (most recent first)
-      const allVideos = Array.from(videoMap.values());
-      allVideos.sort((a, b) => {
-        const dateA = new Date(a.publishedAt).getTime();
-        const dateB = new Date(b.publishedAt).getTime();
-        return dateB - dateA;
-      });
-      
-      console.log('Server-side response:', allVideos.length, 'videos from', playlistIds?.length, 'playlists');
-      return allVideos;
     },
   });
 
@@ -107,9 +126,11 @@ export default function LatestEpisodes({ playlistIds }: LatestEpisodesProps) {
           <Card>
             <CardContent className="p-12 text-center">
               <p className="text-muted-foreground">
-                {playlistIds && playlistIds.length > 0
-                  ? "No episodes found in the playlists."
-                  : "Configure your YouTube playlist IDs to display episodes."}
+                {useChannel 
+                  ? "No videos found on this channel."
+                  : (playlistIds && playlistIds.length > 0
+                      ? "No episodes found in the playlists."
+                      : "Configure your YouTube channel ID or playlist IDs to display episodes.")}
               </p>
             </CardContent>
           </Card>

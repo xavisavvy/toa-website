@@ -13,7 +13,11 @@ import SEO from "@/components/SEO";
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/structuredData";
 
 export default function Home() {
-  // Support multiple playlist IDs (comma-separated in env var)
+  // YouTube configuration - support both channel and playlists
+  // Prefer channel ID if provided (fetches all videos automatically)
+  const YOUTUBE_CHANNEL_ID = import.meta.env.VITE_YOUTUBE_CHANNEL_ID;
+  
+  // Fallback to playlist IDs (for backward compatibility)
   const YOUTUBE_PLAYLIST_IDS_RAW = import.meta.env.VITE_YOUTUBE_PLAYLIST_IDS || import.meta.env.VITE_YOUTUBE_PLAYLIST_ID;
   const YOUTUBE_PLAYLIST_IDS = YOUTUBE_PLAYLIST_IDS_RAW 
     ? YOUTUBE_PLAYLIST_IDS_RAW.split(',').map((id: string) => id.trim()).filter(Boolean)
@@ -42,7 +46,7 @@ export default function Home() {
       />
       <Navigation />
       <Hero />
-      <LatestEpisodes playlistIds={YOUTUBE_PLAYLIST_IDS} />
+      <LatestEpisodes channelId={YOUTUBE_CHANNEL_ID} playlistIds={YOUTUBE_PLAYLIST_IDS} />
       <PodcastSection 
         feedUrl={PODCAST_FEED_URL}
         spotifyUrl={SPOTIFY_URL}
