@@ -76,8 +76,6 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-    # Fix Windows permission issue: run as root, disable user switching
-    user: root
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
@@ -97,10 +95,6 @@ services:
         reservations:
           cpus: '0.1'
           memory: 128M
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
 
   # ============================================
   # PostgreSQL Database (Optional - for local development)
