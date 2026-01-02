@@ -11,6 +11,11 @@ beforeAll(() => {
   process.env.PRINTFUL_API_KEY = 'test_printful_key';
 });
 
+// Mock Printful
+vi.mock('../../server/printful', () => ({
+  getCatalogVariantId: vi.fn(() => Promise.resolve(9876))
+}));
+
 vi.mock('../../server/stripe', () => ({
   stripe: {
     checkout: {
