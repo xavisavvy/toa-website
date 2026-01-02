@@ -1,4 +1,4 @@
-/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 import Stripe from 'stripe';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -151,6 +151,9 @@ export interface PrintfulOrderData {
   items: Array<{
     variant_id: number;
     quantity: number;
+    files?: Array<{
+      url: string;
+    }>;
   }>;
 }
 

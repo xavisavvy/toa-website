@@ -24,10 +24,11 @@ Tales of Aneria website is a full-stack TypeScript application with React fronte
 │                    Express.js Backend (Node.js)                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │  API Routes:                                             │   │
-│  │  - /api/youtube/*        (playlist & shorts)             │   │
+│  │  - /api/youtube/*        (channel, playlist, shorts)    │   │
 │  │  - /api/printful/*       (products)                      │   │
 │  │  - /api/stripe/*         (checkout & webhooks)           │   │
-│  │  - /api/sponsors/*       (inquiry form)                  │   │
+│  │  - /api/podcast/*        (feed & audio proxy)            │   │
+│  │  - /api/metrics          (application metrics)           │   │
 │  │  - /api/health           (health checks)                 │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -43,16 +44,16 @@ Tales of Aneria website is a full-stack TypeScript application with React fronte
            │              │              │              │
            ▼              ▼              ▼              ▼
 ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌──────────┐
-│  YouTube    │  │  Printful   │  │   Stripe    │  │  Resend  │
-│  Data API   │  │     API     │  │     API     │  │   API    │
+│  YouTube    │  │  Printful   │  │   Stripe    │  │ Google   │
+│  Data API   │  │     API     │  │     API     │  │Analytics │
 └─────────────┘  └─────────────┘  └─────────────┘  └──────────┘
            │              │              │
            ▼              ▼              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Data Layer                                │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  PostgreSQL  │  │    Redis     │  │   Drizzle    │          │
-│  │  (Database)  │  │   (Cache)    │  │     ORM      │          │
+│  │  PostgreSQL  │  │  File Cache  │  │   Drizzle    │          │
+│  │  (Database)  │  │    (JSON)    │  │     ORM      │          │
 │  └──────────────┘  └──────────────┘  └──────────────┘          │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -176,17 +177,24 @@ server/
 
 ## Caching Strategy
 
-### Redis Cache
+### File-based Cache (JSON)
 
-- **YouTube API responses**: 1-hour TTL
+- **YouTube API responses**: 24-hour TTL (configurable)
 - **Printful products**: 1-hour TTL
+- **Multi-playlist support**: Independent cache per playlist
 - **Graceful degradation**: Falls back to stale cache on API errors
-- **Health checks**: Monitor Redis connection
+- **Location**: `server/cache/` directory
+
+### Client-side Cache (React Query)
+
+- **Query caching**: Automatic via React Query
+- **Stale time**: Configurable per query
+- **Refetch strategies**: Background updates
 
 ### Browser Cache
 
 - **Static assets**: Long-term caching via Vite build
-- **API responses**: No client-side caching (always fresh)
+- **API responses**: React Query manages freshness
 
 ## Security Architecture
 
@@ -232,11 +240,12 @@ Never committed to git:
 
 ### Docker Development
 - `.env.docker` - Docker-specific variables
-- Redis and PostgreSQL in containers
+- PostgreSQL in container
+- File-based caching
 
 ### Production
 - GitHub Secrets - Secure credential storage
-- Replit Secrets - Production deployment
+- Vercel/Replit Secrets - Production deployment
 - `talesofaneria.com` - Production domain
 
 ## Database Schema
@@ -293,34 +302,36 @@ GitHub Actions
 ```
 Docker Compose Stack:
 ├── toa-website (Node.js app)
-├── toa-postgres (PostgreSQL 16)
-└── toa-redis (Redis 7)
+└── toa-postgres (PostgreSQL 16)
 
 Networks:
 └── app-network (internal)
 
 Volumes:
 ├── postgres-data (persistent)
-└── redis-data (persistent)
+└── cache/ directory (file-based)
 ```
 
 ## Performance Optimization
 
 1. **Caching**
-   - Redis for API responses
+   - File-based cache for API responses (24h YouTube, 1h Printful)
+   - React Query for client-side data caching
    - Browser caching for static assets
-   - Stale cache fallbacks
+   - Stale cache fallbacks for resilience
 
 2. **Build Optimization**
-   - Vite for fast builds
-   - Code splitting
+   - Vite for fast builds & HMR
+   - Code splitting & lazy loading
    - Tree shaking
    - Asset optimization
+   - Parallel build strategies
 
 3. **API Optimization**
-   - Response compression
+   - Response compression (gzip)
    - Minimal payload sizes
-   - Parallel data fetching
+   - Parallel data fetching with React Query
+   - Request deduplication
 
 ## Monitoring & Observability
 
@@ -331,10 +342,16 @@ GET /api/health
 Response:
 {
   "status": "healthy",
-  "timestamp": "2026-01-02T03:00:00.000Z",
+  "timestamp": "2026-01-02T21:00:00.000Z",
+  "uptime": 3600,
+  "version": "1.31.0",
+  "environment": "production",
   "checks": {
-    "database": "healthy",
-    "redis": "degraded" (optional)
+    "storage": { "status": "healthy", "message": "Cache accessible", "responseTime": 5 },
+    "cache": { "status": "healthy", "message": "File cache operational", "responseTime": 2 },
+    "memory": { "status": "healthy", "message": "Memory usage: 45%", "responseTime": 1 },
+    "disk": { "status": "healthy", "message": "Disk usage: 35%", "responseTime": 3 },
+    "cpu": { "status": "healthy", "message": "CPU usage: 25%", "responseTime": 1 }
   }
 }
 ```
@@ -350,18 +367,22 @@ Response:
 
 1. **Horizontal Scaling**
    - Stateless backend design
-   - Redis for shared state
+   - File-based cache (can move to distributed cache if needed)
    - Load balancer ready
+   - Session management via secure cookies
 
 2. **Vertical Scaling**
    - Database connection pooling
-   - Redis memory management
-   - Efficient caching strategies
+   - Efficient file I/O for caching
+   - Memory-efficient caching strategies
+   - Configurable cache TTLs
 
 3. **Future Enhancements**
    - CDN for static assets
+   - Distributed caching (Redis/Memcached)
    - Database read replicas
    - Message queue for async tasks
+   - Serverless function migrations
 
 ## Technology Stack
 
@@ -372,19 +393,20 @@ Response:
 | | Tailwind CSS | Styling |
 | | shadcn/ui | Component library |
 | | Vite | Build tool |
+| | React Query | Data fetching & caching |
 | **Backend** | Express.js | Web framework |
-| | Node.js | Runtime |
+| | Node.js 20+ | Runtime |
 | | TypeScript | Type safety |
 | **Database** | PostgreSQL 16 | Relational data |
 | | Drizzle ORM | Database access |
-| **Cache** | Redis 7 | Response caching |
+| **Cache** | File-based (JSON) | API response caching |
 | **APIs** | YouTube Data API v3 | Video content |
 | | Printful API | Products |
 | | Stripe API | Payments |
-| | Resend API | Transactional email |
+| **Analytics** | Google Analytics 4 | User analytics |
 | **Infrastructure** | Docker | Containerization |
-| | GitHub Actions | CI/CD |
-| | Replit | Hosting |
+| | GitHub Actions | CI/CD pipeline |
+| | Vercel/Replit | Hosting options |
 
 ## Security Compliance
 

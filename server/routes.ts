@@ -7,7 +7,7 @@ import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
 import { metrics } from "./monitoring";
 import { getPodcastFeed } from "./podcast";
-import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId } from "./printful";
+import { getPrintfulSyncProducts, getPrintfulProductDetails , getCatalogVariantId as resolveCatalogVariantId, getSyncVariantFiles } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
@@ -373,7 +373,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  /* eslint-disable no-console, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion, sonarjs/cognitive-complexity */
+  /* eslint-disable no-console, @typescript-eslint/no-explicit-any, sonarjs/cognitive-complexity */
   // Stripe Webhook: Handle payment events
   app.post("/api/stripe/webhook", async (req, res) => {
     const signature = req.headers['stripe-signature'];
@@ -420,7 +420,7 @@ export function registerRoutes(app: Express): Server {
           console.log(`🔄 Converting sync variant ${syncVariantId} to catalog variant...`);
           
           // Convert sync variant ID to catalog variant ID
-          const catalogVariantId = await getCatalogVariantId(syncVariantId);
+          const catalogVariantId = await resolveCatalogVariantId(syncVariantId);
           if (!catalogVariantId) {
             console.error(`❌ Could not resolve catalog variant ID for sync variant ${syncVariantId}`);
             console.error('⚠️  CRITICAL: Payment was successful but order cannot be auto-fulfilled');
@@ -441,18 +441,42 @@ export function registerRoutes(app: Express): Server {
 
           console.log(`✅ Resolved variant: sync=${syncVariantId} → catalog=${catalogVariantId}`);
           
+          // Get print files for the sync variant
+          console.log(`📸 Fetching print files for sync variant ${syncVariantId}...`);
+          const printFiles = await getSyncVariantFiles(syncVariantId);
+          
+          if (!printFiles || printFiles.length === 0) {
+            console.error(`❌ No print files found for sync variant ${syncVariantId}`);
+            console.error('⚠️  CRITICAL: Cannot create Printful order without print files');
+            console.error('This means the product mockup images are not configured in Printful');
+            console.error(`📋 Manual Action Required:`);
+            console.error(`   1. Go to Printful Dashboard → Stores → Manage`);
+            console.error(`   2. Find the product and click "Edit"`);
+            console.error(`   3. Ensure mockup images are generated and saved`);
+            console.error(`   4. Manually create order for: ${eventSession.customer_details?.email}`);
+            console.log('✅ Webhook acknowledged, but order needs manual fulfillment');
+            break;
+          }
+          
+          console.log(`✅ Found ${printFiles.length} print file(s) for variant`);
+          
           // Create order data with catalog variant ID
           const orderData = createPrintfulOrderFromSession(fullSession);
           if (orderData) {
-            // Replace sync variant ID with catalog variant ID
+            // Replace sync variant ID with catalog variant ID and add print files
             orderData.items = orderData.items.map(item => ({
               ...item,
-              variant_id: catalogVariantId
+              variant_id: catalogVariantId,
+              files: printFiles, // Include the print files
             }));
 
             console.log('📦 Creating Printful order...');
             console.log('Recipient:', orderData.recipient.name, orderData.recipient.email);
-            console.log('Items:', orderData.items);
+            console.log('Items:', orderData.items.map(i => ({ 
+              variant_id: i.variant_id, 
+              quantity: i.quantity,
+              files: i.files?.length || 0 
+            })));
             
             const result = await createPrintfulOrder(orderData);
             

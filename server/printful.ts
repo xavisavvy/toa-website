@@ -217,12 +217,12 @@ export async function getPrintfulSyncProducts(limit: number = 20): Promise<Print
     });
 
     const productDetails = await Promise.all(productDetailsPromises);
-    const products = productDetails.filter((p): p is PrintfulProductDisplay => p !== null);
+    const products = productDetails.filter((p): p is NonNullable<typeof p> => p !== null);
 
     // Cache the products
-    writeCache(products);
+    writeCache(products as PrintfulProductDisplay[]);
 
-    return products.slice(0, limit);
+    return products.slice(0, limit) as PrintfulProductDisplay[];
   } catch (error) {
     console.error('Error fetching Printful products:', error);
     
@@ -308,8 +308,56 @@ export async function getPrintfulProductDetails(productId: string): Promise<Prin
 }
 
 /**
- * Get catalog variant ID from sync variant ID
+ * Get files (mockup images) for a sync variant
  */
+export async function getSyncVariantFiles(syncVariantId: string): Promise<Array<{ url: string }> | null> {
+  const apiKey = process.env.PRINTFUL_API_KEY;
+
+  if (!apiKey) {
+    console.error('[getSyncVariantFiles] Printful API key not configured');
+    return null;
+  }
+
+  try {
+    console.log(`📸 Fetching files for sync variant: ${syncVariantId}`);
+    const url = `https://api.printful.com/store/variants/${syncVariantId}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Failed to fetch sync variant ${syncVariantId}: ${response.status}`);
+      console.error(`Response body: ${errorText}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const variant: PrintfulSyncVariant = data.result;
+    
+    if (!variant || !variant.files || variant.files.length === 0) {
+      console.error(`No files found for sync variant ${syncVariantId}`);
+      console.error(`This variant may not have mockup images configured in Printful`);
+      return null;
+    }
+
+    // Convert files to the format Printful expects for orders
+    const files = variant.files
+      .filter(f => f.visible && f.status === 'ok') // Only use visible, ready files
+      .map(f => ({ url: f.url }));
+    
+    console.log(`✅ Found ${files.length} file(s) for sync variant ${syncVariantId}`);
+    return files;
+
+  } catch (error) {
+    console.error(`Error fetching files for sync variant ${syncVariantId}:`, error);
+    return null;
+  }
+}
 export async function getCatalogVariantId(syncVariantId: string): Promise<number | null> {
   console.log(`[getCatalogVariantId] Called with syncVariantId: ${syncVariantId}`);
   
@@ -358,13 +406,11 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     console.log(`[getCatalogVariantId] Found variant, checking for variant_id...`);
     console.log(`[getCatalogVariantId] Variant keys:`, Object.keys(variant).join(', '));
     console.log(`[getCatalogVariantId] variant.variant_id:`, variant?.variant_id);
-    console.log(`[getCatalogVariantId] variant.product_id:`, variant?.product_id);
     console.log(`[getCatalogVariantId] variant.product?.variant_id:`, variant?.product?.variant_id);
     
     // The catalog variant ID is at variant.variant_id or variant.product.variant_id
     const catalogId = variant?.variant_id 
-      || variant?.product?.variant_id 
-      || variant?.product_id;
+      || variant?.product?.variant_id;
     
     if (!catalogId) {
       console.error(`No variant_id found in sync variant ${syncVariantId}`);

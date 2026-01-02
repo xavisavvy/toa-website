@@ -13,7 +13,11 @@ beforeAll(() => {
 
 // Mock Printful
 vi.mock('../../server/printful', () => ({
-  getCatalogVariantId: vi.fn(() => Promise.resolve(9876))
+  getCatalogVariantId: vi.fn(() => Promise.resolve(9876)),
+  getSyncVariantFiles: vi.fn(() => Promise.resolve([
+    { url: 'https://files.printful.com/mockup-1.jpg' },
+    { url: 'https://files.printful.com/mockup-2.jpg' },
+  ])),
 }));
 
 vi.mock('../../server/stripe', () => ({

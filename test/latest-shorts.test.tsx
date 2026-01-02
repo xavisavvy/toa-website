@@ -1,45 +1,49 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import LatestShorts from '@/components/LatestShorts';
+import { renderWithProviders, screen, mockFetch, TestFactory } from './helpers/test-utils';
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-    },
-  });
-  return ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+import LatestShorts from '@/components/LatestShorts';
 
 describe('LatestShorts', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    globalThis.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }) as Promise<globalThis.Response>
-    );
+    mockFetch.success([]);
   });
 
   it('should display section title', () => {
-    render(<LatestShorts channelId="UCtest123" />, { wrapper: createWrapper() });
+    renderWithProviders(<LatestShorts channelId="UCtest123" />);
     expect(screen.getByText(/latest shorts/i)).toBeInTheDocument();
   });
 
   it('should show configuration message when no channel ID provided', () => {
-    render(<LatestShorts />, { wrapper: createWrapper() });
+    renderWithProviders(<LatestShorts />);
     expect(screen.getByText(/configure your youtube channel id/i)).toBeInTheDocument();
   });
 
   it('should render without crashing with channel ID', () => {
-    render(<LatestShorts channelId="UCtest123" />, { wrapper: createWrapper() });
+    renderWithProviders(<LatestShorts channelId="UCtest123" />);
     expect(screen.getByTestId('text-shorts-title')).toBeInTheDocument();
+  });
+
+  it('should display shorts when API returns data', async () => {
+    const mockShorts = [
+      TestFactory.short({ id: 'short-1', title: 'Amazing Short 1' }),
+      TestFactory.short({ id: 'short-2', title: 'Amazing Short 2' }),
+    ];
+    mockFetch.success(mockShorts);
+
+    renderWithProviders(<LatestShorts channelId="UCtest123" />);
+    
+    const title = await screen.findByText('Amazing Short 1');
+    expect(title).toBeInTheDocument();
+  });
+
+  it('should handle API errors gracefully', () => {
+    mockFetch.error(500, 'API Error');
+
+    renderWithProviders(<LatestShorts channelId="UCtest123" />);
+    
+    expect(screen.getByText(/latest shorts/i)).toBeInTheDocument();
   });
 });
 

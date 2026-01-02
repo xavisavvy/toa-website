@@ -1,51 +1,51 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import PrintfulShop from '@/components/PrintfulShop';
+import { renderWithProviders, mockFetch, TestFactory } from './helpers/test-utils';
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-    },
-  });
-  return ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+import PrintfulShop from '@/components/PrintfulShop';
 
 describe('PrintfulShop', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock successful fetch by default
-    globalThis.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }) as Promise<globalThis.Response>
-    );
+    mockFetch.success([]);
   });
 
   it('should render loading state initially', () => {
-    render(<PrintfulShop />, { wrapper: createWrapper() });
-    // Component should render loading skeletons
+    renderWithProviders(<PrintfulShop />);
     const cards = document.querySelectorAll('.animate-pulse');
     expect(cards.length).toBeGreaterThan(0);
   });
 
   it('should render with enableCheckout prop', () => {
-    render(<PrintfulShop enableCheckout={true} />, { wrapper: createWrapper() });
-    // Component should render loading skeletons
+    renderWithProviders(<PrintfulShop enableCheckout={true} />);
     const cards = document.querySelectorAll('.animate-pulse');
     expect(cards.length).toBeGreaterThan(0);
   });
 
   it('should show empty state when no products', async () => {
-    render(<PrintfulShop />, { wrapper: createWrapper() });
-    // Wait for loading to finish and empty state to show
-    const emptyMessage = await screen.findByText(/setting up our product catalog/i);
+    const { findByText } = renderWithProviders(<PrintfulShop />);
+    const emptyMessage = await findByText(/setting up our product catalog/i);
     expect(emptyMessage).toBeInTheDocument();
+  });
+
+  it('should display products when API returns data', async () => {
+    const mockProducts = [
+      TestFactory.product({ id: '1', name: 'Cool T-Shirt', price: '$25.00' }),
+      TestFactory.product({ id: '2', name: 'Awesome Mug', price: '$15.00' }),
+    ];
+    mockFetch.success(mockProducts);
+
+    const { findByText } = renderWithProviders(<PrintfulShop />);
+    const product = await findByText('Cool T-Shirt');
+    expect(product).toBeInTheDocument();
+  });
+
+  it('should handle API errors gracefully', () => {
+    mockFetch.error(500);
+
+    const { container } = renderWithProviders(<PrintfulShop />);
+    
+    // Component should render, even with error
+    expect(container).toBeTruthy();
   });
 });

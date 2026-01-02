@@ -20,6 +20,7 @@ Comprehensive testing strategies and results
 - [Test Coverage Audit](./testing/TEST_COVERAGE_AUDIT.md) - Detailed coverage analysis
 - [Test Coverage Executive Summary](./testing/TEST_COVERAGE_EXECUTIVE_SUMMARY.md) - High-level overview
 - [Test Improvements](./testing/TEST_IMPROVEMENTS.md) - Enhancement recommendations
+- [Test Improvements Complete](./testing/TEST_IMPROVEMENTS_COMPLETE.md) - Implemented improvements
 - [Test Reporting](./testing/TEST_REPORTING.md) - Automated test reporting
 - [Mutation Testing](./testing/MUTATION_TESTING.md) - Mutation testing with Stryker
 - [Accessibility Testing](./testing/ACCESSIBILITY_TEST_RESULTS.md) - WCAG compliance results
@@ -28,6 +29,8 @@ Comprehensive testing strategies and results
 - [Chaos Testing](./testing/CHAOS_TESTING.md) - Resilience testing
 - [Contract Testing](./testing/CONTRACT_TESTING.md) - API contract validation
 - [Agentic Testing](./testing/AGENTIC_TESTING_SUMMARY.md) - AI-powered test generation
+- [Automated Testing on Change](./testing/AUTOMATED_TESTING_ON_CHANGE.md) - Pre-commit hooks
+- [Automated Testing Summary](./testing/AUTOMATED_TESTING_SUMMARY.md) - Testing automation overview
 
 ### 🔒 [Security Documentation](./security/)
 Security scanning, compliance, and best practices
@@ -35,6 +38,7 @@ Security scanning, compliance, and best practices
 - [Security Scanning](./security/SECURITY_SCANNING.md) - Automated security checks
 - [Quick Start Security](./security/QUICK_START_SECURITY.md) - Essential security setup
 - [License Compliance](./security/LICENSE_COMPLIANCE_REVIEW.md) - Open source license review
+- [YouTube API Security](./security/YOUTUBE_API_SECURITY.md) - API security best practices
 
 ### 🚀 [Deployment Documentation](./deployment/)
 Deployment strategies and infrastructure
@@ -43,20 +47,39 @@ Deployment strategies and infrastructure
 - [Docker Optimization](./deployment/DOCKER_OPTIMIZATION.md) - Container optimization
 - [Docker Optimization Summary](./deployment/DOCKER_OPTIMIZATION_SUMMARY.md) - Quick reference
 - [Replit Deployment](./deployment/REPLIT_DEPLOYMENT.md) - Deploying to Replit
+- [Replit Deploy Checklist](./deployment/REPLIT_DEPLOY_CHECKLIST.md) - Pre-deployment verification
 - [Health Check Guide](./deployment/HEALTH_CHECK_GUIDE.md) - Application health monitoring
 
 ### 📘 [Implementation Guides](./guides/)
 Step-by-step implementation documentation
 - [Implementation Summary](./guides/IMPLEMENTATION_SUMMARY.md) - Overall implementation overview
 - [Phase 1 Complete](./guides/PHASE1_COMPLETE.md) - Phase 1 achievements
-- [Phase 2 Complete](./guides/PHASE2_COMPLETE.md) - Phase 2 achievements
+- [Phase 2 Complete](./guides/PHASE2_COMPLETE.md) - Phase 2 achievements (E-commerce integration)
 - [Phase 3 Complete](./guides/PHASE3_COMPLETE.md) - Phase 3 achievements
+- [Agentic SDLC Optimization](./guides/AGENTIC_SDLC_OPTIMIZATION.md) - AI-assisted development guide
+- [Copilot Instructions Guide](./guides/COPILOT_INSTRUCTIONS_GUIDE.md) - GitHub Copilot best practices
+- [Design Guidelines](./guides/DESIGN_GUIDELINES.md) - UI/UX design standards
+- [Project Template Guide](./guides/PROJECT_TEMPLATE_GUIDE.md) - Reusable project template
 
-### 🎨 [Content Management](../)
-Managing website content and data
+### 🎨 [Features & Content Management](../)
+Managing website content, integrations, and features
 - [Character Images Guide](./CHARACTER_IMAGES.md) - Adding and managing character gallery images
-- [Stripe Integration](../STRIPE_INTEGRATION.md) - Payment processing setup
-- [Printful Integration](../PRINTFUL_INTEGRATION.md) - E-commerce product integration
+- [YouTube Channel Videos](./features/YOUTUBE_CHANNEL_VIDEOS.md) - Channel API integration
+- [Analytics Implementation](./ANALYTICS_IMPLEMENTATION.md) - Google Analytics 4 setup
+- [Google Analytics Guide](./GOOGLE_ANALYTICS_GUIDE.md) - Complete GA4 reference
+- [SEO Recommendations](./SEO_RECOMMENDATIONS.md) - Search engine optimization
+- [Dynamic Social Images](./DYNAMIC_SOCIAL_IMAGES.md) - Social media meta tags
+- [E-Commerce Guide](./E-COMMERCE_GUIDE.md) - Printful + Stripe integration overview
+- [Environment Setup](./ENVIRONMENT_SETUP.md) - Local development environment
+- [Environment Management](./ENVIRONMENT_MANAGEMENT.md) - Managing environment variables
+- [Docker Development](./DOCKER_DEVELOPMENT.md) - Local Docker setup
+- [GitHub Cache Management](./GITHUB_CACHE_MANAGEMENT.md) - CI/CD cache cleanup
+
+### 🔌 [Integration Documentation](./integration/)
+Third-party service integrations
+- [Printful Integration](./integration/PRINTFUL_INTEGRATION.md) - Print-on-demand products
+- [Printful Setup](./integration/PRINTFUL_SETUP.md) - Initial Printful configuration
+- [Stripe Integration](./integration/STRIPE_INTEGRATION.md) - Payment processing
 
 ## 🎯 Quick Start
 
@@ -118,6 +141,6 @@ See [LICENSE](../LICENSE) for project licensing information.
 
 ---
 
-**Last Updated:** January 2026
+**Last Updated:** January 2, 2026
 
 **Maintained by:** Tales of Aneria Development Team
