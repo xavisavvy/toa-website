@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue 
 } from "@/components/ui/select";
+import { analytics } from "@/lib/analytics";
 import { createCheckout } from "@/lib/stripe";
 
 
@@ -126,6 +127,11 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
   }, [products, searchQuery, filterType, sortBy]);
 
   const handleProductClick = async (product: Product) => {
+    // Track product view
+    const priceMatch = product.price.match(/\$?([\d.]+)/);
+    const priceValue = priceMatch ? parseFloat(priceMatch[1]) : undefined;
+    analytics.viewItem(product.name, product.id, priceValue);
+
     if (!enableCheckout) {
       // Redirect to shop page with checkout enabled
       window.location.href = '/shop';
@@ -145,6 +151,8 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
       // Extract numeric price from string like "$24.99" or "$24.99 - $29.99"
       const priceMatch = variant.price.match(/\$?([\d.]+)/);
       const price = priceMatch ? priceMatch[1] : '0';
+
+      analytics.beginCheckout(parseFloat(price), [product.name]);
 
       const result = await createCheckout({
         productId: product.id,

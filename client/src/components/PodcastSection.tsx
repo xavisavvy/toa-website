@@ -5,6 +5,7 @@ import { SiSpotify, SiApplepodcasts, SiYoutubemusic } from "react-icons/si";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { analytics } from "@/lib/analytics";
 import { apiRequest } from "@/lib/queryClient";
 
 interface PodcastEpisode {
@@ -151,7 +152,12 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
                     size="sm" 
                     variant="outline"
                     data-testid="button-spotify"
-                    onClick={() => spotifyUrl && window.open(spotifyUrl, '_blank')}
+                    onClick={() => {
+                      if (spotifyUrl) {
+                        analytics.podcastPlay('Spotify');
+                        window.open(spotifyUrl, '_blank');
+                      }
+                    }}
                     disabled={!spotifyUrl}
                   >
                     <SiSpotify className="h-4 w-4 mr-2" />
@@ -161,7 +167,12 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
                     size="sm" 
                     variant="outline"
                     data-testid="button-apple-podcasts"
-                    onClick={() => applePodcastsUrl && window.open(applePodcastsUrl, '_blank')}
+                    onClick={() => {
+                      if (applePodcastsUrl) {
+                        analytics.podcastPlay('Apple Podcasts');
+                        window.open(applePodcastsUrl, '_blank');
+                      }
+                    }}
                     disabled={!applePodcastsUrl}
                   >
                     <SiApplepodcasts className="h-4 w-4 mr-2" />
@@ -171,7 +182,12 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
                     size="sm" 
                     variant="outline"
                     data-testid="button-youtube-music"
-                    onClick={() => youtubeMusicUrl && window.open(youtubeMusicUrl, '_blank')}
+                    onClick={() => {
+                      if (youtubeMusicUrl) {
+                        analytics.podcastPlay('YouTube Music');
+                        window.open(youtubeMusicUrl, '_blank');
+                      }
+                    }}
                     disabled={!youtubeMusicUrl}
                   >
                     <SiYoutubemusic className="h-4 w-4 mr-2" />

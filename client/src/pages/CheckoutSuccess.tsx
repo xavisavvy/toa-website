@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { analytics } from "@/lib/analytics";
 import { getCheckoutSession } from "@/lib/stripe";
 
 export default function CheckoutSuccess() {
@@ -26,6 +27,16 @@ export default function CheckoutSuccess() {
       .then(data => {
         setSession(data);
         setLoading(false);
+        
+        // Track successful purchase
+        if (data) {
+          const totalAmount = data.amount_total ? data.amount_total / 100 : 0;
+          analytics.purchase(
+            sessionId,
+            totalAmount,
+            data.line_items?.map((item: any) => item.description) || []
+          );
+        }
       })
       .catch(() => {
         setLoading(false);

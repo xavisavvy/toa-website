@@ -8,6 +8,7 @@ import {
   Music,
 } from "lucide-react";
 import { useRoute, Link } from "wouter";
+import { useEffect } from "react";
 
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
@@ -22,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import charactersData from "@/data/characters.json";
+import { analytics } from "@/lib/analytics";
 import { getCreativeWorkSchema, getBreadcrumbSchema } from "@/lib/structuredData";
 
 interface CharacterImage {
@@ -106,6 +108,13 @@ export default function CharacterDetail() {
   };
 
   const metaDescription = `Meet ${character.name}, a ${character.race} ${character.class} from ${character.campaign}. ${character.backstory.substring(0, 120)}...`;
+
+  // Track character page view
+  useEffect(() => {
+    if (character) {
+      analytics.characterView(character.name, character.id);
+    }
+  }, [character]);
 
   return (
     <div className="min-h-screen bg-background">

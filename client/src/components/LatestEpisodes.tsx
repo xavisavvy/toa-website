@@ -4,6 +4,7 @@ import { Play, Clock, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { analytics } from "@/lib/analytics";
 
 
 interface Episode {
@@ -143,7 +144,10 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
                 key={episode.id} 
                 className="overflow-hidden hover-elevate cursor-pointer transition-all"
                 data-testid={`card-episode-${episode.id}`}
-                onClick={() => window.open(`https://www.youtube.com/watch?v=${episode.id}`, '_blank')}
+                onClick={() => {
+                  analytics.videoPlay(episode.id, episode.title);
+                  window.open(`https://www.youtube.com/watch?v=${episode.id}`, '_blank');
+                }}
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img

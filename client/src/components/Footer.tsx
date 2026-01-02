@@ -3,6 +3,7 @@ import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import { Link, useLocation } from "wouter";
 
 import { AccessibleIcon } from "@/components/ui/accessible-icon";
+import { analytics } from "@/lib/analytics";
 import socialLinksData from "@/data/social-links.json";
 
 export default function Footer() {
@@ -107,7 +108,10 @@ export default function Footer() {
                     key={link.testId}
                     className="w-10 h-10 rounded-md bg-background hover-elevate flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                     data-testid={`button-footer-${link.testId}`}
-                    onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
+                    onClick={() => {
+                      analytics.externalLinkClick(link.url, link.label);
+                      window.open(link.url, '_blank', 'noopener,noreferrer');
+                    }}
                     aria-label={link.label}
                   >
                     <AccessibleIcon icon={Icon} className="h-5 w-5" />
@@ -149,6 +153,11 @@ export default function Footer() {
                         data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                         target={link.href.startsWith('http') ? '_blank' : undefined}
                         rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        onClick={() => {
+                          if (link.href.startsWith('http')) {
+                            analytics.externalLinkClick(link.href, link.label);
+                          }
+                        }}
                       >
                         {link.label}
                       </a>
