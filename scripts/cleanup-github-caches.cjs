@@ -107,19 +107,38 @@ console.log(`📦 Repository: ${owner}/${repo}\n`);
  * Fetch all caches using GitHub CLI
  */
 function fetchCachesWithCLI() {
-  try {
-    // Use per_page parameter instead of --paginate for simpler parsing
-    const output = execSync(
-      `gh api repos/${owner}/${repo}/actions/caches?per_page=100`,
-      { encoding: 'utf8' }
-    );
-    
-    const data = JSON.parse(output);
-    return data.actions_caches || [];
-  } catch (error) {
-    console.error('❌ Error fetching caches:', error.message);
-    exit(1);
+  const caches = [];
+  let page = 1;
+  const perPage = 100;
+  
+  while (true) {
+    try {
+      const output = execSync(
+        `gh api repos/${owner}/${repo}/actions/caches?per_page=${perPage}&page=${page}`,
+        { encoding: 'utf8' }
+      );
+      
+      const data = JSON.parse(output);
+      
+      if (!data.actions_caches || data.actions_caches.length === 0) {
+        break;
+      }
+      
+      caches.push(...data.actions_caches);
+      console.log(`📄 Fetched page ${page}: ${data.actions_caches.length} caches`);
+      page++;
+      
+      // Check if we've reached the last page
+      if (data.actions_caches.length < perPage) {
+        break;
+      }
+    } catch (error) {
+      console.error('❌ Error fetching caches:', error.message);
+      exit(1);
+    }
   }
+  
+  return caches;
 }
 
 /**
