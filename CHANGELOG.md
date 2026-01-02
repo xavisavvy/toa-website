@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.28.2](https://github.com/xavisavvy/toa-website/compare/v1.28.1...v1.28.2) (2026-01-02)
+
+
+### Bug Fixes
+
+* improve shop search to include variant names in search results ([d18f776](https://github.com/xavisavvy/toa-website/commit/d18f77631a44cc1bc09d3f74669feef7718c919b))
+
 ### [1.28.1](https://github.com/xavisavvy/toa-website/compare/v1.28.0...v1.28.1) (2026-01-02)
 
 ## [1.28.0](https://github.com/xavisavvy/toa-website/compare/v1.27.0...v1.28.0) (2026-01-02)
