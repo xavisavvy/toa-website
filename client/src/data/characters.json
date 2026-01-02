@@ -241,7 +241,7 @@
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
+          "isAiGenerated": true,
           "url": "https://www.dndbeyond.com/avatars/32625/858/1581111423-94493888.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
         }
       ],
@@ -325,7 +325,7 @@
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
+          "isAiGenerated": true,
           "url": "https://www.dndbeyond.com/avatars/44686/720/1581111423-133741834.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
         }
       ],
@@ -409,7 +409,7 @@
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
+          "isAiGenerated": true,
           "url": "https://www.dndbeyond.com/avatars/19773/411/1581111423-56077210.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
         }
       ],
@@ -545,7 +545,7 @@
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
+          "isAiGenerated": true,
           "url": "https://www.dndbeyond.com/avatars/37668/838/1581111423-111107998.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
         }
       ],
@@ -573,7 +573,7 @@
           "type": "portrait",
           "isFeatured": true,
           "copyright": "D&D Beyond / Wizards of the Coast",
-          "isAiGenerated": false,
+          "isAiGenerated": true,
           "url": "https://www.dndbeyond.com/avatars/37573/465/1581111423-111110601.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
         }
       ],
