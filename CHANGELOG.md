@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.27.0](https://github.com/xavisavvy/toa-website/compare/v1.26.0...v1.27.0) (2026-01-02)
+
+
+### Features
+
+* enhance shop page with full catalog and support options ([9f34ded](https://github.com/xavisavvy/toa-website/commit/9f34ded08edda3f336a5fee3778dbf0fd18cad80))
+
 ## [1.26.0](https://github.com/xavisavvy/toa-website/compare/v1.25.0...v1.26.0) (2026-01-02)
 
 
