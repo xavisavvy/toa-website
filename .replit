@@ -54,6 +54,18 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "Reinstall Packages"
+mode = "sequential"
+author = 46039529
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
 [agent]
 integrations = ["youtube:1.0.0"]
 
