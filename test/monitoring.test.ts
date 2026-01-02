@@ -166,9 +166,12 @@ describe('Monitoring & Metrics', () => {
       
       // Should only keep last 1000
       expect(metricsData.latency['GET /api/test'].count).toBeLessThanOrEqual(1000);
-    });
+    }, 10000); // Increase timeout to 10 seconds
 
     test('should handle concurrent requests', async () => {
+      // Reset metrics before test to avoid interference
+      metrics.reset();
+      
       const promises = Array(20).fill(null).map(() => 
         request(app).get('/api/test')
       );

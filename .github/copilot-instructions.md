@@ -271,12 +271,38 @@ jobs:
 ```
 
 ### 🔄 "test on change"
-**Automated:** Pre-commit hook that runs tests for changed files
+**Automated:** Git hooks ensure quality before commit/push
 
-**Already configured!** This project uses Husky + lint-staged to automatically:
-1. Run ESLint and fix issues
+**Already configured!** This project uses Husky to automatically:
+
+#### Pre-commit Hook (`.husky/pre-commit`)
+1. Run ESLint and fix issues (via lint-staged)
 2. Run unit tests for related files (`vitest related --run`)
 3. Only commit if all tests pass
+
+#### Pre-push Hook (`.husky/pre-push`)  
+1. Run **full unit test suite with coverage**
+2. Verify coverage meets thresholds (40% global, 80% for critical files)
+3. **Block push if tests fail or coverage drops**
+4. Only push if all quality gates pass
+
+**Coverage Thresholds:**
+- Global: 40% (lines, functions, statements)
+- Critical files: 80% (server/routes.ts, server/index.ts, etc.)
+
+**Manual Commands:**
+```bash
+# Check coverage before push
+npm run test:coverage
+
+# Clear and check test cache
+npm run clear-cache
+npm run check-quota
+
+# Run specific test suite
+npm run test -- path/to/test.ts --run
+```
+
 
 **How it works:**
 ```json
