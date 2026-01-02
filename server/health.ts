@@ -1,8 +1,10 @@
-import { type Express } from "express";
-import os from "os";
 import fs from "fs/promises";
-import { storage } from "./storage";
+import os from "os";
+
+import { type Express } from "express";
+
 import { metrics } from "./monitoring";
+import { storage } from "./storage";
 
 export type HealthStatus = "healthy" | "degraded" | "unhealthy";
 
@@ -69,6 +71,22 @@ async function checkCache(): Promise<ComponentHealth> {
     const total = cacheMetrics.hits + cacheMetrics.misses;
     const hitRate = total > 0 ? (cacheMetrics.hits / total) * 100 : 0;
     
+    // Check if Redis is unavailable (using in-memory fallback)
+    const isUsingFallback = cacheMetrics.errors > 0 && total === 0;
+    
+    if (isUsingFallback) {
+      return {
+        status: "degraded",
+        message: "Cache using in-memory fallback (Redis unavailable)",
+        responseTime,
+        details: {
+          mode: "in-memory",
+          errors: cacheMetrics.errors,
+          note: "Application continues to function with reduced performance"
+        }
+      };
+    }
+    
     if (hitRate < 50 && total > 100) {
       return {
         status: "degraded",
@@ -92,11 +110,15 @@ async function checkCache(): Promise<ComponentHealth> {
       }
     };
   } catch (error) {
+    // Cache failures should degrade gracefully, not make app unhealthy
     return {
-      status: "unhealthy",
-      message: "Cache check failed",
+      status: "degraded",
+      message: "Cache unavailable, using fallback",
       responseTime: Date.now() - start,
-      details: { error: error instanceof Error ? error.message : "Unknown error" }
+      details: { 
+        error: error instanceof Error ? error.message : "Unknown error",
+        mode: "fallback"
+      }
     };
   }
 }
@@ -112,8 +134,8 @@ function checkMemory(): ComponentHealth {
     
     const responseTime = Date.now() - start;
     
-    // Critical: >90% heap usage
-    if (heapUsedPercent > 90) {
+    // Critical: >95% heap usage
+    if (heapUsedPercent > 95) {
       return {
         status: "unhealthy",
         message: "Critical memory usage",
@@ -127,8 +149,8 @@ function checkMemory(): ComponentHealth {
       };
     }
     
-    // Warning: >75% heap usage
-    if (heapUsedPercent > 75) {
+    // Warning: >85% heap usage
+    if (heapUsedPercent > 85) {
       return {
         status: "degraded",
         message: "High memory usage",
@@ -267,10 +289,17 @@ function checkCPU(): ComponentHealth {
 function determineOverallStatus(checks: HealthCheckResponse["checks"]): HealthStatus {
   const statuses = Object.values(checks).map(check => check.status);
   
-  if (statuses.some(s => s === "unhealthy")) {
+  // Critical components: storage, memory, disk, CPU
+  // Non-critical: cache (can degrade gracefully)
+  const criticalChecks = [checks.storage, checks.memory, checks.disk, checks.cpu];
+  const criticalStatuses = criticalChecks.map(check => check.status);
+  
+  // Unhealthy if any critical component is unhealthy
+  if (criticalStatuses.some(s => s === "unhealthy")) {
     return "unhealthy";
   }
   
+  // Degraded if any component is degraded
   if (statuses.some(s => s === "degraded")) {
     return "degraded";
   }
@@ -321,15 +350,11 @@ export function registerHealthRoutes(app: Express): void {
   // Kubernetes readiness probe - determines if pod can receive traffic
   app.get("/api/ready", async (req, res) => {
     try {
-      // Check critical components only
-      const [storageCheck, cacheCheck] = await Promise.all([
-        checkStorage(),
-        checkCache()
-      ]);
+      // Check critical components only (storage is critical, cache can degrade)
+      const storageCheck = await checkStorage();
       
-      const isReady = 
-        storageCheck.status !== "unhealthy" && 
-        cacheCheck.status !== "unhealthy";
+      // Ready if storage is healthy or degraded (cache failure is tolerable)
+      const isReady = storageCheck.status !== "unhealthy";
       
       if (isReady) {
         res.status(200).json({ 
@@ -341,8 +366,7 @@ export function registerHealthRoutes(app: Express): void {
           ready: false,
           timestamp: new Date().toISOString(),
           checks: {
-            storage: storageCheck.status,
-            cache: cacheCheck.status
+            storage: storageCheck.status
           }
         });
       }
