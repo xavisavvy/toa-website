@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.26.0](https://github.com/xavisavvy/toa-website/compare/v1.25.0...v1.26.0) (2026-01-02)
+
+
+### Features
+
+* Add Stripe donation link and enhance shop page support options ([2670ac7](https://github.com/xavisavvy/toa-website/commit/2670ac7fb5f4b6244f423da1047c1fd3f69a4719))
+* create dedicated shop page ([aa86aaa](https://github.com/xavisavvy/toa-website/commit/aa86aaa198e44e29b12709efe7d0f2e7c40e2076))
+* **shop:** Remove Etsy references and enhance support options ([c095476](https://github.com/xavisavvy/toa-website/commit/c0954766877df0f9f4ea43c49bbb65aeeccd109b))
+
+
+### Performance Improvements
+
+* Increase performance test threshold and fix ESLint errors ([67db2e7](https://github.com/xavisavvy/toa-website/commit/67db2e7d5206f4b851b544cf0958811d90b287dd))
+
 ## [1.25.0](https://github.com/xavisavvy/toa-website/compare/v1.24.5...v1.25.0) (2026-01-02)
 
 
