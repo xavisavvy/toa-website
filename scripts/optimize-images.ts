@@ -1,6 +1,7 @@
-import sharp from 'sharp';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import sharp from 'sharp';
 
 const ASSETS_DIR = path.join(process.cwd(), 'client', 'src', 'assets');
 const OUTPUT_DIR = path.join(process.cwd(), 'client', 'src', 'assets', 'optimized');

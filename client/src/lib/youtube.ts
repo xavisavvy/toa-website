@@ -10,16 +10,16 @@ export interface VideoItem {
 
 function formatViewCount(count: number): string {
   if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'M';
+    return `${(count / 1000000).toFixed(1)  }M`;
   } else if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'K';
+    return `${(count / 1000).toFixed(1)  }K`;
   }
   return count.toString();
 }
 
 function formatDuration(isoDuration: string): string {
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return '0:00';
+  if (!match) {return '0:00';}
 
   const hours = parseInt(match[1] || '0');
   const minutes = parseInt(match[2] || '0');
@@ -64,7 +64,7 @@ export async function getMultiplePlaylistVideosClient(playlistIds: string[], api
 }
 
 export async function getPlaylistVideosClient(playlistId: string, apiKey: string, maxResults: number = 50): Promise<VideoItem[]> {
-  let allVideoIds: string[] = [];
+  const allVideoIds: string[] = [];
   let nextPageToken: string | undefined = undefined;
   
   // Fetch all pages of playlist items

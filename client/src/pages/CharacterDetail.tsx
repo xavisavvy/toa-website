@@ -1,7 +1,3 @@
-import { useRoute, Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowLeft,
   ExternalLink,
@@ -11,10 +7,15 @@ import {
   Heart,
   Music,
 } from "lucide-react";
-import charactersData from "@/data/characters.json";
-import Navigation from "@/components/Navigation";
+import { useRoute, Link } from "wouter";
+
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import SEO from "@/components/SEO";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import charactersData from "@/data/characters.json";
 import { getCreativeWorkSchema, getBreadcrumbSchema } from "@/lib/structuredData";
 
 interface CharacterImage {

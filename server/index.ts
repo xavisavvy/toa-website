@@ -1,10 +1,11 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import { configureSecurity } from "./security";
+
 import { validateEnvironment } from "./env-validator";
 import { metricsMiddleware } from "./monitoring";
+import { registerRoutes } from "./routes";
+import { configureSecurity } from "./security";
+import { setupVite, serveStatic, log } from "./vite";
 
 // Validate environment variables before starting
 validateEnvironment();
@@ -48,7 +49,7 @@ app.use((req, res, next) => {
       }
 
       if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+        logLine = `${logLine.slice(0, 79)  }…`;
       }
 
       log(logLine);

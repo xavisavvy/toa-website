@@ -1,7 +1,7 @@
-import rateLimit from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
-import Redis from 'ioredis';
 import type { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
+import Redis from 'ioredis';
+import RedisStore from 'rate-limit-redis';
 
 // Initialize Redis client (optional - falls back to in-memory if unavailable)
 let redis: Redis | null = null;
@@ -11,7 +11,7 @@ try {
     redis = new Redis(process.env.REDIS_URL, {
       maxRetriesPerRequest: 3,
       retryStrategy: (times) => {
-        if (times > 3) return null;
+        if (times > 3) {return null;}
         return Math.min(times * 100, 3000);
       },
     });

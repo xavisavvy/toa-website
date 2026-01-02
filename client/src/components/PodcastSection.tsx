@@ -1,9 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 import { Headphones } from "lucide-react";
 import { SiSpotify, SiApplepodcasts, SiYoutubemusic } from "react-icons/si";
-import { useQuery } from "@tanstack/react-query";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { apiRequest } from "@/lib/queryClient";
 
 interface PodcastEpisode {
@@ -27,7 +28,7 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
   const { data: episodes, isLoading } = useQuery<PodcastEpisode[]>({
     queryKey: ['/api/podcast/feed', feedUrl],
     queryFn: async () => {
-      if (!feedUrl) return [];
+      if (!feedUrl) {return [];}
       const response = await fetch('/api/podcast/feed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

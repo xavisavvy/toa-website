@@ -52,7 +52,7 @@ export async function createCheckoutSession(params: {
   } = params;
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    return await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
@@ -88,8 +88,6 @@ export async function createCheckoutSession(params: {
       customer_email: undefined, // Let customer enter their email
       billing_address_collection: 'required',
     });
-
-    return session;
   } catch (error) {
     console.error('Error creating Stripe checkout session:', error);
     throw error;
@@ -105,10 +103,9 @@ export async function getCheckoutSession(sessionId: string): Promise<Stripe.Chec
   }
 
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    return await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['line_items', 'customer'],
     });
-    return session;
   } catch (error) {
     console.error('Error retrieving checkout session:', error);
     return null;

@@ -1,10 +1,12 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, ExternalLink, AlertCircle, CreditCard } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { createCheckout } from "@/lib/stripe";
+import { ShoppingBag, ExternalLink, AlertCircle, CreditCard } from "lucide-react";
 import { useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { createCheckout } from "@/lib/stripe";
+
 
 interface Product {
   id: string;

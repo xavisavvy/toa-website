@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 describe('Generic Cache Behavior', () => {
   const testCacheDir = path.join(process.cwd(), 'server', 'cache', 'test');
@@ -81,7 +82,7 @@ describe('Generic Cache Behavior', () => {
       fs.mkdirSync(testCacheDir, { recursive: true });
       
       // Initial cache
-      let cache = { key1: 'value1' };
+      const cache = { key1: 'value1' };
       fs.writeFileSync(testCacheFile, JSON.stringify(cache));
 
       // Read, merge, write
@@ -279,7 +280,7 @@ describe('Generic Cache Behavior', () => {
       const getCachedData = (key: string) => {
         if (fs.existsSync(testCacheFile)) {
           const cache = JSON.parse(fs.readFileSync(testCacheFile, 'utf-8'));
-          if (cache[key]) return cache[key];
+          if (cache[key]) {return cache[key];}
         }
         
         // Simulate fetch from source

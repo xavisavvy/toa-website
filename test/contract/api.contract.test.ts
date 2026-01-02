@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import request from 'supertest';
 import express, { Express } from 'express';
+import request from 'supertest';
+import { describe, it, expect, vi } from 'vitest';
+
 import { registerRoutes } from '../../server/routes';
 
 /**

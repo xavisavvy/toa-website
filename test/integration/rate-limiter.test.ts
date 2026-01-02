@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeAll } from 'vitest';
 import express from 'express';
-import request from 'supertest';
 import rateLimit from 'express-rate-limit';
+import request from 'supertest';
+import { describe, it, expect, beforeAll } from 'vitest';
+
 import { apiLimiter, expensiveLimiter } from '../../server/rate-limiter';
 
 describe('Rate Limiter Integration Tests', () => {

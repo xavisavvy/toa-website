@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { validateUrl, validateString, validateNumber } from '../../server/security';
 
 /**
@@ -381,7 +382,7 @@ describe('Sanitization Edge Cases', () => {
   });
 
   it('should handle very long XSS payloads', () => {
-    const longPayload = '<script>' + 'a'.repeat(10000) + '</script>';
+    const longPayload = `<script>${  'a'.repeat(10000)  }</script>`;
     const result = validateString(longPayload, 20000);
     
     expect(result.valid).toBe(true);

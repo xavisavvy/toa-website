@@ -1,7 +1,8 @@
+import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
+
+import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AccessibleIcon } from "@/components/ui/accessible-icon";
-import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import socialLinksData from "@/data/social-links.json";
 
 export default function CommunitySection() {

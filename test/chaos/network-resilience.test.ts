@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import axios from 'axios';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('Network Resilience & Chaos Tests', () => {
   describe('YouTube API Resilience', () => {
@@ -334,7 +334,7 @@ describe('Network Resilience & Chaos Tests', () => {
         constructor(private capacity: number) {}
 
         get(key: K): V | undefined {
-          if (!this.cache.has(key)) return undefined;
+          if (!this.cache.has(key)) {return undefined;}
           const value = this.cache.get(key)!;
           this.cache.delete(key);
           this.cache.set(key, value);

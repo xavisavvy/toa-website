@@ -1,17 +1,19 @@
-import type { Express } from "express";
 import { createServer, type Server } from "http";
+
+import type { Express } from "express";
 import express from "express";
-import { storage } from "./storage";
-import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
-import { getPodcastFeed } from "./podcast";
-import { getShopListings } from "./etsy";
-import { getPrintfulSyncProducts, getPrintfulProductDetails } from "./printful";
+
 import { getCharacterData } from "./dndbeyond";
-import { validateUrl, validateNumber, logSecurityEvent } from "./security";
-import { metrics } from "./monitoring";
+import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
+import { metrics } from "./monitoring";
+import { getPodcastFeed } from "./podcast";
+import { getPrintfulSyncProducts, getPrintfulProductDetails } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
+import { validateUrl, validateNumber, logSecurityEvent } from "./security";
+import { storage } from "./storage";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
+import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply API rate limiting to all /api routes
@@ -462,7 +464,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-
-  return httpServer;
+  return createServer(app);
 }

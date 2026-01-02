@@ -161,7 +161,7 @@ async function main() {
   // Write back to characters.json
   writeFileSync(charactersPath, JSON.stringify(charactersJson, null, 2));
   
-  console.log('\n' + '='.repeat(50));
+  console.log(`\n${  '='.repeat(50)}`);
   console.log(`✓ Successfully updated ${updatedCount} characters`);
   console.log(`  • Custom images: ${customImageCount}`);
   console.log(`  • D&D Beyond images: ${ddbImageCount}`);

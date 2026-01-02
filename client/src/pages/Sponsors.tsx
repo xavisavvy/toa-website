@@ -1,12 +1,13 @@
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Heart, Mail, TrendingUp, Users, Sparkles } from "lucide-react";
+
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
 import SEO from "@/components/SEO";
-import { getBreadcrumbSchema } from "@/lib/structuredData";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import socialLinksData from "@/data/social-links.json";
+import { getBreadcrumbSchema } from "@/lib/structuredData";
 
 export default function Sponsors() {
   const breadcrumbData = getBreadcrumbSchema([

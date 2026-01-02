@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
+import { describe, it, expect } from 'vitest';
+
 import { validateUrl, validateNumber, validateString } from '../../server/security';
 
 /**

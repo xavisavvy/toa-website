@@ -1,13 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users } from "lucide-react";
+import { useState } from "react";
+import { Link } from "wouter";
+
+import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
+import SEO from "@/components/SEO";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
-import { Link } from "wouter";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import charactersData from "@/data/characters.json";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import SEO from "@/components/SEO";
 import { getBreadcrumbSchema } from "@/lib/structuredData";
 
 interface CharacterImage {

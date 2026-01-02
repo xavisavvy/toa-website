@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeAll } from 'vitest';
 import express from 'express';
 import request from 'supertest';
+import { describe, it, expect, beforeAll } from 'vitest';
+
 import { registerRoutes } from '../../server/routes';
 
 describe('Health Check Endpoints', () => {

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { validateUrl, validateNumber, validateString } from '../server/security';
 
 describe('Security - Input Validation', () => {

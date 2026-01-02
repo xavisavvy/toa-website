@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { validateEnvironment } from '../server/env-validator';
 
 describe('Environment Validator', () => {

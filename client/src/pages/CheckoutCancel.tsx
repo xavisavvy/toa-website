@@ -1,9 +1,10 @@
-import { useLocation } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { XCircle } from "lucide-react";
-import Navigation from "@/components/Navigation";
+import { useLocation } from "wouter";
+
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function CheckoutCancel() {
   const [, setLocation] = useLocation();

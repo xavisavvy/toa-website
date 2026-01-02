@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // We need to test the cache functions and formatters
 // Since they're not exported, we'll test through the main function
@@ -76,7 +77,7 @@ describe('YouTube Cache System', () => {
       fs.writeFileSync(CACHE_FILE, JSON.stringify(initialCache, null, 2));
 
       // Simulate adding a second playlist (read existing, merge, write)
-      let existingCache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+      const existingCache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
       existingCache['PLPlaylist2'] = {
         videos: [{ id: 'video2', title: 'Video 2', thumbnail: '', duration: '3:00', publishedAt: '2024-01-02' }],
         timestamp: Date.now(),
@@ -216,7 +217,7 @@ describe('YouTube Formatters', () => {
         // Manual implementation to test the logic
         const formatDuration = (isoDuration: string): string => {
           const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-          if (!match) return '0:00';
+          if (!match) {return '0:00';}
 
           const hours = parseInt(match[1] || '0');
           const minutes = parseInt(match[2] || '0');
@@ -250,9 +251,9 @@ describe('YouTube Formatters', () => {
       it(`should format ${description}: ${input} -> ${expected}`, () => {
         const formatViewCount = (count: number): string => {
           if (count >= 1000000) {
-            return (count / 1000000).toFixed(1) + 'M';
+            return `${(count / 1000000).toFixed(1)  }M`;
           } else if (count >= 1000) {
-            return (count / 1000).toFixed(1) + 'K';
+            return `${(count / 1000).toFixed(1)  }K`;
           }
           return count.toString();
         };

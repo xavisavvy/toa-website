@@ -1,6 +1,7 @@
-import Parser from 'rss-parser';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import Parser from 'rss-parser';
 
 export interface PodcastEpisode {
   id: string;

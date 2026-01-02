@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express, { Express } from 'express';
 import request from 'supertest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { registerRoutes } from '../server/routes';
 
 // Mock external dependencies
@@ -350,7 +351,7 @@ describe('API Routes', () => {
     });
 
     it('should handle very long URLs gracefully', async () => {
-      const veryLongUrl = 'https://example.com/' + 'a'.repeat(10000);
+      const veryLongUrl = `https://example.com/${  'a'.repeat(10000)}`;
       
       const response = await request(app)
         .post('/api/podcast/feed')

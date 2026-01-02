@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/button";
 import { Play, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
+
 import butterflyImage from "@/assets/hero-butterfly.webp";
 import cinderhearthImage from "@/assets/hero-cinderhearth.webp";
 import desertImage from "@/assets/hero-desert.webp";
 import spaceImage from "@/assets/hero-space.webp";
 import taebrinImage from "@/assets/hero-taebrin.webp";
+import { Button } from "@/components/ui/button";
 import socialLinksData from "@/data/social-links.json";
 
 const heroImages = [
@@ -57,7 +58,7 @@ export default function Hero() {
       {heroImages.map((image, index) => {
         // Only render images that have been loaded or are currently visible
         const shouldRender = loadedImages.has(index) || index === currentImageIndex;
-        if (!shouldRender) return null;
+        if (!shouldRender) {return null;}
 
         return (
           <div

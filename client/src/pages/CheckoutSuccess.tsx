@@ -1,10 +1,11 @@
+import { CheckCircle, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2 } from "lucide-react";
-import Navigation from "@/components/Navigation";
+
 import Footer from "@/components/Footer";
+import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { getCheckoutSession } from "@/lib/stripe";
 
 export default function CheckoutSuccess() {

@@ -112,9 +112,9 @@ async function main() {
     }
   }
 
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${  '='.repeat(60)}`);
   console.log(`✓ Fetched ${allCharacterData.length} characters successfully!`);
-  console.log('='.repeat(60) + '\n');
+  console.log(`${'='.repeat(60)  }\n`);
 
   // Read existing characters.json
   const charactersPath = join(process.cwd(), 'client/src/data/characters.json');

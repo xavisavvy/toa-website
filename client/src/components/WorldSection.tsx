@@ -1,12 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import pterrordaleBg from "@/assets/feat-pterrordale.webp";
-import aneriaBg from "@/assets/feat-aneria.webp";
+
 import taebrinBg from "@/assets/creepy-forest.webp";
+import aneriaBg from "@/assets/feat-aneria.webp";
+import pterrordaleBg from "@/assets/feat-pterrordale.webp";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import charactersData from "@/data/characters.json";
 
 interface Campaign {
@@ -126,7 +127,7 @@ function LazyBackgroundImage({ src, alt, className }: LazyBackgroundImageProps) 
   const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!imgRef.current) return;
+    if (!imgRef.current) {return;}
 
     const observer = new IntersectionObserver(
       (entries) => {

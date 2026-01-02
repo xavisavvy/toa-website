@@ -1,10 +1,12 @@
 import 'dotenv/config';
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./server/routes";
-import { configureSecurity } from "./server/security";
+import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createServer } from "http";
+
+import express, { type Request, Response, NextFunction } from "express";
+
+import { registerRoutes } from "./server/routes";
+import { configureSecurity } from "./server/security";
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,7 +48,7 @@ app.use((req, res, next) => {
       }
 
       if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+        logLine = `${logLine.slice(0, 79)  }…`;
       }
 
       console.log(logLine);

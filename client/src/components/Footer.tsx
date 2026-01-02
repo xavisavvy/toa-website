@@ -1,5 +1,6 @@
-import { Link, useLocation } from "wouter";
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
+import { Link, useLocation } from "wouter";
+
 import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import socialLinksData from "@/data/social-links.json";
 

@@ -1,18 +1,19 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Youtube, Twitter, Instagram, Twitch, Globe } from "lucide-react";
-import castData from "@/data/cast.json";
-import prestonAvatar from "@/assets/cast-preston.webp";
+
 import brigetteAvatar from "@/assets/cast-brigette.webp";
-import dallinAvatar from "@/assets/cast-dallin.webp";
-import coryAvatar from "@/assets/cast-cory.webp";
-import torreyAvatar from "@/assets/cast-torrey.webp";
-import scottAvatar from "@/assets/cast-scott.webp";
 import colbyAvatar from "@/assets/cast-colby.webp";
+import coryAvatar from "@/assets/cast-cory.webp";
+import dallinAvatar from "@/assets/cast-dallin.webp";
 import ianAvatar from "@/assets/cast-ian.webp";
 import jakeAvatar from "@/assets/cast-jake.webp";
+import prestonAvatar from "@/assets/cast-preston.webp";
+import scottAvatar from "@/assets/cast-scott.webp";
+import torreyAvatar from "@/assets/cast-torrey.webp";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import castData from "@/data/cast.json";
 
 interface SocialLinks {
   youtube?: string;

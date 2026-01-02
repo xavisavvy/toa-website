@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+
 import { featureFlags, FeatureFlagManager } from '../../server/feature-flags';
 
 describe('Feature Flags', () => {

@@ -1,4 +1,5 @@
 import autocannon from 'autocannon';
+
 import { setupServer } from '../helpers/test-server';
 
 /**

@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 /**
  * Performance Benchmark Tests
@@ -195,7 +196,7 @@ describe('Data Processing Performance Benchmarks', () => {
 
     const formatDuration = (duration: string): string => {
       const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-      if (!match) return '0:00';
+      if (!match) {return '0:00';}
       
       const hours = parseInt(match[1] || '0');
       const minutes = parseInt(match[2] || '0');

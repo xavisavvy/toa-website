@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Router } from 'wouter';
+
 import Sponsors from '@/pages/Sponsors';
 
 // Mock window.location

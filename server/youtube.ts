@@ -1,6 +1,7 @@
-import { google } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { google } from 'googleapis';
 
 let connectionSettings: any;
 
@@ -15,9 +16,9 @@ async function getAccessToken() {
   
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
   const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
+    ? `repl ${  process.env.REPL_IDENTITY}` 
     : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+    ? `depl ${  process.env.WEB_REPL_RENEWAL}` 
     : null;
 
   if (!xReplitToken) {
@@ -25,7 +26,7 @@ async function getAccessToken() {
   }
 
   connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=youtube',
+    `https://${  hostname  }/api/v2/connection?include_secrets=true&connector_names=youtube`,
     {
       headers: {
         'Accept': 'application/json',
@@ -157,7 +158,7 @@ function writeCache(playlistId: string, videos: VideoItem[]): void {
 
 async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number): Promise<VideoItem[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
-  let allVideoIds: string[] = [];
+  const allVideoIds: string[] = [];
   let nextPageToken: string | undefined = undefined;
   
   // Fetch all pages of playlist items
@@ -303,7 +304,7 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
     
     const youtube = await getUncachableYouTubeClient();
     
-    let allVideoIds: string[] = [];
+    const allVideoIds: string[] = [];
     let nextPageToken: string | undefined = undefined;
     
     // Fetch all pages of playlist items
@@ -565,16 +566,16 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
 
 function formatViewCount(count: number): string {
   if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'M';
+    return `${(count / 1000000).toFixed(1)  }M`;
   } else if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'K';
+    return `${(count / 1000).toFixed(1)  }K`;
   }
   return count.toString();
 }
 
 function formatDuration(isoDuration: string): string {
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return '0:00';
+  if (!match) {return '0:00';}
 
   const hours = parseInt(match[1] || '0');
   const minutes = parseInt(match[2] || '0');
@@ -588,7 +589,7 @@ function formatDuration(isoDuration: string): string {
 
 function getDurationInSeconds(isoDuration: string): number {
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return 0;
+  if (!match) {return 0;}
 
   const hours = parseInt(match[1] || '0');
   const minutes = parseInt(match[2] || '0');

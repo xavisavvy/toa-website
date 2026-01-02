@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 
 /**
  * YouTube Data API v3 Contract Tests
