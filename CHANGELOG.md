@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.23.0](https://github.com/xavisavvy/toa-website/compare/v1.22.12...v1.23.0) (2026-01-02)
+
+
+### Features
+
+* add YouTube channel videos API endpoint ([3a26b9f](https://github.com/xavisavvy/toa-website/commit/3a26b9f79635c8e5a9799b9acd2c4e899f21523c)), closes [#1](https://github.com/xavisavvy/toa-website/issues/1)
+
 ### [1.22.13](https://github.com/xavisavvy/toa-website/compare/v1.22.12...v1.22.13) (2026-01-01)
 
 ### [1.22.12](https://github.com/xavisavvy/toa-website/compare/v1.22.11...v1.22.12) (2026-01-01)
