@@ -1,6 +1,6 @@
 # Tales of Aneria - Feature Roadmap & Checklist
 
-**Last Updated:** 2026-01-01
+**Last Updated:** 2026-01-02
 
 ## 🎯 Current Sprint
 
@@ -31,15 +31,16 @@
 
 
 
-#### �� Content Management
-- [ ] **Switch from Playlists to All Channel Videos** - Fetch all videos from YouTube channel
-  - [ ] Update YouTube API integration to use channel search
-  - [ ] Remove playlist ID requirement  
-  - [ ] Sort videos by publish date (newest first)
-  - [ ] Update environment variables (channel ID instead of playlist IDs)
-  - [ ] Test with real channel data
-  - [ ] Update documentation
-  - Related: server/youtube.ts, Latest Episodes component
+#### 📺 Content Management
+- [x] **Switch from Playlists to All Channel Videos** - Fetch all videos from YouTube channel ✅ COMPLETE
+  - [x] Update YouTube API integration to use channel search
+  - [x] Sort videos by publish date (newest first)
+  - [x] Update environment variables (VITE_YOUTUBE_CHANNEL_ID)
+  - [x] Update frontend components (LatestEpisodes, Home)
+  - [x] Backward compatible (supports both channel and playlists)
+  - [x] Test with real channel data (UC7PTdudxJ43HMLJVv2QxVoQ)
+  - [x] Update documentation
+  - Related: server/youtube.ts, client/src/components/LatestEpisodes.tsx
 
 #### 🎨 User Experience
 - [ ] TBD - Add items as you discover needs
@@ -279,4 +280,5 @@ echo "- [ ] Feature name - Description" >> ROADMAP.md
 - Use conventional commits when implementing features
 - Link to GitHub issues for complex features
 - Keep backlog prioritized and groomed
+
 
