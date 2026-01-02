@@ -1,0 +1,176 @@
+2026-01-02 14:32:39.80
+5d744bf0
+User
+✅ Payment successful: cs_live_a1MXkRsAdjJTOVQw3KnQwnJh8DSVIb6cbBaFwLazcfec1YwzUFZt3Hkdld
+2026-01-02 14:32:39.80
+5d744bf0
+User
+Webhook event received: checkout.session.completed
+2026-01-02 14:32:39.81
+5d744bf0
+User
+Amount paid: 3 USD
+2026-01-02 14:32:40.06
+5d744bf0
+User
+[getCatalogVariantId] Fetching URL: https://api.printful.com/store/variants/5130270457
+2026-01-02 14:32:40.06
+5d744bf0
+User
+🔍 Fetching catalog variant for sync variant: 5130270457
+2026-01-02 14:32:40.06
+5d744bf0
+User
+🔄 Converting sync variant 5130270457 to catalog variant...
+2026-01-02 14:32:40.06
+5d744bf0
+User
+[getCatalogVariantId] Called with syncVariantId: 5130270457
+2026-01-02 14:32:40.06
+5d744bf0
+User
+[getCatalogVariantId] API key is configured, proceeding with fetch...
+2026-01-02 14:32:40.42
+5d744bf0
+User
+[getCatalogVariantId] Response status: 200, ok: true
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"result": {
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"warehouse_product_variant_id": null,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"thumbnail_url": "https://files.cdn.printful.com/files/479/4794c361ef4c7d674565dc5b553a6a7e_thumb.png",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+[getCatalogVariantId] variant.product_id: undefined
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"sku": "69574E00DD3A2_3″x3″",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"sync_product_id": 411807229,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"thumbnail_url": "https://files.cdn.printful.com/files/1df/1dfd52be5ae41e38bcf35b8d57adb4d9_thumb.png",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"id": 924118329,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"retail_price": "3.00",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"warehouse_product_id": null,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"filename": "Artboard-2-flattened.pdf",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"type": "default",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"name": "Kiss Cut Stickers (3″×3″in)"
+2026-01-02 14:32:40.42
+5d744bf0
+User
+{
+2026-01-02 14:32:40.42
+5d744bf0
+User
+[getCatalogVariantId] Variant keys: id, external_id, sync_product_id, name, synced, variant_id, main_category_id, warehouse_product_id, warehouse_product_variant_id, retail_price, sku, currency, product, files, options, is_ignored, size, color, availability_status
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"variant_id": 10163,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"dpi": 120,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"preview_url": "https://files.cdn.printful.com/files/1df/1dfd52be5ae41e38bcf35b8d57adb4d9_preview.png",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"size": 188608,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"image": "https://files.cdn.printful.com/products/358/10163_1553083889.jpg",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"product": {
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"type": "preview",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"variant_id": 10163,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"url": null,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+},
+2026-01-02 14:32:40.42
+5d744bf0
+User
+[getCatalogVariantId] Full API response: {
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"currency": "USD",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"status": "ok",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"size": 21952050,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+},
+2026-01-02 14:32:40.42
+5d744bf0
+User
+{
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"mime_type": "application/pdf",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"name": "Pika-Bolt - TOA Official Bubble-free sticker / 3″×3″",
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"product_id": 358,
+2026-01-02 14:32:40.42
+5d744bf0
+User
+"message": "",
