@@ -355,7 +355,15 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     }
     
     console.log(`[getCatalogVariantId] Found variant, checking for variant_id...`);
-    const catalogId = variant?.variant_id || variant?.product?.variant_id;
+    console.log(`[getCatalogVariantId] Variant fields:`, Object.keys(variant));
+    console.log(`[getCatalogVariantId] variant.variant_id:`, variant?.variant_id);
+    console.log(`[getCatalogVariantId] variant.product_id:`, variant?.product_id);
+    console.log(`[getCatalogVariantId] variant.product?.variant_id:`, variant?.product?.variant_id);
+    
+    // Try multiple possible locations for the catalog variant ID
+    const catalogId = variant?.variant_id 
+      || variant?.product?.variant_id 
+      || variant?.product_id;  // Sometimes Printful uses product_id as the catalog ID
     
     if (!catalogId) {
       console.error(`No variant_id found in sync variant ${syncVariantId}`);
