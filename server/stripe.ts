@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 import Stripe from 'stripe';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -205,6 +206,9 @@ export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise
   }
 
   try {
+    console.log('🚀 Submitting order to Printful API...');
+    console.log('Order data:', JSON.stringify(orderData, null, 2));
+    
     const response = await fetch('https://api.printful.com/orders', {
       method: 'POST',
       headers: {
@@ -214,16 +218,19 @@ export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise
       body: JSON.stringify(orderData),
     });
 
+    const responseText = await response.text();
+    console.log(`Printful API response status: ${response.status}`);
+    console.log(`Printful API response body: ${responseText}`);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Printful order creation failed:', response.status, errorText);
+      console.error('Printful order creation failed:', response.status, responseText);
       return { 
         success: false, 
         error: `Printful API error: ${response.status}` 
       };
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
     const orderId = data.result?.id;
 
     if (!orderId) {

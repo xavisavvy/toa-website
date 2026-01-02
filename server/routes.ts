@@ -10,11 +10,10 @@ import { getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
-import { storage } from "./storage";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export function registerRoutes(app: Express): Server {
   // Apply API rate limiting to all /api routes
   app.use("/api", apiLimiter);
 
@@ -185,8 +184,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Follow redirects to get the final audio URL
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      const controller = new globalThis.AbortController();
+      const timeout = globalThis.setTimeout(() => controller.abort(), 15000);
 
       try {
         const response = await fetch(decodedUrl, {
@@ -198,15 +197,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           signal: controller.signal,
         });
 
-        clearTimeout(timeout);
+        globalThis.clearTimeout(timeout);
 
         // Get the final URL after redirects
         const finalUrl = response.url;
         
         // Redirect client to the actual audio source
         res.redirect(302, finalUrl);
-      } catch (headError) {
-        clearTimeout(timeout);
+      } catch {
+        globalThis.clearTimeout(timeout);
         // If HEAD request fails, try direct redirect
         res.redirect(302, decodedUrl);
       }
@@ -355,6 +354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* eslint-disable no-console, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion, sonarjs/cognitive-complexity */
   // Stripe Webhook: Handle payment events
   app.post("/api/stripe/webhook", async (req, res) => {
     const signature = req.headers['stripe-signature'];
@@ -394,17 +394,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const syncVariantId = fullSession.metadata?.printful_variant_id;
           if (!syncVariantId) {
             console.error('❌ No Printful variant ID in session metadata');
+            console.error('Session metadata:', fullSession.metadata);
             break;
           }
 
+          console.log(`🔄 Converting sync variant ${syncVariantId} to catalog variant...`);
+          
           // Convert sync variant ID to catalog variant ID
           const catalogVariantId = await getCatalogVariantId(syncVariantId);
           if (!catalogVariantId) {
             console.error(`❌ Could not resolve catalog variant ID for sync variant ${syncVariantId}`);
+            console.error('This likely means:');
+            console.error('1. The variant does not exist in your Printful store');
+            console.error('2. The Printful API key is incorrect');
+            console.error('3. The sync variant ID in metadata is wrong');
+            console.error(`Check: https://api.printful.com/store/variants/${syncVariantId}`);
             break;
           }
 
-          console.log(`📦 Resolved variant: sync=${syncVariantId} → catalog=${catalogVariantId}`);
+          console.log(`✅ Resolved variant: sync=${syncVariantId} → catalog=${catalogVariantId}`);
           
           // Create order data with catalog variant ID
           const orderData = createPrintfulOrderFromSession(fullSession);

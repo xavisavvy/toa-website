@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -318,6 +319,7 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
   }
 
   try {
+    console.log(`🔍 Fetching catalog variant for sync variant: ${syncVariantId}`);
     const response = await fetch(`https://api.printful.com/store/variants/${syncVariantId}`, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -326,15 +328,32 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     });
 
     if (!response.ok) {
-      console.error(`Failed to fetch sync variant ${syncVariantId}`);
+      const errorText = await response.text();
+      console.error(`Failed to fetch sync variant ${syncVariantId}: ${response.status}`);
+      console.error(`Response body: ${errorText}`);
       return null;
     }
 
     const data = await response.json();
+    console.log(`API Response for variant ${syncVariantId}:`, JSON.stringify(data, null, 2));
+    
     const variant: PrintfulSyncVariant = data.result?.sync_variant;
     
-    // Return the catalog variant ID
-    return variant?.variant_id || variant?.product?.variant_id || null;
+    if (!variant) {
+      console.error(`No sync_variant found in response for ${syncVariantId}`);
+      return null;
+    }
+    
+    const catalogId = variant?.variant_id || variant?.product?.variant_id;
+    
+    if (!catalogId) {
+      console.error(`No variant_id found in sync variant ${syncVariantId}`);
+      console.error(`Variant data:`, JSON.stringify(variant, null, 2));
+      return null;
+    }
+    
+    console.log(`✅ Resolved: sync variant ${syncVariantId} → catalog variant ${catalogId}`);
+    return catalogId;
   } catch (error) {
     console.error(`Error fetching sync variant ${syncVariantId}:`, error);
     return null;
