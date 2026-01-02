@@ -67,7 +67,7 @@ export default [
       
       // SonarJS - Code Quality & Code Smells
       'sonarjs/cognitive-complexity': ['warn', 15],
-      'sonarjs/no-duplicate-string': ['warn', 5],
+      'sonarjs/no-duplicate-string': ['warn', { threshold: 5 }],
       'sonarjs/no-identical-functions': 'warn',
       'sonarjs/no-collapsible-if': 'warn',
       'sonarjs/no-redundant-boolean': 'warn',

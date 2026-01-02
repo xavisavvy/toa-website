@@ -297,4 +297,39 @@ describe('YouTube Formatters', () => {
       expect(sorted).toHaveLength(2);
     });
   });
+
+  describe('Shorts Filtering', () => {
+    it('should filter videos with duration <= 60 seconds', () => {
+      const videos = [
+        { id: '1', title: 'Short 1', thumbnail: '', duration: '0:30', publishedAt: '2024-01-01', durationSeconds: 30 },
+        { id: '2', title: 'Long Video', thumbnail: '', duration: '5:00', publishedAt: '2024-01-02', durationSeconds: 300 },
+        { id: '3', title: 'Short 2', thumbnail: '', duration: '0:59', publishedAt: '2024-01-03', durationSeconds: 59 },
+        { id: '4', title: 'Exactly 60s', thumbnail: '', duration: '1:00', publishedAt: '2024-01-04', durationSeconds: 60 },
+        { id: '5', title: 'Just over', thumbnail: '', duration: '1:01', publishedAt: '2024-01-05', durationSeconds: 61 },
+      ];
+
+      const shorts = videos.filter(video => {
+        return video.durationSeconds !== undefined && video.durationSeconds > 0 && video.durationSeconds <= 60;
+      });
+
+      expect(shorts).toHaveLength(3);
+      expect(shorts[0].id).toBe('1');
+      expect(shorts[1].id).toBe('3');
+      expect(shorts[2].id).toBe('4');
+    });
+
+    it('should exclude videos with 0 duration', () => {
+      const videos = [
+        { id: '1', title: 'Valid Short', thumbnail: '', duration: '0:30', publishedAt: '2024-01-01', durationSeconds: 30 },
+        { id: '2', title: 'Zero Duration', thumbnail: '', duration: '0:00', publishedAt: '2024-01-02', durationSeconds: 0 },
+      ];
+
+      const shorts = videos.filter(video => {
+        return video.durationSeconds !== undefined && video.durationSeconds > 0 && video.durationSeconds <= 60;
+      });
+
+      expect(shorts).toHaveLength(1);
+      expect(shorts[0].id).toBe('1');
+    });
+  });
 });

@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import LatestEpisodes from "@/components/LatestEpisodes";
+import LatestShorts from "@/components/LatestShorts";
 import PodcastSection from "@/components/PodcastSection";
 import CharactersSection from "@/components/CharactersSection";
 import WorldSection from "@/components/WorldSection";
@@ -47,7 +48,8 @@ export default function Home() {
       <Navigation />
       <Hero />
       <LatestEpisodes channelId={YOUTUBE_CHANNEL_ID} playlistIds={YOUTUBE_PLAYLIST_IDS} />
-      <PodcastSection 
+      <LatestShorts channelId={YOUTUBE_CHANNEL_ID} />
+      <PodcastSection
         feedUrl={PODCAST_FEED_URL}
         spotifyUrl={SPOTIFY_URL}
         applePodcastsUrl={APPLE_PODCASTS_URL}

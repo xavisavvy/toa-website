@@ -70,6 +70,7 @@ export interface VideoItem {
   publishedAt: string;
   viewCount?: string;
   description?: string;
+  durationSeconds?: number;
 }
 
 interface ChannelCacheEntry {
@@ -224,9 +225,9 @@ async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number
         ? formatViewCount(parseInt(statistics.viewCount))
         : undefined;
 
-      const duration = contentDetails?.duration 
-        ? formatDuration(contentDetails.duration)
-        : '0:00';
+      const isoDuration = contentDetails?.duration || 'PT0S';
+      const duration = formatDuration(isoDuration);
+      const durationSeconds = getDurationInSeconds(isoDuration);
 
       return {
         id: video.id || '',
@@ -236,6 +237,7 @@ async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number
         publishedAt: snippet?.publishedAt || '',
         viewCount: viewCount,
         description: snippet?.description || undefined,
+        durationSeconds: durationSeconds,
       };
     });
     
@@ -349,9 +351,9 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
           ? formatViewCount(parseInt(statistics.viewCount))
           : undefined;
 
-        const duration = contentDetails?.duration 
-          ? formatDuration(contentDetails.duration)
-          : '0:00';
+        const isoDuration = contentDetails?.duration || 'PT0S';
+        const duration = formatDuration(isoDuration);
+        const durationSeconds = getDurationInSeconds(isoDuration);
 
         return {
           id: video.id || '',
@@ -361,6 +363,7 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
           publishedAt: snippet?.publishedAt || '',
           viewCount: viewCount,
           description: snippet?.description || undefined,
+          durationSeconds: durationSeconds,
         };
       });
       
@@ -505,9 +508,9 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
           ? formatViewCount(parseInt(statistics.viewCount))
           : undefined;
 
-        const duration = contentDetails?.duration 
-          ? formatDuration(contentDetails.duration)
-          : '0:00';
+        const isoDuration = contentDetails?.duration || 'PT0S';
+        const duration = formatDuration(isoDuration);
+        const durationSeconds = getDurationInSeconds(isoDuration);
 
         return {
           id: video.id || '',
@@ -517,6 +520,7 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
           publishedAt: snippet?.publishedAt || '',
           viewCount: viewCount,
           description: snippet?.description || undefined,
+          durationSeconds: durationSeconds,
         };
       });
       
@@ -580,4 +584,35 @@ function formatDuration(isoDuration: string): string {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function getDurationInSeconds(isoDuration: string): number {
+  const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+
+  const hours = parseInt(match[1] || '0');
+  const minutes = parseInt(match[2] || '0');
+  const seconds = parseInt(match[3] || '0');
+
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Fetch YouTube Shorts from a channel (videos <= 60 seconds)
+ * Uses the same caching mechanism as regular videos
+ * 
+ * @param channelId - YouTube channel ID (starts with UC)
+ * @param maxResults - Maximum number of shorts to fetch
+ * @returns Array of short video items sorted by publish date (newest first)
+ */
+export async function getChannelShorts(channelId: string, maxResults: number = 50): Promise<VideoItem[]> {
+  // Fetch all videos from channel (they're cached)
+  const allVideos = await getChannelVideos(channelId, 200); // Fetch more to ensure we get enough shorts
+  
+  // Filter for shorts (duration <= 60 seconds)
+  const shorts = allVideos.filter(video => {
+    return video.durationSeconds !== undefined && video.durationSeconds > 0 && video.durationSeconds <= 60;
+  });
+  
+  return shorts.slice(0, maxResults);
 }

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { getPlaylistVideos, getChannelVideos } from "./youtube";
+import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
 import { getPodcastFeed } from "./podcast";
 import { getShopListings } from "./etsy";
 import { getCharacterData } from "./dndbeyond";
@@ -72,6 +72,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching channel videos:', error);
       res.status(500).json({ error: 'Failed to fetch YouTube channel videos' });
+    }
+  });
+
+  // Fetch YouTube Shorts from a channel (videos <= 60 seconds)
+  app.get("/api/youtube/channel/:channelId/shorts", async (req, res) => {
+    try {
+      const { channelId } = req.params;
+
+      // A03: Validate channelId format (YouTube channel IDs start with UC)
+      if (!/^UC[a-zA-Z0-9_-]+$/.test(channelId)) {
+        logSecurityEvent('INVALID_CHANNEL_ID', { channelId, ip: req.ip });
+        return res.status(400).json({ error: 'Invalid channel ID format. Channel IDs must start with UC' });
+      }
+
+      // A03: Validate maxResults parameter
+      const maxResultsInput = req.query.maxResults as string;
+      const validation = validateNumber(maxResultsInput || '50', 1, 10000);
+      
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+      }
+
+      const shorts = await getChannelShorts(channelId, validation.value!);
+      res.json(shorts);
+    } catch (error) {
+      console.error('Error fetching YouTube Shorts:', error);
+      res.status(500).json({ error: 'Failed to fetch YouTube Shorts' });
     }
   });
 
