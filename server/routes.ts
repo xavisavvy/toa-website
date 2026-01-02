@@ -1,7 +1,6 @@
 import { createServer, type Server } from "http";
 
 import type { Express } from "express";
-import express from "express";
 
 import { getCharacterData } from "./dndbeyond";
 import { getShopListings } from "./etsy";
@@ -357,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Stripe Webhook: Handle payment events
-  app.post("/api/stripe/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+  app.post("/api/stripe/webhook", async (req, res) => {
     const signature = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

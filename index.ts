@@ -14,7 +14,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // A05: Security Misconfiguration - Apply security middleware FIRST
 configureSecurity(app);
 
-// Body parsing middleware (with size limits)
+// Stripe webhook must receive raw body for signature verification
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+
+// Body parsing middleware (with size limits) - applied to all OTHER routes
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
