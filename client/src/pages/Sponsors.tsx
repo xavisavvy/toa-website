@@ -174,7 +174,7 @@ export default function Sponsors() {
                     <p className="text-sm text-muted-foreground">{tier.description}</p>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-3">
+                    <ul className="space-y-3 mb-6">
                       {tier.benefits.map((benefit, benefitIndex) => (
                         <li key={benefitIndex} className="flex items-start gap-2 text-sm">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
@@ -182,41 +182,63 @@ export default function Sponsors() {
                         </li>
                       ))}
                     </ul>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        const subject = encodeURIComponent(`${tier.name} Sponsorship Inquiry - Tales of Aneria`);
+                        const body = encodeURIComponent(`Hi Tales of Aneria team,\n\nI'm interested in learning more about the ${tier.name} sponsorship opportunity.\n\nPlease send me more information about:\n- Pricing and availability\n- Detailed analytics and audience demographics\n- Customization options\n- Next steps\n\nLooking forward to hearing from you!\n\nBest regards`);
+                        window.location.href = `mailto:${socialLinksData.email}?subject=${subject}&body=${body}`;
+                      }}
+                      data-testid={`button-inquire-${tier.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      <Mail className="mr-2 h-4 w-4" />
+                      Inquire About {tier.name}
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
             </div>
+            <p className="text-sm text-muted-foreground text-center mt-6">
+              Custom packages available. Contact us to discuss your specific needs.
+            </p>
           </div>
 
           {/* Audience Metrics */}
           <div className="mb-20">
-            <h2 className="font-serif text-3xl font-semibold mb-8 text-center">Our Community</h2>
+            <h2 className="font-serif text-3xl font-semibold mb-8 text-center">Our Community & Reach</h2>
+            <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
+              Connect with a highly engaged TTRPG community across multiple platforms
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-youtube">Growing</div>
-                  <p className="text-sm text-muted-foreground">YouTube Subscribers</p>
+                  <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-youtube">Multi-Platform</div>
+                  <p className="text-sm text-muted-foreground">YouTube, Podcast, Social</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-episodes">Weekly</div>
-                  <p className="text-sm text-muted-foreground">New Episodes</p>
+                  <p className="text-sm text-muted-foreground">Consistent Content</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-community">Engaged</div>
-                  <p className="text-sm text-muted-foreground">Community</p>
+                  <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-community">High</div>
+                  <p className="text-sm text-muted-foreground">Engagement Rate</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-platforms">Multi-Platform</div>
-                  <p className="text-sm text-muted-foreground">Distribution</p>
+                  <div className="text-3xl font-bold text-primary mb-2" data-testid="text-metric-platforms">Global</div>
+                  <p className="text-sm text-muted-foreground">Audience Reach</p>
                 </CardContent>
               </Card>
             </div>
+            <p className="text-sm text-muted-foreground text-center mt-4">
+              Contact us for detailed analytics and audience demographics
+            </p>
           </div>
 
           {/* Why Partner With Us */}
@@ -263,8 +285,54 @@ export default function Sponsors() {
                 <CardContent>
                   <p className="text-muted-foreground">
                     We provide regular analytics and insights about your sponsorship performance, including 
-                    reach, engagement, and audience feedback.
+                    reach, engagement, and audience feedback to measure your ROI.
                   </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Target Audience & Ideal Sponsors */}
+          <div className="mb-20">
+            <h2 className="font-serif text-3xl font-semibold mb-8 text-center">Perfect For These Brands</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-lg">Gaming & Entertainment</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• TTRPG publishers & game designers</li>
+                    <li>• Dice makers & gaming accessories</li>
+                    <li>• Virtual tabletop platforms</li>
+                    <li>• Board game companies</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-lg">Lifestyle & Services</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Subscription boxes & services</li>
+                    <li>• Online education platforms</li>
+                    <li>• Creative software & tools</li>
+                    <li>• Apparel & merchandise brands</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-lg">Community & Tech</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Discord bots & community tools</li>
+                    <li>• Streaming equipment & tech</li>
+                    <li>• Audio/video production tools</li>
+                    <li>• Fan art & commission platforms</li>
+                  </ul>
                 </CardContent>
               </Card>
             </div>
@@ -282,7 +350,11 @@ export default function Sponsors() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Button 
                     size="lg"
-                    onClick={() => window.location.href = `mailto:${socialLinksData.email}?subject=Sponsorship Inquiry - Tales of Aneria`}
+                    onClick={() => {
+                      const subject = encodeURIComponent('Sponsorship Inquiry - Tales of Aneria');
+                      const body = encodeURIComponent('Hi Tales of Aneria team,\n\nI\'m interested in partnering with you!\n\nPlease provide:\n- Sponsorship packages and pricing\n- Available slots and timeline\n- Media kit and analytics\n- References from current sponsors\n\nCompany: \nContact: \nGoals: \n\nThank you!');
+                      window.location.href = `mailto:${socialLinksData.email}?subject=${subject}&body=${body}`;
+                    }}
                     data-testid="button-contact-sponsor"
                   >
                     <Mail className="mr-2 h-5 w-5" />
