@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.24.2](https://github.com/xavisavvy/toa-website/compare/v1.24.1...v1.24.2) (2026-01-02)
+
+
+### Bug Fixes
+
+* resolve Replit production errors (trust proxy + rate limiter) ([1d192e4](https://github.com/xavisavvy/toa-website/commit/1d192e4354a7df9e85c2b08c95372aac576c4ce1))
+
 ### [1.24.1](https://github.com/xavisavvy/toa-website/compare/v1.24.0...v1.24.1) (2026-01-02)
 
 ## [1.24.0](https://github.com/xavisavvy/toa-website/compare/v1.23.0...v1.24.0) (2026-01-02)
