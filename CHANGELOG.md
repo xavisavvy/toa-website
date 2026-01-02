@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.28.3](https://github.com/xavisavvy/toa-website/compare/v1.28.2...v1.28.3) (2026-01-02)
+
+
+### Bug Fixes
+
+* resolve TypeScript linting issues ([df9d70d](https://github.com/xavisavvy/toa-website/commit/df9d70d24c074e0bbe0a3246df8f11458467c194))
+
 ### [1.28.2](https://github.com/xavisavvy/toa-website/compare/v1.28.1...v1.28.2) (2026-01-02)
 
 
