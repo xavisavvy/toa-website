@@ -376,14 +376,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle the event
       switch (event.type) {
-        case 'checkout.session.completed':
-          const session = event.data.object as any;
-          console.log('✅ Payment successful:', session.id);
-          console.log('Customer email:', session.customer_details?.email);
-          console.log('Amount paid:', session.amount_total / 100, session.currency.toUpperCase());
+        case 'checkout.session.completed': {
+          const eventSession = event.data.object as any;
+          console.log('✅ Payment successful:', eventSession.id);
+          console.log('Customer email:', eventSession.customer_details?.email);
+          console.log('Amount paid:', eventSession.amount_total / 100, eventSession.currency.toUpperCase());
+          
+          // Fetch full session with shipping details (not included in webhook by default)
+          const fullSession = await getCheckoutSession(eventSession.id);
+          
+          if (!fullSession) {
+            console.error('❌ Failed to retrieve full session data');
+            break;
+          }
           
           // Create Printful order automatically
-          const orderData = createPrintfulOrderFromSession(session);
+          const orderData = createPrintfulOrderFromSession(fullSession);
           if (orderData) {
             console.log('📦 Creating Printful order...');
             console.log('Recipient:', orderData.recipient.name, orderData.recipient.email);
@@ -404,27 +412,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           } else {
             console.error('❌ Could not extract order data from Stripe session');
-            console.error('Session ID:', session.id);
+            console.error('Session ID:', eventSession.id);
           }
           
           break;
+        }
 
-        case 'checkout.session.async_payment_succeeded':
+        case 'checkout.session.async_payment_succeeded': {
           console.log('✅ Async payment succeeded');
           // Handle delayed payment methods (bank transfers, etc.)
-          const asyncSession = event.data.object as any;
-          const asyncOrderData = createPrintfulOrderFromSession(asyncSession);
-          if (asyncOrderData) {
-            await createPrintfulOrder(asyncOrderData);
+          const asyncEventSession = event.data.object as any;
+          const asyncSession = await getCheckoutSession(asyncEventSession.id);
+          if (asyncSession) {
+            const asyncOrderData = createPrintfulOrderFromSession(asyncSession);
+            if (asyncOrderData) {
+              await createPrintfulOrder(asyncOrderData);
+            }
           }
           break;
+        }
 
-        case 'checkout.session.async_payment_failed':
+        case 'checkout.session.async_payment_failed': {
           console.log('❌ Async payment failed');
           const failedSession = event.data.object as any;
           console.log('Failed session ID:', failedSession.id);
           // TODO: Notify customer that payment failed
           break;
+        }
 
         default:
           console.log(`ℹ️  Unhandled event type: ${event.type}`);

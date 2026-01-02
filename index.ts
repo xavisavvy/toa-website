@@ -11,6 +11,9 @@ import { configureSecurity } from "./server/security";
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Trust proxy - required for rate limiting behind reverse proxy (Replit, etc.)
+app.set('trust proxy', 1);
+
 // A05: Security Misconfiguration - Apply security middleware FIRST
 configureSecurity(app);
 
