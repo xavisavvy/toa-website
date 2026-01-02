@@ -25,15 +25,17 @@ interface Product {
 
 interface PrintfulShopProps {
   enableCheckout?: boolean;
+  limit?: number;
 }
 
-export default function PrintfulShop({ enableCheckout = false }: PrintfulShopProps) {
+export default function PrintfulShop({ enableCheckout = false, limit }: PrintfulShopProps) {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   const { data: products, isLoading, error } = useQuery<Product[]>({
-    queryKey: ['/api/printful/products'],
+    queryKey: ['/api/printful/products', limit],
     queryFn: async () => {
-      const response = await fetch('/api/printful/products?limit=8');
+      const url = limit ? `/api/printful/products?limit=${limit}` : '/api/printful/products';
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
@@ -42,7 +44,7 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
     staleTime: 5 * 60 * 1000,
   });
 
-  const displayProducts = products?.slice(0, 4) || [];
+  const displayProducts = products || [];
 
   const handleProductClick = async (product: Product) => {
     if (!enableCheckout) {

@@ -32,7 +32,7 @@ export default function Shop() {
         {/* Shop Section */}
         <section id="products" className="py-20 lg:py-32 bg-background">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <PrintfulShop />
+            <PrintfulShop enableCheckout={true} />
           </div>
         </section>
 

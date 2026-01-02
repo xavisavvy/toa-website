@@ -58,7 +58,7 @@ export default function Home() {
       <CharactersSection />
       <WorldSection />
       <PromotionsSection />
-      <PrintfulShop enableCheckout={true} />
+      <PrintfulShop enableCheckout={true} limit={4} />
       <AboutSection />
       <CommunitySection />
       <Footer />
