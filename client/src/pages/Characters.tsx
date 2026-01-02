@@ -71,7 +71,7 @@ export default function Characters() {
     const featuredImage = character.images.find((img) => img.isFeatured);
     
     return (
-      <Link key={character.id} href={`/characters/${character.id}`}>
+      <Link key={character.id} href={`/characters/${character.id}`} className="relative z-0 hover:z-10">
         <Card
           className="overflow-hidden hover-elevate cursor-pointer transition-all h-full"
           data-testid={`card-character-${character.id}`}
@@ -94,15 +94,20 @@ export default function Characters() {
               </Badge>
               {featuredImage?.isAiGenerated && (
                 <TooltipProvider>
-                  <Tooltip>
+                  <Tooltip delayDuration={200}>
                     <TooltipTrigger asChild>
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-amber-500/90 text-white border-amber-600 cursor-help"
-                        data-testid={`badge-ai-${character.id}`}
+                      <div 
+                        onClick={(e) => e.preventDefault()}
+                        onMouseDown={(e) => e.stopPropagation()}
                       >
-                        AI Art
-                      </Badge>
+                        <Badge 
+                          variant="secondary" 
+                          className="bg-amber-500/90 text-white border-amber-600 cursor-help"
+                          data-testid={`badge-ai-${character.id}`}
+                        >
+                          AI Art
+                        </Badge>
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
                       <p>This artwork was generated using AI for early character exploration and personal use. AI-generated artwork is not used for commercial purposes or merchandise. We believe in transparency about the use of AI tools in creative work.</p>

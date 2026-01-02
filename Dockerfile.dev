@@ -1,0 +1,32 @@
+# ==============================================
+# Development Dockerfile with Hot Reload
+# ==============================================
+FROM node:20-alpine AS development
+
+# Install system dependencies
+RUN apk upgrade --no-cache && \
+    apk add --no-cache \
+    libc6-compat \
+    curl \
+    git
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including dev dependencies)
+RUN npm ci && npm cache clean --force
+
+# Copy application source (this will be overridden by volume mount)
+COPY . .
+
+# Expose ports
+EXPOSE 5000 5173
+
+# Set environment
+ENV NODE_ENV=development
+
+# Start development server with hot reload
+CMD ["npm", "run", "dev"]

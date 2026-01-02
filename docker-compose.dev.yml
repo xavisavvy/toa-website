@@ -1,0 +1,125 @@
+services:
+  # ============================================
+  # Application Service (Development with Hot Reload)
+  # ============================================
+  app:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: toa-website-dev
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+      - "5173:5173"  # Vite HMR port
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - DATABASE_URL=${DATABASE_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - VITE_YOUTUBE_PLAYLIST_ID=${VITE_YOUTUBE_PLAYLIST_ID}
+      - VITE_PODCAST_FEED_URL=${VITE_PODCAST_FEED_URL}
+      - VITE_PODCAST_SPOTIFY_URL=${VITE_PODCAST_SPOTIFY_URL}
+      - VITE_PODCAST_APPLE_URL=${VITE_PODCAST_APPLE_URL}
+      - VITE_PODCAST_YOUTUBE_MUSIC_URL=${VITE_PODCAST_YOUTUBE_MUSIC_URL}
+      - PRINTFUL_API_KEY=${PRINTFUL_API_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      # Mount source code for hot-reload
+      - .:/app
+      # Exclude node_modules to use container's version
+      - /app/node_modules
+      # Persist cache data
+      - cache-data:/app/server/cache
+      # Temporary directory for runtime needs
+      - type: tmpfs
+        target: /tmp/app
+        tmpfs:
+          size: 50M
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+    # Security: Resource limits (more generous for dev)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ============================================
+  # Redis Cache (for rate limiting and caching)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: toa-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  db:
+    image: postgres:16-alpine
+    container_name: toa-postgres-dev
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-toa_website}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+  cache-data:
+    driver: local
+  redis-data:
+    driver: local
