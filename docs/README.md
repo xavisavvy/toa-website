@@ -52,6 +52,12 @@ Step-by-step implementation documentation
 - [Phase 2 Complete](./guides/PHASE2_COMPLETE.md) - Phase 2 achievements
 - [Phase 3 Complete](./guides/PHASE3_COMPLETE.md) - Phase 3 achievements
 
+### 🎨 [Content Management](../)
+Managing website content and data
+- [Character Images Guide](./CHARACTER_IMAGES.md) - Adding and managing character gallery images
+- [Stripe Integration](../STRIPE_INTEGRATION.md) - Payment processing setup
+- [Printful Integration](../PRINTFUL_INTEGRATION.md) - E-commerce product integration
+
 ## 🎯 Quick Start
 
 ### For Developers

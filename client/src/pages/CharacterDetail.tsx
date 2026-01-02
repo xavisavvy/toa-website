@@ -241,21 +241,32 @@ export default function CharacterDetail() {
                               <p className="text-white text-sm font-medium mb-1">
                                 {image.caption}
                               </p>
-                              {image.isAiGenerated && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <p className="text-amber-300 text-xs mb-1 flex items-center gap-1 cursor-help">
-                                        <span className="inline-block w-1.5 h-1.5 bg-amber-300 rounded-full"></span>
-                                        AI Art
-                                      </p>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-xs">
-                                      <p>This artwork was generated using AI for early character exploration and personal use. AI-generated artwork is not used for commercial purposes or merchandise. We believe in transparency about the use of AI tools in creative work.</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              )}
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {image.type && (
+                                  <Badge 
+                                    variant={image.type === 'official' ? 'default' : 'secondary'} 
+                                    className="text-xs"
+                                    data-testid={`badge-type-${image.id}`}
+                                  >
+                                    {image.type === 'official' ? 'Official Art' : 'Fan Art'}
+                                  </Badge>
+                                )}
+                                {image.isAiGenerated && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <p className="text-amber-300 text-xs flex items-center gap-1 cursor-help">
+                                          <span className="inline-block w-1.5 h-1.5 bg-amber-300 rounded-full"></span>
+                                          AI Art
+                                        </p>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="max-w-xs">
+                                        <p>This artwork was generated using AI for early character exploration and personal use. AI-generated artwork is not used for commercial purposes or merchandise. We believe in transparency about the use of AI tools in creative work.</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                              </div>
                               {image.copyright && (
                                 <p 
                                   className="text-white/70 text-xs" 
