@@ -20,6 +20,7 @@ playwright/.cache/
 # Mutation testing
 .stryker-tmp/
 reports/mutation/
+reports/
 stryker.log
 
 # Security scan results
