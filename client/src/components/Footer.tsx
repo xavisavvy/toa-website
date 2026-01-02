@@ -1,5 +1,6 @@
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import { Link, useLocation } from "wouter";
+import type React from "react";
 
 import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import socialLinksData from "@/data/social-links.json";
@@ -20,8 +21,7 @@ export default function Footer() {
       { label: "World Lore", href: "/#lore" },
     ],
     Shop: [
-      { label: "Merchandise", href: "/#shop" },
-      { label: "Etsy Store", href: socialLinksData.etsy },
+      { label: "Merchandise", href: "/shop" },
       { label: "Support on Patreon", href: socialLinksData.patreon },
     ],
     Resources: [
@@ -73,7 +73,7 @@ export default function Footer() {
     if (location !== '/') {
       setLocation(`/${hash}`);
       // Wait for navigation, then scroll
-      setTimeout(() => {
+      window.setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth', block: 'start' });

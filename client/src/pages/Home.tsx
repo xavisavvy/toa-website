@@ -7,7 +7,7 @@ import LatestEpisodes from "@/components/LatestEpisodes";
 import LatestShorts from "@/components/LatestShorts";
 import Navigation from "@/components/Navigation";
 import PodcastSection from "@/components/PodcastSection";
-import PrintfulShop from "@/components/PrintfulShop";
+import PrintfulShopPreview from "@/components/PrintfulShopPreview";
 import PromotionsSection from "@/components/PromotionsSection";
 import SEO from "@/components/SEO";
 import WorldSection from "@/components/WorldSection";
@@ -58,7 +58,19 @@ export default function Home() {
       <CharactersSection />
       <WorldSection />
       <PromotionsSection />
-      <PrintfulShop enableCheckout={true} limit={4} />
+      <section id="shop" className="py-20 lg:py-32 bg-background">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-4xl md:text-5xl font-semibold mb-4" data-testid="text-shop-title">
+              Support the Show
+            </h2>
+            <p className="text-muted-foreground text-lg mb-6">
+              Explore our exclusive merchandise and take a piece of Aneria home with you
+            </p>
+          </div>
+          <PrintfulShopPreview />
+        </div>
+      </section>
       <AboutSection />
       <CommunitySection />
       <Footer />

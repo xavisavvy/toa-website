@@ -4,7 +4,7 @@ import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Privacy() {
-  const lastUpdated = "October 20, 2025";
+  const lastUpdated = "January 2, 2026";
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,6 +70,9 @@ export default function Privacy() {
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Email address (if you contact us or subscribe to updates)</li>
                     <li>Name and contact details (if you submit forms or inquiries)</li>
+                    <li>Payment and billing information (processed securely through Stripe)</li>
+                    <li>Shipping address (for product orders)</li>
+                    <li>Sponsorship inquiry details (company name, contact information, goals)</li>
                     <li>Any other information you choose to provide</li>
                   </ul>
                 </div>
@@ -85,13 +88,17 @@ export default function Privacy() {
                 <p>We use the information we collect to:</p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
                   <li>Provide, operate, and maintain our website</li>
+                  <li>Process your merchandise orders and donations through Stripe</li>
+                  <li>Fulfill orders through Printful for product manufacturing and shipping</li>
+                  <li>Respond to sponsorship inquiries and partnership requests</li>
                   <li>Improve, personalize, and expand our website</li>
                   <li>Understand and analyze how you use our website</li>
                   <li>Develop new features, products, and services</li>
                   <li>Communicate with you for customer service and support</li>
-                  <li>Send you updates about our content and community</li>
+                  <li>Send you updates about your orders and transactions</li>
+                  <li>Send you updates about our content and community (with your consent)</li>
                   <li>Monitor and analyze usage and trends to improve user experience</li>
-                  <li>Detect, prevent, and address technical issues</li>
+                  <li>Detect, prevent, and address technical issues and fraud</li>
                 </ul>
               </CardContent>
             </Card>
@@ -131,19 +138,46 @@ export default function Privacy() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">Etsy</h3>
+                  <h3 className="font-semibold text-foreground mb-2">Printful</h3>
                   <p>
-                    We display products from our Etsy shop. When you click on product links, you'll be directed to Etsy, 
-                    which has its own privacy policy.
+                    We use Printful for product manufacturing and fulfillment. When you browse our shop, product information 
+                    is retrieved from Printful&apos;s API. Printful may collect information according to their privacy policy.
                   </p>
                   <p className="text-sm mt-1">
-                    Etsy Privacy Policy: <a 
-                      href="https://www.etsy.com/legal/privacy" 
+                    Printful Privacy Policy: <a 
+                      href="https://www.printful.com/policies/privacy" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      https://www.etsy.com/legal/privacy
+                      https://www.printful.com/policies/privacy
+                    </a>
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">Stripe</h3>
+                  <p>
+                    We use Stripe to process payments for merchandise purchases and donations. When you make a purchase or donation, 
+                    Stripe collects payment information, billing details, and transaction data. We do not store your full credit card 
+                    information on our servers. Stripe is PCI-DSS compliant and uses industry-leading security measures.
+                  </p>
+                  <p className="mb-2">Information collected by Stripe may include:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-4 mb-2">
+                    <li>Payment card information (processed securely by Stripe)</li>
+                    <li>Billing name and address</li>
+                    <li>Email address</li>
+                    <li>Transaction history</li>
+                    <li>Device and browser information</li>
+                  </ul>
+                  <p className="text-sm mt-1">
+                    Stripe Privacy Policy: <a 
+                      href="https://stripe.com/privacy" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      https://stripe.com/privacy
                     </a>
                   </p>
                 </div>
@@ -243,7 +277,7 @@ export default function Privacy() {
             {/* Children's Privacy */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-serif text-2xl">Children's Privacy</CardTitle>
+                <CardTitle className="font-serif text-2xl">Children&apos;s Privacy</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-muted-foreground">
                 <p>
@@ -276,7 +310,7 @@ export default function Privacy() {
               <CardContent className="space-y-4 text-muted-foreground">
                 <p>
                   We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new 
-                  Privacy Policy on this page and updating the "Last Updated" date at the top of this policy.
+                  Privacy Policy on this page and updating the &quot;Last Updated&quot; date at the top of this policy.
                 </p>
                 <p>
                   You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy 
