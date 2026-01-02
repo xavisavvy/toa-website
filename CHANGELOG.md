@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.31.0](https://github.com/xavisavvy/toa-website/compare/v1.30.0...v1.31.0) (2026-01-02)
+
+
+### Features
+
+* Add AI-generated image badges and improve shop/privacy features ([45f3e02](https://github.com/xavisavvy/toa-website/commit/45f3e0242b7a3f96b297bd9382f7cced81a411f2))
+
 ## [1.30.0](https://github.com/xavisavvy/toa-website/compare/v1.29.0...v1.30.0) (2026-01-02)
 
 
