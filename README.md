@@ -41,12 +41,15 @@ A professional landing page for our TTRPG Live Play series, featuring YouTube in
 
 ## Features
 
-✨ **YouTube Integration** - Automatically fetches and displays our latest episodes from any YouTube playlist
+✨ **YouTube Integration** - Automatically fetches and displays our latest episodes and shorts from YouTube playlists
 🎙️ **Podcast Feed** - Integrates with any RSS podcast feed to showcase our audio content
 🗺️ **World Building** - Links to WorldAnvil pages for characters, locations, factions, and lore
-🛍️ **Merchandise** - Showcase products and link to our Etsy storefront
+🛍️ **E-Commerce** - Direct sales through Printful integration with Stripe checkout
+💳 **Payment Processing** - Secure Stripe integration for direct customer payments
+📦 **Print-on-Demand** - Automated fulfillment through Printful
 👥 **Cast & Community** - Highlight our team and connect with fans through social media
 📱 **Fully Responsive** - Beautiful design on desktop, tablet, and mobile devices
+🤝 **Sponsorship Platform** - Professional sponsor inquiry form with automated email delivery
 
 ## Quick Start
 
@@ -67,14 +70,19 @@ This project uses environment variables for configuration. All required and opti
    - `DATABASE_URL` - PostgreSQL connection string
    - `YOUTUBE_API_KEY` - YouTube Data API v3 key (server-side)
    - `VITE_YOUTUBE_PLAYLIST_ID` - Our YouTube playlist ID
+   - `VITE_YOUTUBE_SHORTS_PLAYLIST_ID` - Our YouTube Shorts playlist ID
    - `VITE_PODCAST_FEED_URL` - Our podcast RSS feed URL
    - `SESSION_SECRET` - Random secret for session encryption
    - `ALLOWED_ORIGINS` - CORS allowed origins (production only)
+   - `PRINTFUL_API_KEY` - Printful API key for product catalog
+   - `STRIPE_PUBLISHABLE_KEY` - Stripe public key for checkout
+   - `STRIPE_SECRET_KEY` - Stripe secret key for payment processing
+   - `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
 
 4. **Optional Variables:**
    - `VITE_YOUTUBE_API_KEY` - YouTube API key for client-side access
-   - `ETSY_API_KEY` - For Etsy shop integration
-   - `ETSY_ACCESS_TOKEN` - For Etsy shop integration
+   - `RESEND_API_KEY` - For email notifications (sponsor inquiries)
+   - `BASE_URL` - Base URL for redirects (defaults to localhost)
 
 
 
@@ -224,6 +232,12 @@ GET /api/youtube/playlist/:playlistId?maxResults=10
 ```
 Fetches videos from a YouTube playlist with thumbnails, duration, and view counts.
 
+### YouTube Shorts
+```
+GET /api/youtube/shorts?maxResults=5
+```
+Fetches short-form videos (< 60 seconds) from configured shorts playlist.
+
 ### Podcast Feed
 ```
 POST /api/podcast/feed
@@ -231,11 +245,41 @@ Body: { feedUrl: string, limit?: number }
 ```
 Parses an RSS podcast feed and returns episode information.
 
+### Printful Products
+```
+GET /api/printful/products
+GET /api/printful/products/:productId
+```
+Fetches product catalog from Printful with caching.
+
+### Stripe Checkout
+```
+POST /api/stripe/create-checkout-session
+Body: { productId: string, variantId: string, quantity: number }
+```
+Creates a Stripe checkout session for product purchase.
+
+### Stripe Webhook
+```
+POST /api/stripe/webhook
+```
+Handles Stripe payment confirmation webhooks.
+
+### Sponsor Inquiries
+```
+POST /api/sponsors/inquire
+Body: { name, email, company, message, package, budget }
+```
+Sends sponsor inquiry email and logs to database.
+
 ## Technologies Used
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS, Shadcn UI
-- **Backend**: Express.js, Node.js
-- **Integrations**: YouTube Data API v3, RSS Parser
+- **Backend**: Express.js, Node.js, PostgreSQL, Redis
+- **Integrations**: YouTube Data API v3, RSS Parser, Printful API, Stripe API, Resend (email)
+- **Payment**: Stripe Checkout
+- **Fulfillment**: Printful (print-on-demand)
+- **Caching**: Redis (with graceful degradation)
 - **Styling**: Custom fantasy theme with purple and amber accents
 
 ## Versioning

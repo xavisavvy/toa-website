@@ -1,1 +1,13 @@
+# Check if .env.example was modified
+if git diff --cached --name-only | grep -q "^\.env\.example$"; then
+  echo "⚠️  .env.example was modified!"
+  echo "📝 Checking environment file synchronization..."
+  npm run env:check || {
+    echo ""
+    echo "❌ Environment files are out of sync!"
+    echo "💡 Run 'npm run env:sync' to synchronize, then commit again"
+    exit 1
+  }
+fi
+
 npx lint-staged

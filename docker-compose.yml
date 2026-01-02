@@ -3,6 +3,8 @@ services:
   # Application Service
   # ============================================
   app:
+    env_file:
+      - .env.docker
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,6 +27,10 @@ services:
       - VITE_PODCAST_YOUTUBE_MUSIC_URL=${VITE_PODCAST_YOUTUBE_MUSIC_URL}
       - ETSY_API_KEY=${ETSY_API_KEY:-}
       - ETSY_ACCESS_TOKEN=${ETSY_ACCESS_TOKEN:-}
+      - PRINTFUL_API_KEY=${PRINTFUL_API_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       - REDIS_URL=redis://redis:6379
     volumes:
       # Persist cache data

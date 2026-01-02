@@ -164,18 +164,69 @@ The infrastructure is ready - just needs the Stripe layer added!
 ✅ Rate limiting per IP address  
 ✅ Security event logging  
 ✅ No sensitive data in client code  
+✅ Webhook signature verification
+✅ HTTPS required in production
 
 ## Environment Variables Needed
 
 ```bash
-# Current (Etsy only)
-ETSY_API_KEY=...
-ETSY_ACCESS_TOKEN=...
+# Required - Printful
+PRINTFUL_API_KEY=your_printful_api_key
 
-# Add for Printful
-PRINTFUL_API_KEY=...
+# Required - Stripe (Test keys shown)
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 
-# Future (for Stripe)
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
+# Business Info
+BUSINESS_NAME=Tales of Aneria
+SUPPORT_EMAIL=TalesOfAneria@gmail.com
+
+# Optional - Email notifications
+RESEND_API_KEY=re_...
 ```
+
+## ✅ Current Status
+
+### Implemented Features
+- ✅ Printful product fetching with caching
+- ✅ Stripe checkout integration
+- ✅ Webhook handler for payment confirmation
+- ✅ Success/cancel pages
+- ✅ Security headers and CSP configuration
+- ✅ Redis caching with graceful degradation
+- ✅ Comprehensive error handling
+
+### Production Checklist
+- ✅ Sandbox testing complete
+- ⬜ Switch to production API keys
+- ⬜ Configure production webhook endpoint
+- ⬜ Enable automatic Printful order creation (Phase 2)
+- ⬜ Set up email confirmations
+- ⬜ Add order tracking
+
+## 🚀 Going Live
+
+### Step 1: Production Keys
+Replace sandbox keys in production environment:
+```bash
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+```
+
+### Step 2: Webhook Configuration
+1. Go to Stripe Dashboard → Webhooks
+2. Add endpoint: `https://talesofaneria.com/api/stripe/webhook`
+3. Select events: `checkout.session.completed`
+4. Copy signing secret to `STRIPE_WEBHOOK_SECRET`
+
+### Step 3: Testing
+Test with production test mode before going fully live
+
+## 📊 Analytics & Monitoring
+
+Monitor through:
+- Stripe Dashboard (payments)
+- Printful Dashboard (orders)
+- Server logs (errors)
+- Health check endpoint (`/api/health`)
