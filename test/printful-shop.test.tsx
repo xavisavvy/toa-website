@@ -28,13 +28,24 @@ describe('PrintfulShop', () => {
     );
   });
 
-  it('should render without crashing', () => {
+  it('should render loading state initially', () => {
     render(<PrintfulShop />, { wrapper: createWrapper() });
-    expect(screen.getByText(/official merchandise/i)).toBeInTheDocument();
+    // Component should render loading skeletons
+    const cards = document.querySelectorAll('.animate-pulse');
+    expect(cards.length).toBeGreaterThan(0);
   });
 
   it('should render with enableCheckout prop', () => {
     render(<PrintfulShop enableCheckout={true} />, { wrapper: createWrapper() });
-    expect(screen.getByText(/official merchandise/i)).toBeInTheDocument();
+    // Component should render loading skeletons
+    const cards = document.querySelectorAll('.animate-pulse');
+    expect(cards.length).toBeGreaterThan(0);
+  });
+
+  it('should show empty state when no products', async () => {
+    render(<PrintfulShop />, { wrapper: createWrapper() });
+    // Wait for loading to finish and empty state to show
+    const emptyMessage = await screen.findByText(/setting up our product catalog/i);
+    expect(emptyMessage).toBeInTheDocument();
   });
 });
