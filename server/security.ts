@@ -1,7 +1,7 @@
-import helmet from 'helmet';
 import cors from 'cors';
+import type { Express, Request } from 'express';
 import rateLimit from 'express-rate-limit';
-import type { Express } from 'express';
+import helmet from 'helmet';
 import validator from 'validator';
 
 /**
@@ -25,6 +25,7 @@ export function configureSecurity(app: Express) {
             "https://www.youtube.com",
             "https://www.google.com",
             "https://apis.google.com",
+            "https://js.stripe.com", // Stripe Checkout
           ],
           workerSrc: ["'self'", "blob:"], // Required for Vite HMR workers
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
@@ -40,6 +41,8 @@ export function configureSecurity(app: Express) {
             "https://www.googleapis.com",
             "https://openapi.etsy.com",
             "https://character-service.dndbeyond.com",
+            "https://api.stripe.com", // Stripe API
+            "https://api.printful.com", // Printful API
             "wss:", // For WebSocket connections in development
           ],
           mediaSrc: [
@@ -50,7 +53,14 @@ export function configureSecurity(app: Express) {
             "https://*.apple.com",
             ...(isDevelopment ? ["http://localhost:*", "http://127.0.0.1:*"] : []),
           ],
-          frameSrc: ["'self'", "https://www.youtube.com", "https://open.spotify.com", "https://music.youtube.com"],
+          frameSrc: [
+            "'self'",
+            "https://www.youtube.com",
+            "https://open.spotify.com",
+            "https://music.youtube.com",
+            "https://js.stripe.com", // Stripe Checkout iframe
+            "https://hooks.stripe.com", // Stripe webhooks
+          ],
           objectSrc: ["'none'"],
           upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
         },
@@ -85,9 +95,10 @@ export function configureSecurity(app: Express) {
 
   app.use(
     cors({
-      origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+       
+      origin: (origin: string | undefined, callback: (_err: Error | null, _allow?: boolean) => void) => {
         // Allow requests with no origin (like mobile apps, Postman, or same-origin)
-        if (!origin) return callback(null, true);
+        if (!origin) {return callback(null, true);}
         
         // In development, allow all origins
         if (process.env.NODE_ENV === 'development') {
@@ -116,7 +127,8 @@ export function configureSecurity(app: Express) {
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: 'Too many requests from this IP, please try again later.',
     // Skip rate limiting in development
-    skip: (req) => process.env.NODE_ENV === 'development',
+     
+    skip: (__req: Request) => process.env.NODE_ENV === 'development',
   });
 
   // Apply rate limiting to all API routes
@@ -127,7 +139,8 @@ export function configureSecurity(app: Express) {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 30, // Limit each IP to 30 requests per windowMs
     message: 'Too many requests, please slow down.',
-    skip: (req) => process.env.NODE_ENV === 'development',
+     
+    skip: (__req: Request) => process.env.NODE_ENV === 'development',
   });
 
   // Apply strict limiting to external API calls
@@ -151,6 +164,7 @@ export function validateUrl(url: string): { valid: boolean; error?: string } {
   }
 
   try {
+    // eslint-disable-next-line no-undef
     const parsedUrl = new URL(url);
     
     // A10: SSRF - Block private/internal IP addresses
@@ -190,7 +204,7 @@ export function validateUrl(url: string): { valid: boolean; error?: string } {
     }
 
     return { valid: true };
-  } catch (error) {
+  } catch {
     return { valid: false, error: 'Invalid URL' };
   }
 }
@@ -222,7 +236,7 @@ export function validateString(input: string, maxLength: number = 1000): { valid
 /**
  * A03: Injection - Validate numeric input
  */
-export function validateNumber(input: any, min: number = 1, max: number = 1000): { valid: boolean; error?: string; value?: number } {
+export function validateNumber(input: unknown, min: number = 1, max: number = 1000): { valid: boolean; error?: string; value?: number } {
   // Strict validation: must be a valid integer string with no extra characters
   const stringInput = String(input).trim();
   
@@ -248,7 +262,7 @@ export function validateNumber(input: any, min: number = 1, max: number = 1000):
  * A09: Security Logging and Monitoring
  * Logs security-related events
  */
-export function logSecurityEvent(event: string, details: Record<string, any>) {
+export function logSecurityEvent(event: string, details: Record<string, unknown>) {
   const timestamp = new Date().toISOString();
   const logEntry = {
     timestamp,
