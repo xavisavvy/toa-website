@@ -3,6 +3,7 @@ import { Heart, Mail, TrendingUp, Users, Sparkles } from "lucide-react";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import SEO from "@/components/SEO";
+import { SponsorshipForm } from "@/components/SponsorshipForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -341,37 +342,26 @@ export default function Sponsors() {
 
           {/* CTA */}
           <div>
-            <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-              <CardContent className="p-12 text-center">
-                <h2 className="font-serif text-3xl font-semibold mb-4">Ready to Partner With Us?</h2>
-                <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  Let's discuss how we can create a sponsorship package that meets your goals and resonates 
-                  with our community. We're excited to hear from you!
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <Button 
-                    size="lg"
-                    onClick={() => {
-                      const subject = encodeURIComponent('Sponsorship Inquiry - Tales of Aneria');
-                      const body = encodeURIComponent('Hi Tales of Aneria team,\n\nI\'m interested in partnering with you!\n\nPlease provide:\n- Sponsorship packages and pricing\n- Available slots and timeline\n- Media kit and analytics\n- References from current sponsors\n\nCompany: \nContact: \nGoals: \n\nThank you!');
-                      window.location.href = `mailto:${socialLinksData.email}?subject=${subject}&body=${body}`;
-                    }}
-                    data-testid="button-contact-sponsor"
-                  >
-                    <Mail className="mr-2 h-5 w-5" />
-                    Contact Us About Sponsorship
-                  </Button>
-                  <Button 
-                    size="lg"
-                    variant="outline"
-                    onClick={() => window.location.href = '/press-kit'}
-                    data-testid="button-press-kit"
-                  >
-                    Download Press Kit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="text-center mb-12">
+              <h2 className="font-serif text-3xl font-semibold mb-4">Ready to Partner With Us?</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Join our growing list of sponsors and reach an engaged, passionate audience of TTRPG enthusiasts. 
+                Let&apos;s create something amazing together!
+              </p>
+            </div>
+            
+            <SponsorshipForm />
+            
+            <div className="text-center mt-8">
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => window.location.href = '/press-kit'}
+                data-testid="button-press-kit"
+              >
+                Download Press Kit
+              </Button>
+            </div>
           </div>
         </div>
       </main>

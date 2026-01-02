@@ -80,18 +80,49 @@ describe('Sponsors Page', () => {
     expect(window.location.href).toContain('Sponsorship');
   });
 
-  it('should open mailto link when main CTA button is clicked', () => {
+  it('should render sponsorship contact form with all fields', () => {
     render(
       <Router>
         <Sponsors />
       </Router>
     );
 
-    const contactButton = screen.getByTestId('button-contact-sponsor');
-    fireEvent.click(contactButton);
+    const form = screen.getByTestId('sponsorship-form');
+    expect(form).toBeInTheDocument();
+    
+    expect(screen.getByTestId('input-company')).toBeInTheDocument();
+    expect(screen.getByTestId('input-contact-name')).toBeInTheDocument();
+    expect(screen.getByTestId('input-email')).toBeInTheDocument();
+    expect(screen.getByTestId('input-phone')).toBeInTheDocument();
+    expect(screen.getByTestId('textarea-goals')).toBeInTheDocument();
+    expect(screen.getByTestId('textarea-message')).toBeInTheDocument();
+    expect(screen.getByTestId('button-submit-sponsorship')).toBeInTheDocument();
+  });
+
+  it('should open mailto when sponsorship form is submitted', () => {
+    render(
+      <Router>
+        <Sponsors />
+      </Router>
+    );
+
+     
+    const companyInput = screen.getByTestId('input-company') as any;
+    const contactNameInput = screen.getByTestId('input-contact-name') as any;
+    const emailInput = screen.getByTestId('input-email') as any;
+    const goalsInput = screen.getByTestId('textarea-goals') as any;
+    const submitButton = screen.getByTestId('button-submit-sponsorship');
+     
+
+    fireEvent.change(companyInput, { target: { value: 'Test Company' } });
+    fireEvent.change(contactNameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(goalsInput, { target: { value: 'Brand awareness' } });
+    fireEvent.click(submitButton);
 
     expect(window.location.href).toContain('mailto:TalesOfAneria@gmail.com');
     expect(window.location.href).toContain('subject=');
+    expect(window.location.href).toContain('Test%20Company');
   });
 
   it('should open mailto with tier-specific content when tier inquiry button is clicked', () => {
@@ -177,19 +208,31 @@ describe('Sponsors Page', () => {
     expect(document.title).toBeTruthy();
   });
 
-  it('should encode email subject and body properly', () => {
+  it('should properly encode special characters in form submission', () => {
     render(
       <Router>
         <Sponsors />
       </Router>
     );
 
-    const button = screen.getByTestId('button-contact-sponsor');
-    fireEvent.click(button);
+     
+    const companyInput = screen.getByTestId('input-company') as any;
+    const contactNameInput = screen.getByTestId('input-contact-name') as any;
+    const emailInput = screen.getByTestId('input-email') as any;
+    const goalsInput = screen.getByTestId('textarea-goals') as any;
+    const submitButton = screen.getByTestId('button-submit-sponsorship');
+     
+
+    fireEvent.change(companyInput, { target: { value: 'Test & Co.' } });
+    fireEvent.change(contactNameInput, { target: { value: 'John Doe' } });
+    fireEvent.change(emailInput, { target: { value: 'john@test.com' } });
+    fireEvent.change(goalsInput, { target: { value: 'Brand awareness & promotion' } });
+    fireEvent.click(submitButton);
 
     // Check that special characters are URL encoded
     const href = window.location.href;
     expect(href).not.toContain(' '); // Spaces should be encoded
     expect(href).toContain('%20'); // Space encoding
+    expect(href).toContain('%26'); // & encoding
   });
 });
