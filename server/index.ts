@@ -11,6 +11,13 @@ validateEnvironment();
 
 const app = express();
 
+// A05: Trust proxy for production environments (Replit, cloud platforms)
+// This is required for rate limiting and security features to work correctly
+if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT) {
+  app.set('trust proxy', 1); // Trust first proxy
+  log('Trust proxy enabled for production environment');
+}
+
 // A05: Security Misconfiguration - Apply security middleware FIRST
 configureSecurity(app);
 

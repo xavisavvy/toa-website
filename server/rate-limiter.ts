@@ -40,6 +40,8 @@ export const apiLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
   message: 'Too many requests from this IP, please try again later.',
+  // Trust proxy for Replit and cloud environments
+  validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
   skip: (req: Request) => {
     // Skip rate limiting for localhost in development
     return process.env.NODE_ENV === 'development' && req.ip === '127.0.0.1';
@@ -66,6 +68,7 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true, // Don't count successful requests
   message: 'Too many authentication attempts from this IP, please try again later.',
+  validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
   handler: (req: Request, res: Response) => {
     res.status(429).json({
       error: 'Too many authentication attempts',
@@ -87,6 +90,7 @@ export const expensiveLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: 'Too many expensive requests from this IP, please try again later.',
+  validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
   handler: (req: Request, res: Response) => {
     res.status(429).json({
       error: 'Rate limit exceeded',
