@@ -8,6 +8,12 @@ import SEO from "@/components/SEO";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import charactersData from "@/data/characters.json";
 import { getBreadcrumbSchema } from "@/lib/structuredData";
 
@@ -87,13 +93,22 @@ export default function Characters() {
                 Level {character.level}
               </Badge>
               {featuredImage?.isAiGenerated && (
-                <Badge 
-                  variant="secondary" 
-                  className="bg-amber-500/90 text-white border-amber-600"
-                  data-testid={`badge-ai-${character.id}`}
-                >
-                  AI Generated
-                </Badge>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-amber-500/90 text-white border-amber-600 cursor-help"
+                        data-testid={`badge-ai-${character.id}`}
+                      >
+                        AI Art
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>This artwork was generated using AI for early character exploration and personal use. AI-generated artwork is not used for commercial purposes or merchandise. We believe in transparency about the use of AI tools in creative work.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </div>
           </div>
