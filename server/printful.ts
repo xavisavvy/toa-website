@@ -344,7 +344,7 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     }
 
     const data = await response.json();
-    console.log(`API Response for variant ${syncVariantId}:`, JSON.stringify(data, null, 2));
+    console.log(`[getCatalogVariantId] Full API response:`, JSON.stringify(data, null, 2).substring(0, 2000));
     
     const variant: PrintfulSyncVariant = data.result?.sync_variant;
     
@@ -355,7 +355,7 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     }
     
     console.log(`[getCatalogVariantId] Found variant, checking for variant_id...`);
-    console.log(`[getCatalogVariantId] Variant fields:`, Object.keys(variant));
+    console.log(`[getCatalogVariantId] Variant keys:`, Object.keys(variant).join(', '));
     console.log(`[getCatalogVariantId] variant.variant_id:`, variant?.variant_id);
     console.log(`[getCatalogVariantId] variant.product_id:`, variant?.product_id);
     console.log(`[getCatalogVariantId] variant.product?.variant_id:`, variant?.product?.variant_id);
