@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.30.0](https://github.com/xavisavvy/toa-website/compare/v1.29.0...v1.30.0) (2026-01-02)
+
+
+### Features
+
+* add AI-generated image badges to character pages ([60f6db4](https://github.com/xavisavvy/toa-website/commit/60f6db4a6aa94d9bdf3a6a8f9ffc23c71128ca5d))
+
 ## [1.29.0](https://github.com/xavisavvy/toa-website/compare/v1.28.3...v1.29.0) (2026-01-02)
 
 
