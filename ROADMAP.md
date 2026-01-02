@@ -29,6 +29,18 @@
   - [ ] A/B test CTA placement and messaging
   - Related: Sponsors endpoint, marketing strategy
 
+
+
+#### �� Content Management
+- [ ] **Switch from Playlists to All Channel Videos** - Fetch all videos from YouTube channel
+  - [ ] Update YouTube API integration to use channel search
+  - [ ] Remove playlist ID requirement  
+  - [ ] Sort videos by publish date (newest first)
+  - [ ] Update environment variables (channel ID instead of playlist IDs)
+  - [ ] Test with real channel data
+  - [ ] Update documentation
+  - Related: server/youtube.ts, Latest Episodes component
+
 #### 🎨 User Experience
 - [ ] TBD - Add items as you discover needs
 
@@ -262,3 +274,4 @@ echo "- [ ] Feature name - Description" >> ROADMAP.md
 - Use conventional commits when implementing features
 - Link to GitHub issues for complex features
 - Keep backlog prioritized and groomed
+

@@ -72,6 +72,15 @@ export interface VideoItem {
   description?: string;
 }
 
+interface ChannelCacheEntry {
+  videos: VideoItem[];
+  timestamp: number;
+}
+
+interface CachedChannelData {
+  [channelId: string]: ChannelCacheEntry;
+}
+
 interface PlaylistCacheEntry {
   videos: VideoItem[];
   timestamp: number;
@@ -388,6 +397,163 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
     }
     
     // Return empty array instead of throwing to prevent page crashes
+    console.log('⚠️  YouTube API unavailable, returning empty video list');
+    return [];
+  }
+}
+
+/**
+ * Fetch all videos from a YouTube channel (sorted by newest first)
+ * Uses YouTube Search API to get all videos from a channel
+ * 
+ * @param channelId - YouTube channel ID (starts with UC)
+ * @param maxResults - Maximum number of videos to fetch
+ * @returns Array of video items sorted by publish date (newest first)
+ */
+export async function getChannelVideos(channelId: string, maxResults: number = 50): Promise<VideoItem[]> {
+  // Check cache first (use channelId as cache key)
+  const cachedVideos = readCache(channelId);
+  if (cachedVideos !== null) {
+    return cachedVideos;
+  }
+
+  // Cache miss or expired, fetch from API
+  try {
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    
+    if (!apiKey) {
+      console.log('⚠️  No YouTube API key available. Please configure YOUTUBE_API_KEY.');
+      return [];
+    }
+
+    let allVideoIds: string[] = [];
+    let nextPageToken: string | undefined = undefined;
+    
+    // Fetch all pages of channel videos using search API
+    do {
+      const url = new URL('https://www.googleapis.com/youtube/v3/search');
+      url.searchParams.set('part', 'id');
+      url.searchParams.set('channelId', channelId);
+      url.searchParams.set('order', 'date'); // Sort by newest first
+      url.searchParams.set('type', 'video'); // Only videos, not playlists or channels
+      url.searchParams.set('maxResults', '50'); // API max per page
+      url.searchParams.set('key', apiKey);
+      if (nextPageToken) {
+        url.searchParams.set('pageToken', nextPageToken);
+      }
+      
+      const response = await fetch(url.toString());
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`YouTube API error: ${JSON.stringify(error)}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.items || data.items.length === 0) {
+        break;
+      }
+
+      const videoIds = data.items
+        .map((item: any) => item.id?.videoId)
+        .filter(Boolean) as string[];
+      
+      allVideoIds.push(...videoIds);
+      nextPageToken = data.nextPageToken;
+      
+      // Limit to maxResults
+      if (allVideoIds.length >= maxResults) {
+        allVideoIds = allVideoIds.slice(0, maxResults);
+        break;
+      }
+      
+    } while (nextPageToken);
+
+    if (allVideoIds.length === 0) {
+      console.log(`No videos found for channel ${channelId}`);
+      return [];
+    }
+
+    console.log(`Found ${allVideoIds.length} videos for channel ${channelId}`);
+
+    // Fetch video details in batches of 50 (API limit)
+    const allVideos: VideoItem[] = [];
+    for (let i = 0; i < allVideoIds.length; i += 50) {
+      const batchIds = allVideoIds.slice(i, i + 50);
+      
+      const url = new URL('https://www.googleapis.com/youtube/v3/videos');
+      url.searchParams.set('part', 'snippet,contentDetails,statistics');
+      url.searchParams.set('id', batchIds.join(','));
+      url.searchParams.set('key', apiKey);
+      
+      const response = await fetch(url.toString());
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`YouTube API error: ${JSON.stringify(error)}`);
+      }
+      
+      const data = await response.json();
+
+      const videos: VideoItem[] = (data.items || []).map((video: any) => {
+        const snippet = video.snippet;
+        const statistics = video.statistics;
+        const contentDetails = video.contentDetails;
+        
+        const viewCount = statistics?.viewCount 
+          ? formatViewCount(parseInt(statistics.viewCount))
+          : undefined;
+
+        const duration = contentDetails?.duration 
+          ? formatDuration(contentDetails.duration)
+          : '0:00';
+
+        return {
+          id: video.id || '',
+          title: snippet?.title || 'Untitled',
+          thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
+          duration: duration,
+          publishedAt: snippet?.publishedAt || '',
+          viewCount: viewCount,
+          description: snippet?.description || undefined,
+        };
+      });
+      
+      allVideos.push(...videos);
+    }
+
+    // Already sorted by date from search API, but ensure consistency
+    allVideos.sort((a, b) => {
+      const dateA = new Date(a.publishedAt).getTime();
+      const dateB = new Date(b.publishedAt).getTime();
+      return dateB - dateA; // Newest first
+    });
+
+    // Cache the fetched data
+    writeCache(channelId, allVideos);
+
+    console.log(`Cached ${allVideos.length} videos for channel ${channelId}`);
+    return allVideos;
+
+  } catch (error) {
+    console.error('Error fetching channel videos:', error);
+    
+    // Try to return stale cache if available
+    try {
+      if (fs.existsSync(CACHE_FILE)) {
+        const cacheContent = fs.readFileSync(CACHE_FILE, 'utf-8');
+        const cachedData: CachedChannelData = JSON.parse(cacheContent);
+        const cacheEntry = cachedData[channelId];
+        if (cacheEntry && cacheEntry.videos) {
+          console.log(`⚠️  Returning stale cache for channel ${channelId} due to API error`);
+          return cacheEntry.videos;
+        }
+      }
+    } catch (cacheError) {
+      // Ignore cache read errors
+    }
+    
     console.log('⚠️  YouTube API unavailable, returning empty video list');
     return [];
   }
