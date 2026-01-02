@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import express from "express";
 import { storage } from "./storage";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
 import { getPodcastFeed } from "./podcast";
@@ -10,6 +11,7 @@ import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { metrics } from "./monitoring";
 import { registerHealthRoutes } from "./health";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
+import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, STRIPE_CONFIG } from "./stripe";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply API rate limiting to all /api routes
@@ -283,6 +285,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error fetching Printful product:', error);
       res.status(500).json({ error: 'Failed to fetch product details' });
     }
+  });
+
+  // Stripe Checkout: Create checkout session
+  app.post("/api/stripe/create-checkout", async (req, res) => {
+    try {
+      const { productId, variantId, productName, price, quantity, imageUrl } = req.body;
+
+      // Validate inputs
+      if (!productId || !variantId || !productName || !price) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      if (!/^\d+$/.test(productId) || !/^\d+$/.test(variantId)) {
+        return res.status(400).json({ error: 'Invalid product or variant ID' });
+      }
+
+      const priceInCents = Math.round(parseFloat(price) * 100);
+      if (isNaN(priceInCents) || priceInCents <= 0) {
+        return res.status(400).json({ error: 'Invalid price' });
+      }
+
+      const session = await createCheckoutSession({
+        productId,
+        variantId,
+        productName,
+        price: priceInCents,
+        quantity: quantity || 1,
+        imageUrl,
+      });
+
+      if (!session) {
+        return res.status(500).json({ error: 'Failed to create checkout session' });
+      }
+
+      res.json({ sessionId: session.id, url: session.url });
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  // Stripe: Get checkout session details
+  app.get("/api/stripe/checkout/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+
+      if (!sessionId.startsWith('cs_')) {
+        return res.status(400).json({ error: 'Invalid session ID format' });
+      }
+
+      const session = await getCheckoutSession(sessionId);
+      
+      if (!session) {
+        return res.status(404).json({ error: 'Session not found' });
+      }
+
+      res.json({
+        id: session.id,
+        status: session.status,
+        payment_status: session.payment_status,
+        customer_email: session.customer_details?.email,
+        amount_total: session.amount_total,
+      });
+    } catch (error) {
+      console.error('Error fetching checkout session:', error);
+      res.status(500).json({ error: 'Failed to fetch session details' });
+    }
+  });
+
+  // Stripe Webhook: Handle payment events
+  app.post("/api/stripe/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+    const signature = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!signature || !webhookSecret) {
+      console.error('Missing webhook signature or secret');
+      return res.status(400).send('Webhook signature verification failed');
+    }
+
+    try {
+      const event = verifyWebhookSignature(req.body, signature as string, webhookSecret);
+
+      if (!event) {
+        return res.status(400).send('Invalid signature');
+      }
+
+      console.log('Webhook event received:', event.type);
+
+      // Handle the event
+      switch (event.type) {
+        case 'checkout.session.completed':
+          const session = event.data.object as any;
+          console.log('Payment successful:', session.id);
+          
+          // TODO: Create Printful order here
+          const orderData = createPrintfulOrderFromSession(session);
+          if (orderData) {
+            console.log('Order data ready for Printful:', JSON.stringify(orderData, null, 2));
+            // In Phase 2, we'll actually create the Printful order here
+          }
+          
+          break;
+
+        case 'checkout.session.async_payment_succeeded':
+          console.log('Async payment succeeded');
+          break;
+
+        case 'checkout.session.async_payment_failed':
+          console.log('Async payment failed');
+          break;
+
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error('Webhook error:', error);
+      res.status(400).send('Webhook error');
+    }
+  });
+
+  // Get Stripe config (publishable key for client-side)
+  app.get("/api/stripe/config", (req, res) => {
+    res.json({
+      publishableKey: STRIPE_CONFIG.publishableKey,
+    });
   });
 
   // A03: Injection Prevention - Validate D&D Beyond character ID

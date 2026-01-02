@@ -11,6 +11,8 @@ import Privacy from "@/pages/Privacy";
 import TermsOfService from "@/pages/TermsOfService";
 import Sponsors from "@/pages/Sponsors";
 import PressKit from "@/pages/PressKit";
+import CheckoutSuccess from "@/pages/CheckoutSuccess";
+import CheckoutCancel from "@/pages/CheckoutCancel";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -33,6 +35,8 @@ function Router() {
         <Route path="/characters/:id" component={CharacterDetail} />
         <Route path="/sponsors" component={Sponsors} />
         <Route path="/press-kit" component={PressKit} />
+        <Route path="/checkout/success" component={CheckoutSuccess} />
+        <Route path="/checkout/cancel" component={CheckoutCancel} />
         <Route path="/legal/privacy" component={Privacy} />
         <Route path="/legal/tos" component={TermsOfService} />
         <Route component={NotFound} />

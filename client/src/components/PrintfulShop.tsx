@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, ExternalLink, AlertCircle, CreditCard } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { createCheckout } from "@/lib/stripe";
+import { useState } from "react";
 
 interface Product {
   id: string;
@@ -11,13 +13,21 @@ interface Product {
   image: string;
   url: string;
   inStock: boolean;
+  variants?: Array<{
+    id: string;
+    name: string;
+    price: string;
+    inStock: boolean;
+  }>;
 }
 
 interface PrintfulShopProps {
-  enableCheckout?: boolean; // Future: enable Stripe checkout
+  enableCheckout?: boolean;
 }
 
 export default function PrintfulShop({ enableCheckout = false }: PrintfulShopProps) {
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+
   const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ['/api/printful/products'],
     queryFn: async () => {
@@ -27,19 +37,51 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
       }
       return response.json();
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
   const displayProducts = products?.slice(0, 4) || [];
 
-  const handleProductClick = (product: Product) => {
-    if (enableCheckout) {
-      // Future: Navigate to product detail page with Stripe checkout
-      window.location.href = product.url;
-    } else {
-      // For now, open Etsy or external link as fallback
-      // You can replace this with your Etsy URL or keep it as internal link
-      window.location.href = product.url;
+  const handleProductClick = async (product: Product) => {
+    if (!enableCheckout) {
+      // Link to Etsy
+      window.open('https://www.etsy.com/shop/talesofaneria', '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Get first available variant or use product directly
+    const variant = product.variants?.[0];
+    if (!variant) {
+      console.error('No variants available for product');
+      return;
+    }
+
+    setCheckoutLoading(product.id);
+
+    try {
+      // Extract numeric price from string like "$24.99" or "$24.99 - $29.99"
+      const priceMatch = variant.price.match(/\$?([\d.]+)/);
+      const price = priceMatch ? priceMatch[1] : '0';
+
+      const result = await createCheckout({
+        productId: product.id,
+        variantId: variant.id,
+        productName: `${product.name} - ${variant.name}`,
+        price,
+        quantity: 1,
+        imageUrl: product.image,
+      });
+
+      if (result?.url) {
+        window.location.href = result.url;
+      } else {
+        alert('Failed to create checkout session. Please try again.');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to start checkout. Please try again.');
+    } finally {
+      setCheckoutLoading(null);
     }
   };
 
