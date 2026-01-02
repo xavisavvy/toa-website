@@ -346,10 +346,11 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     const data = await response.json();
     console.log(`[getCatalogVariantId] Full API response:`, JSON.stringify(data, null, 2).substring(0, 2000));
     
-    const variant: PrintfulSyncVariant = data.result?.sync_variant;
+    // The API returns the variant directly at data.result, not data.result.sync_variant
+    const variant: PrintfulSyncVariant = data.result;
     
     if (!variant) {
-      console.error(`No sync_variant found in response for ${syncVariantId}`);
+      console.error(`No result found in response for ${syncVariantId}`);
       console.error(`Response structure:`, JSON.stringify(data, null, 2));
       return null;
     }
@@ -360,10 +361,10 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     console.log(`[getCatalogVariantId] variant.product_id:`, variant?.product_id);
     console.log(`[getCatalogVariantId] variant.product?.variant_id:`, variant?.product?.variant_id);
     
-    // Try multiple possible locations for the catalog variant ID
+    // The catalog variant ID is at variant.variant_id or variant.product.variant_id
     const catalogId = variant?.variant_id 
       || variant?.product?.variant_id 
-      || variant?.product_id;  // Sometimes Printful uses product_id as the catalog ID
+      || variant?.product_id;
     
     if (!catalogId) {
       console.error(`No variant_id found in sync variant ${syncVariantId}`);
