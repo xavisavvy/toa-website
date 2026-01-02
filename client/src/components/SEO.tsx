@@ -9,6 +9,10 @@ interface SEOProps {
   keywords?: string;
   noindex?: boolean;
   jsonLd?: object;
+  ogImageAlt?: string;
+  ogImageWidth?: string;
+  ogImageHeight?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
 }
 
 export default function SEO({
@@ -20,8 +24,17 @@ export default function SEO({
   keywords = 'TTRPG, Dungeons and Dragons, D&D, live play, actual play, tabletop RPG, fantasy, Aneria, podcast, YouTube',
   noindex = false,
   jsonLd,
+  ogImageAlt = 'Tales of Aneria - Epic TTRPG Live Play Series',
+  ogImageWidth = '1200',
+  ogImageHeight = '630',
+  twitterCard = 'summary_large_image',
 }: SEOProps) {
   useEffect(() => {
+    // Ensure absolute URL for OG image
+    const absoluteOgImage = ogImage.startsWith('http') 
+      ? ogImage 
+      : `https://talesofaneria.com${ogImage}`;
+
     // Update document title
     document.title = title;
 
@@ -47,13 +60,20 @@ export default function SEO({
     updateMetaTag('og:title', title, true);
     updateMetaTag('og:description', description, true);
     updateMetaTag('og:url', canonical, true);
-    updateMetaTag('og:image', ogImage, true);
+    updateMetaTag('og:image', absoluteOgImage, true);
+    updateMetaTag('og:image:secure_url', absoluteOgImage, true);
+    updateMetaTag('og:image:alt', ogImageAlt, true);
+    updateMetaTag('og:image:width', ogImageWidth, true);
+    updateMetaTag('og:image:height', ogImageHeight, true);
     updateMetaTag('og:type', ogType, true);
+    updateMetaTag('og:site_name', 'Tales of Aneria', true);
 
     // Twitter Card
+    updateMetaTag('twitter:card', twitterCard);
     updateMetaTag('twitter:title', title);
     updateMetaTag('twitter:description', description);
-    updateMetaTag('twitter:image', ogImage);
+    updateMetaTag('twitter:image', absoluteOgImage);
+    updateMetaTag('twitter:image:alt', ogImageAlt);
 
     // Robots
     if (noindex) {
@@ -83,7 +103,7 @@ export default function SEO({
         document.head.appendChild(scriptElement);
       }
     }
-  }, [title, description, canonical, ogImage, ogType, keywords, noindex, jsonLd]);
+  }, [title, description, canonical, ogImage, ogType, keywords, noindex, jsonLd, ogImageAlt, ogImageWidth, ogImageHeight, twitterCard]);
 
   return null; // This component doesn't render anything
 }
