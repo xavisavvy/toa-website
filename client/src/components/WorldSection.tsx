@@ -205,6 +205,7 @@ export default function WorldSection() {
           description: "High school students investigating the supernatural",
         },
       ],
+      comingSoon: false,
       link: "https://www.youtube.com/watch?v=GzMnW52hmP4",
       backgroundImage: pterrordaleBg,
     },
