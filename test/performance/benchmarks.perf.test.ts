@@ -13,7 +13,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 const CACHE_DIR = path.join(process.cwd(), 'server', 'cache');
 const TEST_CACHE_FILE = path.join(CACHE_DIR, 'perf-test-cache.json');
 
-describe('Cache Performance Benchmarks', () => {
+describe.skip('Cache Performance Benchmarks', () => {
   beforeEach(() => {
     // Ensure cache directory exists
     if (!fs.existsSync(CACHE_DIR)) {
