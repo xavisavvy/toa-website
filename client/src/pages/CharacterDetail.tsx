@@ -245,13 +245,13 @@ export default function CharacterDetail() {
                                 {image.caption}
                               </p>
                               <div className="flex items-center gap-2 flex-wrap">
-                                {image.type && (
+                                {image.artist && (
                                   <Badge 
-                                    variant={image.type === 'official' ? 'default' : 'secondary'} 
+                                    variant="secondary"
                                     className="text-xs"
                                     data-testid={`badge-type-${image.id}`}
                                   >
-                                    {image.type === 'official' ? 'Official Art' : 'Fan Art'}
+                                    Fan Art
                                   </Badge>
                                 )}
                                 {image.isAiGenerated && (
