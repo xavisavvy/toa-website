@@ -1,5 +1,6 @@
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import type React from "react";
 
 import taebrinBg from "@/assets/creepy-forest.webp";
 import aneriaBg from "@/assets/feat-aneria.webp";
@@ -214,8 +215,8 @@ export default function WorldSection() {
       description:
         "A bronze age themed land inhabited by the ancient Saurian people, where dinosaur civilizations thrive",
       campaigns: [],
-      comingSoon: true,
-      link: "",
+      comingSoon: false,
+      link: "https://www.youtube.com/playlist?list=PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY",
       backgroundImage: taebrinBg,
     },
   ];
@@ -310,7 +311,7 @@ export default function WorldSection() {
                   </div>
                 )}
 
-                {!world.comingSoon && world.link === worldAnvilUrl && (
+                {!world.comingSoon && (
                   <div className="pt-2">
                     <Button
                       variant="outline"
@@ -323,7 +324,7 @@ export default function WorldSection() {
                       }}
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
-                      Explore on WorldAnvil
+                      {world.link === worldAnvilUrl ? 'Explore on WorldAnvil' : 'Explore on YouTube'}
                     </Button>
                   </div>
                 )}
