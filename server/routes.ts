@@ -7,7 +7,7 @@ import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
 import { metrics } from "./monitoring";
 import { getPodcastFeed } from "./podcast";
-import { getPrintfulSyncProducts, getPrintfulProductDetails } from "./printful";
+import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { storage } from "./storage";
@@ -390,9 +390,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
           
-          // Create Printful order automatically
+          // Get sync variant ID from metadata
+          const syncVariantId = fullSession.metadata?.printful_variant_id;
+          if (!syncVariantId) {
+            console.error('❌ No Printful variant ID in session metadata');
+            break;
+          }
+
+          // Convert sync variant ID to catalog variant ID
+          const catalogVariantId = await getCatalogVariantId(syncVariantId);
+          if (!catalogVariantId) {
+            console.error(`❌ Could not resolve catalog variant ID for sync variant ${syncVariantId}`);
+            break;
+          }
+
+          console.log(`📦 Resolved variant: sync=${syncVariantId} → catalog=${catalogVariantId}`);
+          
+          // Create order data with catalog variant ID
           const orderData = createPrintfulOrderFromSession(fullSession);
           if (orderData) {
+            // Replace sync variant ID with catalog variant ID
+            orderData.items = orderData.items.map(item => ({
+              ...item,
+              variant_id: catalogVariantId
+            }));
+
             console.log('📦 Creating Printful order...');
             console.log('Recipient:', orderData.recipient.name, orderData.recipient.email);
             console.log('Items:', orderData.items);

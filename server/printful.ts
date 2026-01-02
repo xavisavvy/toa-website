@@ -1,49 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-interface PrintfulVariant {
-  id: number;
-  product_id: number;
-  name: string;
-  size: string;
-  color: string;
-  color_code: string;
-  image: string;
-  price: string;
-  in_stock: boolean;
-  availability_status: string;
-}
-
-interface PrintfulProduct {
-  id: number;
-  type: string;
-  type_name: string;
-  title: string;
-  brand: string;
-  model: string;
-  image: string;
-  variant_count: number;
-  currency: string;
-  files: Array<{
-    id: number;
-    type: string;
-    title: string;
-    additional_price: string;
-  }>;
-  options: Array<{
-    id: string;
-    title: string;
-    type: string;
-    values: Record<string, string>;
-    additional_price: string | null;
-  }>;
-  dimensions: {
-    '1x1': string;
-  } | null;
-  is_discontinued: boolean;
-  description: string;
-}
-
 interface PrintfulSyncProduct {
   id: number;
   external_id: string;
@@ -345,6 +302,41 @@ export async function getPrintfulProductDetails(productId: string): Promise<Prin
     };
   } catch (error) {
     console.error(`Error fetching product ${productId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Get catalog variant ID from sync variant ID
+ */
+export async function getCatalogVariantId(syncVariantId: string): Promise<number | null> {
+  const apiKey = process.env.PRINTFUL_API_KEY;
+
+  if (!apiKey) {
+    console.error('Printful API key not configured');
+    return null;
+  }
+
+  try {
+    const response = await fetch(`https://api.printful.com/store/variants/${syncVariantId}`, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch sync variant ${syncVariantId}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const variant: PrintfulSyncVariant = data.result?.sync_variant;
+    
+    // Return the catalog variant ID
+    return variant?.variant_id || variant?.product?.variant_id || null;
+  } catch (error) {
+    console.error(`Error fetching sync variant ${syncVariantId}:`, error);
     return null;
   }
 }
