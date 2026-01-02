@@ -5,10 +5,16 @@
 ## 🎯 Current Sprint
 
 ### In Progress
-- [ ] Update sponsors endpoint with sponsorship contact link (best practices)
+- [ ] Production deployment preparation
+  - [ ] Switch to production Stripe keys
+  - [ ] Configure production webhook endpoint
+  - [ ] Test end-to-end checkout flow
+  - [ ] Update donation link to production
 
 ### Up Next
-- [ ] TBD
+- [ ] Phase 2: Automated Printful order creation
+- [ ] Email order confirmations
+- [ ] Customer order tracking
 
 ---
 
@@ -76,6 +82,35 @@
 ## ✅ Completed Features
 
 ### 2026-01-02
+- [x] **Printful + Stripe E-commerce Integration** - Complete shop implementation
+  - [x] Printful API integration with product catalog
+  - [x] Stripe Checkout for secure payments
+  - [x] Webhook handler for payment confirmation
+  - [x] Product filtering by category and type
+  - [x] Full product catalog page (/shop)
+  - [x] Success/cancel checkout pages
+  - [x] Support section with multiple funding options
+  - [x] CSP configuration for Stripe.js
+  - [x] Redis caching with graceful degradation
+  - [x] Environment variable sync automation
+  - [x] Comprehensive test coverage
+  - [x] Documentation updates
+- [x] **YouTube Shorts Integration** - Latest shorts section on homepage
+  - [x] Fetch 5 most recent YouTube Shorts
+  - [x] Same caching mechanism as episodes
+  - [x] Responsive display component
+- [x] **Sponsors Page Enhancement** - Best practices implementation
+  - [x] Concrete audience metrics
+  - [x] Media kit download CTA
+  - [x] Professional contact form
+  - [x] Value proposition improvements
+  - [x] SEO optimization
+- [x] **Docker & Environment Improvements**
+  - [x] Fixed Redis permission issues
+  - [x] Graceful Redis degradation
+  - [x] Environment variable validation
+  - [x] .env sync automation script
+  - [x] Local development domain setup (dev-local.talesofaneria.com)
 - [x] **GitHub Actions Cache Management** - Programmatic cache cleanup solution
   - Automated cleanup script with multiple strategies
   - Comprehensive documentation

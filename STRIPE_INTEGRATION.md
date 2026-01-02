@@ -15,19 +15,29 @@ Your Stripe integration is fully implemented and ready to use. Here's what's bee
 
 ---
 
-## 🔑 Environment Variables (Already Configured)
+## 🔑 Environment Variables Required
 
 ```bash
 # Printful
-PRINTFUL_API_KEY=5w5cFAnClnbxlQHJp8Pjny7QjKGqoSULvHwcdxBA
+PRINTFUL_API_KEY=your_printful_api_key_here
 
-# Stripe (Test/Sandbox)
-STRIPE_PUBLISHABLE_KEY=pk_test_51SkxsyKIWXnqSsOfO0VW0pbb9CEoAgzdHb0iiEZQmMbMwgycTSGYWlfHsD6PlwG0wc2ck7dckC7xIr94DbxoFjOx003HOAEJHB
-STRIPE_SECRET_KEY=sk_test_51SkxsyKIWXnqSsOfzjiSCifRjqMvq79MCvjjeo01lVUjXfcceQzMiU9lO6F4hQoWQ6dSKi07NHvDUHtBnfTPnZBi00xG7b6jq4
+# Stripe (Test/Sandbox - get your own keys from Stripe Dashboard)
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Stripe (Production - when ready to go live)
+# STRIPE_PUBLISHABLE_KEY=pk_live_...
+# STRIPE_SECRET_KEY=sk_live_...
 
 # Business Info
 BUSINESS_NAME=Tales of Aneria
 SUPPORT_EMAIL=TalesOfAneria@gmail.com
+
+# Stripe URLs
+BASE_URL=https://talesofaneria.com
+STRIPE_DONATION_URL_TEST=https://donate.stripe.com/test_...
+STRIPE_DONATION_URL=https://donate.stripe.com/...
 ```
 
 ---
