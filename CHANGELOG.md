@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.24.0](https://github.com/xavisavvy/toa-website/compare/v1.23.0...v1.24.0) (2026-01-02)
+
+
+### Features
+
+* integrate YouTube channel videos in frontend ([b8048f0](https://github.com/xavisavvy/toa-website/commit/b8048f0b42e21ff706ed26911676f646146a452a)), closes [#1](https://github.com/xavisavvy/toa-website/issues/1)
+
 ## [1.23.0](https://github.com/xavisavvy/toa-website/compare/v1.22.12...v1.23.0) (2026-01-02)
 
 
