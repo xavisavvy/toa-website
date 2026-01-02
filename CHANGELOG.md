@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.25.0](https://github.com/xavisavvy/toa-website/compare/v1.24.5...v1.25.0) (2026-01-02)
+
+
+### Features
+
+* add comprehensive tests for PrintfulShop and LatestShorts ([9d2a420](https://github.com/xavisavvy/toa-website/commit/9d2a420b8f8bec9bc7ec4148be2ee725c8d2e8fb))
+* add GitHub Actions cache cleanup script ([f5c18e9](https://github.com/xavisavvy/toa-website/commit/f5c18e92643b7a6bbe4876b6a30d98331c482f50))
+* Add local development domain support and environment documentation ([fcc3276](https://github.com/xavisavvy/toa-website/commit/fcc3276ee09df9d8ee91b1e0d36f4d1393a1bf30))
+* Add Printful integration as Etsy alternative ([8d719d7](https://github.com/xavisavvy/toa-website/commit/8d719d7ef3d3b857351dad202a0992bd3ee7edc1))
+* Add Printful store integration with Stripe payments ([6b8dc6b](https://github.com/xavisavvy/toa-website/commit/6b8dc6b8ca037db90588ef0395d054b55a2d8848))
+* Add Printful store integration with Stripe payments ([5025bb5](https://github.com/xavisavvy/toa-website/commit/5025bb55fdeceab6835a3fb83be85b3a0d00eda9))
+* Add test script for local domain setup ([fdcb9b0](https://github.com/xavisavvy/toa-website/commit/fdcb9b0fb1e32eece0783e92b95f4acf7dc06dc4))
+* Add YouTube Shorts section to homepage ([b6c5cbe](https://github.com/xavisavvy/toa-website/commit/b6c5cbeb06f1ddfc96a35c2486416ee0397f0840))
+* Complete Stripe checkout integration ([2d33721](https://github.com/xavisavvy/toa-website/commit/2d33721ac0861454d4e73de1e0b041b7d2588fcc))
+* implement graceful health check degradation ([f36809a](https://github.com/xavisavvy/toa-website/commit/f36809ab36fd34f243598d10d0f738aa2d05b5fe))
+* Improve sponsors page with industry best practices ([8a26691](https://github.com/xavisavvy/toa-website/commit/8a266912dfd666511ad38f5b489ed1e0a3c1430a))
+* Phase 2 - Automatic Printful order creation + ENV tracking ([2128f92](https://github.com/xavisavvy/toa-website/commit/2128f9222e42684f78a6dd2caa716ae1d046cd51))
+* Switch to PrintfulShop with Stripe checkout enabled ([d7659cb](https://github.com/xavisavvy/toa-website/commit/d7659cb58521a9cab52aec87aba563abe9d97e19))
+
+
+### Bug Fixes
+
+* Add Stripe and Printful to CSP + lint fixes ([f5c090d](https://github.com/xavisavvy/toa-website/commit/f5c090d5e55d8f3d7e8edb505c63c7df44e49fb9))
+* Docker Compose issues for Windows ([dca75cf](https://github.com/xavisavvy/toa-website/commit/dca75cff93d8b9caf4cdd4e30190f7c85764a628))
+* implement pagination for GitHub CLI cache fetching ([332537d](https://github.com/xavisavvy/toa-website/commit/332537dddb46a8f7615f182622d8133555d67caa))
+* PostCSS 'from' option warning ([41c160b](https://github.com/xavisavvy/toa-website/commit/41c160bba017a5e236d95f9074b1f98ea8a091cc))
+* Redis Docker permission error for Windows ([8ec1af4](https://github.com/xavisavvy/toa-website/commit/8ec1af49006ea5d1e97bb62b926a14c99ccdab73))
+
 ### [1.24.6](https://github.com/xavisavvy/toa-website/compare/v1.24.5...v1.24.6) (2026-01-02)
 
 ### [1.24.5](https://github.com/xavisavvy/toa-website/compare/v1.24.4...v1.24.5) (2026-01-02)
