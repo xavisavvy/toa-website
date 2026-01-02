@@ -38,6 +38,8 @@
     "test:ci": "vitest run --coverage && playwright test",
     "coverage:view": "open coverage/index.html",
     "clean:reports": "rimraf reports coverage playwright-report test-results",
+    "clear-cache": "node scripts/clear-cache.mjs",
+    "check-quota": "node scripts/check-quota.mjs",
     "db:push": "drizzle-kit push",
     "update-taebrin-images": "tsx scripts/update-taebrin-with-custom-images.ts",
     "release": "standard-version",
