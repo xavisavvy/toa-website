@@ -62,7 +62,8 @@ export function configureSecurity(app: Express) {
             "https://hooks.stripe.com", // Stripe webhooks
           ],
           objectSrc: ["'none'"],
-          upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+          // Only upgrade insecure requests in production
+          ...(process.env.NODE_ENV === 'production' ? { upgradeInsecureRequests: [] } : {}),
         },
       },
       // Strict-Transport-Security - Forces HTTPS (only in production)

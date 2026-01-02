@@ -56,6 +56,12 @@ export default defineConfig({
     sourcemap: process.env.NODE_ENV === 'development',
   },
   server: {
+    host: '0.0.0.0', // Allow access from any host
+    port: 5000,
+    strictPort: true,
+    hmr: {
+      clientPort: 5000, // Use the same port for HMR
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],

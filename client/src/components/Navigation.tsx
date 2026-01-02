@@ -1,8 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, MouseEvent } from "react";
 import { Link, useLocation } from "wouter";
+
 import logoSvg from "@/assets/logo-TOA.svg";
+import { Button } from "@/components/ui/button";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,11 +14,16 @@ export default function Navigation() {
     { label: "Podcast", href: "#podcast" },
     { label: "Characters", href: "#characters" },
     { label: "Lore", href: "#lore" },
-    { label: "Shop", href: "#shop" },
+    { label: "Shop", href: "/shop", isRoute: true },
     { label: "About", href: "#about" },
   ];
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: MouseEvent<HTMLAnchorElement>, href: string, isRoute: boolean = false) => {
+    // If it's a route (not a hash), let the default behavior happen
+    if (isRoute) {
+      return;
+    }
+    
     e.preventDefault();
     const sectionId = href.replace('#', '');
     
@@ -60,7 +66,7 @@ export default function Navigation() {
                 href={item.href}
                 className="text-foreground/80 hover:text-foreground transition-colors"
                 data-testid={`link-nav-${item.label.toLowerCase()}`}
-                onClick={(e) => handleNavClick(e, item.href)}
+                onClick={(e) => handleNavClick(e, item.href, item.isRoute)}
               >
                 {item.label}
               </a>
@@ -90,7 +96,7 @@ export default function Navigation() {
                 className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
                 data-testid={`link-mobile-${item.label.toLowerCase()}`}
                 onClick={(e) => {
-                  handleNavClick(e, item.href);
+                  handleNavClick(e, item.href, item.isRoute);
                   setIsOpen(false);
                 }}
               >

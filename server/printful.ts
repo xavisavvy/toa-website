@@ -190,11 +190,12 @@ export async function getPrintfulSyncProducts(limit: number = 20): Promise<Print
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Printful API error:', response.status);
+      console.error('Error details:', errorText);
       if (process.env.NODE_ENV === 'development') {
-        const errorText = await response.text();
-        console.log('⚠️  Printful API error (expected in local dev):', response.status, errorText);
-      } else {
-        console.error('Printful API error:', response.status);
+        console.log('⚠️  Make sure you have created sync products in your Printful dashboard');
+        console.log('⚠️  Visit: https://www.printful.com/dashboard/sync-products');
       }
       return [];
     }
