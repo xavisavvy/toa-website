@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.29.0](https://github.com/xavisavvy/toa-website/compare/v1.28.3...v1.29.0) (2026-01-02)
+
+
+### Features
+
+* update Privacy Policy for Stripe and Printful integration ([564e362](https://github.com/xavisavvy/toa-website/commit/564e362e43086783f47c7fd419c1fbb0b84ae571))
+
 ### [1.28.3](https://github.com/xavisavvy/toa-website/compare/v1.28.2...v1.28.3) (2026-01-02)
 
 
