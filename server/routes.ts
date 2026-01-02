@@ -404,11 +404,19 @@ export function registerRoutes(app: Express): Server {
           const catalogVariantId = await getCatalogVariantId(syncVariantId);
           if (!catalogVariantId) {
             console.error(`❌ Could not resolve catalog variant ID for sync variant ${syncVariantId}`);
+            console.error('⚠️  CRITICAL: Payment was successful but order cannot be auto-fulfilled');
             console.error('This likely means:');
-            console.error('1. The variant does not exist in your Printful store');
+            console.error('1. The variant does not exist in your Printful store (most common)');
             console.error('2. The Printful API key is incorrect');
             console.error('3. The sync variant ID in metadata is wrong');
-            console.error(`Check: https://api.printful.com/store/variants/${syncVariantId}`);
+            console.error(`📋 Manual Action Required:`);
+            console.error(`   - Check session: https://dashboard.stripe.com/payments/${eventSession.id}`);
+            console.error(`   - Check variant: https://api.printful.com/store/variants/${syncVariantId}`);
+            console.error(`   - Manually create Printful order for: ${eventSession.customer_details?.email}`);
+            console.error(`   - Amount paid: $${eventSession.amount_total / 100} ${eventSession.currency.toUpperCase()}`);
+            // Don't break - continue processing webhook to acknowledge receipt
+            // But the order will need manual fulfillment
+            console.log('✅ Webhook acknowledged, but order needs manual fulfillment');
             break;
           }
 
