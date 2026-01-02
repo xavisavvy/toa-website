@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.28.0](https://github.com/xavisavvy/toa-website/compare/v1.27.0...v1.28.0) (2026-01-02)
+
+
+### Features
+
+* Add filtering and sorting to shop page ([7ea1812](https://github.com/xavisavvy/toa-website/commit/7ea1812f1e1302f82feae7dc0196ad3aecd6a5af))
+
 ## [1.27.0](https://github.com/xavisavvy/toa-website/compare/v1.26.0...v1.27.0) (2026-01-02)
 
 
