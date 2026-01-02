@@ -11,7 +11,7 @@ import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
-import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
+import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
 
 export function registerRoutes(app: Express): Server {
   // Apply API rate limiting to all /api routes
@@ -102,6 +102,25 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('Error fetching YouTube Shorts:', error);
       res.status(500).json({ error: 'Failed to fetch YouTube Shorts' });
+    }
+  });
+
+  // YouTube channel statistics endpoint
+  app.get("/api/youtube/channel/:channelId/stats", async (req, res) => {
+    try {
+      const { channelId } = req.params;
+
+      // A03: Validate channelId format (YouTube channel IDs start with UC)
+      if (!/^UC[a-zA-Z0-9_-]+$/.test(channelId)) {
+        logSecurityEvent('INVALID_CHANNEL_ID', { channelId, ip: req.ip });
+        return res.status(400).json({ error: 'Invalid channel ID format. Channel IDs must start with UC' });
+      }
+
+      const stats = await getChannelStats(channelId);
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching YouTube channel stats:', error);
+      res.status(500).json({ error: 'Failed to fetch channel statistics' });
     }
   });
 

@@ -156,7 +156,7 @@ function writeCache(playlistId: string, videos: VideoItem[]): void {
   }
 }
 
-async function getPlaylistVideosDirectAPI(playlistId: string, maxResults: number): Promise<VideoItem[]> {
+async function getPlaylistVideosDirectAPI(playlistId: string, _maxResults: number): Promise<VideoItem[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const allVideoIds: string[] = [];
   let nextPageToken: string | undefined = undefined;
@@ -555,7 +555,7 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
           return cacheEntry.videos;
         }
       }
-    } catch (cacheError) {
+    } catch (_cacheError) {
       // Ignore cache read errors
     }
     
@@ -616,4 +616,134 @@ export async function getChannelShorts(channelId: string, maxResults: number = 5
   });
   
   return shorts.slice(0, maxResults);
+}
+
+/**
+ * Channel statistics interface
+ */
+export interface ChannelStats {
+  subscriberCount: string;
+  videoCount: string;
+  viewCount: string;
+  estimatedWatchHours: string;
+}
+
+interface ChannelStatsCacheEntry {
+  stats: ChannelStats;
+  timestamp: number;
+}
+
+const CHANNEL_STATS_CACHE_FILE = path.join(CACHE_DIR, 'youtube-channel-stats.json');
+
+/**
+ * Fetch channel statistics from YouTube API
+ * Cached for 24 hours
+ * 
+ * @param channelId - YouTube channel ID (starts with UC)
+ * @returns Channel statistics including subscribers, videos, views, and estimated watch hours
+ */
+export async function getChannelStats(channelId: string): Promise<ChannelStats> {
+  try {
+    // Check cache first
+    if (fs.existsSync(CHANNEL_STATS_CACHE_FILE)) {
+      const cacheContent = fs.readFileSync(CHANNEL_STATS_CACHE_FILE, 'utf-8');
+      const cachedData: { [key: string]: ChannelStatsCacheEntry } = JSON.parse(cacheContent);
+      const cacheEntry = cachedData[channelId];
+      
+      if (cacheEntry && isCacheValid(cacheEntry)) {
+        const age = Math.floor((Date.now() - cacheEntry.timestamp) / 1000 / 60);
+        console.log(`Using cached channel stats for ${channelId} (age: ${age}m)`);
+        return cacheEntry.stats;
+      }
+    }
+
+    console.log(`Fetching fresh channel stats for ${channelId}...`);
+    
+    const youtube = await getUncachableYouTubeClient();
+    
+    const response = await youtube.channels.list({
+      part: ['statistics', 'contentDetails'],
+      id: [channelId],
+    });
+
+    if (!response.data.items || response.data.items.length === 0) {
+      throw new Error(`Channel ${channelId} not found`);
+    }
+
+    const channel = response.data.items[0];
+    const statistics = channel.statistics;
+
+    if (!statistics) {
+      throw new Error('Channel statistics not available');
+    }
+
+    // Format numbers with abbreviations
+    const subscriberCount = formatLargeNumber(parseInt(statistics.subscriberCount || '0'));
+    const videoCount = statistics.videoCount || '0';
+    const viewCount = statistics.viewCount || '0';
+    
+    // Estimate watch hours: Assume average video duration of 2 hours
+    // Watch hours ≈ (Total Views × Average Duration) / 60
+    // This is a rough estimate since we don't have actual watch time from API
+    const avgVideoDurationMinutes = 120; // 2 hours average
+    const estimatedWatchMinutes = parseInt(viewCount) * avgVideoDurationMinutes;
+    const estimatedWatchHours = Math.floor(estimatedWatchMinutes / 60);
+    
+    const stats: ChannelStats = {
+      subscriberCount,
+      videoCount,
+      viewCount: formatLargeNumber(parseInt(viewCount)),
+      estimatedWatchHours: formatLargeNumber(estimatedWatchHours),
+    };
+
+    // Update cache
+    let cachedData: { [key: string]: ChannelStatsCacheEntry } = {};
+    if (fs.existsSync(CHANNEL_STATS_CACHE_FILE)) {
+      const cacheContent = fs.readFileSync(CHANNEL_STATS_CACHE_FILE, 'utf-8');
+      cachedData = JSON.parse(cacheContent);
+    }
+
+    cachedData[channelId] = {
+      stats,
+      timestamp: Date.now(),
+    };
+
+    if (!fs.existsSync(CACHE_DIR)) {
+      fs.mkdirSync(CACHE_DIR, { recursive: true });
+    }
+    fs.writeFileSync(CHANNEL_STATS_CACHE_FILE, JSON.stringify(cachedData, null, 2));
+    
+    console.log(`Channel stats cached successfully for ${channelId}`);
+    
+    return stats;
+  } catch (error) {
+    console.error('Error fetching channel stats:', error);
+    
+    // Try to return stale cache on error
+    if (fs.existsSync(CHANNEL_STATS_CACHE_FILE)) {
+      const cacheContent = fs.readFileSync(CHANNEL_STATS_CACHE_FILE, 'utf-8');
+      const cachedData: { [key: string]: ChannelStatsCacheEntry } = JSON.parse(cacheContent);
+      const cacheEntry = cachedData[channelId];
+      
+      if (cacheEntry) {
+        console.log(`⚠️  Returning stale cache for channel stats ${channelId} due to API error`);
+        return cacheEntry.stats;
+      }
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Format large numbers with K/M abbreviations
+ */
+function formatLargeNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toString();
 }

@@ -1,4 +1,5 @@
 import { Youtube, Twitter, Instagram, Twitch, Globe } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import brigetteAvatar from "@/assets/cast-brigette.webp";
 import colbyAvatar from "@/assets/cast-colby.webp";
@@ -14,6 +15,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import castData from "@/data/cast.json";
+
+// YouTube channel ID for Tales of Aneria
+const YOUTUBE_CHANNEL_ID = "UC7PTdudxJ43HMLJVv2QxVoQ";
+
+interface ChannelStats {
+  subscriberCount: string;
+  videoCount: string;
+  viewCount: string;
+  estimatedWatchHours: string;
+}
 
 interface SocialLinks {
   youtube?: string;
@@ -38,6 +49,9 @@ export default function AboutSection() {
   const currentCast = allCast.filter((member) => member.isCurrent);
   const pastCast = allCast.filter((member) => !member.isCurrent);
 
+  const [channelStats, setChannelStats] = useState<ChannelStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+
   const avatarImages: Record<string, string> = {
     "cast-preston.webp": prestonAvatar,
     "cast-brigette.webp": brigetteAvatar,
@@ -50,11 +64,36 @@ export default function AboutSection() {
     "cast-jake.webp": jakeAvatar,
   };
 
-  const stats = [
-    { label: "Episodes", value: "187+" },
-    { label: "Subscribers", value: "5K" },
-    { label: "Watch Hours", value: "92.2K" },
-  ];
+  // Fetch channel statistics on mount
+  useEffect(() => {
+    async function fetchChannelStats() {
+      try {
+        const response = await fetch(`/api/youtube/channel/${YOUTUBE_CHANNEL_ID}/stats`);
+        if (response.ok) {
+          const data = await response.json();
+          setChannelStats(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch channel stats:', error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+
+    fetchChannelStats();
+  }, []);
+
+  const stats = channelStats
+    ? [
+        { label: "Episodes", value: channelStats.videoCount },
+        { label: "Subscribers", value: channelStats.subscriberCount },
+        { label: "Watch Hours", value: channelStats.estimatedWatchHours },
+      ]
+    : [
+        { label: "Episodes", value: "187+" },
+        { label: "Subscribers", value: "5K" },
+        { label: "Watch Hours", value: "92.2K" },
+      ];
 
   const renderSocialLinks = (member: CastMember) => {
     const links = [];
@@ -268,7 +307,7 @@ export default function AboutSection() {
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div
-                  className="text-4xl font-bold text-primary mb-2"
+                  className={`text-4xl font-bold text-primary mb-2 ${isLoadingStats ? 'animate-pulse' : ''}`}
                   data-testid={`text-stat-value-${index}`}
                 >
                   {stat.value}
