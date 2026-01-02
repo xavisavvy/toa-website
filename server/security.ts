@@ -129,7 +129,7 @@ export function configureSecurity(app: Express) {
     message: 'Too many requests from this IP, please try again later.',
     // Skip rate limiting in development
      
-    skip: (__req: Request) => process.env.NODE_ENV === 'development',
+    skip: () => process.env.NODE_ENV === 'development',
   });
 
   // Apply rate limiting to all API routes
@@ -141,7 +141,7 @@ export function configureSecurity(app: Express) {
     max: 30, // Limit each IP to 30 requests per windowMs
     message: 'Too many requests, please slow down.',
      
-    skip: (__req: Request) => process.env.NODE_ENV === 'development',
+    skip: () => process.env.NODE_ENV === 'development',
   });
 
   // Apply strict limiting to external API calls
@@ -165,7 +165,7 @@ export function validateUrl(url: string): { valid: boolean; error?: string } {
   }
 
   try {
-    // eslint-disable-next-line no-undef
+     
     const parsedUrl = new URL(url);
     
     // A10: SSRF - Block private/internal IP addresses

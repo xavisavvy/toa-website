@@ -1,6 +1,6 @@
+import type React from "react";
 import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import { Link, useLocation } from "wouter";
-import type React from "react";
 
 import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import socialLinksData from "@/data/social-links.json";
@@ -64,7 +64,7 @@ export default function Footer() {
     },
   ];
 
-  const handleHashNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleHashNavigation = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     const hash = href.substring(href.indexOf('#'));
     const sectionId = hash.replace('#', '');

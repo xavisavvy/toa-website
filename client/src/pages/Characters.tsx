@@ -61,30 +61,42 @@ export default function Characters() {
     (char) => char.status !== "active"
   );
 
-  const CharacterCard = ({ character }: { character: Character }) => (
-    <Link key={character.id} href={`/characters/${character.id}`}>
-      <Card
-        className="overflow-hidden hover-elevate cursor-pointer transition-all h-full"
-        data-testid={`card-character-${character.id}`}
-      >
-        <div className="relative aspect-[3/4] bg-muted overflow-hidden">
-          {character.featuredImage ? (
-            <img
-              src={character.featuredImage}
-              alt={character.name}
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              <Users className="h-16 w-16" />
+  const CharacterCard = ({ character }: { character: Character }) => {
+    const featuredImage = character.images.find((img) => img.isFeatured);
+    
+    return (
+      <Link key={character.id} href={`/characters/${character.id}`}>
+        <Card
+          className="overflow-hidden hover-elevate cursor-pointer transition-all h-full"
+          data-testid={`card-character-${character.id}`}
+        >
+          <div className="relative aspect-[3/4] bg-muted overflow-hidden">
+            {character.featuredImage ? (
+              <img
+                src={character.featuredImage}
+                alt={character.name}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <Users className="h-16 w-16" />
+              </div>
+            )}
+            <div className="absolute top-3 right-3 flex flex-col gap-2">
+              <Badge variant="secondary" data-testid={`badge-level-${character.id}`}>
+                Level {character.level}
+              </Badge>
+              {featuredImage?.isAiGenerated && (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-amber-500/90 text-white border-amber-600"
+                  data-testid={`badge-ai-${character.id}`}
+                >
+                  AI Generated
+                </Badge>
+              )}
             </div>
-          )}
-          <div className="absolute top-3 right-3">
-            <Badge variant="secondary" data-testid={`badge-level-${character.id}`}>
-              Level {character.level}
-            </Badge>
           </div>
-        </div>
         <CardHeader>
           <CardTitle
             className="text-xl mb-2"
@@ -123,6 +135,7 @@ export default function Characters() {
       </Card>
     </Link>
   );
+};
 
   const breadcrumbData = getBreadcrumbSchema([
     { name: "Home", url: "https://talesofaneria.com/" },

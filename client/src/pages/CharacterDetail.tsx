@@ -80,7 +80,6 @@ export default function CharacterDetail() {
   }
 
   const featuredImage = character.images.find((img) => img.isFeatured);
-  const galleryImages = character.images.filter((img) => !img.isFeatured);
 
   const characterSchema = getCreativeWorkSchema({
     name: character.name,
@@ -152,6 +151,15 @@ export default function CharacterDetail() {
               <Badge variant="outline" data-testid="badge-alignment">
                 {character.alignment}
               </Badge>
+              {featuredImage?.isAiGenerated && (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-amber-500 text-white border-amber-600"
+                  data-testid="badge-ai-featured"
+                >
+                  Featured Image: AI Generated
+                </Badge>
+              )}
             </div>
           </div>
         </div>
