@@ -311,21 +311,30 @@ export async function getPrintfulProductDetails(productId: string): Promise<Prin
  * Get catalog variant ID from sync variant ID
  */
 export async function getCatalogVariantId(syncVariantId: string): Promise<number | null> {
+  console.log(`[getCatalogVariantId] Called with syncVariantId: ${syncVariantId}`);
+  
   const apiKey = process.env.PRINTFUL_API_KEY;
 
   if (!apiKey) {
-    console.error('Printful API key not configured');
+    console.error('[getCatalogVariantId] Printful API key not configured');
     return null;
   }
 
+  console.log('[getCatalogVariantId] API key is configured, proceeding with fetch...');
+
   try {
     console.log(`🔍 Fetching catalog variant for sync variant: ${syncVariantId}`);
-    const response = await fetch(`https://api.printful.com/store/variants/${syncVariantId}`, {
+    const url = `https://api.printful.com/store/variants/${syncVariantId}`;
+    console.log(`[getCatalogVariantId] Fetching URL: ${url}`);
+    
+    const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
+
+    console.log(`[getCatalogVariantId] Response status: ${response.status}, ok: ${response.ok}`);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -341,9 +350,11 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     
     if (!variant) {
       console.error(`No sync_variant found in response for ${syncVariantId}`);
+      console.error(`Response structure:`, JSON.stringify(data, null, 2));
       return null;
     }
     
+    console.log(`[getCatalogVariantId] Found variant, checking for variant_id...`);
     const catalogId = variant?.variant_id || variant?.product?.variant_id;
     
     if (!catalogId) {
@@ -355,6 +366,7 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
     console.log(`✅ Resolved: sync variant ${syncVariantId} → catalog variant ${catalogId}`);
     return catalogId;
   } catch (error) {
+    console.error(`[getCatalogVariantId] Exception caught:`, error);
     console.error(`Error fetching sync variant ${syncVariantId}:`, error);
     return null;
   }
