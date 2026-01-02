@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 
 import { queryClient } from "./lib/queryClient";
-
+import { initGA, analytics } from "@/lib/analytics";
 
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,10 +29,27 @@ function ScrollToTop() {
   return null;
 }
 
+function Analytics() {
+  const [location] = useLocation();
+
+  // Initialize Google Analytics on mount
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  // Track page views on route change
+  useEffect(() => {
+    analytics.pageView(location);
+  }, [location]);
+
+  return null;
+}
+
 function Router() {
   return (
     <>
       <ScrollToTop />
+      <Analytics />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/characters" component={Characters} />
