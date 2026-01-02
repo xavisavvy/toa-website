@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag, ExternalLink, AlertCircle, CreditCard } from "lucide-react";
+import { ShoppingBag, AlertCircle, CreditCard } from "lucide-react";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -46,8 +46,8 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
 
   const handleProductClick = async (product: Product) => {
     if (!enableCheckout) {
-      // Link to Etsy
-      window.open('https://www.etsy.com/shop/talesofaneria', '_blank', 'noopener,noreferrer');
+      // Redirect to shop page with checkout enabled
+      window.location.href = '/shop';
       return;
     }
 
@@ -77,11 +77,10 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
       if (result?.url) {
         window.location.href = result.url;
       } else {
-        alert('Failed to create checkout session. Please try again.');
+        console.error('Failed to create checkout session');
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Failed to start checkout. Please try again.');
     } finally {
       setCheckoutLoading(null);
     }
@@ -97,9 +96,9 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
           <p className="text-muted-foreground text-lg mb-6">
             High-quality print-on-demand products featuring Tales of Aneria designs
           </p>
-          {!enableCheckout && (
+          {enableCheckout && (
             <p className="text-sm text-muted-foreground">
-              Currently available through our Etsy store
+              Secure checkout powered by Stripe
             </p>
           )}
         </div>
@@ -124,7 +123,7 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
                 Unable to load products at the moment.
               </p>
               <p className="text-sm text-muted-foreground">
-                Please check back later or visit our Etsy store!
+                Please check back later!
               </p>
             </CardContent>
           </Card>
@@ -133,16 +132,18 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
             <CardContent className="p-12 text-center">
               <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground mb-4">
-                We're setting up our product catalog. Check back soon!
+                We&apos;re setting up our product catalog. Check back soon!
               </p>
               <p className="text-sm text-muted-foreground">
-                In the meantime, you can browse our Etsy store for available items.
+                New products are being added regularly.
               </p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {displayProducts.map((product) => (
+            {displayProducts.map((product) => {
+              const isLoading = checkoutLoading === product.id;
+              return (
               <Card
                 key={product.id}
                 className="overflow-hidden hover-elevate cursor-pointer transition-all"
@@ -164,7 +165,7 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
                       Sold Out
                     </Badge>
                   )}
-                  {enableCheckout && product.inStock && (
+                  {enableCheckout && product.inStock && !isLoading && (
                     <div className="absolute bottom-3 right-3">
                       <Badge variant="default" className="bg-primary/90">
                         <CreditCard className="h-3 w-3 mr-1" />
@@ -185,7 +186,8 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
                   </p>
                 </CardContent>
               </Card>
-            ))}
+            );
+            })}
           </div>
         )}
 
@@ -201,23 +203,15 @@ export default function PrintfulShop({ enableCheckout = false }: PrintfulShopPro
               Browse All Products
             </Button>
           ) : (
-            <>
-              <p className="text-sm text-muted-foreground mb-4">
-                These products are powered by Printful and currently available through our Etsy store
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button 
-                  size="lg"
-                  className="text-lg px-8"
-                  data-testid="button-visit-etsy"
-                  onClick={() => window.open('https://www.etsy.com/shop/talesofaneria', '_blank', 'noopener,noreferrer')}
-                >
-                  <ShoppingBag className="mr-2 h-5 w-5" />
-                  Shop on Etsy
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </>
+            <Button 
+              size="lg"
+              className="text-lg px-8"
+              data-testid="button-visit-shop"
+              onClick={() => window.location.href = '/shop'}
+            >
+              <ShoppingBag className="mr-2 h-5 w-5" />
+              View All Products
+            </Button>
           )}
         </div>
       </div>
