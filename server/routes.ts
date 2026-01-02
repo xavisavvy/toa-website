@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts } from "./youtube";
 import { getPodcastFeed } from "./podcast";
 import { getShopListings } from "./etsy";
+import { getPrintfulSyncProducts, getPrintfulProductDetails } from "./printful";
 import { getCharacterData } from "./dndbeyond";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { metrics } from "./monitoring";
@@ -238,6 +239,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching Etsy listings:', error);
       res.status(500).json({ error: 'Failed to fetch Etsy products' });
+    }
+  });
+
+  // Printful sync products endpoint
+  app.get("/api/printful/products", async (req, res) => {
+    try {
+      // A03: Validate limit parameter
+      const limitInput = req.query.limit as string;
+      const validation = validateNumber(limitInput || '20', 1, 50);
+      
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+      }
+      
+      const products = await getPrintfulSyncProducts(validation.value!);
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching Printful products:', error);
+      res.status(500).json({ error: 'Failed to fetch Printful products' });
+    }
+  });
+
+  // Printful product details endpoint
+  app.get("/api/printful/products/:productId", async (req, res) => {
+    try {
+      const { productId } = req.params;
+      
+      // A03: Validate productId format (Printful product IDs are numeric)
+      if (!/^\d+$/.test(productId)) {
+        logSecurityEvent('INVALID_PRODUCT_ID', { productId, ip: req.ip });
+        return res.status(400).json({ error: 'Invalid product ID format' });
+      }
+      
+      const product = await getPrintfulProductDetails(productId);
+      
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      res.json(product);
+    } catch (error) {
+      console.error('Error fetching Printful product:', error);
+      res.status(500).json({ error: 'Failed to fetch product details' });
     }
   });
 

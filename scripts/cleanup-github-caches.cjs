@@ -114,8 +114,8 @@ function fetchCachesWithCLI() {
   while (true) {
     try {
       const output = execSync(
-        `gh api repos/${owner}/${repo}/actions/caches?per_page=${perPage}&page=${page}`,
-        { encoding: 'utf8' }
+        `gh api "repos/${owner}/${repo}/actions/caches?per_page=${perPage}&page=${page}"`,
+        { encoding: 'utf8', shell: 'powershell.exe' }
       );
       
       const data = JSON.parse(output);
