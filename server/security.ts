@@ -1,5 +1,5 @@
 import cors from 'cors';
-import type { Express, Request } from 'express';
+import type { Express } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import validator from 'validator';
@@ -24,6 +24,7 @@ export function configureSecurity(app: Express) {
             "'unsafe-eval'", // Required for Vite in development
             "https://www.youtube.com",
             "https://www.google.com",
+            "https://www.googletagmanager.com", // Google Analytics & Tag Manager
             "https://apis.google.com",
             "https://js.stripe.com", // Stripe Checkout
           ],
@@ -39,6 +40,8 @@ export function configureSecurity(app: Express) {
           connectSrc: [
             "'self'",
             "https://www.googleapis.com",
+            "https://www.google-analytics.com", // Google Analytics data collection
+            "https://analytics.google.com", // Google Analytics 4
             "https://openapi.etsy.com",
             "https://character-service.dndbeyond.com",
             "https://api.stripe.com", // Stripe API
@@ -97,7 +100,7 @@ export function configureSecurity(app: Express) {
   app.use(
     cors({
        
-      origin: (origin: string | undefined, callback: (_err: Error | null, _allow?: boolean) => void) => {
+      origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps, Postman, or same-origin)
         if (!origin) {return callback(null, true);}
         
