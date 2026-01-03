@@ -77,10 +77,23 @@ app.use((req, res, next) => {
   if (isProduction || isReplitDeployment) {
     // When running from dist/index.js, __dirname is 'dist', so we need 'public' not 'dist/public'
     const distPath = path.join(__dirname, 'public');
-    app.use(express.static(distPath));
+    
+    // Serve static files with explicit configuration
+    app.use(express.static(distPath, {
+      maxAge: '1y', // Cache static assets for 1 year
+      etag: true,
+      lastModified: true,
+      index: false, // Don't auto-serve index.html - we'll handle it explicitly
+    }));
     
     // SPA fallback - serve index.html for all non-API routes
+    // This MUST come after static file serving
     app.get('*', (req, res) => {
+      // Don't serve index.html for asset requests (they should 404 if missing)
+      if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
+        return res.status(404).send('Not found');
+      }
+      
       res.sendFile(path.join(distPath, 'index.html'));
     });
     
@@ -89,6 +102,7 @@ app.use((req, res, next) => {
 
   // A07: Enhanced error handling - Don't leak sensitive information
   // IMPORTANT: Register error handler AFTER all routes
+  /* eslint-disable-next-line no-unused-vars */
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     
