@@ -496,6 +496,22 @@ export async function getPrintfulShippingEstimate(params: {
     console.log('Recipient:', params.recipient.city, params.recipient.state_code);
     console.log('Items:', params.items);
 
+    // Convert sync_variant_id to variant_id (catalog variant)
+    const itemsWithVariantIds = await Promise.all(
+      params.items.map(async (item) => {
+        const catalogVariantId = await getCatalogVariantId(item.sync_variant_id.toString());
+        if (!catalogVariantId) {
+          throw new Error(`Could not resolve catalog variant for sync variant ${item.sync_variant_id}`);
+        }
+        return {
+          variant_id: catalogVariantId,
+          quantity: item.quantity,
+        };
+      })
+    );
+
+    console.log('📦 Resolved catalog variants:', itemsWithVariantIds);
+
     const response = await fetch('https://api.printful.com/shipping/rates', {
       method: 'POST',
       headers: {
@@ -504,7 +520,7 @@ export async function getPrintfulShippingEstimate(params: {
       },
       body: JSON.stringify({
         recipient: params.recipient,
-        items: params.items,
+        items: itemsWithVariantIds,
         currency: 'USD',
         locale: 'en_US',
       }),
@@ -518,6 +534,7 @@ export async function getPrintfulShippingEstimate(params: {
 
     const data = await response.json();
     console.log('✅ Printful shipping response received');
+    console.log('📦 First rate object:', JSON.stringify(data.result[0], null, 2));
 
     if (!data.result || !data.result.length) {
       console.error('No shipping rates returned from Printful');
@@ -531,7 +548,7 @@ export async function getPrintfulShippingEstimate(params: {
       Shipping Method: ${cheapestRate.name}
       Shipping Cost: $${cheapestRate.rate}
       Tax/VAT: $${cheapestRate.vat || 0}
-      Delivery: ${cheapestRate.min_delivery_days}-${cheapestRate.max_delivery_days} business days
+      Delivery: ${cheapestRate.minDeliveryDays || 'N/A'}-${cheapestRate.maxDeliveryDays || 'N/A'} business days
     `);
 
     return {
@@ -554,13 +571,13 @@ export async function getPrintfulShippingEstimate(params: {
         vat: cheapestRate.vat || '0',
         total: cheapestRate.costs?.total || '0',
       },
-      rates: data.result.map((rate: { id: string; name: string; rate: string; currency: string; min_delivery_days: number; max_delivery_days: number }) => ({
+      rates: data.result.map((rate: any) => ({
         id: rate.id,
         name: rate.name,
         rate: rate.rate,
         currency: rate.currency,
-        min_delivery_days: rate.min_delivery_days,
-        max_delivery_days: rate.max_delivery_days,
+        min_delivery_days: rate.minDeliveryDays || rate.min_delivery_days || 0,
+        max_delivery_days: rate.maxDeliveryDays || rate.max_delivery_days || 0,
       })),
     };
 
