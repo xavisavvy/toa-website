@@ -24,12 +24,17 @@ export const STRIPE_CONFIG = {
 
 /**
  * Create a Stripe Checkout session for a Printful product
+ * 
+ * NOTE: Price calculation includes:
+ * - Retail price (product cost)
+ * - Estimated shipping ($4.50)
+ * - Estimated tax (7%)
  */
 export async function createCheckoutSession(params: {
   productId: string;
   variantId: string;
   productName: string;
-  price: number; // in cents (e.g., 2499 for $24.99)
+  price: number; // Retail price in cents (e.g., 300 for $3.00)
   quantity: number;
   imageUrl?: string;
   successUrl?: string;
@@ -44,13 +49,29 @@ export async function createCheckoutSession(params: {
     productId,
     variantId,
     productName,
-    price,
+    price: retailPrice,
     quantity,
     imageUrl,
     successUrl,
     cancelUrl,
     metadata = {},
   } = params;
+
+  // Calculate total price including shipping and tax
+  const ESTIMATED_SHIPPING_CENTS = 450;  // $4.50 estimated US shipping
+  const TAX_RATE = 0.07;  // 7% estimated tax rate
+  
+  const subtotal = retailPrice + ESTIMATED_SHIPPING_CENTS;
+  const estimatedTax = Math.ceil(subtotal * TAX_RATE);
+  const totalAmount = subtotal + estimatedTax;
+  
+  console.log(`💰 Checkout Price Calculation:
+    Product: $${(retailPrice / 100).toFixed(2)}
+    Shipping (est): $${(ESTIMATED_SHIPPING_CENTS / 100).toFixed(2)}
+    Tax (est 7%): $${(estimatedTax / 100).toFixed(2)}
+    ────────────────────────
+    Total: $${(totalAmount / 100).toFixed(2)}
+  `);
 
   try {
     return await stripe.checkout.sessions.create({
@@ -60,14 +81,18 @@ export async function createCheckoutSession(params: {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: productName,
+              name: `${productName} (includes shipping & tax)`,
+              description: `Shipping: $${(ESTIMATED_SHIPPING_CENTS / 100).toFixed(2)} (est) | Tax: $${(estimatedTax / 100).toFixed(2)} (est)`,
               images: imageUrl ? [imageUrl] : [],
               metadata: {
                 printful_product_id: productId,
                 printful_variant_id: variantId,
+                retail_price_cents: retailPrice.toString(),
+                shipping_cents: ESTIMATED_SHIPPING_CENTS.toString(),
+                tax_cents: estimatedTax.toString(),
               },
             },
-            unit_amount: price,
+            unit_amount: totalAmount,  // Total including shipping & tax
           },
           quantity,
         },
