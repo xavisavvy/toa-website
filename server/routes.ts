@@ -676,5 +676,47 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // D&D Beyond avatar proxy to bypass CORS/CORB
+  app.get("/api/dndbeyond/avatars/:characterId/avatar.jpg", async (req, res) => {
+    const { characterId } = req.params;
+
+    try {
+      // Validate characterId format
+      if (!/^\d+$/.test(characterId)) {
+        logSecurityEvent('INVALID_CHARACTER_ID', { characterId, ip: req.ip });
+        return res.status(400).json({ error: 'Invalid character ID format' });
+      }
+
+      const imageUrl = `https://www.dndbeyond.com/avatars/${characterId}/avatar.jpg`;
+      
+      const response = await fetch(imageUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      });
+
+      if (!response.ok) {
+        return res.status(response.status).json({
+          error: 'Failed to fetch D&D Beyond avatar',
+          status: response.status,
+        });
+      }
+
+      // Get the image buffer
+      const imageBuffer = await response.arrayBuffer();
+      
+      // Set appropriate headers
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      
+      // Send the image
+      res.send(Buffer.from(imageBuffer));
+    } catch (error) {
+      console.error('Error proxying D&D Beyond avatar:', error);
+      res.status(500).json({ error: 'Failed to proxy image' });
+    }
+  });
+
   return createServer(app);
 }

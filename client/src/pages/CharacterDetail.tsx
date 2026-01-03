@@ -93,7 +93,7 @@ export default function CharacterDetail() {
   if (character.dndbeyondId) {
     allImages.push({
       id: 'dndbeyond-avatar',
-      url: `https://www.dndbeyond.com/avatars/${character.dndbeyondId}/avatar.jpg`,
+      url: `/api/dndbeyond/avatars/${character.dndbeyondId}/avatar.jpg`,
       caption: `${character.name} - D&D Beyond Character Portrait`,
       type: 'portrait',
       isFeatured: false,
