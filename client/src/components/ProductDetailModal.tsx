@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { analytics } from "@/lib/analytics";
 import { createCheckout } from "@/lib/stripe";
 import { useCart } from "@/hooks/useCart";
+import { loadZipCode, saveZipCode } from "@/lib/zipCode";
 
 interface ProductVariant {
   id: string;
@@ -67,7 +68,7 @@ export default function ProductDetailModal({
   onClose,
 }: ProductDetailModalProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [zipCode, setZipCode] = useState("");
+  const [zipCode, setZipCode] = useState(() => loadZipCode());
   const [quantity, setQuantity] = useState(1);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -77,11 +78,18 @@ export default function ProductDetailModal({
   useEffect(() => {
     if (product) {
       setSelectedVariant(product.variants?.[0] || null);
-      setZipCode("");
       setQuantity(1);
       setAddedToCart(false);
+      // Keep zip code from previous entry
     }
   }, [product]);
+
+  // Save zip code when it changes
+  useEffect(() => {
+    if (zipCode && zipCode.length >= 5) {
+      saveZipCode(zipCode);
+    }
+  }, [zipCode]);
 
   // Fetch shipping estimate when zip code and variant are available
   const { data: shippingEstimate, isLoading: shippingLoading } = useQuery<ShippingEstimate>({

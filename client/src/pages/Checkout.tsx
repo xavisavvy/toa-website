@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Loader2, MapPin, Package, CreditCard, AlertCircle, Trash2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -17,14 +17,22 @@ import { createCheckout } from '@/lib/stripe';
 import { validateCartItems } from '@/lib/cart';
 import type { ShippingEstimate } from '@/types/cart';
 import { Badge } from '@/components/ui/badge';
+import { loadZipCode, saveZipCode } from '@/lib/zipCode';
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
   const { cart, removeItem, updateQuantity, getCartSummary, clearCart } = useCart();
   const summary = getCartSummary();
   
-  const [zipCode, setZipCode] = useState('');
+  const [zipCode, setZipCode] = useState(() => loadZipCode());
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  // Save zip code when it changes
+  useEffect(() => {
+    if (zipCode && zipCode.length >= 5) {
+      saveZipCode(zipCode);
+    }
+  }, [zipCode]);
 
   const validation = validateCartItems(cart);
 

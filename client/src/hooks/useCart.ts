@@ -17,6 +17,34 @@ import { analytics } from '@/lib/analytics';
 export function useCart() {
   const [cart, setCart] = useState<Cart>(() => loadCart());
 
+  // Listen for localStorage changes from other components/tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'toa_shopping_cart' && e.newValue) {
+        try {
+          const updatedCart = JSON.parse(e.newValue) as Cart;
+          setCart(updatedCart);
+        } catch (error) {
+          console.error('Error parsing cart from storage event:', error);
+        }
+      }
+    };
+
+    // Also listen for custom events from same window
+    const handleCartUpdate = () => {
+      const updatedCart = loadCart();
+      setCart(updatedCart);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('cart-updated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('cart-updated', handleCartUpdate);
+    };
+  }, []);
+
   useEffect(() => {
     if (isCartExpired(cart)) {
       const newCart = createEmptyCart();
@@ -27,6 +55,8 @@ export function useCart() {
 
   useEffect(() => {
     saveCart(cart);
+    // Dispatch custom event for same-window sync
+    window.dispatchEvent(new Event('cart-updated'));
   }, [cart]);
 
   const addItem = useCallback((item: Omit<CartItem, 'addedAt'>) => {

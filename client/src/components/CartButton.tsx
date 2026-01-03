@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { getDaysUntilExpiration } from '@/lib/cart';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { calculateShipping, FREE_SHIPPING_THRESHOLD, calculateOrderTotal } from '@/lib/shipping';
 
 export function CartButton() {
   const [, setLocation] = useLocation();
@@ -26,6 +27,11 @@ export function CartButton() {
   const quantityIssues = cart.items.filter(
     (item) => item.availableQuantity !== undefined && item.quantity > item.availableQuantity
   );
+
+  // Calculate shipping
+  const shipping = calculateShipping(summary.subtotal);
+  const estimatedTotal = calculateOrderTotal(summary.subtotal, shipping);
+  const amountUntilFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - summary.subtotal);
 
   return (
     <Sheet>
@@ -168,13 +174,34 @@ export function CartButton() {
 
         {summary.itemCount > 0 && (
           <div className="border-t pt-4 space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+            {/* Pricing Summary */}
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-semibold">${summary.subtotal.toFixed(2)}</span>
+                <span className="font-medium">${summary.subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Shipping</span>
+                <span className="font-medium">
+                  {shipping === 0 ? (
+                    <span className="text-green-600">FREE</span>
+                  ) : (
+                    `$${shipping.toFixed(2)}`
+                  )}
+                </span>
+              </div>
+              {amountUntilFreeShipping > 0 && shipping > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Add ${amountUntilFreeShipping.toFixed(2)} more for free shipping!
+                </p>
+              )}
+              <Separator />
+              <div className="flex justify-between text-base font-semibold">
+                <span>Estimated Total</span>
+                <span>${estimatedTotal.toFixed(2)}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Shipping and taxes calculated at checkout
+                Tax calculated at checkout
               </p>
             </div>
 
