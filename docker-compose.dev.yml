@@ -60,6 +60,8 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+    # Disable swap warnings on Windows/WSL2
+    mem_swappiness: 0
 
   # ============================================
   # Redis Cache (for rate limiting and caching)
@@ -88,6 +90,8 @@ services:
         reservations:
           cpus: '0.1'
           memory: 128M
+    # Disable swap warnings on Windows/WSL2
+    mem_swappiness: 0
 
   # ============================================
   # PostgreSQL Database
