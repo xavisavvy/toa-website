@@ -189,6 +189,10 @@ export default function WorldSection() {
           name: "Littlest Hopes",
           description: "Side quest campaign with overlapping storylines",
         },
+        {
+          name: "Aneria Holiday Specials",
+          description: "Festive one-shots and holiday adventures",
+        },
       ],
       link: worldAnvilUrl,
       backgroundImage: aneriaBg,
