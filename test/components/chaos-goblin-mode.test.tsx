@@ -83,25 +83,25 @@ describe('Chaos Goblin Mode', () => {
       expect(overlay?.style.transition).toContain('ease-in-out');
     });
 
-    it('should not block user interaction', () => {
+    it('should block user interaction when active', () => {
       const onComplete = vi.fn();
       const { container } = render(<ChaosGoblinMode active={true} onComplete={onComplete} />);
       
-      const overlay = container.querySelector('.pointer-events-none');
+      const overlay = container.querySelector('[style*="pointer-events: all"]');
       expect(overlay).toBeInTheDocument();
     });
 
     it('should display countdown from 60 seconds', () => {
       render(<ChaosGoblinMode active={true} onComplete={vi.fn()} />);
       
-      expect(screen.getByText('Ending in 60s')).toBeInTheDocument();
+      expect(screen.getByText(/Ending in 60s/)).toBeInTheDocument();
       
       // Advance timer by 1 second
       act(() => {
         vi.advanceTimersByTime(1000);
       });
       
-      expect(screen.getByText('Ending in 59s')).toBeInTheDocument();
+      expect(screen.getByText(/Ending in 59s/)).toBeInTheDocument();
     });
 
     it('should call onComplete after 60 seconds', () => {

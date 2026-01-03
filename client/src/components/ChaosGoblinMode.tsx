@@ -64,13 +64,26 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
   const [timeLeft, setTimeLeft] = useState(60);
   const playerRef = useRef<YT.Player | null>(null);
   const iframeRef = useRef<HTMLDivElement>(null);
+  const [playerReady, setPlayerReady] = useState(false);
+
+  // Handle cleanup when deactivating
+  const cleanup = () => {
+    setTimeLeft(60);
+    setPlayerReady(false);
+    if (playerRef.current && playerReady) {
+      try {
+        playerRef.current.stopVideo();
+        playerRef.current.destroy();
+      } catch (e) {
+        console.error('Error cleaning up YouTube player:', e);
+      }
+      playerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!active) {
-      setTimeLeft(60);
-      if (playerRef.current) {
-        playerRef.current.stopVideo();
-      }
+      cleanup();
       return;
     }
 
@@ -106,8 +119,14 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
         },
         events: {
           onReady: (event: YT.PlayerEvent) => {
+            console.log('YouTube player ready');
+            setPlayerReady(true);
             event.target.setVolume(50);
             event.target.playVideo();
+            console.log('Started playing YouTube audio');
+          },
+          onError: (event: YT.OnErrorEvent) => {
+            console.error('YouTube player error:', event.data);
           },
         },
       });
@@ -148,8 +167,12 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
     const timeout = globalThis.setTimeout(() => {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
-      if (playerRef.current) {
-        playerRef.current.stopVideo();
+      if (playerRef.current && playerReady) {
+        try {
+          playerRef.current.stopVideo();
+        } catch (e) {
+          console.error('Error stopping YouTube player:', e);
+        }
       }
       onComplete();
     }, 60000);
@@ -158,20 +181,31 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
       globalThis.clearTimeout(timeout);
-      if (playerRef.current) {
-        playerRef.current.stopVideo();
+      if (playerRef.current && playerReady) {
+        try {
+          playerRef.current.stopVideo();
+        } catch (e) {
+          console.error('Error stopping YouTube player:', e);
+        }
       }
     };
-  }, [active, onComplete]);
+  }, [active, onComplete, playerReady]);
 
   if (!active) {return null;}
 
+  const handleDismiss = () => {
+    cleanup();
+    onComplete();
+  };
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+      onClick={handleDismiss}
+      className="fixed inset-0 z-[9999] flex items-center justify-center cursor-pointer"
       style={{
         backgroundColor: color,
-        transition: 'background-color 0.5s ease-in-out', // Smooth transition
+        transition: 'background-color 0.5s ease-in-out',
+        pointerEvents: 'all',
       }}
     >
       {/* Hidden YouTube player */}
@@ -203,7 +237,7 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
 
         {/* Countdown */}
         <p className="text-2xl text-white mt-4 font-bold drop-shadow-lg">
-          Ending in {timeLeft}s
+          Ending in {timeLeft}s • Click to dismiss
         </p>
       </div>
 
