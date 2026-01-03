@@ -58,12 +58,11 @@ vi.mock('../server/dndbeyond', () => ({
 
 describe('API Routes', () => {
   let app: Express;
-  let server: any;
 
   beforeEach(async () => {
     app = express();
     app.use(express.json());
-    server = await registerRoutes(app);
+    await registerRoutes(app);
   });
 
   describe('GET /api/metrics', () => {
@@ -420,7 +419,7 @@ describe('API Routes', () => {
       
       // Simulate a timeout
       vi.mocked(getPlaylistVideos).mockImplementationOnce(() => 
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 100))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 100) as unknown as Promise<never>)
       );
 
       const response = await request(app)

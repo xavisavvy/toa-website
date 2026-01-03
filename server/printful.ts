@@ -147,8 +147,8 @@ function writeCache(products: PrintfulProductDisplay[]): void {
 
     fs.writeFileSync(CACHE_FILE, JSON.stringify(cacheData, null, 2), 'utf-8');
     console.log('Printful data cached successfully');
-  } catch (error) {
-    console.error('Error writing Printful cache:', error);
+  } catch {
+    console.error('Error writing Printful cache');
   }
 }
 
@@ -242,8 +242,8 @@ export async function getPrintfulSyncProducts(limit: number = 20): Promise<Print
               inStock: v.synced,
             })),
         };
-      } catch (error) {
-        console.error(`Error fetching product details for ${product.id}:`, error);
+      } catch {
+        console.error(`Error fetching product details for ${product.id}`);
         return null;
       }
     });
@@ -333,8 +333,8 @@ export async function getPrintfulProductDetails(productId: string): Promise<Prin
           inStock: v.synced,
         })),
     };
-  } catch (error) {
-    console.error(`Error fetching product ${productId}:`, error);
+  } catch {
+    console.error(`Error fetching product ${productId}`);
     return null;
   }
 }

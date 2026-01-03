@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock fetch
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 describe('YouTube Client Library', () => {
   it('should export getPlaylistVideosClient function', async () => {
@@ -12,7 +12,7 @@ describe('YouTube Client Library', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    (global.fetch as any).mockRejectedValueOnce(new Error('API Error'));
+    (globalThis.fetch as any).mockRejectedValueOnce(new Error('API Error'));
     
     const { getPlaylistVideosClient } = await import('../client/src/lib/youtube');
     
@@ -22,7 +22,7 @@ describe('YouTube Client Library', () => {
   });
 
   it('should format durations correctly', async () => {
-    (global.fetch as any)
+    (globalThis.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({

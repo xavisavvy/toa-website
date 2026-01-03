@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 
 import { MetricsCache } from '../server/cache';
 import { metrics } from '../server/monitoring';
@@ -53,7 +53,7 @@ describe('MetricsCache', () => {
       
       expect(cache.get('key1')).toBe('value1');
       
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise<void>(resolve => setTimeout(resolve, 150));
       
       expect(cache.get('key1')).toBeUndefined();
     });
@@ -64,7 +64,7 @@ describe('MetricsCache', () => {
       
       expect(shortCache.get('key1')).toBe('value1');
       
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise<void>(resolve => setTimeout(resolve, 150));
       
       expect(shortCache.get('key1')).toBeUndefined();
     });
@@ -74,7 +74,7 @@ describe('MetricsCache', () => {
       
       expect(cache.has('key1')).toBe(true);
       
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise<void>(resolve => setTimeout(resolve, 150));
       
       expect(cache.has('key1')).toBe(false);
     });
@@ -85,7 +85,7 @@ describe('MetricsCache', () => {
       
       expect(cache.size()).toBe(2);
       
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise<void>(resolve => setTimeout(resolve, 150));
       
       expect(cache.size()).toBe(1);
     });
@@ -148,7 +148,7 @@ describe('MetricsCache', () => {
     test('should track misses for expired entries', async () => {
       cache.set('key1', 'value1', { ttl: 100 });
       
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise<void>(resolve => setTimeout(resolve, 150));
       
       cache.get('key1');
       
@@ -214,7 +214,7 @@ describe('MetricsCache', () => {
       
       expect(cache.get('key1')).toBe('value1');
       
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise<void>(resolve => setTimeout(resolve, 20));
       
       expect(cache.get('key1')).toBeUndefined();
     });

@@ -187,12 +187,12 @@ test.describe('Load and Stress Tests', () => {
       const burst1 = Array(20).fill(null).map(() => request.get('/'));
       const responses1 = await Promise.all(burst1);
       
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise<void>(resolve => setTimeout(resolve, 500));
       
       const burst2 = Array(30).fill(null).map(() => request.get('/api/characters'));
       const responses2 = await Promise.all(burst2);
       
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise<void>(resolve => setTimeout(resolve, 500));
       
       const burst3 = Array(40).fill(null).map(() => request.get('/'));
       const responses3 = await Promise.all(burst3);
@@ -219,7 +219,7 @@ test.describe('Load and Stress Tests', () => {
         responses.push(response);
         
         // Wait for next interval
-        await new Promise(resolve => setTimeout(resolve, interval));
+        await new Promise<void>(resolve => setTimeout(resolve, interval));
       }
       
       const totalDuration = Date.now() - startTime;

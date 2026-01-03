@@ -4,7 +4,7 @@ import * as path from 'path';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock fetch globally
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 const CACHE_DIR = path.join(process.cwd(), 'server', 'cache');
 const TEST_CACHE_FILE = path.join(CACHE_DIR, 'test-youtube-playlist.json');
@@ -39,7 +39,7 @@ describe('YouTube API Integration Tests', () => {
         text: async () => 'Rate limit exceeded',
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       try {
         const response = await fetch('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=PLTest&maxResults=50&key=test');
@@ -65,7 +65,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/playlistItems');
       expect(response.ok).toBe(false);
@@ -85,7 +85,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/playlistItems?playlistId=PLNonExistent');
       expect(response.ok).toBe(false);
@@ -93,7 +93,7 @@ describe('YouTube API Integration Tests', () => {
     });
 
     it('should handle network errors', async () => {
-      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network request failed'));
+      vi.mocked(globalThis.fetch).mockRejectedValueOnce(new Error('Network request failed'));
 
       await expect(
         fetch('https://www.googleapis.com/youtube/v3/playlistItems')
@@ -109,7 +109,7 @@ describe('YouTube API Integration Tests', () => {
         },
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/playlistItems');
       await expect(response.json()).rejects.toThrow('Unexpected token');
@@ -122,7 +122,7 @@ describe('YouTube API Integration Tests', () => {
         json: async () => ({}),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/playlistItems');
       const data = await response.json();
@@ -140,7 +140,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/playlistItems');
       const data = await response.json();
@@ -175,7 +175,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch)
+      vi.mocked(globalThis.fetch)
         .mockResolvedValueOnce(page1Response as any)
         .mockResolvedValueOnce(page2Response as any);
 
@@ -200,7 +200,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(response as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(response as any);
 
       const result = await fetch('https://www.googleapis.com/youtube/v3/playlistItems');
       const data = await result.json();
@@ -221,7 +221,7 @@ describe('YouTube API Integration Tests', () => {
       }));
 
       pageResponses.forEach(resp => {
-        vi.mocked(global.fetch).mockResolvedValueOnce(resp as any);
+        vi.mocked(globalThis.fetch).mockResolvedValueOnce(resp as any);
       });
 
       let totalVideos = 0;
@@ -264,7 +264,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/videos');
       const data = await response.json();
@@ -293,7 +293,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/videos');
       const data = await response.json();
@@ -319,7 +319,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
 
       const response = await fetch('https://www.googleapis.com/youtube/v3/videos');
       const data = await response.json();
@@ -371,7 +371,7 @@ describe('YouTube API Integration Tests', () => {
       }
 
       // Mock API failure
-      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('API Error'));
+      vi.mocked(globalThis.fetch).mockRejectedValueOnce(new Error('API Error'));
 
       await expect(
         fetch('https://www.googleapis.com/youtube/v3/playlistItems')
@@ -393,7 +393,7 @@ describe('YouTube API Integration Tests', () => {
       };
 
       // Simulate multiple concurrent requests
-      vi.mocked(global.fetch).mockResolvedValue(mockResponse as any);
+      vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse as any);
 
       const requests = Array.from({ length: 5 }, () => 
         fetch('https://www.googleapis.com/youtube/v3/playlistItems?playlistId=PLTest')
@@ -426,7 +426,7 @@ describe('YouTube API Integration Tests', () => {
         }),
       };
 
-      vi.mocked(global.fetch)
+      vi.mocked(globalThis.fetch)
         .mockResolvedValueOnce(playlist1Response as any)
         .mockResolvedValueOnce(playlist2Response as any);
 

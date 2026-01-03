@@ -16,17 +16,6 @@ function TestKonamiComponent() {
 describe('Chaos Goblin Mode', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    
-    // Mock Audio API globally as a constructor
-     
-    globalThis.Audio = vi.fn().mockImplementation(function(this: any) {
-      this.play = vi.fn().mockResolvedValue(undefined);
-      this.pause = vi.fn();
-      this.currentTime = 0;
-      this.volume = 0.5;
-      this.loop = false;
-      return this;
-    }) as unknown as typeof Audio;
   });
 
   afterEach(() => {
@@ -131,15 +120,17 @@ describe('Chaos Goblin Mode', () => {
       const mockPlay = vi.fn().mockResolvedValue(undefined);
       const mockPause = vi.fn();
       
-       
-      globalThis.Audio = vi.fn().mockImplementation(function(this: any) {
-        this.play = mockPlay;
-        this.pause = mockPause;
-        this.currentTime = 0;
-        this.volume = 0.5;
-        this.loop = false;
-        return this;
-      }) as unknown as typeof Audio;
+      // Create a proper constructor function
+      function MockAudio() {
+        return {
+          play: mockPlay,
+          pause: mockPause,
+          currentTime: 0,
+          volume: 0.5,
+          loop: false,
+        };
+      }
+      globalThis.Audio = MockAudio as unknown as typeof Audio;
       
       render(<ChaosGoblinMode active={true} onComplete={vi.fn()} />);
       
@@ -150,15 +141,17 @@ describe('Chaos Goblin Mode', () => {
       const mockPlay = vi.fn().mockResolvedValue(undefined);
       const mockPause = vi.fn();
       
-       
-      globalThis.Audio = vi.fn().mockImplementation(function(this: any) {
-        this.play = mockPlay;
-        this.pause = mockPause;
-        this.currentTime = 0;
-        this.volume = 0.5;
-        this.loop = false;
-        return this;
-      }) as unknown as typeof Audio;
+      // Create a proper constructor function
+      function MockAudio() {
+        return {
+          play: mockPlay,
+          pause: mockPause,
+          currentTime: 0,
+          volume: 0.5,
+          loop: false,
+        };
+      }
+      globalThis.Audio = MockAudio as unknown as typeof Audio;
       
       const { rerender } = render(<ChaosGoblinMode active={true} onComplete={vi.fn()} />);
       

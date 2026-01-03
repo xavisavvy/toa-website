@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import express from 'express';
 import request from 'supertest';
 import { describe, test, expect, beforeEach } from 'vitest';

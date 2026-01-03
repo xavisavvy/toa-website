@@ -48,7 +48,26 @@ export default [
         fetch: 'readonly',
         alert: 'readonly',
         performance: 'readonly',
-        URL: 'readonly'
+        URL: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        Image: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLAnchorElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        HTMLParagraphElement: 'readonly',
+        HTMLHeadingElement: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLOListElement: 'readonly',
+        HTMLLIElement: 'readonly',
+        HTMLSpanElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        SVGSVGElement: 'readonly',
+        IntersectionObserver: 'readonly',
+        Audio: 'readonly',
+        globalThis: 'readonly'
       }
     },
     plugins: {

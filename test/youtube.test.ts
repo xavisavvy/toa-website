@@ -127,8 +127,6 @@ describe('YouTube Cache System', () => {
         fs.unlinkSync(CACHE_FILE);
       }
 
-      const hasDir = fs.existsSync(CACHE_DIR);
-
       // Simulate cache write operation
       if (!fs.existsSync(CACHE_DIR)) {
         fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -216,8 +214,11 @@ describe('YouTube Formatters', () => {
       it(`should format ${description}: ${input} -> ${expected}`, () => {
         // Manual implementation to test the logic
         const formatDuration = (isoDuration: string): string => {
+          // eslint-disable-next-line security/detect-unsafe-regex
           const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-          if (!match) {return '0:00';}
+          if (!match) {
+            return '0:00';
+          }
 
           const hours = parseInt(match[1] || '0');
           const minutes = parseInt(match[2] || '0');

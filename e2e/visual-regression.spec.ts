@@ -237,7 +237,7 @@ test.describe('Visual Regression Tests', () => {
     test('loading spinner appearance', async ({ page }) => {
       // Slow down network to capture loading state
       await page.route('**/*', route => {
-        setTimeout(() => route.continue(), 100);
+        globalThis.setTimeout(() => route.continue(), 100);
       });
       
       const navigationPromise = page.goto('/characters');

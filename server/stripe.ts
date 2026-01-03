@@ -152,8 +152,8 @@ export function verifyWebhookSignature(
 
   try {
     return stripe.webhooks.constructEvent(payload, signature, secret);
-  } catch (error) {
-    console.error('Webhook signature verification failed:', error);
+  } catch {
+    console.error('Webhook signature verification failed');
     return null;
   }
 }
