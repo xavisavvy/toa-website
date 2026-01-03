@@ -18,7 +18,6 @@ import { validateCartItems } from '@/lib/cart';
 import type { ShippingEstimate } from '@/types/cart';
 import { Badge } from '@/components/ui/badge';
 import { loadZipCode, saveZipCode, clearZipCode } from '@/lib/zipCode';
-import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping';
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
@@ -61,19 +60,7 @@ export default function Checkout() {
         throw new Error('Failed to estimate shipping');
       }
 
-      const estimate = await response.json();
-      
-      // Apply free shipping if cart meets threshold
-      if (estimate.subtotal >= FREE_SHIPPING_THRESHOLD) {
-        return {
-          ...estimate,
-          shipping: 0, // Free shipping applied
-          total: estimate.subtotal + estimate.tax,
-          freeShippingApplied: true,
-        };
-      }
-      
-      return estimate;
+      return response.json();
     },
     enabled: zipCode.length >= 5 && cart.items.length > 0,
     staleTime: 5 * 60 * 1000,
@@ -342,19 +329,9 @@ export default function Checkout() {
                             Shipping
                           </span>
                           <span className="font-medium">
-                            {shippingEstimate.shipping === 0 ? (
-                              <span className="text-green-600 font-semibold">FREE</span>
-                            ) : (
-                              `$${shippingEstimate.shipping.toFixed(2)}`
-                            )}
+                            ${shippingEstimate.shipping.toFixed(2)}
                           </span>
                         </div>
-
-                        {shippingEstimate.shipping === 0 && summary.subtotal >= FREE_SHIPPING_THRESHOLD && (
-                          <p className="text-xs text-green-600">
-                            🎉 Free shipping applied on orders over ${FREE_SHIPPING_THRESHOLD}!
-                          </p>
-                        )}
 
                         {shippingEstimate.tax > 0 && (
                           <div className="flex justify-between text-sm">

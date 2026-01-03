@@ -1,12 +1,19 @@
 /**
- * Printful Shipping Constants
- * Based on Printful's flat-rate shipping model
+ * Printful Shipping Integration
+ * 
+ * NOTE: Do NOT use calculateShipping() for display purposes.
+ * Always use Printful's API for accurate shipping costs.
+ * Printful's rates vary by product type and quantity:
+ * - Single shirt: $4.75
+ * - Each additional shirt: +$2.20
+ * - Other products have different rates
  */
 
-// Printful's standard flat rate shipping (US)
-export const PRINTFUL_FLAT_RATE_SHIPPING = 4.39;
+// Printful's BASE flat rate (for reference only - not accurate for all products)
+export const PRINTFUL_BASE_SHIPPING = 4.75;
 
-// Free shipping threshold (if applicable)
+// DEPRECATED: Do not use for calculations - Printful API gives accurate pricing
+export const PRINTFUL_FLAT_RATE_SHIPPING = 4.39;
 export const FREE_SHIPPING_THRESHOLD = 100;
 
 export interface ShippingAddress {
@@ -34,6 +41,8 @@ export interface ShippingEstimate {
 /**
  * Calculate shipping cost for multiple items using Printful API
  * This gives accurate shipping for the entire cart
+ * 
+ * IMPORTANT: This is the ONLY reliable way to get shipping costs
  */
 export async function calculateCartShipping(
   items: Array<{ variantId: string; quantity: number }>,
@@ -62,11 +71,12 @@ export async function calculateCartShipping(
 }
 
 /**
- * Calculate shipping cost based on cart total (FALLBACK ONLY)
- * Printful uses flat-rate shipping, typically $4.39 for US
- * Some retailers offer free shipping above a threshold
+ * @deprecated Use Printful API instead - this is inaccurate
  * 
- * NOTE: Use calculateCartShipping() instead for accurate multi-item shipping
+ * Calculate shipping cost based on cart total (FALLBACK ONLY)
+ * This is NOT accurate for Printful's actual pricing.
+ * 
+ * Use calculateCartShipping() for accurate multi-item shipping
  */
 export function calculateShipping(subtotal: number, freeShippingThreshold = FREE_SHIPPING_THRESHOLD): number {
   if (subtotal >= freeShippingThreshold) {
@@ -84,6 +94,8 @@ export function calculateEstimatedTax(subtotal: number, taxRate = 0.0): number {
 }
 
 /**
+ * @deprecated Use Printful API shipping estimate instead
+ * 
  * Calculate order total including shipping and tax
  */
 export function calculateOrderTotal(

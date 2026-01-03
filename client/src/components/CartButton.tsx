@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/useCart';
 import { getDaysUntilExpiration } from '@/lib/cart';
-import { calculateShipping, FREE_SHIPPING_THRESHOLD, calculateOrderTotal } from '@/lib/shipping';
 
 export function CartButton() {
   const [, setLocation] = useLocation();
@@ -27,11 +26,6 @@ export function CartButton() {
   const quantityIssues = cart.items.filter(
     (item) => item.availableQuantity !== undefined && item.quantity > item.availableQuantity
   );
-
-  // Calculate shipping
-  const shipping = calculateShipping(summary.subtotal);
-  const estimatedTotal = calculateOrderTotal(summary.subtotal, shipping);
-  const amountUntilFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - summary.subtotal);
 
   return (
     <Sheet>
@@ -181,28 +175,13 @@ export function CartButton() {
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-medium">${summary.subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Shipping</span>
-                <span className="font-medium">
-                  {shipping === 0 ? (
-                    <span className="text-green-600">FREE</span>
-                  ) : (
-                    `$${shipping.toFixed(2)}`
-                  )}
-                </span>
-              </div>
-              {amountUntilFreeShipping > 0 && shipping > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Add ${amountUntilFreeShipping.toFixed(2)} more for free shipping!
-                </p>
-              )}
               <Separator />
               <div className="flex justify-between text-base font-semibold">
-                <span>Estimated Total</span>
-                <span>${estimatedTotal.toFixed(2)}</span>
+                <span>Subtotal</span>
+                <span>${summary.subtotal.toFixed(2)}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Tax calculated at checkout
+                Shipping and tax calculated at checkout
               </p>
             </div>
 
