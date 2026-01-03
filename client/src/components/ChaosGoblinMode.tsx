@@ -64,16 +64,19 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
   const [timeLeft, setTimeLeft] = useState(60);
   const playerRef = useRef<YT.Player | null>(null);
   const iframeRef = useRef<HTMLDivElement>(null);
-  const [playerReady, setPlayerReady] = useState(false);
 
   // Handle cleanup when deactivating
   const cleanup = () => {
     setTimeLeft(60);
-    setPlayerReady(false);
-    if (playerRef.current && playerReady) {
+    if (playerRef.current) {
       try {
-        playerRef.current.stopVideo();
-        playerRef.current.destroy();
+        // Check if methods exist before calling
+        if (typeof playerRef.current.stopVideo === 'function') {
+          playerRef.current.stopVideo();
+        }
+        if (typeof playerRef.current.destroy === 'function') {
+          playerRef.current.destroy();
+        }
       } catch (e) {
         console.error('Error cleaning up YouTube player:', e);
       }
@@ -119,11 +122,8 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
         },
         events: {
           onReady: (event: YT.PlayerEvent) => {
-            console.log('YouTube player ready');
-            setPlayerReady(true);
             event.target.setVolume(50);
             event.target.playVideo();
-            console.log('Started playing YouTube audio');
           },
           onError: (event: YT.OnErrorEvent) => {
             console.error('YouTube player error:', event.data);
@@ -167,7 +167,7 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
     const timeout = globalThis.setTimeout(() => {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
-      if (playerRef.current && playerReady) {
+      if (playerRef.current && typeof playerRef.current.stopVideo === 'function') {
         try {
           playerRef.current.stopVideo();
         } catch (e) {
@@ -181,7 +181,7 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
       globalThis.clearTimeout(timeout);
-      if (playerRef.current && playerReady) {
+      if (playerRef.current && typeof playerRef.current.stopVideo === 'function') {
         try {
           playerRef.current.stopVideo();
         } catch (e) {
@@ -189,7 +189,7 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
         }
       }
     };
-  }, [active, onComplete, playerReady]);
+  }, [active, onComplete]);
 
   if (!active) {return null;}
 
@@ -201,6 +201,14 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
   return (
     <div
       onClick={handleDismiss}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+          handleDismiss();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Dismiss Chaos Goblin Mode"
       className="fixed inset-0 z-[9999] flex items-center justify-center cursor-pointer"
       style={{
         backgroundColor: color,
