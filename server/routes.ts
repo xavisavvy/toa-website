@@ -306,7 +306,72 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Printful: Calculate shipping estimate
+  // Printful: Calculate shipping estimate (simple zip code-based)
+  app.post("/api/printful/shipping/estimate", async (req, res) => {
+    try {
+      const { variantId, zipCode, quantity } = req.body;
+
+      // Validate inputs
+      if (!variantId || !zipCode) {
+        return res.status(400).json({ error: 'Missing required fields: variantId, zipCode' });
+      }
+
+      // Basic zip code validation (US/CA) - simplified to avoid regex issues
+      const zipTrimmed = zipCode.trim();
+      if (zipTrimmed.length < 5 || zipTrimmed.length > 10) {
+        return res.status(400).json({ error: 'Invalid zip/postal code format' });
+      }
+
+      // Parse US zip code to get state info (rough estimate)
+      const zip = zipCode.substring(0, 5);
+      const isUSZip = /^\d{5}$/.test(zip);
+      
+      // Default shipping address (placeholder - would normally geocode the zip)
+      const recipient = {
+        address1: '123 Main St',
+        city: isUSZip ? 'New York' : 'Toronto',
+        state_code: isUSZip ? 'NY' : 'ON',
+        country_code: isUSZip ? 'US' : 'CA',
+        zip: zipCode,
+      };
+
+      const estimate = await getPrintfulShippingEstimate({
+        recipient,
+        items: [{
+          sync_variant_id: parseInt(variantId),
+          quantity: quantity || 1,
+        }],
+      });
+
+      if (!estimate) {
+        return res.status(500).json({ error: 'Failed to calculate shipping estimate' });
+      }
+
+      // Calculate total
+      const basePrice = parseFloat(req.body.basePrice || '0');
+      const subtotal = basePrice * (quantity || 1);
+      const total = subtotal + estimate.shipping + estimate.tax;
+
+      res.json({
+        subtotal,
+        shipping: estimate.shipping,
+        tax: estimate.tax,
+        total,
+        rates: estimate.rates.map(rate => ({
+          id: rate.id,
+          name: rate.name,
+          rate: rate.rate,
+          minDays: rate.min_delivery_days,
+          maxDays: rate.max_delivery_days,
+        })),
+      });
+    } catch (error) {
+      console.error('Error calculating shipping estimate:', error);
+      res.status(500).json({ error: 'Failed to calculate shipping' });
+    }
+  });
+
+  // Backward compatibility: old shipping estimate endpoint
   app.post("/api/printful/shipping-estimate", async (req, res) => {
     try {
       const { variantId, quantity, recipient } = req.body;

@@ -40,6 +40,10 @@ export async function createCheckoutSession(params: {
   successUrl?: string;
   cancelUrl?: string;
   metadata?: Record<string, string>;
+  shippingEstimate?: {
+    shipping: number;
+    tax: number;
+  };
 }): Promise<Stripe.Checkout.Session | null> {
   if (!stripe) {
     throw new Error('Stripe is not configured');
@@ -55,20 +59,32 @@ export async function createCheckoutSession(params: {
     successUrl,
     cancelUrl,
     metadata = {},
+    shippingEstimate,
   } = params;
 
-  // Calculate total price including shipping and tax
-  const ESTIMATED_SHIPPING_CENTS = 450;  // $4.50 estimated US shipping
-  const TAX_RATE = 0.07;  // 7% estimated tax rate
+  // Use actual Printful shipping estimate if provided, otherwise use defaults
+  let shippingCents: number;
+  let taxCents: number;
+
+  if (shippingEstimate) {
+    shippingCents = Math.round(shippingEstimate.shipping * 100);
+    taxCents = Math.round(shippingEstimate.tax * 100);
+    console.log('💰 Using Printful shipping estimate');
+  } else {
+    // Fallback to estimated rates
+    shippingCents = 450;  // $4.50 estimated US shipping
+    const subtotal = retailPrice + shippingCents;
+    taxCents = Math.ceil(subtotal * 0.07);  // 7% estimated tax
+    console.log('💰 Using fallback shipping estimate');
+  }
   
-  const subtotal = retailPrice + ESTIMATED_SHIPPING_CENTS;
-  const estimatedTax = Math.ceil(subtotal * TAX_RATE);
-  const totalAmount = subtotal + estimatedTax;
+  const subtotal = retailPrice * quantity + shippingCents;
+  const totalAmount = subtotal + taxCents;
   
   console.log(`💰 Checkout Price Calculation:
-    Product: $${(retailPrice / 100).toFixed(2)}
-    Shipping (est): $${(ESTIMATED_SHIPPING_CENTS / 100).toFixed(2)}
-    Tax (est 7%): $${(estimatedTax / 100).toFixed(2)}
+    Product: $${(retailPrice / 100).toFixed(2)} × ${quantity}
+    Shipping: $${(shippingCents / 100).toFixed(2)}
+    Tax: $${(taxCents / 100).toFixed(2)}
     ────────────────────────
     Total: $${(totalAmount / 100).toFixed(2)}
   `);
@@ -82,14 +98,14 @@ export async function createCheckoutSession(params: {
             currency: 'usd',
             product_data: {
               name: `${productName} (includes shipping & tax)`,
-              description: `Shipping: $${(ESTIMATED_SHIPPING_CENTS / 100).toFixed(2)} (est) | Tax: $${(estimatedTax / 100).toFixed(2)} (est)`,
+              description: `Shipping: $${(shippingCents / 100).toFixed(2)} | Tax: $${(taxCents / 100).toFixed(2)}`,
               images: imageUrl ? [imageUrl] : [],
               metadata: {
                 printful_product_id: productId,
                 printful_variant_id: variantId,
                 retail_price_cents: retailPrice.toString(),
-                shipping_cents: ESTIMATED_SHIPPING_CENTS.toString(),
-                tax_cents: estimatedTax.toString(),
+                shipping_cents: shippingCents.toString(),
+                tax_cents: taxCents.toString(),
               },
             },
             unit_amount: totalAmount,  // Total including shipping & tax

@@ -23,6 +23,9 @@ export interface CheckoutParams {
   price: string; // e.g., "24.99"
   quantity?: number;
   imageUrl?: string;
+  zipCode?: string;
+  shipping?: number;
+  tax?: number;
 }
 
 export async function createCheckout(params: CheckoutParams): Promise<{ url: string } | null> {

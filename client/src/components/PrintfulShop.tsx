@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag, AlertCircle, CreditCard, Search, SlidersHorizontal } from "lucide-react";
+import { ShoppingBag, AlertCircle, Search, SlidersHorizontal } from "lucide-react";
 import { useState, useMemo } from "react";
 
+import ProductDetailModal from "@/components/ProductDetailModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +15,6 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { analytics } from "@/lib/analytics";
-import { createCheckout } from "@/lib/stripe";
 
 
 interface Product {
@@ -38,7 +38,8 @@ interface PrintfulShopProps {
 }
 
 export default function PrintfulShop({ enableCheckout = false, limit }: PrintfulShopProps) {
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "price-low" | "price-high">("name");
   const [filterType, setFilterType] = useState<string>("all");
@@ -126,7 +127,7 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
     });
   }, [products, searchQuery, filterType, sortBy]);
 
-  const handleProductClick = async (product: Product) => {
+  const handleProductClick = (product: Product) => {
     // Track product view
     const priceMatch = product.price.match(/\$?([\d.]+)/);
     const priceValue = priceMatch ? parseFloat(priceMatch[1]) : undefined;
@@ -138,46 +139,24 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
       return;
     }
 
-    // Get first available variant or use product directly
-    const variant = product.variants?.[0];
-    if (!variant) {
-      console.error('No variants available for product');
-      return;
-    }
-
-    setCheckoutLoading(product.id);
-
-    try {
-      // Extract numeric price from string like "$24.99" or "$24.99 - $29.99"
-      const priceMatch = variant.price.match(/\$?([\d.]+)/);
-      const price = priceMatch ? priceMatch[1] : '0';
-
-      analytics.beginCheckout(parseFloat(price), [product.name]);
-
-      const result = await createCheckout({
-        productId: product.id,
-        variantId: variant.id,
-        productName: `${product.name} - ${variant.name}`,
-        price,
-        quantity: 1,
-        imageUrl: product.image,
-      });
-
-      if (result?.url) {
-        window.location.href = result.url;
-      } else {
-        console.error('Failed to create checkout session');
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-    } finally {
-      setCheckoutLoading(null);
-    }
+    // Open product detail modal
+    setSelectedProduct(product);
+    setIsModalOpen(true);
   };
 
   return (
-    <div>
-      {/* Filter and Sort Controls - Only show if not limiting products */}
+    <>
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedProduct(null);
+        }}
+      />
+
+      <div>
+        {/* Filter and Sort Controls - Only show if not limiting products */}
       {!limit && displayProducts.length > 0 && (
         <div className="mb-8 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -212,7 +191,7 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
             )}
 
             {/* Sort */}
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+            <Select value={sortBy} onValueChange={(value: "name" | "price-low" | "price-high") => setSortBy(value)}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -279,9 +258,7 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {displayProducts.map((product) => {
-            const isLoading = checkoutLoading === product.id;
-            return (
+          {displayProducts.map((product) => (
             <Card
               key={product.id}
               className="overflow-hidden hover-elevate cursor-pointer transition-all"
@@ -303,14 +280,6 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
                     Sold Out
                   </Badge>
                 )}
-                {enableCheckout && product.inStock && !isLoading && (
-                  <div className="absolute bottom-3 right-3">
-                    <Badge variant="default" className="bg-primary/90">
-                      <CreditCard className="h-3 w-3 mr-1" />
-                      Buy Now
-                    </Badge>
-                  </div>
-                )}
               </div>
               <CardContent className="p-4">
                 <h3 
@@ -324,10 +293,10 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
                 </p>
               </CardContent>
             </Card>
-          );
-          })}
+          ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
