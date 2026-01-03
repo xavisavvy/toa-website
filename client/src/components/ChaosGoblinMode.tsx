@@ -231,6 +231,10 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
         {TAEBRIN_CHARACTERS.map((character, index) => {
           const leftPosition = (index + 1) * (100 / (TAEBRIN_CHARACTERS.length + 1));
           const delay = index * 0.2;
+          // Titheus is short, others get 20% extra height (2x vs 2.4x base)
+          const heightClass = character.name.toLowerCase() === 'titheus' 
+            ? 'h-64 md:h-80' 
+            : 'h-[307px] md:h-96';
           
           return (
             <div
@@ -246,7 +250,7 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
               <img
                 src={character.featuredImage}
                 alt={character.name}
-                className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-4 border-white shadow-2xl"
+                className={`w-auto ${heightClass} object-contain`}
                 style={{
                   filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.8))',
                 }}
