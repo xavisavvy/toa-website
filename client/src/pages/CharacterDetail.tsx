@@ -88,8 +88,17 @@ export default function CharacterDetail() {
 
   const featuredImage = character.images.find((img) => img.isFeatured);
 
-  // Use character images from the data file (already includes D&D Beyond avatars)
+  // Combine local images with D&D Beyond avatar if available
   const allImages = [...character.images];
+  if (character.dndbeyondId) {
+    allImages.push({
+      id: 'dndbeyond-avatar',
+      url: `https://www.dndbeyond.com/avatars/${character.dndbeyondId}/avatar.jpg`,
+      caption: `${character.name} - D&D Beyond Character Portrait`,
+      type: 'portrait',
+      isFeatured: false,
+    });
+  }
 
   const characterSchema = getCreativeWorkSchema({
     name: character.name,
