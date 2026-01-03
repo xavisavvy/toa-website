@@ -25,8 +25,10 @@ export const STRIPE_CONFIG = {
 /**
  * Create a Stripe Checkout session for a Printful product
  * 
- * NOTE: If shippingEstimate is provided, uses EXACT Printful costs.
- * Otherwise, falls back to estimated shipping/tax.
+ * NOTE: Price calculation includes:
+ * - Retail price (product cost)
+ * - Estimated shipping ($4.50)
+ * - Estimated tax (7%)
  */
 export async function createCheckoutSession(params: {
   productId: string;
@@ -38,10 +40,6 @@ export async function createCheckoutSession(params: {
   successUrl?: string;
   cancelUrl?: string;
   metadata?: Record<string, string>;
-  shippingEstimate?: {
-    shipping: number;  // Exact shipping from Printful
-    tax: number;       // Exact tax from Printful
-  };
 }): Promise<Stripe.Checkout.Session | null> {
   if (!stripe) {
     throw new Error('Stripe is not configured');
@@ -57,36 +55,20 @@ export async function createCheckoutSession(params: {
     successUrl,
     cancelUrl,
     metadata = {},
-    shippingEstimate,
   } = params;
 
-  // Use exact Printful costs if provided, otherwise estimate
-  let shippingCents: number;
-  let taxCents: number;
-  let priceSource: string;
-
-  if (shippingEstimate) {
-    // EXACT costs from Printful API
-    shippingCents = Math.round(shippingEstimate.shipping * 100);
-    taxCents = Math.round(shippingEstimate.tax * 100);
-    priceSource = 'Printful API (exact)';
-  } else {
-    // ESTIMATED costs (fallback)
-    const ESTIMATED_SHIPPING_CENTS = 450;  // $4.50
-    const TAX_RATE = 0.07;  // 7%
-    
-    shippingCents = ESTIMATED_SHIPPING_CENTS;
-    const subtotal = retailPrice + shippingCents;
-    taxCents = Math.ceil(subtotal * TAX_RATE);
-    priceSource = 'Estimated (fallback)';
-  }
-
-  const totalAmount = retailPrice + shippingCents + taxCents;
+  // Calculate total price including shipping and tax
+  const ESTIMATED_SHIPPING_CENTS = 450;  // $4.50 estimated US shipping
+  const TAX_RATE = 0.07;  // 7% estimated tax rate
   
-  console.log(`💰 Checkout Price Calculation (${priceSource}):
+  const subtotal = retailPrice + ESTIMATED_SHIPPING_CENTS;
+  const estimatedTax = Math.ceil(subtotal * TAX_RATE);
+  const totalAmount = subtotal + estimatedTax;
+  
+  console.log(`💰 Checkout Price Calculation:
     Product: $${(retailPrice / 100).toFixed(2)}
-    Shipping: $${(shippingCents / 100).toFixed(2)}
-    Tax: $${(taxCents / 100).toFixed(2)}
+    Shipping (est): $${(ESTIMATED_SHIPPING_CENTS / 100).toFixed(2)}
+    Tax (est 7%): $${(estimatedTax / 100).toFixed(2)}
     ────────────────────────
     Total: $${(totalAmount / 100).toFixed(2)}
   `);
@@ -99,16 +81,15 @@ export async function createCheckoutSession(params: {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: productName,
-              description: `Product: $${(retailPrice / 100).toFixed(2)} | Shipping: $${(shippingCents / 100).toFixed(2)} | Tax: $${(taxCents / 100).toFixed(2)}`,
+              name: `${productName} (includes shipping & tax)`,
+              description: `Shipping: $${(ESTIMATED_SHIPPING_CENTS / 100).toFixed(2)} (est) | Tax: $${(estimatedTax / 100).toFixed(2)} (est)`,
               images: imageUrl ? [imageUrl] : [],
               metadata: {
                 printful_product_id: productId,
                 printful_variant_id: variantId,
                 retail_price_cents: retailPrice.toString(),
-                shipping_cents: shippingCents.toString(),
-                tax_cents: taxCents.toString(),
-                price_source: priceSource,
+                shipping_cents: ESTIMATED_SHIPPING_CENTS.toString(),
+                tax_cents: estimatedTax.toString(),
               },
             },
             unit_amount: totalAmount,  // Total including shipping & tax
