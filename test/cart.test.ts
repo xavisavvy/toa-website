@@ -440,6 +440,7 @@ describe('Cart Utilities', () => {
       const validation = validateCartItems(cart);
       expect(validation.valid).toBe(true);
       expect(validation.outOfStockItems).toHaveLength(0);
+      expect(validation.quantityExceededItems).toHaveLength(0);
     });
 
     it('should return invalid for cart with out-of-stock items', () => {
@@ -508,6 +509,53 @@ describe('Cart Utilities', () => {
       const validation = validateCartItems(cart);
       expect(validation.valid).toBe(false);
       expect(validation.outOfStockItems).toHaveLength(2);
+    });
+
+    it('should detect quantity exceeded items', () => {
+      const cart = createEmptyCart();
+      cart.items = [
+        {
+          id: '1',
+          productId: 'prod-1',
+          variantId: 'var-1',
+          productName: 'Product 1',
+          variantName: 'Variant 1',
+          price: 29.99,
+          quantity: 5,
+          availableQuantity: 3,
+          imageUrl: '',
+          inStock: true,
+          addedAt: Date.now(),
+        },
+      ];
+
+      const validation = validateCartItems(cart);
+      expect(validation.valid).toBe(false);
+      expect(validation.quantityExceededItems).toHaveLength(1);
+      expect(validation.quantityExceededItems[0]?.requested).toBe(5);
+      expect(validation.quantityExceededItems[0]?.available).toBe(3);
+    });
+
+    it('should allow items without availableQuantity specified', () => {
+      const cart = createEmptyCart();
+      cart.items = [
+        {
+          id: '1',
+          productId: 'prod-1',
+          variantId: 'var-1',
+          productName: 'Product 1',
+          variantName: 'Variant 1',
+          price: 29.99,
+          quantity: 10,
+          imageUrl: '',
+          inStock: true,
+          addedAt: Date.now(),
+        },
+      ];
+
+      const validation = validateCartItems(cart);
+      expect(validation.valid).toBe(true);
+      expect(validation.quantityExceededItems).toHaveLength(0);
     });
   });
 });

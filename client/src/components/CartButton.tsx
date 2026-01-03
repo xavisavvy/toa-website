@@ -14,12 +14,18 @@ import { useCart } from '@/hooks/useCart';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { getDaysUntilExpiration } from '@/lib/cart';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function CartButton() {
   const [, setLocation] = useLocation();
   const { cart, removeItem, updateQuantity, getCartSummary } = useCart();
   const summary = getCartSummary();
   const daysUntilExpiration = getDaysUntilExpiration(cart);
+
+  // Check for quantity issues
+  const quantityIssues = cart.items.filter(
+    (item) => item.availableQuantity !== undefined && item.quantity > item.availableQuantity
+  );
 
   return (
     <Sheet>
@@ -55,11 +61,20 @@ export function CartButton() {
         </SheetHeader>
 
         {summary.itemCount > 0 && daysUntilExpiration <= 3 && (
-          <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md">
-            <p className="text-sm text-amber-800 dark:text-amber-200">
+          <Alert className="mt-4">
+            <AlertDescription className="text-sm">
               Your cart will expire in {daysUntilExpiration} {daysUntilExpiration === 1 ? 'day' : 'days'}
-            </p>
-          </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {quantityIssues.length > 0 && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription className="text-sm">
+              {quantityIssues.length} {quantityIssues.length === 1 ? 'item has' : 'items have'} quantity issues. 
+              Please adjust before checkout.
+            </AlertDescription>
+          </Alert>
         )}
 
         <div className="flex-1 overflow-y-auto my-6 space-y-4">
@@ -95,6 +110,11 @@ export function CartButton() {
                       Out of Stock
                     </Badge>
                   )}
+                  {item.availableQuantity !== undefined && item.quantity > item.availableQuantity && (
+                    <Badge variant="destructive" className="text-xs mb-2">
+                      Exceeds Stock ({item.availableQuantity} available)
+                    </Badge>
+                  )}
                   <div className="flex items-center gap-2">
                     <div className="flex items-center border rounded-md">
                       <Button
@@ -112,8 +132,16 @@ export function CartButton() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, Math.min(10, item.quantity + 1))}
-                        disabled={item.quantity >= 10}
+                        onClick={() => {
+                          const maxQty = item.availableQuantity !== undefined 
+                            ? Math.min(10, item.availableQuantity)
+                            : 10;
+                          updateQuantity(item.id, Math.min(maxQty, item.quantity + 1));
+                        }}
+                        disabled={
+                          item.quantity >= 10 || 
+                          (item.availableQuantity !== undefined && item.quantity >= item.availableQuantity)
+                        }
                         aria-label="Increase quantity"
                       >
                         <Plus className="h-3 w-3" />

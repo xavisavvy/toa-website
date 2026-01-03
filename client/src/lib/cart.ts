@@ -67,6 +67,7 @@ export function clearCart(): void {
 
 /**
  * Add item to cart or update quantity if already exists
+ * Respects availableQuantity limits if specified
  */
 export function addToCart(cart: Cart, item: Omit<CartItem, 'addedAt'>): Cart {
   const existingIndex = cart.items.findIndex(
@@ -79,17 +80,33 @@ export function addToCart(cart: Cart, item: Omit<CartItem, 'addedAt'>): Cart {
     // eslint-disable-next-line security/detect-object-injection
     const existing = updatedItems[existingIndex];
     if (existing) {
+      let newQuantity = existing.quantity + item.quantity;
+      
+      // Respect available quantity limit if specified
+      if (item.availableQuantity !== undefined && newQuantity > item.availableQuantity) {
+        newQuantity = item.availableQuantity;
+      }
+      
       // eslint-disable-next-line security/detect-object-injection
       updatedItems[existingIndex] = {
         ...existing,
-        quantity: existing.quantity + item.quantity,
+        quantity: newQuantity,
         price: item.price,
         inStock: item.inStock,
+        availableQuantity: item.availableQuantity,
       };
     }
   } else {
+    let quantity = item.quantity;
+    
+    // Respect available quantity limit if specified
+    if (item.availableQuantity !== undefined && quantity > item.availableQuantity) {
+      quantity = item.availableQuantity;
+    }
+    
     updatedItems.push({
       ...item,
+      quantity,
       addedAt: Date.now(),
     });
   }
@@ -102,6 +119,7 @@ export function addToCart(cart: Cart, item: Omit<CartItem, 'addedAt'>): Cart {
 
 /**
  * Update cart item quantity
+ * Respects availableQuantity limits if specified
  */
 export function updateCartItemQuantity(
   cart: Cart,
@@ -112,9 +130,19 @@ export function updateCartItemQuantity(
     return removeFromCart(cart, itemId);
   }
 
-  const updatedItems = cart.items.map((item) =>
-    item.id === itemId ? { ...item, quantity } : item
-  );
+  const updatedItems = cart.items.map((item) => {
+    if (item.id === itemId) {
+      let newQuantity = quantity;
+      
+      // Respect available quantity limit if specified
+      if (item.availableQuantity !== undefined && newQuantity > item.availableQuantity) {
+        newQuantity = item.availableQuantity;
+      }
+      
+      return { ...item, quantity: newQuantity };
+    }
+    return item;
+  });
 
   return {
     ...cart,
@@ -167,10 +195,25 @@ export function getDaysUntilExpiration(cart: Cart): number {
 export function validateCartItems(cart: Cart): {
   valid: boolean;
   outOfStockItems: CartItem[];
+  quantityExceededItems: Array<{ item: CartItem; requested: number; available: number }>;
 } {
   const outOfStockItems = cart.items.filter((item) => !item.inStock);
+  const quantityExceededItems = cart.items
+    .filter((item) => {
+      if (!item.availableQuantity) {
+        return false; // No quantity limit specified
+      }
+      return item.quantity > item.availableQuantity;
+    })
+    .map((item) => ({
+      item,
+      requested: item.quantity,
+      available: item.availableQuantity || 0,
+    }));
+
   return {
-    valid: outOfStockItems.length === 0,
+    valid: outOfStockItems.length === 0 && quantityExceededItems.length === 0,
     outOfStockItems,
+    quantityExceededItems,
   };
 }

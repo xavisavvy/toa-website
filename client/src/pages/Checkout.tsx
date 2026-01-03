@@ -147,25 +147,66 @@ export default function Checkout() {
               <CardContent className="p-6">
                 <div className="flex gap-3">
                   <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-destructive mb-2">Items Out of Stock</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      The following items are no longer available. Please remove them to continue.
-                    </p>
-                    <ul className="space-y-1">
-                      {validation.outOfStockItems.map(item => (
-                        <li key={item.id} className="text-sm flex items-center justify-between">
-                          <span>{item.productName} - {item.variantName}</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="flex-1">
+                    {validation.outOfStockItems.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="font-semibold text-destructive mb-2">Items Out of Stock</h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          The following items are no longer available. Please remove them to continue.
+                        </p>
+                        <ul className="space-y-1">
+                          {validation.outOfStockItems.map(item => (
+                            <li key={item.id} className="text-sm flex items-center justify-between">
+                              <span>{item.productName} - {item.variantName}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeItem(item.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {validation.quantityExceededItems.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-destructive mb-2">Quantity Exceeds Available Stock</h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Requested quantities exceed available stock. Adjust or remove these items.
+                        </p>
+                        <ul className="space-y-2">
+                          {validation.quantityExceededItems.map(({ item, requested, available }) => (
+                            <li key={item.id} className="text-sm">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-medium">{item.productName} - {item.variantName}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeItem(item.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-muted-foreground">
+                                  Requested: {requested}, Available: {available}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => updateQuantity(item.id, available)}
+                                >
+                                  Adjust to {available}
+                                </Button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

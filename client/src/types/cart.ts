@@ -9,6 +9,7 @@ export interface CartItem {
   imageUrl: string;
   inStock: boolean;
   addedAt: number;
+  availableQuantity?: number; // Maximum quantity available to order
 }
 
 export interface Cart {

@@ -7,7 +7,7 @@
 declare global {
   interface Window {
      
-    gtag?: (..._args: any[]) => void;
+    gtag?: () => void;
      
     dataLayer?: any[];
   }
@@ -181,3 +181,4 @@ export const analytics = {
     });
   },
 };
+
