@@ -676,6 +676,13 @@ Before submitting PR:
 - [ ] No `any` types used
 - [ ] Accessibility attributes added
 - [ ] Responsive design implemented
+
+## 📤 Git Push Status Reporting
+
+**IMPORTANT**: At the end of every summary or response involving code changes:
+- ✅ **Always indicate whether changes have been pushed to remote**
+- Format: `🔄 Status: Pushed to remote` or `⚠️ Status: Not yet pushed to remote`
+- This helps maintain clarity on deployment state
 - [ ] Error handling included
 - [ ] Documentation updated
 - [ ] Environment variables documented
