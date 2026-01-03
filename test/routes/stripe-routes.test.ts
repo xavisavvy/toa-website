@@ -100,7 +100,7 @@ vi.mock('../../server/stripe', () => ({
       zip: '12345',
       email: 'test@example.com'
     },
-    items: [{ variant_id: 12345, quantity: 1 }]
+    items: [{ sync_variant_id: 12345, quantity: 1 }]
   })),
   createPrintfulOrder: vi.fn(() => Promise.resolve({
     success: true,

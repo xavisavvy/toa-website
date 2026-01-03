@@ -7,7 +7,7 @@ import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
 import { metrics } from "./monitoring";
 import { getPodcastFeed } from "./podcast";
-import { getPrintfulSyncProducts, getPrintfulProductDetails , getCatalogVariantId as resolveCatalogVariantId, getSyncVariantFiles } from "./printful";
+import { getPrintfulSyncProducts, getPrintfulProductDetails , getCatalogVariantId as resolveCatalogVariantId } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
@@ -452,41 +452,17 @@ export function registerRoutes(app: Express): Server {
 
           console.log(`✅ Resolved variant: sync=${syncVariantId} → catalog=${catalogVariantId}`);
           
-          // Get print files for the sync variant
-          console.log(`📸 Fetching print files for sync variant ${syncVariantId}...`);
-          const printFiles = await getSyncVariantFiles(syncVariantId);
+          // Note: For sync products in Printful, use sync_variant_id (not variant_id)
+          // The files are already associated with the sync variant, no need to send them
+          console.log(`📦 Creating Printful order with sync variant ${syncVariantId}...`);
           
-          if (!printFiles || printFiles.length === 0) {
-            console.error(`❌ No print files found for sync variant ${syncVariantId}`);
-            console.error('⚠️  CRITICAL: Cannot create Printful order without print files');
-            console.error('This means the product mockup images are not configured in Printful');
-            console.error(`📋 Manual Action Required:`);
-            console.error(`   1. Go to Printful Dashboard → Stores → Manage`);
-            console.error(`   2. Find the product and click "Edit"`);
-            console.error(`   3. Ensure mockup images are generated and saved`);
-            console.error(`   4. Manually create order for: ${eventSession.customer_details?.email}`);
-            console.log('✅ Webhook acknowledged, but order needs manual fulfillment');
-            break;
-          }
-          
-          console.log(`✅ Found ${printFiles.length} print file(s) for variant`);
-          
-          // Create order data with catalog variant ID
           const orderData = createPrintfulOrderFromSession(fullSession);
           if (orderData) {
-            // Replace sync variant ID with catalog variant ID and add print files
-            orderData.items = orderData.items.map(item => ({
-              ...item,
-              variant_id: catalogVariantId,
-              files: printFiles, // Include the print files
-            }));
-
-            console.log('📦 Creating Printful order...');
+            // Order data already uses sync_variant_id from createPrintfulOrderFromSession
             console.log('Recipient:', orderData.recipient.name, orderData.recipient.email);
             console.log('Items:', orderData.items.map(i => ({ 
-              variant_id: i.variant_id, 
-              quantity: i.quantity,
-              files: i.files?.length || 0 
+              sync_variant_id: i.sync_variant_id,
+              quantity: i.quantity
             })));
             
             const result = await createPrintfulOrder(orderData);

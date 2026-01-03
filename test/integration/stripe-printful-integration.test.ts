@@ -152,7 +152,7 @@ describe('Stripe → Printful Integration', () => {
         email: 'test@example.com',
       });
       expect(orderData?.items).toHaveLength(1);
-      expect(orderData?.items[0].variant_id).toBe(5130270457);
+      expect(orderData?.items[0].sync_variant_id).toBe(5130270457);  // Changed from variant_id to sync_variant_id
       expect(orderData?.items[0].quantity).toBe(1);
     });
 

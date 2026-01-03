@@ -149,7 +149,8 @@ export interface PrintfulOrderData {
     email: string;
   };
   items: Array<{
-    variant_id: number;
+    sync_variant_id?: number; // For sync products (pre-configured)
+    variant_id?: number; // For catalog products (manual)
     quantity: number;
     files?: Array<{
       url: string;
@@ -186,7 +187,7 @@ export function createPrintfulOrderFromSession(
     },
     items: [
       {
-        variant_id: parseInt(variantId),
+        sync_variant_id: parseInt(variantId), // Use sync_variant_id for synced products
         quantity: 1, // Get from line items if needed
       },
     ],
