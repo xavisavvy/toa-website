@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+/// <reference types="youtube" />
+
+import { useEffect, useState, useRef } from 'react';
 
 const KONAMI_CODE = [
   'ArrowUp',
@@ -13,6 +15,17 @@ const KONAMI_CODE = [
   'a',
 ];
 
+// YouTube video ID for "Goblin Mode" song
+const YOUTUBE_VIDEO_ID = 'tB-opEiK16o';
+
+// Extend Window interface for YouTube API
+declare global {
+  interface Window {
+    YT: typeof YT;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
 export function useKonamiCode(callback: () => void) {
   const [keys, setKeys] = useState<string[]>([]);
 
@@ -22,6 +35,7 @@ export function useKonamiCode(callback: () => void) {
         const newKeys = [...prevKeys, e.key].slice(-KONAMI_CODE.length);
         
         // Check if the sequence matches
+        // eslint-disable-next-line security/detect-object-injection
         const matches = KONAMI_CODE.every((key, index) => key === newKeys[index]);
         
         if (matches) {
@@ -48,33 +62,54 @@ interface ChaosGoblinModeProps {
 export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
   const [color, setColor] = useState('#ff0000');
   const [timeLeft, setTimeLeft] = useState(60);
-  const [audio] = useState(() => {
-    // Check if Audio is available (mock or real)
-    if (typeof globalThis.Audio === 'undefined') {
-      return null;
-    }
-    // YouTube video ID: tB-opEiK16o = "Goblin Mode" song
-    // Using direct MP3 from a CDN or local file
-    const audioElement = new globalThis.Audio('/goblin-mode.mp3');
-    audioElement.volume = 0.5; // 50% volume
-    audioElement.loop = false;
-    return audioElement;
-  });
+  const playerRef = useRef<YT.Player | null>(null);
+  const iframeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!active) {
       setTimeLeft(60);
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
+      if (playerRef.current) {
+        playerRef.current.stopVideo();
       }
       return;
     }
 
-    // Play music
-    if (audio) {
-      audio.play().catch((err) => {
-        console.warn('Failed to play Chaos Goblin audio:', err);
+    // Load YouTube IFrame API
+    if (!globalThis.window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      if (firstScriptTag?.parentNode) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      } else {
+        document.head.appendChild(tag);
+      }
+
+      // Wait for API to load
+      globalThis.window.onYouTubeIframeAPIReady = () => {
+        initializePlayer();
+      };
+    } else {
+      initializePlayer();
+    }
+
+    function initializePlayer() {
+      if (!iframeRef.current || !globalThis.window.YT) {return;}
+
+      playerRef.current = new globalThis.window.YT.Player(iframeRef.current, {
+        height: '0',
+        width: '0',
+        videoId: YOUTUBE_VIDEO_ID,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+        },
+        events: {
+          onReady: (event: YT.PlayerEvent) => {
+            event.target.setVolume(50);
+            event.target.playVideo();
+          },
+        },
       });
     }
 
@@ -93,6 +128,7 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
     
     // Change color every 500ms (safe, non-seizure inducing)
     const interval = globalThis.setInterval(() => {
+      // eslint-disable-next-line security/detect-object-injection
       setColor(colors[colorIndex] || '#FF6B6B');
       colorIndex = (colorIndex + 1) % colors.length;
     }, 500);
@@ -112,9 +148,8 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
     const timeout = globalThis.setTimeout(() => {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
+      if (playerRef.current) {
+        playerRef.current.stopVideo();
       }
       onComplete();
     }, 60000);
@@ -123,12 +158,11 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
       globalThis.clearTimeout(timeout);
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
+      if (playerRef.current) {
+        playerRef.current.stopVideo();
       }
     };
-  }, [active, onComplete, audio]);
+  }, [active, onComplete]);
 
   if (!active) {return null;}
 
@@ -140,6 +174,9 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
         transition: 'background-color 0.5s ease-in-out', // Smooth transition
       }}
     >
+      {/* Hidden YouTube player */}
+      <div ref={iframeRef} style={{ display: 'none' }} />
+
       <div className="flex flex-col items-center animate-bounce">
         {/* Dancing Goblin Image */}
         <img

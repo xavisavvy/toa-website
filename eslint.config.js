@@ -67,7 +67,8 @@ export default [
         SVGSVGElement: 'readonly',
         IntersectionObserver: 'readonly',
         Audio: 'readonly',
-        globalThis: 'readonly'
+        globalThis: 'readonly',
+        YT: 'readonly'
       }
     },
     plugins: {
