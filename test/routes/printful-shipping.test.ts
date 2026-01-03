@@ -102,7 +102,7 @@ describe('Printful Shipping Estimate API', () => {
     expect(response.body.rates[0].name).toContain('Flat Rate');
   });
 
-  it('should return 400 for missing variantId', async () => {
+  it('should return 400 for missing variantId and items', async () => {
     const response = await request(app)
       .post('/api/printful/shipping-estimate')
       .send({
@@ -117,7 +117,30 @@ describe('Printful Shipping Estimate API', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Missing required fields');
+    expect(response.body.error).toContain('Missing required field: variantId or items');
+  });
+
+  it('should calculate shipping for multiple items (cart)', async () => {
+    const response = await request(app)
+      .post('/api/printful/shipping-estimate')
+      .send({
+        items: [
+          { variantId: '5130270457', quantity: 2 },
+          { variantId: '5130270458', quantity: 1 },
+        ],
+        recipient: {
+          address1: '526 E 200 S',
+          city: 'Clearfield',
+          state_code: 'UT',
+          country_code: 'US',
+          zip: '84015',
+        },
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('shipping');
+    expect(response.body).toHaveProperty('tax');
+    expect(response.body).toHaveProperty('rates');
   });
 
   it('should return 400 for incomplete recipient address', async () => {

@@ -1,7 +1,10 @@
 import { ShoppingCart, X, Plus, Minus } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import {
   Sheet,
   SheetContent,
@@ -11,10 +14,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/useCart';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { getDaysUntilExpiration } from '@/lib/cart';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { calculateShipping, FREE_SHIPPING_THRESHOLD, calculateOrderTotal } from '@/lib/shipping';
 
 export function CartButton() {
