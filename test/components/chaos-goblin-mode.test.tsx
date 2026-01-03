@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -16,6 +16,17 @@ function TestKonamiComponent() {
 describe('Chaos Goblin Mode', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    
+    // Mock Audio API globally as a constructor
+     
+    globalThis.Audio = vi.fn().mockImplementation(function(this: any) {
+      this.play = vi.fn().mockResolvedValue(undefined);
+      this.pause = vi.fn();
+      this.currentTime = 0;
+      this.volume = 0.5;
+      this.loop = false;
+      return this;
+    }) as unknown as typeof Audio;
   });
 
   afterEach(() => {
@@ -89,6 +100,72 @@ describe('Chaos Goblin Mode', () => {
       
       const overlay = container.querySelector('.pointer-events-none');
       expect(overlay).toBeInTheDocument();
+    });
+
+    it('should display countdown from 60 seconds', () => {
+      render(<ChaosGoblinMode active={true} onComplete={vi.fn()} />);
+      
+      expect(screen.getByText('Ending in 60s')).toBeInTheDocument();
+      
+      // Advance timer by 1 second
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      
+      expect(screen.getByText('Ending in 59s')).toBeInTheDocument();
+    });
+
+    it('should call onComplete after 60 seconds', () => {
+      const onComplete = vi.fn();
+      render(<ChaosGoblinMode active={true} onComplete={onComplete} />);
+      
+      // Fast-forward 60 seconds
+      act(() => {
+        vi.advanceTimersByTime(60000);
+      });
+      
+      expect(onComplete).toHaveBeenCalled();
+    });
+
+    it('should play audio when activated', () => {
+      const mockPlay = vi.fn().mockResolvedValue(undefined);
+      const mockPause = vi.fn();
+      
+       
+      globalThis.Audio = vi.fn().mockImplementation(function(this: any) {
+        this.play = mockPlay;
+        this.pause = mockPause;
+        this.currentTime = 0;
+        this.volume = 0.5;
+        this.loop = false;
+        return this;
+      }) as unknown as typeof Audio;
+      
+      render(<ChaosGoblinMode active={true} onComplete={vi.fn()} />);
+      
+      expect(mockPlay).toHaveBeenCalled();
+    });
+
+    it('should stop audio when deactivated', () => {
+      const mockPlay = vi.fn().mockResolvedValue(undefined);
+      const mockPause = vi.fn();
+      
+       
+      globalThis.Audio = vi.fn().mockImplementation(function(this: any) {
+        this.play = mockPlay;
+        this.pause = mockPause;
+        this.currentTime = 0;
+        this.volume = 0.5;
+        this.loop = false;
+        return this;
+      }) as unknown as typeof Audio;
+      
+      const { rerender } = render(<ChaosGoblinMode active={true} onComplete={vi.fn()} />);
+      
+      // Deactivate
+      rerender(<ChaosGoblinMode active={false} onComplete={vi.fn()} />);
+      
+      expect(mockPause).toHaveBeenCalled();
     });
   });
 });

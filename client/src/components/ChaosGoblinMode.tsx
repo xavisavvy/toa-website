@@ -47,12 +47,35 @@ interface ChaosGoblinModeProps {
 
 export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
   const [color, setColor] = useState('#ff0000');
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [audio] = useState(() => {
+    // Check if Audio is available (mock or real)
+    if (typeof globalThis.Audio === 'undefined') {
+      return null;
+    }
+    // YouTube video ID: tB-opEiK16o = "Goblin Mode" song
+    // Using direct MP3 from a CDN or local file
+    const audioElement = new globalThis.Audio('/goblin-mode.mp3');
+    audioElement.volume = 0.5; // 50% volume
+    audioElement.loop = false;
+    return audioElement;
+  });
 
   useEffect(() => {
     if (!active) {
-      setTimeLeft(10);
+      setTimeLeft(60);
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
       return;
+    }
+
+    // Play music
+    if (audio) {
+      audio.play().catch((err) => {
+        console.warn('Failed to play Chaos Goblin audio:', err);
+      });
     }
 
     // Safe rainbow colors (slower transition, less intense)
@@ -85,19 +108,27 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
       });
     }, 1000);
 
-    // Auto-stop after 10 seconds
+    // Auto-stop after 60 seconds
     const timeout = globalThis.setTimeout(() => {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
       onComplete();
-    }, 10000);
+    }, 60000);
 
     return () => {
       globalThis.clearInterval(interval);
       globalThis.clearInterval(countdownInterval);
       globalThis.clearTimeout(timeout);
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
     };
-  }, [active, onComplete]);
+  }, [active, onComplete, audio]);
 
   if (!active) {return null;}
 

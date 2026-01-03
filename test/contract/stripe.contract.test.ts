@@ -1,6 +1,6 @@
-/* eslint-disable no-undef, @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
+ 
 import type Stripe from 'stripe';
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
 
 import { 
   createCheckoutSession, 

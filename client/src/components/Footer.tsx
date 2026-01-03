@@ -3,8 +3,8 @@ import { SiYoutube, SiX, SiDiscord, SiPatreon, SiReddit } from "react-icons/si";
 import { Link, useLocation } from "wouter";
 
 import { AccessibleIcon } from "@/components/ui/accessible-icon";
-import { analytics } from "@/lib/analytics";
 import socialLinksData from "@/data/social-links.json";
+import { analytics } from "@/lib/analytics";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

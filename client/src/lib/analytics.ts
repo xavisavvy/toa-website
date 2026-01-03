@@ -6,9 +6,9 @@
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     gtag?: (..._args: any[]) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     dataLayer?: any[];
   }
 }
@@ -31,7 +31,7 @@ export const initGA = () => {
   // Initialize gtag
   window.gtag = function gtag() {
     window.dataLayer = window.dataLayer || [];
-    // eslint-disable-next-line prefer-rest-params
+     
     window.dataLayer.push(arguments);
   };
 

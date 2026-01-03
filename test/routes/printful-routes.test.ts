@@ -1,8 +1,9 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import express from 'express';
 import request from 'supertest';
 import { describe, it, expect, beforeEach, vi, beforeAll, afterAll } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
 
 import { registerRoutes } from '../../server/routes';
 
