@@ -1,12 +1,13 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 
 import { queryClient } from "./lib/queryClient";
-import { initGA, analytics } from "@/lib/analytics";
 
+import { useKonamiCode, ChaosGoblinMode } from "@/components/ChaosGoblinMode";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { initGA, analytics } from "@/lib/analytics";
 import CharacterDetail from "@/pages/CharacterDetail";
 import Characters from "@/pages/Characters";
 import CheckoutCancel from "@/pages/CheckoutCancel";
@@ -68,10 +69,24 @@ function Router() {
 }
 
 function App() {
+  const [chaosMode, setChaosMode] = useState(false);
+
+  // Activate Chaos Goblin Mode with Konami code
+  useKonamiCode(() => {
+    setChaosMode(true);
+  });
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        
+        {/* Chaos Goblin Mode Easter Egg */}
+        <ChaosGoblinMode 
+          active={chaosMode} 
+          onComplete={() => setChaosMode(false)} 
+        />
+        
         <Router />
       </TooltipProvider>
     </QueryClientProvider>

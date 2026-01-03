@@ -48,6 +48,38 @@ interface PrintfulSyncVariant {
   }>;
 }
 
+interface PrintfulShippingRate {
+  id: string;
+  name: string;
+  rate: string;
+  currency: string;
+  min_delivery_days: number;
+  max_delivery_days: number;
+}
+
+export interface PrintfulShippingEstimate {
+  shipping: number;
+  tax: number;
+  retail_costs: {
+    subtotal: number;
+    discount: number;
+    shipping: number;
+    tax: number;
+  };
+  costs: {
+    subtotal: string;
+    discount: string;
+    shipping: string;
+    digitization: string;
+    additional_fee: string;
+    fulfillment_fee: string;
+    tax: string;
+    vat: string;
+    total: string;
+  };
+  rates: PrintfulShippingRate[];
+}
+
 export interface PrintfulProductDisplay {
   id: string;
   name: string;
@@ -423,6 +455,117 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
   } catch (error) {
     console.error(`[getCatalogVariantId] Exception caught:`, error);
     console.error(`Error fetching sync variant ${syncVariantId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Get exact shipping rates and tax from Printful for a specific order
+ * This gives us ACTUAL costs before creating the Stripe checkout
+ */
+export async function getPrintfulShippingEstimate(params: {
+  recipient: {
+    address1: string;
+    address2?: string | null;
+    city: string;
+    state_code: string;
+    country_code: string;
+    zip: string;
+  };
+  items: Array<{
+    sync_variant_id: number;
+    quantity: number;
+  }>;
+  retail_costs?: {
+    currency: string;
+    subtotal: number;
+    discount?: number;
+    shipping?: number;
+    tax?: number;
+  };
+}): Promise<PrintfulShippingEstimate | null> {
+  const apiKey = process.env.PRINTFUL_API_KEY;
+
+  if (!apiKey) {
+    console.error('Printful API key not configured');
+    return null;
+  }
+
+  try {
+    console.log('📦 Calculating shipping rates from Printful...');
+    console.log('Recipient:', params.recipient.city, params.recipient.state_code);
+    console.log('Items:', params.items);
+
+    const response = await fetch('https://api.printful.com/shipping/rates', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        recipient: params.recipient,
+        items: params.items,
+        currency: 'USD',
+        locale: 'en_US',
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Printful shipping API error:', response.status, errorText);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('✅ Printful shipping response received');
+
+    if (!data.result || !data.result.length) {
+      console.error('No shipping rates returned from Printful');
+      return null;
+    }
+
+    // Get the cheapest shipping option (usually first one)
+    const cheapestRate = data.result[0];
+    
+    console.log(`💰 Shipping Breakdown from Printful:
+      Shipping Method: ${cheapestRate.name}
+      Shipping Cost: $${cheapestRate.rate}
+      Tax/VAT: $${cheapestRate.vat || 0}
+      Delivery: ${cheapestRate.min_delivery_days}-${cheapestRate.max_delivery_days} business days
+    `);
+
+    return {
+      shipping: parseFloat(cheapestRate.rate),
+      tax: parseFloat(cheapestRate.vat || '0'),
+      retail_costs: {
+        subtotal: params.retail_costs?.subtotal || 0,
+        discount: params.retail_costs?.discount || 0,
+        shipping: parseFloat(cheapestRate.rate),
+        tax: parseFloat(cheapestRate.vat || '0'),
+      },
+      costs: {
+        subtotal: cheapestRate.costs?.subtotal || '0',
+        discount: cheapestRate.costs?.discount || '0',
+        shipping: cheapestRate.rate,
+        digitization: cheapestRate.costs?.digitization || '0',
+        additional_fee: cheapestRate.costs?.additional_fee || '0',
+        fulfillment_fee: cheapestRate.costs?.fulfillment_fee || '0',
+        tax: cheapestRate.costs?.tax || '0',
+        vat: cheapestRate.vat || '0',
+        total: cheapestRate.costs?.total || '0',
+      },
+      rates: data.result.map((rate: { id: string; name: string; rate: string; currency: string; min_delivery_days: number; max_delivery_days: number }) => ({
+        id: rate.id,
+        name: rate.name,
+        rate: rate.rate,
+        currency: rate.currency,
+        min_delivery_days: rate.min_delivery_days,
+        max_delivery_days: rate.max_delivery_days,
+      })),
+    };
+
+  } catch (error) {
+    console.error('Error calculating Printful shipping:', error);
     return null;
   }
 }

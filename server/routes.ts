@@ -7,7 +7,7 @@ import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
 import { metrics } from "./monitoring";
 import { getPodcastFeed } from "./podcast";
-import { getPrintfulSyncProducts, getPrintfulProductDetails , getCatalogVariantId as resolveCatalogVariantId } from "./printful";
+import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
@@ -306,10 +306,55 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Printful: Calculate shipping estimate
+  app.post("/api/printful/shipping-estimate", async (req, res) => {
+    try {
+      const { variantId, quantity, recipient } = req.body;
+
+      // Validate inputs
+      if (!variantId || !recipient) {
+        return res.status(400).json({ error: 'Missing required fields: variantId, recipient' });
+      }
+
+      if (!recipient.address1 || !recipient.city || !recipient.state_code || !recipient.country_code || !recipient.zip) {
+        return res.status(400).json({ error: 'Missing required recipient fields' });
+      }
+
+      const estimate = await getPrintfulShippingEstimate({
+        recipient: {
+          address1: recipient.address1,
+          address2: recipient.address2 || null,
+          city: recipient.city,
+          state_code: recipient.state_code,
+          country_code: recipient.country_code,
+          zip: recipient.zip,
+        },
+        items: [{
+          sync_variant_id: parseInt(variantId),
+          quantity: quantity || 1,
+        }],
+      });
+
+      if (!estimate) {
+        return res.status(500).json({ error: 'Failed to calculate shipping estimate' });
+      }
+
+      res.json({
+        shipping: estimate.shipping,
+        tax: estimate.tax,
+        rates: estimate.rates,
+        costs: estimate.costs,
+      });
+    } catch (error) {
+      console.error('Error calculating shipping estimate:', error);
+      res.status(500).json({ error: 'Failed to calculate shipping' });
+    }
+  });
+
   // Stripe Checkout: Create checkout session
   app.post("/api/stripe/create-checkout", async (req, res) => {
     try {
-      const { productId, variantId, productName, price, quantity, imageUrl } = req.body;
+      const { productId, variantId, productName, price, quantity, imageUrl, shipping } = req.body;
 
       // Validate inputs
       if (!productId || !variantId || !productName || !price) {
@@ -325,6 +370,15 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Invalid price' });
       }
 
+      // Parse shipping estimate if provided
+      let shippingEstimate;
+      if (shipping && typeof shipping.shipping === 'number' && typeof shipping.tax === 'number') {
+        shippingEstimate = {
+          shipping: shipping.shipping,
+          tax: shipping.tax,
+        };
+      }
+
       const session = await createCheckoutSession({
         productId,
         variantId,
@@ -332,6 +386,7 @@ export function registerRoutes(app: Express): Server {
         price: priceInCents,
         quantity: quantity || 1,
         imageUrl,
+        shippingEstimate,  // Pass Printful's exact costs if available
       });
 
       if (!session) {

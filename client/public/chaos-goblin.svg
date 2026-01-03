@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="512" height="512">
+  <!-- Happy Dancing Goblin -->
+  
+  <!-- Body (green) -->
+  <ellipse cx="100" cy="120" rx="45" ry="55" fill="#4CAF50"/>
+  
+  <!-- Arms (raised in celebration) -->
+  <path d="M 60 100 Q 40 80 35 60" stroke="#4CAF50" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M 140 100 Q 160 80 165 60" stroke="#4CAF50" stroke-width="12" fill="none" stroke-linecap="round"/>
+  
+  <!-- Hands -->
+  <circle cx="35" cy="55" r="8" fill="#4CAF50"/>
+  <circle cx="165" cy="55" r="8" fill="#4CAF50"/>
+  
+  <!-- Legs -->
+  <path d="M 80 165 L 75 190" stroke="#4CAF50" stroke-width="10" stroke-linecap="round"/>
+  <path d="M 120 165 L 125 190" stroke="#4CAF50" stroke-width="10" stroke-linecap="round"/>
+  
+  <!-- Feet -->
+  <ellipse cx="75" cy="193" rx="12" ry="6" fill="#388E3C"/>
+  <ellipse cx="125" cy="193" rx="12" ry="6" fill="#388E3C"/>
+  
+  <!-- Head -->
+  <circle cx="100" cy="65" r="35" fill="#66BB6A"/>
+  
+  <!-- Pointed ears -->
+  <path d="M 70 55 L 60 45 L 72 60 Z" fill="#66BB6A"/>
+  <path d="M 130 55 L 140 45 L 128 60 Z" fill="#66BB6A"/>
+  
+  <!-- Eyes (happy closed eyes) -->
+  <path d="M 85 60 Q 87 65 90 60" stroke="#2E7D32" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 110 60 Q 112 65 115 60" stroke="#2E7D32" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- Big happy smile -->
+  <path d="M 80 75 Q 100 90 120 75" stroke="#2E7D32" stroke-width="3" fill="none" stroke-linecap="round"/>
+  
+  <!-- Rosy cheeks -->
+  <circle cx="75" cy="70" r="6" fill="#FF6B6B" opacity="0.5"/>
+  <circle cx="125" cy="70" r="6" fill="#FF6B6B" opacity="0.5"/>
+  
+  <!-- Party hat -->
+  <path d="M 100 30 L 80 50 L 120 50 Z" fill="#FF5722"/>
+  <circle cx="100" cy="25" r="6" fill="#FFC107"/>
+  
+  <!-- Confetti pieces -->
+  <rect x="140" y="30" width="4" height="8" fill="#FF5722" transform="rotate(45 142 34)"/>
+  <rect x="60" y="35" width="4" height="8" fill="#2196F3" transform="rotate(-30 62 39)"/>
+  <circle cx="150" cy="50" r="3" fill="#FFC107"/>
+  <circle cx="50" cy="50" r="3" fill="#4CAF50"/>
+  <rect x="145" y="70" width="3" height="6" fill="#9C27B0" transform="rotate(20 146.5 73)"/>
+  <rect x="55" y="75" width="3" height="6" fill="#FF5722" transform="rotate(-45 56.5 78)"/>
+  
+  <!-- Belly button -->
+  <circle cx="100" cy="125" r="3" fill="#388E3C"/>
+</svg>
