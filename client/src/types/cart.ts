@@ -30,11 +30,12 @@ export interface ShippingEstimate {
   shipping: number;
   tax: number;
   total: number;
-  rates: Array<{
+  rates?: Array<{
     id: string;
     name: string;
-    rate: string;
+    rate: string | number;
     minDays: number;
     maxDays: number;
   }>;
+  freeShippingApplied?: boolean;
 }
