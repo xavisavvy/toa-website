@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 
+import charactersData from '@/data/characters.json';
+
 const KONAMI_CODE = [
   'ArrowUp',
   'ArrowUp',
@@ -17,6 +19,11 @@ const KONAMI_CODE = [
 
 // YouTube video ID for "Goblin Mode" song
 const YOUTUBE_VIDEO_ID = 'tB-opEiK16o';
+
+// Get all Journeys Through Taebrin characters
+const TAEBRIN_CHARACTERS = charactersData.characters.filter(
+  (char) => char.campaign === 'Journeys Through Taebrin' && char.status === 'active'
+);
 
 // Extend Window interface for YouTube API
 declare global {
@@ -219,7 +226,40 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
       {/* Hidden YouTube player */}
       <div ref={iframeRef} style={{ display: 'none' }} />
 
-      <div className="flex flex-col items-center animate-bounce">
+      {/* Dancing Taebrin Characters scattered horizontally */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {TAEBRIN_CHARACTERS.map((character, index) => {
+          const leftPosition = (index + 1) * (100 / (TAEBRIN_CHARACTERS.length + 1));
+          const delay = index * 0.2;
+          
+          return (
+            <div
+              key={character.id}
+              className="absolute"
+              style={{
+                left: `${leftPosition}%`,
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                animation: `character-dance 1s ease-in-out ${delay}s infinite alternate`,
+              }}
+            >
+              <img
+                src={character.featuredImage}
+                alt={character.name}
+                className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full border-4 border-white shadow-2xl"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.8))',
+                }}
+              />
+              <p className="text-white text-sm md:text-base font-bold text-center mt-2 drop-shadow-lg">
+                {character.name}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col items-center animate-bounce relative z-10">
         {/* Dancing Goblin Image */}
         <img
           src="/chaos-goblin.svg"
@@ -262,6 +302,11 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
           50% { transform: translateY(0) translateX(10px); }
           75% { transform: translateY(-20px) translateX(-10px); }
           100% { transform: translateY(0) translateX(0); }
+        }
+        @keyframes character-dance {
+          0% { transform: translate(-50%, -50%) translateY(0) scale(1) rotate(-5deg); }
+          50% { transform: translate(-50%, -50%) translateY(-30px) scale(1.1) rotate(5deg); }
+          100% { transform: translate(-50%, -50%) translateY(0) scale(1) rotate(-5deg); }
         }
       `}</style>
     </div>
