@@ -36,13 +36,14 @@ export function CartButton() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="relative"
-          aria-label={`Shopping cart with ${summary.totalItems} items`}
-        >
-          <ShoppingCart className="h-5 w-5" />
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={`Shopping cart with ${summary.totalItems} items`}
+          >
+            <ShoppingCart className="h-5 w-5" />
+          </Button>
           {summary.totalItems > 0 && (
             <Badge
               variant="destructive"
@@ -51,7 +52,7 @@ export function CartButton() {
               {summary.totalItems}
             </Badge>
           )}
-        </Button>
+        </div>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col">
         <SheetHeader>

@@ -374,15 +374,33 @@ export function registerRoutes(app: Express): Server {
   // Backward compatibility: old shipping estimate endpoint
   app.post("/api/printful/shipping-estimate", async (req, res) => {
     try {
-      const { variantId, quantity, recipient } = req.body;
+      const { variantId, quantity, recipient, items } = req.body;
 
-      // Validate inputs
-      if (!variantId || !recipient) {
-        return res.status(400).json({ error: 'Missing required fields: variantId, recipient' });
+      // Validate inputs - support both single item (legacy) and multi-item (cart)
+      if (!recipient) {
+        return res.status(400).json({ error: 'Missing required field: recipient' });
       }
 
       if (!recipient.address1 || !recipient.city || !recipient.state_code || !recipient.country_code || !recipient.zip) {
         return res.status(400).json({ error: 'Missing required recipient fields' });
+      }
+
+      // Build items array - support both formats
+      let itemsToEstimate;
+      if (items && Array.isArray(items) && items.length > 0) {
+        // Multi-item cart format
+        itemsToEstimate = items.map(item => ({
+          sync_variant_id: parseInt(item.variantId),
+          quantity: item.quantity || 1,
+        }));
+      } else if (variantId) {
+        // Single item format (legacy)
+        itemsToEstimate = [{
+          sync_variant_id: parseInt(variantId),
+          quantity: quantity || 1,
+        }];
+      } else {
+        return res.status(400).json({ error: 'Missing required field: variantId or items' });
       }
 
       const estimate = await getPrintfulShippingEstimate({
@@ -394,10 +412,7 @@ export function registerRoutes(app: Express): Server {
           country_code: recipient.country_code,
           zip: recipient.zip,
         },
-        items: [{
-          sync_variant_id: parseInt(variantId),
-          quantity: quantity || 1,
-        }],
+        items: itemsToEstimate,
       });
 
       if (!estimate) {

@@ -9,10 +9,64 @@ export const PRINTFUL_FLAT_RATE_SHIPPING = 4.39;
 // Free shipping threshold (if applicable)
 export const FREE_SHIPPING_THRESHOLD = 100;
 
+export interface ShippingAddress {
+  address1: string;
+  address2?: string;
+  city: string;
+  state_code: string;
+  country_code: string;
+  zip: string;
+}
+
+export interface ShippingEstimate {
+  shipping: number;
+  tax: number;
+  rates?: Array<{
+    id: string;
+    name: string;
+    rate: string;
+    currency: string;
+    min_delivery_days: number;
+    max_delivery_days: number;
+  }>;
+}
+
 /**
- * Calculate shipping cost based on cart total
+ * Calculate shipping cost for multiple items using Printful API
+ * This gives accurate shipping for the entire cart
+ */
+export async function calculateCartShipping(
+  items: Array<{ variantId: string; quantity: number }>,
+  recipient: ShippingAddress
+): Promise<ShippingEstimate | null> {
+  try {
+    const response = await fetch('/api/printful/shipping-estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items,
+        recipient,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to calculate shipping:', await response.text());
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error calculating shipping:', error);
+    return null;
+  }
+}
+
+/**
+ * Calculate shipping cost based on cart total (FALLBACK ONLY)
  * Printful uses flat-rate shipping, typically $4.39 for US
  * Some retailers offer free shipping above a threshold
+ * 
+ * NOTE: Use calculateCartShipping() instead for accurate multi-item shipping
  */
 export function calculateShipping(subtotal: number, freeShippingThreshold = FREE_SHIPPING_THRESHOLD): number {
   if (subtotal >= freeShippingThreshold) {
