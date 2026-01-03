@@ -375,6 +375,9 @@ export function registerRoutes(app: Express): Server {
 
   /* eslint-disable no-console, @typescript-eslint/no-explicit-any, sonarjs/cognitive-complexity */
   // Stripe Webhook: Handle payment events
+  // Track processed sessions to prevent duplicate orders
+  const processedSessions = new Set<string>();
+
   app.post("/api/stripe/webhook", async (req, res) => {
     const signature = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -397,7 +400,15 @@ export function registerRoutes(app: Express): Server {
       switch (event.type) {
         case 'checkout.session.completed': {
           const eventSession = event.data.object as any;
-          console.log('✅ Payment successful:', eventSession.id);
+          const sessionId = eventSession.id;
+          
+          // Idempotency check - prevent duplicate order creation
+          if (processedSessions.has(sessionId)) {
+            console.log(`⚠️  Session ${sessionId} already processed, skipping duplicate webhook`);
+            return res.json({ received: true, duplicate: true });
+          }
+          
+          console.log('✅ Payment successful:', sessionId);
           console.log('Customer email:', eventSession.customer_details?.email);
           console.log('Amount paid:', eventSession.amount_total / 100, eventSession.currency.toUpperCase());
           
@@ -483,6 +494,17 @@ export function registerRoutes(app: Express): Server {
             if (result.success) {
               console.log(`✅ Printful order created successfully! Order ID: ${result.orderId}`);
               console.log(`Order will be fulfilled and shipped by Printful`);
+              
+              // Mark session as processed to prevent duplicates
+              processedSessions.add(sessionId);
+              
+              // Clean up old sessions (keep last 1000 to prevent memory leak)
+              if (processedSessions.size > 1000) {
+                const sessionsArray = Array.from(processedSessions);
+                processedSessions.clear();
+                sessionsArray.slice(-500).forEach(id => processedSessions.add(id));
+              }
+              
               // TODO: Send confirmation email to customer
               // TODO: Store order in database for tracking
             } else {

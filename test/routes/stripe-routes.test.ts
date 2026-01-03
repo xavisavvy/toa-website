@@ -213,6 +213,34 @@ describe('Stripe Routes', () => {
       expect(getCheckoutSession).toHaveBeenCalledWith('cs_test_123');
       expect(createPrintfulOrder).toHaveBeenCalled();
     });
+
+    it('should prevent duplicate order creation for the same session', async () => {
+      // First webhook - should process
+      const firstResponse = await request(app)
+        .post('/api/stripe/webhook')
+        .set('stripe-signature', 'valid_sig')
+        .send(JSON.stringify({
+          type: 'checkout.session.completed',
+          data: { object: { id: 'cs_test_duplicate_456' } }
+        }))
+        .expect(200);
+
+      expect(firstResponse.body).toHaveProperty('received', true);
+      expect(firstResponse.body).not.toHaveProperty('duplicate');
+
+      // Second webhook - should detect duplicate
+      const secondResponse = await request(app)
+        .post('/api/stripe/webhook')
+        .set('stripe-signature', 'valid_sig')
+        .send(JSON.stringify({
+          type: 'checkout.session.completed',
+          data: { object: { id: 'cs_test_duplicate_456' } }
+        }))
+        .expect(200);
+
+      expect(secondResponse.body).toHaveProperty('received', true);
+      expect(secondResponse.body).toHaveProperty('duplicate', true);
+    });
   });
 
   describe('GET /api/stripe/config', () => {
