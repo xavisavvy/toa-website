@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { analytics } from "@/lib/analytics";
 import { getCheckoutSession } from "@/lib/stripe";
+import { clearZipCode } from "@/lib/zipCode";
 
 export default function CheckoutSuccess() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,9 @@ export default function CheckoutSuccess() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Clear PII data after successful checkout
+    clearZipCode();
+
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
 

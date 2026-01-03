@@ -159,6 +159,49 @@ describe('Printful Shipping Estimate API', () => {
     expect(response.body.error).toContain('Missing required recipient fields');
   });
 
+  it('should calculate shipping for cart with zip code only', async () => {
+    const response = await request(app)
+      .post('/api/printful/shipping/estimate-cart')
+      .send({
+        items: [
+          { variantId: '5130270457', quantity: 2, basePrice: 3.00 },
+          { variantId: '5130270458', quantity: 1, basePrice: 5.00 },
+        ],
+        zipCode: '84015',
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('subtotal');
+    expect(response.body).toHaveProperty('shipping');
+    expect(response.body).toHaveProperty('tax');
+    expect(response.body).toHaveProperty('total');
+    expect(response.body.subtotal).toBe(11.00); // 2*3 + 1*5
+  });
+
+  it('should return 400 for cart estimate without zip code', async () => {
+    const response = await request(app)
+      .post('/api/printful/shipping/estimate-cart')
+      .send({
+        items: [
+          { variantId: '5130270457', quantity: 1, basePrice: 3.00 },
+        ],
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Invalid zip code');
+  });
+
+  it('should return 400 for cart estimate without items', async () => {
+    const response = await request(app)
+      .post('/api/printful/shipping/estimate-cart')
+      .send({
+        zipCode: '84015',
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Missing required field: items');
+  });
+
   it('should use Printful shipping in Stripe checkout', async () => {
     const response = await request(app)
       .post('/api/stripe/create-checkout')

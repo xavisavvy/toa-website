@@ -431,6 +431,68 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Cart-specific shipping estimate endpoint
+  // Simplified endpoint for cart checkout flow
+  app.post("/api/printful/shipping/estimate-cart", async (req, res) => {
+    try {
+      const { items, zipCode } = req.body;
+
+      // Validate inputs
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: 'Missing required field: items' });
+      }
+
+      if (!zipCode || !/^\d{5}(-\d{4})?$/.test(zipCode)) {
+        return res.status(400).json({ error: 'Invalid zip code format' });
+      }
+
+      // Convert items to Printful format
+      const itemsToEstimate = items.map(item => ({
+        sync_variant_id: parseInt(item.variantId),
+        quantity: item.quantity || 1,
+      }));
+
+      // Use a default US address with the provided zip code
+      // Printful only needs zip code for US domestic shipping estimates
+      const estimate = await getPrintfulShippingEstimate({
+        recipient: {
+          address1: '123 Main St', // Placeholder - not used for rate calculation
+          address2: null,
+          city: 'Any City', // Placeholder - not used for rate calculation
+          state_code: zipCode.length >= 5 ? 'US' : 'US', // Could parse state from zip if needed
+          country_code: 'US',
+          zip: zipCode.slice(0, 5), // Use only 5-digit zip
+        },
+        items: itemsToEstimate,
+      });
+
+      if (!estimate) {
+        return res.status(500).json({ error: 'Failed to calculate shipping estimate' });
+      }
+
+      // Calculate totals
+      const subtotal = items.reduce((sum, item) => sum + (item.basePrice * item.quantity), 0);
+      const total = subtotal + estimate.shipping + estimate.tax;
+
+      res.json({
+        subtotal,
+        shipping: estimate.shipping,
+        tax: estimate.tax,
+        total,
+        rates: estimate.rates?.map(rate => ({
+          id: rate.id,
+          name: rate.name,
+          rate: parseFloat(rate.rate),
+          minDays: rate.min_delivery_days,
+          maxDays: rate.max_delivery_days,
+        })) || [],
+      });
+    } catch (error) {
+      console.error('Error calculating cart shipping estimate:', error);
+      res.status(500).json({ error: 'Failed to calculate shipping' });
+    }
+  });
+
   // Stripe Checkout: Create checkout session
   app.post("/api/stripe/create-checkout", async (req, res) => {
     try {

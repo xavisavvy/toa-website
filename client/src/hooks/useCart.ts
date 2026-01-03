@@ -16,11 +16,13 @@ import { analytics } from '@/lib/analytics';
 
 export function useCart() {
   const [cart, setCart] = useState<Cart>(() => loadCart());
+  const [isUpdatingCart, setIsUpdatingCart] = useState(false);
 
-  // Listen for localStorage changes from other components/tabs
+  // Listen for localStorage changes from other tabs (not same window)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'toa_shopping_cart' && e.newValue) {
+      // Only handle changes from OTHER tabs/windows
+      if (e.key === 'toa_shopping_cart' && e.newValue && !isUpdatingCart) {
         try {
           const updatedCart = JSON.parse(e.newValue) as Cart;
           setCart(updatedCart);
@@ -30,20 +32,12 @@ export function useCart() {
       }
     };
 
-    // Also listen for custom events from same window
-    const handleCartUpdate = () => {
-      const updatedCart = loadCart();
-      setCart(updatedCart);
-    };
-
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('cart-updated', handleCartUpdate);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('cart-updated', handleCartUpdate);
     };
-  }, []);
+  }, [isUpdatingCart]);
 
   useEffect(() => {
     if (isCartExpired(cart)) {
@@ -53,34 +47,51 @@ export function useCart() {
     }
   }, [cart]);
 
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    saveCart(cart);
-    // Dispatch custom event for same-window sync
-    window.dispatchEvent(new Event('cart-updated'));
-  }, [cart]);
+    if (!isUpdatingCart) {
+      saveCart(cart);
+    }
+  }, [cart, isUpdatingCart]);
 
   const addItem = useCallback((item: Omit<CartItem, 'addedAt'>) => {
+    setIsUpdatingCart(true);
     setCart((currentCart) => {
       const updatedCart = addToCartUtil(currentCart, item);
       
       analytics.addToCart(item.productName, item.productId, item.price, item.quantity);
       
+      // Save immediately to ensure sync
+      saveCart(updatedCart);
+      
       return updatedCart;
     });
+    // Reset flag after a short delay to allow state to settle
+    setTimeout(() => setIsUpdatingCart(false), 100);
   }, []);
 
   const removeItem = useCallback((itemId: string) => {
+    setIsUpdatingCart(true);
     setCart((currentCart) => {
       const item = currentCart.items.find((i) => i.id === itemId);
       if (item) {
         analytics.removeFromCart(item.productName, item.productId, item.price, item.quantity);
       }
-      return removeFromCartUtil(currentCart, itemId);
+      const updatedCart = removeFromCartUtil(currentCart, itemId);
+      saveCart(updatedCart);
+      return updatedCart;
     });
+    setTimeout(() => setIsUpdatingCart(false), 100);
   }, []);
 
   const updateQuantity = useCallback((itemId: string, quantity: number) => {
-    setCart((currentCart) => updateCartItemQuantityUtil(currentCart, itemId, quantity));
+    setIsUpdatingCart(true);
+    setCart((currentCart) => {
+      const updatedCart = updateCartItemQuantityUtil(currentCart, itemId, quantity);
+      saveCart(updatedCart);
+      return updatedCart;
+    });
+    setTimeout(() => setIsUpdatingCart(false), 100);
   }, []);
 
   const clearCart = useCallback(() => {

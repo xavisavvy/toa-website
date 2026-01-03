@@ -17,7 +17,7 @@ import { createCheckout } from '@/lib/stripe';
 import { validateCartItems } from '@/lib/cart';
 import type { ShippingEstimate } from '@/types/cart';
 import { Badge } from '@/components/ui/badge';
-import { loadZipCode, saveZipCode } from '@/lib/zipCode';
+import { loadZipCode, saveZipCode, clearZipCode } from '@/lib/zipCode';
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
@@ -93,7 +93,9 @@ export default function Checkout() {
       });
 
       if (result?.url) {
+        // Clear cart and zip code for security
         clearCart();
+        clearZipCode();
         window.location.href = result.url;
       } else {
         console.error('Failed to create checkout session');
