@@ -14,9 +14,30 @@ import {
 } from '@/lib/cart';
 import { analytics } from '@/lib/analytics';
 
+// Custom event for cart updates within the same window
+const CART_UPDATE_EVENT = 'cart-updated';
+
+function dispatchCartUpdate() {
+  window.dispatchEvent(new Event(CART_UPDATE_EVENT));
+}
+
 export function useCart() {
   const [cart, setCart] = useState<Cart>(() => loadCart());
   const [isUpdatingCart, setIsUpdatingCart] = useState(false);
+
+  // Listen for cart updates from same window (custom event)
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      if (!isUpdatingCart) {
+        setCart(loadCart());
+      }
+    };
+
+    window.addEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+    return () => {
+      window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+    };
+  }, [isUpdatingCart]);
 
   // Listen for localStorage changes from other tabs (not same window)
   useEffect(() => {
@@ -66,8 +87,11 @@ export function useCart() {
       
       return updatedCart;
     });
-    // Reset flag after a short delay to allow state to settle
-    setTimeout(() => setIsUpdatingCart(false), 100);
+    // Reset flag and notify other components
+    setTimeout(() => {
+      setIsUpdatingCart(false);
+      dispatchCartUpdate();
+    }, 100);
   }, []);
 
   const removeItem = useCallback((itemId: string) => {
@@ -81,7 +105,10 @@ export function useCart() {
       saveCart(updatedCart);
       return updatedCart;
     });
-    setTimeout(() => setIsUpdatingCart(false), 100);
+    setTimeout(() => {
+      setIsUpdatingCart(false);
+      dispatchCartUpdate();
+    }, 100);
   }, []);
 
   const updateQuantity = useCallback((itemId: string, quantity: number) => {
@@ -91,7 +118,10 @@ export function useCart() {
       saveCart(updatedCart);
       return updatedCart;
     });
-    setTimeout(() => setIsUpdatingCart(false), 100);
+    setTimeout(() => {
+      setIsUpdatingCart(false);
+      dispatchCartUpdate();
+    }, 100);
   }, []);
 
   const clearCart = useCallback(() => {
