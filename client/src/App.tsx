@@ -73,6 +73,22 @@ function Router() {
 function App() {
   const [chaosMode, setChaosMode] = useState(false);
 
+  // Ensure app rehydrates properly when navigating back (e.g., from Stripe)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Force re-render when page becomes visible
+        // This helps when navigating back from external sites
+        window.dispatchEvent(new Event('cart-updated'));
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   // Activate Chaos Goblin Mode with Konami code
   useKonamiCode(() => {
     setChaosMode(true);
