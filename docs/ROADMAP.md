@@ -12,9 +12,16 @@
   - [ ] Update donation link to production
 
 ### Up Next
+- [ ] **Complete Payment Flow TODOs** - Critical payment/order handling (HIGH PRIORITY)
+  - [ ] Send confirmation email to customers after successful orders
+  - [ ] Implement database order tracking system
+  - [ ] Add admin alerts for failed orders
+  - [ ] Store failed orders for manual processing
+  - [ ] Implement customer notifications for payment failures
+  - [ ] Create order management dashboard
+  - Related: server/routes.ts (lines 681-715)
 - [ ] Phase 2: Automated Printful order creation
-- [ ] Email order confirmations
-- [ ] Customer order tracking
+- [ ] Customer order tracking portal
 
 ---
 
@@ -49,10 +56,27 @@
   - Related: server/youtube.ts, client/src/components/LatestEpisodes.tsx
 
 #### 🎨 User Experience
-- [ ] TBD - Add items as you discover needs
+- [ ] **Fix Carousel Accessibility** - WCAG 2.1 AA compliance
+  - [ ] Update carousel button sizes from 8px to 24px minimum
+  - [ ] Test with screen readers
+  - [ ] Verify keyboard navigation
+  - [ ] Update E2E accessibility tests
+  - Related: e2e/accessibility.spec.ts, carousel component
+- [ ] **Cart Error Boundary** - Graceful cart state error handling
+  - [ ] Create CartErrorBoundary component
+  - [ ] Wrap cart-related components
+  - [ ] Add error recovery mechanisms
+  - [ ] Display user-friendly error messages
+  - [ ] Log cart errors for debugging
+  - Related: client/src/components/CartButton.tsx
 
 #### 🔒 Security & Performance
-- [ ] TBD - Add items as you discover needs
+- [ ] **Cart Performance Optimization** - Improve cart responsiveness
+  - [ ] Add memoization to cart calculations
+  - [ ] Optimize re-renders in cart components
+  - [ ] Implement cart state persistence
+  - [ ] Add loading skeletons for cart items
+  - Related: client/src/components/CartButton.tsx, QuantityControl.tsx
 
 #### 📱 Social Media Integration
 - [ ] TBD - Add items as you discover needs
@@ -65,17 +89,58 @@
 - [ ] TBD - Add items as you discover needs
 
 #### 🧪 Testing Improvements
-- [ ] TBD - Add items as you discover needs
+- [ ] **QuantityControl Component Tests** - Add comprehensive unit tests
+  - [ ] Test increment/decrement functionality
+  - [ ] Test min/max boundary conditions
+  - [ ] Test disabled states
+  - [ ] Test accessibility (ARIA labels)
+  - [ ] Test keyboard interactions
+  - Related: client/src/components/QuantityControl.tsx
+- [ ] **Cart State Management Tests** - Edge case coverage
+  - [ ] Test cart state corruption scenarios
+  - [ ] Test concurrent cart updates
+  - [ ] Test cart persistence across sessions
+  - [ ] Test cart cleanup on logout
+  - Related: Cart functionality
+- [ ] **Checkout Flow E2E Tests** - Complete purchase journey
+  - [ ] Test full checkout flow (cart → checkout → success)
+  - [ ] Test checkout with multiple items
+  - [ ] Test quantity changes during checkout
+  - [ ] Test payment cancellation flow
+  - [ ] Test Stripe webhook handling
+  - Related: e2e/, checkout pages
 
 ---
 
 ### Low Priority / Nice to Have
 
 #### 🎨 UI/UX Polish
-- [ ] TBD - Add items as you discover needs
+- [ ] **Component Extraction & Reusability** - DRY improvements
+  - [ ] Extract ProductCard component (used in shop pages)
+  - [ ] Create PriceDisplay component (consistent price formatting)
+  - [ ] Add LoadingSkeleton components for shop items
+  - [ ] Create VariantSelector component (for product variants)
+  - Related: client/src/components/, shop pages
+- [ ] **Shop Performance** - Optimize product browsing
+  - [ ] Implement virtualization for large product lists
+  - [ ] Add lazy loading for product images
+  - [ ] Optimize product filtering/sorting
+  - [ ] Add pagination or infinite scroll
+  - Related: client/src/components/PrintfulShop.tsx
 
 #### 📚 Content Management
-- [ ] TBD - Add items as you discover needs
+- [ ] **Environment Variable Runtime Validation** - Strengthen config
+  - [ ] Extend env-validator.ts for cart/checkout features
+  - [ ] Add validation for Stripe keys
+  - [ ] Add validation for Printful keys
+  - [ ] Provide helpful error messages for missing vars
+  - Related: server/env-validator.ts
+- [ ] **Type Safety Improvements** - Stronger TypeScript
+  - [ ] Add stricter return types to cart functions
+  - [ ] Create shared cart types in shared/types/
+  - [ ] Add Zod schemas for cart operations
+  - [ ] Remove unnecessary 'any' types
+  - Related: shared/types/, cart-related code
 
 ---
 
