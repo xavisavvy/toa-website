@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { initGA, analytics } from "@/lib/analytics";
 import CharacterDetail from "@/pages/CharacterDetail";
 import Characters from "@/pages/Characters";
+import Checkout from "@/pages/Checkout";
 import CheckoutCancel from "@/pages/CheckoutCancel";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import Home from "@/pages/Home";
@@ -56,6 +57,7 @@ function Router() {
         <Route path="/characters" component={Characters} />
         <Route path="/characters/:id" component={CharacterDetail} />
         <Route path="/shop" component={Shop} />
+        <Route path="/checkout" component={Checkout} />
         <Route path="/sponsors" component={Sponsors} />
         <Route path="/press-kit" component={PressKit} />
         <Route path="/checkout/success" component={CheckoutSuccess} />

@@ -4,6 +4,7 @@ import { Link, useLocation } from "wouter";
 
 import logoSvg from "@/assets/logo-TOA.svg";
 import { Button } from "@/components/ui/button";
+import { CartButton } from "@/components/CartButton";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,18 +72,21 @@ export default function Navigation() {
                 {item.label}
               </a>
             ))}
+            <CartButton />
           </div>
 
-          <Button
-            size="icon"
-            variant="ghost"
-            className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
-            data-testid="button-menu-toggle"
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-          >
-            {isOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
-          </Button>
+          <div className="flex md:hidden items-center gap-2">
+            <CartButton />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setIsOpen(!isOpen)}
+              data-testid="button-menu-toggle"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              {isOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
+            </Button>
+          </div>
         </div>
       </div>
 

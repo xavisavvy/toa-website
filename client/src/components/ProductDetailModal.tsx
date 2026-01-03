@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, MapPin, Package, CreditCard } from "lucide-react";
+import { Loader2, MapPin, Package, CreditCard, ShoppingCart, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { analytics } from "@/lib/analytics";
 import { createCheckout } from "@/lib/stripe";
+import { useCart } from "@/hooks/useCart";
 
 interface ProductVariant {
   id: string;
@@ -69,6 +70,8 @@ export default function ProductDetailModal({
   const [zipCode, setZipCode] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const { addItem } = useCart();
 
   // Reset state when product changes
   useEffect(() => {
@@ -76,6 +79,7 @@ export default function ProductDetailModal({
       setSelectedVariant(product.variants?.[0] || null);
       setZipCode("");
       setQuantity(1);
+      setAddedToCart(false);
     }
   }, [product]);
 
@@ -111,6 +115,28 @@ export default function ProductDetailModal({
     enabled: !!selectedVariant && zipCode.length >= 5,
     staleTime: 5 * 60 * 1000,
   });
+
+  const handleAddToCart = () => {
+    if (!product || !selectedVariant) {return;}
+
+    const priceMatch = selectedVariant.price.match(/\$?([\d.]+)/);
+    const basePrice = priceMatch ? parseFloat(priceMatch[1]) : 0;
+
+    addItem({
+      id: `${product.id}-${selectedVariant.id}`,
+      productId: product.id,
+      variantId: selectedVariant.id,
+      productName: product.name,
+      variantName: selectedVariant.name,
+      price: basePrice,
+      quantity,
+      imageUrl: product.image,
+      inStock: selectedVariant.inStock,
+    });
+
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   const handleCheckout = async () => {
     if (!product || !selectedVariant) {return;}
@@ -307,25 +333,47 @@ export default function ProductDetailModal({
 
             <Separator />
 
-            {/* Checkout Button */}
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={handleCheckout}
-              disabled={!selectedVariant || !selectedVariant.inStock || checkoutLoading}
-            >
-              {checkoutLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Proceed to Checkout
-                </>
-              )}
-            </Button>
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <Button
+                className="w-full"
+                size="lg"
+                variant="outline"
+                onClick={handleAddToCart}
+                disabled={!selectedVariant || !selectedVariant.inStock || addedToCart}
+              >
+                {addedToCart ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Added to Cart
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add to Cart
+                  </>
+                )}
+              </Button>
+
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleCheckout}
+                disabled={!selectedVariant || !selectedVariant.inStock || checkoutLoading}
+              >
+                {checkoutLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Buy Now
+                  </>
+                )}
+              </Button>
+            </div>
 
             {!selectedVariant?.inStock && (
               <p className="text-sm text-destructive text-center">

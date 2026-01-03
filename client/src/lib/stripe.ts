@@ -17,15 +17,23 @@ export const getStripe = () => {
 };
 
 export interface CheckoutParams {
-  productId: string;
-  variantId: string;
-  productName: string;
-  price: string; // e.g., "24.99"
+  productId?: string;
+  variantId?: string;
+  productName?: string;
+  price?: string; // e.g., "24.99"
   quantity?: number;
   imageUrl?: string;
   zipCode?: string;
   shipping?: number;
   tax?: number;
+  items?: Array<{
+    productId: string;
+    variantId: string;
+    productName: string;
+    price: string;
+    quantity: number;
+    imageUrl?: string;
+  }>;
 }
 
 export async function createCheckout(params: CheckoutParams): Promise<{ url: string } | null> {

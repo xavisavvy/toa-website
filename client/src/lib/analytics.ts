@@ -32,6 +32,7 @@ export const initGA = () => {
   window.gtag = function gtag() {
     window.dataLayer = window.dataLayer || [];
      
+    // eslint-disable-next-line prefer-rest-params
     window.dataLayer.push(arguments);
   };
 
@@ -100,11 +101,21 @@ export const analytics = {
     });
   },
 
-  addToCart: (itemName: string, itemId?: string, price?: number) => {
+  addToCart: (itemName: string, itemId?: string, price?: number, quantity?: number) => {
     trackEvent('add_to_cart', {
       item_name: itemName,
       item_id: itemId,
       price,
+      quantity,
+    });
+  },
+
+  removeFromCart: (itemName: string, itemId?: string, price?: number, quantity?: number) => {
+    trackEvent('remove_from_cart', {
+      item_name: itemName,
+      item_id: itemId,
+      price,
+      quantity,
     });
   },
 
