@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { auditLogs, type InsertAuditLog, type AuditLog } from "../shared/schema";
 import { logger } from "./logger";
-import { maskPII } from "./log-sanitizer";
+import { sanitizeObject } from "./log-sanitizer";
 import type { Request } from "express";
 
 // Audit action types
@@ -121,20 +121,29 @@ export class AuditService {
       const logLevel = context.severity === AuditSeverity.CRITICAL ? "error" :
                       context.severity === AuditSeverity.WARNING ? "warn" : "info";
       
-      logger[logLevel]({
+      const logData = {
         audit: true,
         action: context.action,
         resource: context.resource,
         status: context.status,
         userId: context.userId,
         ipAddress,
-      }, `[AUDIT] ${context.action} on ${context.resource}`);
+      };
+      const logMessage = `[AUDIT] ${context.action} on ${context.resource}`;
+      
+      if (logLevel === "error") {
+        logger.error(logData, logMessage);
+      } else if (logLevel === "warn") {
+        logger.warn(logData, logMessage);
+      } else {
+        logger.info(logData, logMessage);
+      }
 
     } catch (error) {
       // Critical: audit logging failure should be logged but not throw
       logger.error({ 
         error, 
-        context: this.maskSensitiveData(context as any) 
+        context: this.maskSensitiveData(context as Record<string, unknown>) 
       }, "Failed to write audit log");
     }
   }
@@ -244,27 +253,8 @@ export class AuditService {
    * Mask sensitive data in audit logs
    */
   private static maskSensitiveData(data: Record<string, unknown>): Record<string, unknown> {
-    const sensitiveFields = [
-      "password", "passwordHash", "token", "secret", "apiKey", "api_key",
-      "creditCard", "ssn", "dob", "birthDate"
-    ];
-
-    const masked: Record<string, unknown> = {};
-    
-    for (const [key, value] of Object.entries(data)) {
-      const lowerKey = key.toLowerCase();
-      if (sensitiveFields.some(field => lowerKey.includes(field.toLowerCase()))) {
-        masked[key] = "***REDACTED***";
-      } else if (lowerKey.includes("email")) {
-        masked[key] = maskPII(String(value));
-      } else if (typeof value === "object" && value !== null) {
-        masked[key] = this.maskSensitiveData(value as Record<string, unknown>);
-      } else {
-        masked[key] = value;
-      }
-    }
-    
-    return masked;
+    // Use the centralized sanitizeObject function
+    return sanitizeObject(data);
   }
 
   /**
@@ -278,7 +268,7 @@ export class AuditService {
   /**
    * Query audit logs (for admin dashboard)
    */
-  static async queryLogs(filters: {
+  static queryLogs(filters: {
     userId?: string;
     action?: string;
     category?: string;

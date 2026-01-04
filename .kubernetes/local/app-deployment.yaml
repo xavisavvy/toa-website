@@ -25,7 +25,7 @@ spec:
         args:
         - |
           echo "Waiting for PostgreSQL..."
-          until nc -z postgres 5432; do
+          until nslookup postgres | grep -q "Address:.*10\."; do
             echo "PostgreSQL not ready, waiting..."
             sleep 2
           done
@@ -43,7 +43,7 @@ spec:
         args:
         - |
           echo "Waiting for Redis..."
-          until nc -z redis 6379; do
+          until nslookup redis | grep -q "Address:.*10\."; do
             echo "Redis not ready, waiting..."
             sleep 2
           done
@@ -98,25 +98,8 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 3
           failureThreshold: 3
-        # Hot reload support - mount source code
-        volumeMounts:
-        - name: source-code
-          mountPath: /app/client/src
-          subPath: client/src
-        - name: source-code
-          mountPath: /app/server
-          subPath: server
-        - name: source-code
-          mountPath: /app/shared
-          subPath: shared
-        - name: node-modules-cache
-          mountPath: /app/node_modules/.cache
       
       volumes:
-      - name: source-code
-        hostPath:
-          path: ${PWD}
-          type: Directory
       - name: node-modules-cache
         emptyDir: {}
 ---
