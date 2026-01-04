@@ -1,16 +1,19 @@
 import { createServer, type Server } from "http";
 
-import express, { type Express } from "express";
 import { eq, desc, gte } from 'drizzle-orm';
+import express, { type Express } from "express";
 
+import { orders, orderItems, orderEvents, auditLogs , loginSchema } from "../shared/schema";
+import type { User } from "../shared/schema";
+
+import { AuditService, AuditAction } from "./audit";
 import { authenticateUser, getUserById } from "./auth";
 import { requireAdmin, optionalAuth } from "./auth-middleware";
-import { AuditService, AuditAction } from "./audit";
 import { db } from "./db";
-import { orders, orderItems, orderEvents } from "../shared/schema";
 import { getCharacterData } from "./dndbeyond";
 import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
+import { safeLog, maskEmail } from "./log-sanitizer";
 import { metrics } from "./monitoring";
 import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
 import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId } from "./order-service";
@@ -18,11 +21,10 @@ import { getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
-import { safeLog, maskEmail } from "./log-sanitizer";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
-import type { User } from "../shared/schema";
-import { loginSchema } from "../shared/schema";
+
+
 
 // Extend Express Session to include user
 declare module 'express-session' {
@@ -425,12 +427,12 @@ export function registerRoutes(app: Express): Server {
       
       const conditions = [];
       
-      if (category) conditions.push(eqOp(auditLogs.category, category as string));
-      if (severity) conditions.push(eqOp(auditLogs.severity, severity as string));
-      if (action) conditions.push(eqOp(auditLogs.action, action as string));
-      if (userId) conditions.push(eqOp(auditLogs.userId, userId as string));
-      if (startDate) conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string).toISOString()));
-      if (endDate) conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string).toISOString()));
+      if (category) {conditions.push(eqOp(auditLogs.category, category as string));}
+      if (severity) {conditions.push(eqOp(auditLogs.severity, severity as string));}
+      if (action) {conditions.push(eqOp(auditLogs.action, action as string));}
+      if (userId) {conditions.push(eqOp(auditLogs.userId, userId as string));}
+      if (startDate) {conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string).toISOString()));}
+      if (endDate) {conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string).toISOString()));}
 
       let query = db.select().from(auditLogs);
       
@@ -538,16 +540,16 @@ export function registerRoutes(app: Express): Server {
       // Security events from audit logs
       const failedLoginEvents = await db
         .select()
-        .from(db.auditLogs)
-        .where(db.sql`${db.auditLogs.action} = 'LOGIN_FAILED'`)
-        .orderBy(db.sql`${db.auditLogs.createdAt} DESC`)
+        .from(auditLogs)
+        .where(eq(auditLogs.action, 'login_failed'))
+        .orderBy(desc(auditLogs.createdAt))
         .limit(5);
 
       const suspiciousEvents = await db
         .select()
-        .from(db.auditLogs)
-        .where(db.sql`${db.auditLogs.action} IN ('RATE_LIMIT_EXCEEDED', 'UNAUTHORIZED_ACCESS', 'INVALID_TOKEN')`)
-        .orderBy(db.sql`${db.auditLogs.createdAt} DESC`)
+        .from(auditLogs)
+        .where(eq(auditLogs.severity, 'high'))
+        .orderBy(desc(auditLogs.createdAt))
         .limit(5);
 
       const securityEvents = {
@@ -555,15 +557,15 @@ export function registerRoutes(app: Express): Server {
         suspiciousActivities: suspiciousEvents.length,
         failedLoginDetails: failedLoginEvents.map(log => ({
           timestamp: log.createdAt,
-          ip: log.ipAddress,
-          email: log.metadata?.email || 'Unknown',
-          reason: log.metadata?.reason || 'Authentication failed',
+          ip: log.ipAddress || 'Unknown',
+          email: log.userEmail || 'Unknown',
+          reason: log.errorMessage || 'Authentication failed',
         })),
         suspiciousActivityDetails: suspiciousEvents.map(log => ({
           timestamp: log.createdAt,
-          ip: log.ipAddress,
+          ip: log.ipAddress || 'Unknown',
           action: log.action,
-          details: log.metadata?.details || log.action,
+          details: log.resource || log.action,
         })),
       };
 
@@ -1573,7 +1575,7 @@ export function registerRoutes(app: Express): Server {
         
         if (digest !== signature) {
           logSecurityEvent('PRINTFUL_WEBHOOK_INVALID_SIGNATURE', {
-            receivedSignature: signature?.substring(0, 10) + '...',
+            receivedSignature: `${signature?.substring(0, 10)  }...`,
           });
           return res.status(401).json({ error: 'Invalid signature' });
         }
