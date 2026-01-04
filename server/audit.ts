@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { auditLogs, type InsertAuditLog, type AuditLog } from "@db/schema";
+import { auditLogs, type InsertAuditLog, type AuditLog } from "../shared/schema";
 import { logger } from "./logger";
 import { maskPII } from "./log-sanitizer";
 import type { Request } from "express";

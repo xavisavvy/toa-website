@@ -315,7 +315,7 @@ export function registerRoutes(app: Express): Server {
       const offset = (pageNum - 1) * limitNum;
 
       // Build query dynamically based on filters
-      const { auditLogs } = await import("@db/schema");
+      const { auditLogs } = await import("../shared/schema");
       const { and, eq: eqOp, gte: gteOp, lte: lteOp } = await import("drizzle-orm");
       
       const conditions = [];
