@@ -73,6 +73,7 @@ integrations = ["youtube:1.0.0"]
 
 [userenv.production]
 PORT = "5000"
+NODE_ENV = "production"
 
 [userenv.shared]
 VITE_YOUTUBE_PLAYLIST_IDS = "PLrmC8WonT9uaUoORXiAwGUo21Mp_N2u8v,PLrmC8WonT9ubI5I9YwJQupNJPBjlkUuyh"
