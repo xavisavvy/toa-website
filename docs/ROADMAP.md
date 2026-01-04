@@ -115,31 +115,31 @@
 ### Low Priority / Nice to Have
 
 #### 🎨 UI/UX Polish
-- [ ] **Component Extraction & Reusability** - DRY improvements
-  - [ ] Extract ProductCard component (used in shop pages)
-  - [ ] Create PriceDisplay component (consistent price formatting)
-  - [ ] Add LoadingSkeleton components for shop items
-  - [ ] Create VariantSelector component (for product variants)
+- [x] **Component Extraction & Reusability** - DRY improvements ✅ COMPLETE
+  - [x] Extract ProductCard component (used in shop pages)
+  - [x] Create PriceDisplay component (consistent price formatting)
+  - [x] Add LoadingSkeleton components for shop items
+  - [x] Create VariantSelector component (for product variants)
   - Related: client/src/components/, shop pages
 - [ ] **Shop Performance** - Optimize product browsing
   - [ ] Implement virtualization for large product lists
-  - [ ] Add lazy loading for product images
+  - [ ] Add lazy loading for product images (✅ Added to ProductCard)
   - [ ] Optimize product filtering/sorting
   - [ ] Add pagination or infinite scroll
   - Related: client/src/components/PrintfulShop.tsx
 
 #### 📚 Content Management
-- [ ] **Environment Variable Runtime Validation** - Strengthen config
-  - [ ] Extend env-validator.ts for cart/checkout features
-  - [ ] Add validation for Stripe keys
-  - [ ] Add validation for Printful keys
-  - [ ] Provide helpful error messages for missing vars
+- [x] **Environment Variable Runtime Validation** - Strengthen config ✅ COMPLETE
+  - [x] Extend env-validator.ts for cart/checkout features
+  - [x] Add validation for Stripe keys
+  - [x] Add validation for Printful keys
+  - [x] Provide helpful error messages for missing vars
   - Related: server/env-validator.ts
-- [ ] **Type Safety Improvements** - Stronger TypeScript
-  - [ ] Add stricter return types to cart functions
-  - [ ] Create shared cart types in shared/types/
-  - [ ] Add Zod schemas for cart operations
-  - [ ] Remove unnecessary 'any' types
+- [x] **Type Safety Improvements** - Stronger TypeScript ✅ COMPLETE
+  - [x] Add stricter return types to cart functions
+  - [x] Create shared cart types in shared/types/
+  - [x] Add Zod schemas for cart operations
+  - [x] Remove unnecessary 'any' types (verified - none found)
   - Related: shared/types/, cart-related code
 
 ---
@@ -147,6 +147,12 @@
 ## ✅ Completed Features
 
 ### 2026-01-03
+- [x] **Low Priority Roadmap Improvements** - Code quality & DX enhancements
+  - [x] Component Extraction: ProductCard, PriceDisplay, LoadingSkeleton, VariantSelector
+  - [x] Environment Variable Validation: Stripe & Printful key validation with helpful errors
+  - [x] Type Safety: Zod schemas for all cart operations
+  - [x] DRY refactoring: PrintfulShop now uses reusable components
+  - [x] Runtime validation displays feature availability on startup
 - [x] **Comprehensive Testing Improvements** - 63 new tests added
   - [x] QuantityControl component tests (26 tests) - full coverage
   - [x] Cart state management edge case tests (19 tests)
