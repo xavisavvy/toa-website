@@ -52,7 +52,7 @@ I would like to discuss:
 Thank you!`;
 
     const subject = `Sponsorship Inquiry - ${formData.company || 'Potential Partner'}`;
-    const mailtoLink = `mailto:TalesOfAneria@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    const mailtoLink = `mailto:contact@talesofaneria.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
     
     window.location.href = mailtoLink;
   };

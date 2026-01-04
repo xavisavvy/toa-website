@@ -73,7 +73,7 @@ describe('Sponsors Page', () => {
     fireEvent.click(becomeButton);
 
     const href = locationMock.getHref();
-    expect(href).toContain('mailto:TalesOfAneria@gmail.com');
+    expect(href).toContain('mailto:contact@talesofaneria.com');
     expect(href).toContain('subject=');
     expect(href).toContain('Sponsorship');
   });
@@ -119,7 +119,7 @@ describe('Sponsors Page', () => {
     fireEvent.click(submitButton);
 
     const href = locationMock.getHref();
-    expect(href).toContain('mailto:TalesOfAneria@gmail.com');
+    expect(href).toContain('mailto:contact@talesofaneria.com');
     expect(href).toContain('subject=');
     expect(href).toContain('Test%20Company');
   });
@@ -135,7 +135,7 @@ describe('Sponsors Page', () => {
     fireEvent.click(platinumButton);
 
     const href = locationMock.getHref();
-    expect(href).toContain('mailto:TalesOfAneria@gmail.com');
+    expect(href).toContain('mailto:contact@talesofaneria.com');
     expect(href).toContain('Platinum%20Sponsor');
   });
 
