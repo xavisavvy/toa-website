@@ -3,7 +3,9 @@ import { ShoppingBag, AlertCircle, Search, SlidersHorizontal } from "lucide-reac
 import { useState, useMemo } from "react";
 
 import ProductDetailModal from "@/components/ProductDetailModal";
-import { Badge } from "@/components/ui/badge";
+import { ProductCard } from "@/components/ProductCard";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+import { parsePrice } from "@/components/PriceDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -107,15 +109,9 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
       if (sortBy === "name") {
         return a.name.localeCompare(b.name);
       }
-      
-      // Extract first price from price string
-      const getPrice = (priceStr: string) => {
-        const match = priceStr.match(/\$?([\d.]+)/);
-        return match ? parseFloat(match[1]) : 0;
-      };
 
-      const priceA = getPrice(a.price);
-      const priceB = getPrice(b.price);
+      const priceA = parsePrice(a.price);
+      const priceB = parsePrice(b.price);
 
       if (sortBy === "price-low") {
         return priceA - priceB;
@@ -129,8 +125,7 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
 
   const handleProductClick = (product: Product) => {
     // Track product view
-    const priceMatch = product.price.match(/\$?([\d.]+)/);
-    const priceValue = priceMatch ? parseFloat(priceMatch[1]) : undefined;
+    const priceValue = parsePrice(product.price);
     analytics.viewItem(product.name, product.id, priceValue);
 
     if (!enableCheckout) {
@@ -211,17 +206,7 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="overflow-hidden">
-              <div className="aspect-square bg-muted animate-pulse" />
-              <CardContent className="p-4">
-                <div className="h-5 bg-muted rounded animate-pulse mb-2" />
-                <div className="h-4 bg-muted rounded animate-pulse w-1/2" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <LoadingSkeleton count={4} type="product" />
       ) : error ? (
         <Card>
           <CardContent className="p-12 text-center">
@@ -259,40 +244,15 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {displayProducts.map((product) => (
-            <Card
+            <ProductCard
               key={product.id}
-              className="overflow-hidden hover-elevate cursor-pointer transition-all"
-              data-testid={`card-printful-product-${product.id}`}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              image={product.image}
+              inStock={product.inStock}
               onClick={() => handleProductClick(product)}
-            >
-              <div className="relative aspect-square overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="object-cover w-full h-full"
-                />
-                {!product.inStock && (
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute top-3 right-3" 
-                    data-testid={`badge-printful-product-${product.id}`}
-                  >
-                    Sold Out
-                  </Badge>
-                )}
-              </div>
-              <CardContent className="p-4">
-                <h3 
-                  className="font-semibold mb-2 line-clamp-2" 
-                  data-testid={`text-printful-product-name-${product.id}`}
-                >
-                  {product.name}
-                </h3>
-                <p className="text-primary font-semibold" data-testid={`text-printful-product-price-${product.id}`}>
-                  {product.price}
-                </p>
-              </CardContent>
-            </Card>
+            />
           ))}
         </div>
       )}

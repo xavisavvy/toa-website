@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { QuantityControl } from '@/components/QuantityControl';
 import { useCart } from '@/hooks/useCart';
 import { analytics } from '@/lib/analytics';
 import { createCheckout } from '@/lib/stripe';
@@ -260,15 +261,18 @@ export default function Checkout() {
                           </Button>
                         </div>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <Label className="text-sm">Qty:</Label>
-                            <Input
-                              type="number"
-                              min="1"
-                              max="10"
-                              value={item.quantity}
-                              onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                              className="w-20"
+                            <QuantityControl
+                              quantity={item.quantity}
+                              onDecrease={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              onIncrease={() => {
+                                const maxQty = item.availableQuantity !== undefined 
+                                  ? Math.min(10, item.availableQuantity)
+                                  : 10;
+                                updateQuantity(item.id, Math.min(maxQty, item.quantity + 1));
+                              }}
+                              max={item.availableQuantity !== undefined ? Math.min(10, item.availableQuantity) : 10}
                             />
                           </div>
                           <span className="font-semibold">

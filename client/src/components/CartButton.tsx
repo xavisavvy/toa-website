@@ -1,6 +1,7 @@
-import { ShoppingCart, X, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, X } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
+import { QuantityControl } from '@/components/QuantityControl';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { QuantityControl } from '@/components/QuantityControl';
 import { useCart } from '@/hooks/useCart';
 import { getDaysUntilExpiration } from '@/lib/cart';
 
@@ -42,9 +44,9 @@ export function CartButton() {
         {summary.totalItems > 0 && (
           <Badge
             variant="destructive"
-            className="!absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs pointer-events-none"
+            className="!absolute -top-2 -right-2 h-5 min-w-5 rounded-full px-1 flex items-center justify-center text-xs pointer-events-none"
           >
-            {summary.totalItems}
+            {summary.totalItems > 9999 ? '9999+' : summary.totalItems}
           </Badge>
         )}
       </div>
@@ -117,37 +119,17 @@ export function CartButton() {
                     </Badge>
                   )}
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center border rounded-md">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                        disabled={item.quantity <= 1}
-                        aria-label="Decrease quantity"
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="px-3 text-sm font-medium">{item.quantity}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => {
-                          const maxQty = item.availableQuantity !== undefined 
-                            ? Math.min(10, item.availableQuantity)
-                            : 10;
-                          updateQuantity(item.id, Math.min(maxQty, item.quantity + 1));
-                        }}
-                        disabled={
-                          item.quantity >= 10 || 
-                          (item.availableQuantity !== undefined && item.quantity >= item.availableQuantity)
-                        }
-                        aria-label="Increase quantity"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
+                    <QuantityControl
+                      quantity={item.quantity}
+                      onDecrease={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                      onIncrease={() => {
+                        const maxQty = item.availableQuantity !== undefined 
+                          ? Math.min(10, item.availableQuantity)
+                          : 10;
+                        updateQuantity(item.id, Math.min(maxQty, item.quantity + 1));
+                      }}
+                      max={item.availableQuantity !== undefined ? Math.min(10, item.availableQuantity) : 10}
+                    />
                     <span className="text-sm font-semibold">
                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
