@@ -1,7 +1,7 @@
 import { createServer, type Server } from "http";
 
 import express, { type Express } from "express";
-import { eq, desc, gte, sql } from 'drizzle-orm';
+import { eq, desc, gte } from 'drizzle-orm';
 
 import { authenticateUser, getUserById } from "./auth";
 import { requireAdmin, optionalAuth } from "./auth-middleware";
@@ -294,11 +294,12 @@ export function registerRoutes(app: Express): Server {
       
       allOrderItems.forEach(({ order_items: item, orders: order }) => {
         if (order.status === 'completed' || order.status === 'processing') {
-          if (!productStats[item.name]) {
-            productStats[item.name] = { name: item.name, quantity: 0, revenue: 0 };
+          const productName = item.name;
+          if (!productStats[productName]) {
+            productStats[productName] = { name: productName, quantity: 0, revenue: 0 };
           }
-          productStats[item.name].quantity += item.quantity;
-          productStats[item.name].revenue += parseFloat(item.price) * item.quantity;
+          productStats[productName].quantity += item.quantity;
+          productStats[productName].revenue += parseFloat(item.price) * item.quantity;
         }
       });
 
@@ -325,9 +326,7 @@ export function registerRoutes(app: Express): Server {
       // Mock conversion rate (would need GA4 integration for real data)
       const conversionRate = 2.5;
 
-      // Security events (last 30 days)
-      const securityStartDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      // Note: In production, fetch from security logs table
+      // Security events placeholder (would need security logs table)
       const securityEvents = {
         failedLogins: 0,
         suspiciousActivities: 0,

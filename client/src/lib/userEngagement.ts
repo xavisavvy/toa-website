@@ -63,8 +63,8 @@ export function initSessionTracking() {
     analytics.sessionQuality(sessionDuration, pagesViewed);
   });
 
-  const originalPushState = history.pushState;
-  history.pushState = function(...args) {
+  const originalPushState = window.history.pushState;
+  window.history.pushState = function(...args) {
     pagesViewed++;
     return originalPushState.apply(this, args);
   };

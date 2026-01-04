@@ -26,13 +26,16 @@ vi.mock('../../server/printful', async () => {
   };
 });
 
-describe('Stripe Webhook Integration with Order Service', () => {
+describe('Stripe Webhook Integration with Order Service', async () => {
   let app: Express;
-  const mockVerifyWebhook = vi.mocked((await import('../../server/stripe')).verifyWebhookSignature);
-  const mockGetCheckoutSession = vi.mocked((await import('../../server/stripe')).getCheckoutSession);
-  const mockCreatePrintfulOrderFromSession = vi.mocked((await import('../../server/stripe')).createPrintfulOrderFromSession);
-  const mockCreatePrintfulOrder = vi.mocked((await import('../../server/stripe')).createPrintfulOrder);
-  const mockGetCatalogVariantId = vi.mocked((await import('../../server/printful')).getCatalogVariantId);
+  const stripeModule = await import('../../server/stripe');
+  const printfulModule = await import('../../server/printful');
+  
+  const mockVerifyWebhook = vi.mocked(stripeModule.verifyWebhookSignature);
+  const mockGetCheckoutSession = vi.mocked(stripeModule.getCheckoutSession);
+  const mockCreatePrintfulOrderFromSession = vi.mocked(stripeModule.createPrintfulOrderFromSession);
+  const mockCreatePrintfulOrder = vi.mocked(stripeModule.createPrintfulOrder);
+  const mockGetCatalogVariantId = vi.mocked(printfulModule.getCatalogVariantId);
   
   const mockCreateOrder = vi.mocked(createOrder);
   const mockGetOrderByStripeSessionId = vi.mocked(getOrderByStripeSessionId);
@@ -186,7 +189,7 @@ describe('Stripe Webhook Integration with Order Service', () => {
       mockGetCheckoutSession.mockResolvedValueOnce(mockSession as any);
       mockCreateOrder.mockRejectedValueOnce(new Error('Database connection failed'));
 
-      const response = await request(app)
+      await request(app)
         .post('/api/stripe/webhook')
         .set('stripe-signature', 'test-signature')
         .send(Buffer.from(JSON.stringify(mockEvent)));

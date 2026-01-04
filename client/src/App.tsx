@@ -15,6 +15,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminAnalytics from "@/pages/AdminAnalytics";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminOrders from "@/pages/AdminOrders";
+import AdminOrderDetail from "@/pages/AdminOrderDetail";
 import CharacterDetail from "@/pages/CharacterDetail";
 import Characters from "@/pages/Characters";
 import Checkout from "@/pages/Checkout";
@@ -83,6 +84,7 @@ function Router() {
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route path="/admin/analytics" component={AdminAnalytics} />
+        <Route path="/admin/orders/:orderId" component={AdminOrderDetail} />
         <Route path="/admin/orders" component={AdminOrders} />
         
         {/* Customer Order Tracking - Privacy Protected */}
@@ -103,7 +105,7 @@ function App() {
       if (document.visibilityState === 'visible') {
         // Force re-render when page becomes visible
         // This helps when navigating back from external sites
-        window.dispatchEvent(new Event('cart-updated'));
+        window.dispatchEvent(new window.Event('cart-updated'));
       }
     };
 

@@ -118,6 +118,67 @@ Most podcast platforms provide an RSS feed URL:
 
 ### 4. Run the Application
 
+#### Docker Compose (Recommended)
+```bash
+# Start all services (app, database, redis)
+docker-compose -f docker-compose.dev.yml up -d
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Stop all services
+docker-compose -f docker-compose.dev.yml down
+```
+
+#### Kubernetes (Local Development)
+**Prerequisites:** Docker Desktop or Rancher Desktop with Kubernetes enabled
+
+**First Time Setup:**
+```bash
+# Windows
+.\.kubernetes\local\setup.ps1
+
+# macOS/Linux
+./.kubernetes/local/setup.sh
+```
+
+**Daily Workflow:**
+```bash
+# Start the cluster
+# Windows
+.\.kubernetes\local\start.ps1
+# macOS/Linux
+./.kubernetes/local/start.sh
+
+# Access the application
+# Option 1: NodePort (recommended)
+http://localhost:30000
+
+# Option 2: Port forwarding
+kubectl port-forward -n toa-local svc/toa-website 5000:80
+http://localhost:5000
+
+# View logs
+kubectl logs -n toa-local -l app=toa-website -f
+
+# Stop the cluster
+# Windows
+.\.kubernetes\local\stop.ps1
+# macOS/Linux
+./.kubernetes/local/stop.sh
+```
+
+**Teardown (Fresh Start):**
+```bash
+# Windows
+.\.kubernetes\local\teardown.ps1
+# macOS/Linux
+./.kubernetes/local/teardown.sh
+```
+
+**Note:** Teardown will delete all data including the database. Only use this when you want a completely fresh start.
+
+#### Production (Replit)
 The application is already running! Just refresh our browser to see the changes after configuring environment variables.
 
 ## Customization Guide

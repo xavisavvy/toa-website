@@ -24,7 +24,7 @@ try {
       console.log('✅ Redis connected for rate limiting');
     });
   }
-} catch (err) {
+} catch {
   console.warn('⚠️  Failed to initialize Redis for rate limiting, using in-memory store');
 }
 
@@ -43,6 +43,10 @@ export const apiLimiter = rateLimit({
   // Trust proxy for Replit and cloud environments
   validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
   skip: (req: Request) => {
+    // Skip rate limiting for health check endpoints (used by K8s probes)
+    if (req.path === '/api/health' || req.path === '/api/ready' || req.path === '/api/alive' || req.path === '/api/startup') {
+      return true;
+    }
     // Skip rate limiting for localhost in development
     return process.env.NODE_ENV === 'development' && req.ip === '127.0.0.1';
   },

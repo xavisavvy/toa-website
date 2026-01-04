@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { initScrollTracking, initRageClickDetection, initSessionTracking } from '@/lib/userEngagement';
 import { analytics } from '@/lib/analytics';
 
@@ -25,7 +25,7 @@ describe('User Engagement Tracking', () => {
       initScrollTracking();
 
       // Simulate scroll event
-      window.dispatchEvent(new Event('scroll'));
+      window.dispatchEvent(new window.Event('scroll'));
       
       // Use requestAnimationFrame callback
       vi.runAllTimers();
@@ -87,7 +87,7 @@ describe('User Engagement Tracking', () => {
       vi.spyOn(Date, 'now').mockReturnValue(startTime + 60000);
 
       // Trigger beforeunload
-      window.dispatchEvent(new Event('beforeunload'));
+      window.dispatchEvent(new window.Event('beforeunload'));
 
       expect(analytics.sessionQuality).toHaveBeenCalledWith(60000, 1);
     });

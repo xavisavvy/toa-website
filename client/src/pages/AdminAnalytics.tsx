@@ -38,6 +38,7 @@ export default function AdminAnalytics() {
 
   useEffect(() => {
     fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange]);
 
   const fetchAnalytics = async () => {
@@ -108,7 +109,7 @@ export default function AdminAnalytics() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-              <p className="text-sm text-gray-600 mt-1">Monitor your store's performance</p>
+              <p className="text-sm text-gray-600 mt-1">Monitor your store&apos;s performance</p>
             </div>
             <div className="flex gap-2">
               <button

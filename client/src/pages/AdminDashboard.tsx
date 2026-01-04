@@ -16,7 +16,6 @@ export default function AdminDashboard() {
   const { user, loading: authLoading, logout } = useAuth();
   const [, navigate] = useLocation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Redirect if not authenticated or not admin
@@ -28,6 +27,7 @@ export default function AdminDashboard() {
     if (user && user.role === 'admin') {
       fetchStats();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   const fetchStats = async () => {
@@ -42,8 +42,6 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
