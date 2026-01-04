@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Cart, CartItem, CartSummary } from '@/types/cart';
 import {
   loadCart,
@@ -137,6 +137,9 @@ export function useCart() {
     };
   }, [cart]);
 
+  // Memoize cart summary to avoid recalculation on every render
+  const cartSummary = useMemo(() => getCartSummary(), [getCartSummary]);
+
   return {
     cart,
     addItem,
@@ -144,5 +147,6 @@ export function useCart() {
     updateQuantity,
     clearCart,
     getCartSummary,
+    cartSummary, // Pre-calculated summary for performance
   };
 }
