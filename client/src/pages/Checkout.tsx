@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import Footer from '@/components/Footer';
 import Navigation from '@/components/Navigation';
 import SEO from '@/components/SEO';
+import { CartErrorBoundary } from '@/components/CartErrorBoundary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -150,8 +151,9 @@ export default function Checkout() {
       <Navigation />
       
       <main className="pt-16">
-        <div className="max-w-6xl mx-auto px-6 py-12 lg:py-20">
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-8">Checkout</h1>
+        <CartErrorBoundary fallbackUI="full">
+          <div className="max-w-6xl mx-auto px-6 py-12 lg:py-20">
+            <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-8">Checkout</h1>
 
           {!validation.valid && (
             <Card className="mb-6 border-destructive">
@@ -402,6 +404,7 @@ export default function Checkout() {
             </div>
           </div>
         </div>
+        </CartErrorBoundary>
       </main>
 
       <Footer />

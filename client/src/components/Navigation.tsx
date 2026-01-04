@@ -5,6 +5,7 @@ import { Link, useLocation } from "wouter";
 import logoSvg from "@/assets/logo-TOA.svg";
 import { Button } from "@/components/ui/button";
 import { CartButton } from "@/components/CartButton";
+import { CartErrorBoundary } from "@/components/CartErrorBoundary";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,11 +73,15 @@ export default function Navigation() {
                 {item.label}
               </a>
             ))}
-            <CartButton />
+            <CartErrorBoundary fallbackUI="minimal">
+              <CartButton />
+            </CartErrorBoundary>
           </div>
 
           <div className="flex md:hidden items-center gap-2">
-            <CartButton />
+            <CartErrorBoundary fallbackUI="minimal">
+              <CartButton />
+            </CartErrorBoundary>
             <Button
               size="icon"
               variant="ghost"
