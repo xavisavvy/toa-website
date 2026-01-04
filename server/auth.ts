@@ -3,6 +3,7 @@ import { db } from './db';
 import { users } from '../shared/schema';
 import type { User, UserWithPassword, LoginCredentials } from '../shared/schema';
 import { eq } from 'drizzle-orm';
+import { maskEmail, safeLog } from './log-sanitizer';
 
 // Security: Use strong work factor for bcrypt (10-12 recommended)
 const SALT_ROUNDS = 12;
@@ -23,7 +24,7 @@ export async function hashPassword(password: string): Promise<string> {
     throw new Error('Password must be at least 8 characters');
   }
   
-  return await bcrypt.hash(password, SALT_ROUNDS);
+  return bcrypt.hash(password, SALT_ROUNDS);
 }
 
 /**
@@ -33,7 +34,7 @@ export async function hashPassword(password: string): Promise<string> {
  * @returns True if password matches
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return await bcrypt.compare(password, hash);
+  return bcrypt.compare(password, hash);
 }
 
 /**
@@ -54,8 +55,8 @@ export async function createUser(
   }
 
   // Security: Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!EMAIL_REGEX.test(email)) {
     throw new Error('Invalid email address');
   }
 
@@ -117,14 +118,14 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<U
 
     // Security: Check if account is active
     if (user.isActive !== 1) {
-      console.warn(`Inactive account login attempt: ${user.email}`);
+      safeLog.warn(`Inactive account login attempt: ${maskEmail(user.email)}`);
       return null;
     }
 
     // Verify password
     const isValid = await verifyPassword(credentials.password, user.passwordHash);
     if (!isValid) {
-      console.warn(`Failed login attempt for: ${user.email}`);
+      safeLog.warn(`Failed login attempt for: ${maskEmail(user.email)}`);
       return null;
     }
 
@@ -134,7 +135,7 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<U
       .set({ lastLoginAt: new Date() })
       .where(eq(users.id, user.id));
 
-    console.info(`Successful login: ${user.email} (${user.role})`);
+    safeLog.info(`Successful login: ${maskEmail(user.email)} (${user.role})`);
 
     // Security: Return user without password hash
     return sanitizeUser(user);
@@ -257,6 +258,7 @@ export async function reactivateUser(userId: string): Promise<void> {
  * @returns User without password hash
  */
 function sanitizeUser(user: UserWithPassword): User {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { passwordHash, ...safeUser } = user;
   return safeUser;
 }
@@ -267,7 +269,7 @@ function sanitizeUser(user: UserWithPassword): User {
  * @param requiredRole Required role (optional)
  * @returns True if valid
  */
-export function isValidSessionUser(user: any, requiredRole?: 'admin' | 'customer'): user is User {
+export function isValidSessionUser(user: unknown, requiredRole?: 'admin' | 'customer'): user is User {
   if (!user || !user.id || !user.email || !user.role) {
     return false;
   }

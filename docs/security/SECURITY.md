@@ -22,6 +22,9 @@ This project implements the following security measures:
 - ✅ XSS protection
 - ✅ CSRF protection
 - ✅ Secure session management
+- ✅ Webhook signature verification (Stripe & Printful)
+- ✅ HMAC-based authentication for webhooks
+- ✅ Security event logging
 
 ### Container Security
 - ✅ Non-root user execution

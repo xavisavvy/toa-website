@@ -1,10 +1,10 @@
 import { createServer, type Server } from "http";
 
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { eq, desc } from 'drizzle-orm';
 
-import { authenticateUser, getUserById, isValidSessionUser } from "./auth";
-import { requireAuth, requireAdmin, optionalAuth } from "./auth-middleware";
+import { authenticateUser, getUserById } from "./auth";
+import { requireAdmin, optionalAuth } from "./auth-middleware";
 import { db } from "./db";
 import { orders, orderItems, orderEvents } from "../shared/schema";
 import { getCharacterData } from "./dndbeyond";
@@ -17,6 +17,7 @@ import { getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
+import { safeLog, maskEmail } from "./log-sanitizer";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
 import type { User } from "../shared/schema";
@@ -87,7 +88,7 @@ export function registerRoutes(app: Express): Server {
           });
         }
 
-        console.info(`User logged in: ${user.email} (${user.role})`);
+        safeLog.info(`User logged in: ${maskEmail(user.email)} (${user.role})`);
 
         res.json({ 
           success: true,
@@ -121,7 +122,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       if (userEmail) {
-        console.info(`User logged out: ${userEmail}`);
+        safeLog.info(`User logged out: ${maskEmail(userEmail)}`);
       }
 
       res.json({ success: true });
@@ -749,7 +750,8 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Missing required field: items' });
       }
 
-      if (!zipCode || !/^\d{5}(-\d{4})?$/.test(zipCode)) {
+      // eslint-disable-next-line security/detect-unsafe-regex
+      if (!zipCode || !/^\d{5}(?:-\d{4})?$/.test(zipCode)) {
         return res.status(400).json({ error: 'Invalid zip code format' });
       }
 
@@ -836,6 +838,9 @@ export function registerRoutes(app: Express): Server {
         quantity: quantity || 1,
         imageUrl,
         shippingEstimate,  // Pass Printful's exact costs if available
+        metadata: {
+          product_image_url: imageUrl || '', // Store image URL in metadata
+        },
       });
 
       if (!session) {
@@ -913,7 +918,7 @@ export function registerRoutes(app: Express): Server {
           }
           
           console.log('✅ Payment successful:', sessionId);
-          console.log('Customer email:', eventSession.customer_details?.email);
+          safeLog.info('Customer email:', { email: eventSession.customer_details?.email });
           console.log('Amount paid:', eventSession.amount_total / 100, eventSession.currency.toUpperCase());
           
           // Fetch full session with shipping details (not included in webhook by default)
@@ -953,7 +958,7 @@ export function registerRoutes(app: Express): Server {
                 name: item.description || '',
                 quantity: item.quantity || 1,
                 price: ((item.amount_total || 0) / 100).toFixed(2),
-                imageUrl: undefined,
+                imageUrl: fullSession.metadata?.product_image_url || undefined,
               })) || [],
               metadata: fullSession.metadata || undefined,
             };
@@ -1063,7 +1068,7 @@ export function registerRoutes(app: Express): Server {
                   }];
                   
                   await sendOrderConfirmation(order, items);
-                  console.log(`✅ Order confirmation email sent to ${order.customerEmail}`);
+                  safeLog.info(`✅ Order confirmation email sent to ${maskEmail(order.customerEmail)}`);
                 } else {
                   console.error('❌ Could not find order in database to update');
                 }
@@ -1202,6 +1207,228 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // ============================================
+  // PRINTFUL WEBHOOKS
+  // ============================================
+  
+  /**
+   * Printful Webhook Handler
+   * Handles order status updates from Printful:
+   * - package_shipped: Order has been shipped
+   * - package_returned: Order was returned
+   * - order_failed: Order failed to fulfill
+   * - order_canceled: Order was cancelled
+   * 
+   * Security: Uses HMAC signature verification
+   * Documentation: https://developers.printful.com/docs/#tag/Webhooks
+   */
+  // Printful webhook handler - receives notifications from Printful
+  app.post("/api/webhooks/printful", express.raw({ type: 'application/json' }), async (req, res) => {
+    try {
+      const signature = req.headers['x-printful-signature'] as string;
+      const webhookSecret = process.env.PRINTFUL_WEBHOOK_SECRET;
+
+      // Verify webhook signature for security
+      if (webhookSecret && signature) {
+        const crypto = await import('crypto');
+        const hmac = crypto.createHmac('sha256', webhookSecret);
+        const digest = hmac.update(req.body).digest('hex');
+        
+        if (digest !== signature) {
+          logSecurityEvent('PRINTFUL_WEBHOOK_INVALID_SIGNATURE', {
+            receivedSignature: signature?.substring(0, 10) + '...',
+          });
+          return res.status(401).json({ error: 'Invalid signature' });
+        }
+      } else if (webhookSecret) {
+        // Secret is set but no signature provided
+        logSecurityEvent('PRINTFUL_WEBHOOK_MISSING_SIGNATURE', {});
+        return res.status(401).json({ error: 'Missing signature' });
+      }
+      // If no secret is set, allow webhook (dev mode)
+
+      // Parse the webhook payload
+      const payload = JSON.parse(req.body.toString());
+      const { type, data } = payload;
+
+      console.log('[Printful Webhook] Event received:', type);
+      console.log('[Printful Webhook] Data:', JSON.stringify(data, null, 2));
+
+      // Find the order by Printful order ID
+      const printfulOrderId = data.order?.id || data.id;
+      if (!printfulOrderId) {
+        console.error('❌ No Printful order ID in webhook payload');
+        return res.status(400).json({ error: 'Missing order ID' });
+      }
+
+      const [order] = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.printfulOrderId, String(printfulOrderId)))
+        .limit(1);
+
+      if (!order) {
+        console.warn(`⚠️  Order not found for Printful ID: ${printfulOrderId}`);
+        // Still return 200 to acknowledge receipt (might be a test webhook)
+        return res.json({ received: true, warning: 'Order not found' });
+      }
+
+      console.log(`📦 Processing webhook for order ${order.id}`);
+
+      // Handle different webhook events
+      switch (type) {
+        case 'package_shipped': {
+          console.log('✅ Package shipped for order:', order.id);
+          
+          // Extract shipping information
+          const shipment = data.shipment || {};
+          const trackingNumber = shipment.tracking_number;
+          const trackingUrl = shipment.tracking_url;
+          const carrier = shipment.carrier;
+          const service = shipment.service;
+          
+          // Update order status and add tracking info
+          const updatedMetadata = {
+            ...(order.metadata as object || {}),
+            tracking_number: trackingNumber,
+            tracking_url: trackingUrl,
+            carrier: carrier,
+            service: service,
+            shipped_at: new Date().toISOString(),
+          };
+
+          await db
+            .update(orders)
+            .set({
+              status: 'shipped',
+              metadata: updatedMetadata,
+              updatedAt: new Date(),
+            })
+            .where(eq(orders.id, order.id));
+
+          // Log event
+          await db.insert(orderEvents).values({
+            orderId: order.id,
+            eventType: 'shipped',
+            status: 'success',
+            message: `Package shipped via ${carrier} ${service}`,
+            metadata: {
+              tracking_number: trackingNumber,
+              tracking_url: trackingUrl,
+              carrier: carrier,
+            },
+          });
+
+          console.log(`📬 Order ${order.id} marked as shipped. Tracking: ${trackingNumber}`);
+
+          // TODO: Send shipping notification email to customer
+          // await sendShippingNotification(order, trackingNumber, trackingUrl);
+
+          break;
+        }
+
+        case 'package_returned': {
+          console.log('⚠️  Package returned for order:', order.id);
+          
+          await db
+            .update(orders)
+            .set({
+              status: 'returned',
+              updatedAt: new Date(),
+            })
+            .where(eq(orders.id, order.id));
+
+          await db.insert(orderEvents).values({
+            orderId: order.id,
+            eventType: 'returned',
+            status: 'success',
+            message: 'Package was returned',
+            metadata: data,
+          });
+
+          // Alert admin about returned package
+          await sendAdminAlert(
+            'Package Returned',
+            `Order ${order.id} has been returned\n\nCustomer: ${order.customerEmail}`,
+            { orderId: order.id, printfulOrderId }
+          );
+
+          break;
+        }
+
+        case 'order_failed': {
+          console.error('❌ Order failed:', order.id);
+          
+          const reason = data.reason || 'Unknown reason';
+          
+          await db
+            .update(orders)
+            .set({
+              status: 'failed',
+              metadata: {
+                ...(order.metadata as object || {}),
+                failure_reason: reason,
+                failed_at: new Date().toISOString(),
+              },
+              updatedAt: new Date(),
+            })
+            .where(eq(orders.id, order.id));
+
+          await db.insert(orderEvents).values({
+            orderId: order.id,
+            eventType: 'failed',
+            status: 'failed',
+            message: `Order failed: ${reason}`,
+            metadata: data,
+          });
+
+          // Alert admin about failed order
+          await sendAdminAlert(
+            'Order Failed',
+            `Order ${order.id} failed to fulfill\n\nReason: ${reason}\nCustomer: ${order.customerEmail}`,
+            { orderId: order.id, printfulOrderId, reason }
+          );
+
+          break;
+        }
+
+        case 'order_canceled': {
+          console.log('🚫 Order canceled:', order.id);
+          
+          await db
+            .update(orders)
+            .set({
+              status: 'cancelled',
+              metadata: {
+                ...(order.metadata as object || {}),
+                canceled_at: new Date().toISOString(),
+              },
+              updatedAt: new Date(),
+            })
+            .where(eq(orders.id, order.id));
+
+          await db.insert(orderEvents).values({
+            orderId: order.id,
+            eventType: 'cancelled',
+            status: 'success',
+            message: 'Order was cancelled',
+            metadata: data,
+          });
+
+          break;
+        }
+
+        default:
+          console.log(`ℹ️  Unhandled Printful webhook type: ${type}`);
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error('❌ Printful webhook error:', error);
+      res.status(500).json({ error: 'Webhook processing failed' });
+    }
+  });
+
   // Get Stripe config (publishable key for client-side)
   app.get("/api/stripe/config", (req, res) => {
     res.json({
@@ -1324,7 +1551,7 @@ export function registerRoutes(app: Express): Server {
         `,
       };
 
-      console.log('📧 Email would be sent:', emailData);
+      safeLog.info('📧 Email would be sent:', emailData);
 
       // Return success
       res.json({

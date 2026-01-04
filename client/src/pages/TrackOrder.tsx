@@ -8,6 +8,8 @@ import { Badge } from '../components/ui/badge';
 import { Package, Search, AlertCircle, CheckCircle, Clock, XCircle, ShieldCheck } from 'lucide-react';
 import type { Order, OrderItem } from '../../../shared/schema';
 import { Helmet } from 'react-helmet-async';
+import Footer from '@/components/Footer';
+import logoUrl from '@/assets/logo-TOA.svg';
 
 interface OrderDetails {
   order: Order;
@@ -119,6 +121,13 @@ export default function TrackOrder() {
                   <div className="p-3 bg-primary/10 rounded-full">
                     <Package className="h-12 w-12 text-primary" />
                   </div>
+                </div>
+                <div className="flex justify-center mb-4">
+                  <img 
+                    src={logoUrl} 
+                    alt="Tales of Aneria" 
+                    className="h-16 w-auto"
+                  />
                 </div>
                 <CardTitle className="text-2xl font-bold">Track Your Order</CardTitle>
                 <CardDescription>
@@ -282,6 +291,7 @@ export default function TrackOrder() {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }

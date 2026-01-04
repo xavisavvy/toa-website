@@ -198,10 +198,13 @@ GET /api/orders/track?email=customer@example.com&orderId=xxx
 ### Customer Order Tracking
 - **Privacy notice banner**
 - Email + Order ID form
-- Order status display
+- Order status display with real-time Printful updates
 - Shipping address
-- Order items with images
+- Order items with Printful product images
+- Tracking information (when shipped)
 - Auto-clear after 10 minutes
+- Tales of Aneria logo branding
+- Global footer component
 
 ---
 
@@ -336,11 +339,19 @@ npx tsx scripts/create-admin-direct.ts
 - [ ] Admin order detail view (single order)
 - [ ] Manual order status updates
 - [ ] Order export (CSV/Excel)
-- [ ] Email notifications for customers
+- [x] Email notifications for customers (shipping notifications via Printful webhooks)
 - [ ] 2FA for admin accounts
 - [ ] Bulk actions on orders
 - [ ] Advanced filtering/search
 - [ ] Dashboard analytics charts
+
+### Recently Added
+- [x] Printful webhook integration for real-time order updates
+- [x] Product images from Printful CDN
+- [x] Tracking information display
+- [x] Logo branding on login and tracking pages
+- [x] Global footer on tracking page
+- [x] PII sanitization in all logs
 
 ---
 

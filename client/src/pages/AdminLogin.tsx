@@ -6,7 +6,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Shield, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -43,9 +43,11 @@ export default function AdminLogin() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-primary/10 rounded-full">
-              <Shield className="h-12 w-12 text-primary" />
-            </div>
+            <img 
+              src="/src/assets/logo-TOA.svg" 
+              alt="Tales of Aneria" 
+              className="h-24 w-auto"
+            />
           </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>

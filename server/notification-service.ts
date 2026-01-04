@@ -1,4 +1,5 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { safeLog, maskEmail } from './log-sanitizer';
 import type { Order } from '../shared/schema';
 
 export interface EmailParams {
@@ -22,10 +23,8 @@ const sesClient = process.env.AWS_SES_ACCESS_KEY_ID
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   // If SES is not configured, log and return false
   if (!sesClient || !process.env.AWS_SES_FROM_EMAIL) {
-    console.log('⚠️  AWS SES not configured. Email would be sent:');
-    console.log(`  To: ${params.to}`);
-    console.log(`  Subject: ${params.subject}`);
-    console.log(`  Body: ${params.body}`);
+    console.info('⚠️  AWS SES not configured. Email would be sent to:', maskEmail(params.to));
+    console.info('  Subject:', params.subject);
     return false;
   }
 
@@ -56,7 +55,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     });
 
     await sesClient.send(command);
-    console.log(`✅ Email sent successfully to ${params.to}`);
+    safeLog.info(`✅ Email sent successfully to ${maskEmail(params.to)}`);
     return true;
   } catch (error) {
     console.error('❌ Failed to send email via AWS SES:', error);
@@ -100,10 +99,11 @@ Best regards,
 ${process.env.BUSINESS_NAME || 'Tales of Aneria'}
   `.trim();
 
+  const CUSTOMER_NAME = order.customerName || 'Customer';
   const htmlBody = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Thank you for your order!</h2>
-      <p>Dear ${order.customerName || 'Customer'},</p>
+      <p>Dear ${CUSTOMER_NAME},</p>
       <p>We've received your payment and are processing your order.</p>
       
       <h3>Order Details</h3>
@@ -141,7 +141,7 @@ ${process.env.BUSINESS_NAME || 'Tales of Aneria'}
       body: emailBody,
       html: htmlBody,
     });
-    console.log(`✅ Order confirmation email sent to ${order.customerEmail}`);
+    safeLog.info(`✅ Order confirmation email sent to ${maskEmail(order.customerEmail)}`);
   } catch (error) {
     console.error('❌ Failed to send order confirmation email:', error);
     throw error;
@@ -176,7 +176,7 @@ ${process.env.BUSINESS_NAME || 'Tales of Aneria'}
       subject: `Payment Failed - ${process.env.BUSINESS_NAME || 'Tales of Aneria'}`,
       body: emailBody,
     });
-    console.log(`✅ Payment failure notification sent to ${customerEmail}`);
+    safeLog.info(`✅ Payment failure notification sent to ${maskEmail(customerEmail)}`);
   } catch (error) {
     console.error('❌ Failed to send payment failure notification:', error);
   }
@@ -185,7 +185,7 @@ ${process.env.BUSINESS_NAME || 'Tales of Aneria'}
 export async function sendAdminAlert(
   subject: string,
   message: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<void> {
   const adminEmail = process.env.ADMIN_EMAIL || process.env.SUPPORT_EMAIL || 'admin@talesofaneria.com';
   
@@ -206,7 +206,7 @@ This is an automated alert from ${process.env.BUSINESS_NAME || 'Tales of Aneria'
       subject: `[ADMIN ALERT] ${subject}`,
       body: emailBody,
     });
-    console.log(`✅ Admin alert sent: ${subject}`);
+    console.info(`✅ Admin alert sent: ${subject}`);
   } catch (error) {
     console.error('❌ Failed to send admin alert:', error);
   }

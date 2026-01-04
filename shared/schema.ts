@@ -43,7 +43,7 @@ export const orders = pgTable("orders", {
   stripeSessionId: text("stripe_session_id").notNull().unique(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   printfulOrderId: text("printful_order_id"),
-  status: text("status").notNull().default("pending"), // pending, processing, completed, failed, refunded
+  status: text("status").notNull().default("pending"), // pending, processing, shipped, completed, failed, refunded, returned, cancelled
   customerEmail: text("customer_email").notNull(),
   customerName: text("customer_name"),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
@@ -57,7 +57,7 @@ export const orders = pgTable("orders", {
     postal_code: string;
     country: string;
   }>(),
-  metadata: json("metadata").$type<Record<string, any>>(),
+  metadata: json("metadata").$type<Record<string, unknown>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => ({
@@ -76,7 +76,7 @@ export const orderItems = pgTable("order_items", {
   quantity: integer("quantity").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   imageUrl: text("image_url"),
-  metadata: json("metadata").$type<Record<string, any>>(),
+  metadata: json("metadata").$type<Record<string, unknown>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => ({
   orderIdIdx: index("order_id_idx").on(table.orderId),
@@ -85,10 +85,10 @@ export const orderItems = pgTable("order_items", {
 export const orderEvents = pgTable("order_events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   orderId: varchar("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
-  eventType: text("event_type").notNull(), // payment_success, payment_failed, printful_created, printful_failed, notification_sent
+  eventType: text("event_type").notNull(), // payment_success, payment_failed, printful_created, printful_failed, shipped, returned, cancelled, failed, notification_sent
   status: text("status").notNull(), // success, failed
   message: text("message"),
-  metadata: json("metadata").$type<Record<string, any>>(),
+  metadata: json("metadata").$type<Record<string, unknown>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => ({
   orderIdIdx: index("order_event_order_id_idx").on(table.orderId),

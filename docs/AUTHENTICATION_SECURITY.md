@@ -1,5 +1,33 @@
 # Authentication & Security Implementation
 
+## 🛡️ PII Protection & Logging Security
+
+**Status**: ✅ Implemented (2026-01-04)
+
+All application logging implements **automatic PII sanitization** to comply with GDPR, CCPA, and PCI DSS requirements.
+
+### Key Features
+- **Automatic masking** of emails, names, phone numbers, addresses
+- **Recursive sanitization** of nested objects and arrays
+- **Safe logging API** (`safeLog.*`) that replaces `console.*`
+- **27 comprehensive unit tests** covering real-world scenarios
+- **Detailed documentation** in `docs/LOGGING_AND_PII.md`
+
+### Quick Example
+```typescript
+import { safeLog } from './log-sanitizer';
+
+// Email is automatically masked
+safeLog.info('User logged in:', { email: 'john@example.com' });
+// Output: { email: 'j***@example.com' }
+```
+
+See **[LOGGING_AND_PII.md](./LOGGING_AND_PII.md)** for complete documentation.
+
+---
+
+# Authentication & Security Implementation
+
 ## 🔒 Security Overview
 
 This document describes the authentication and security implementation for Tales of Aneria admin dashboard.
