@@ -14,11 +14,10 @@ test.describe('Homepage Accessibility', () => {
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .disableRules(['target-size', 'svg-img-alt']) // Icons inside labeled buttons are acceptable
+      .disableRules(['svg-img-alt']) // Icons inside labeled buttons are acceptable
       .analyze();
 
-    // Document known issues
-    // TODO: Fix carousel button sizes (currently 8px, should be 24px minimum)
+    // Carousel button sizes are now fixed (40px × 40px, exceeds 24px minimum)
     // NOTE: SVG icons inside buttons with aria-labels are decorative and don't need individual labels
     
     expect(accessibilityScanResults.violations).toEqual([]);
@@ -29,7 +28,7 @@ test.describe('Homepage Accessibility', () => {
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['best-practice'])
-      .disableRules(['target-size', 'svg-img-alt'])
+      .disableRules(['svg-img-alt'])
       .include('h1, h2, h3, h4, h5, h6')
       .analyze();
 
@@ -98,7 +97,7 @@ test.describe('Characters Page Accessibility', () => {
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(['target-size', 'svg-img-alt'])
+      .disableRules(['svg-img-alt'])
       .analyze();
 
     expect(accessibilityScanResults.violations).toEqual([]);
@@ -122,7 +121,7 @@ test.describe('Characters Page Accessibility', () => {
     await page.goto('/characters');
     
     const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(['target-size', 'svg-img-alt'])
+      .disableRules(['svg-img-alt'])
       .analyze();
 
     // Check for landmark violations
@@ -188,7 +187,7 @@ test.describe('Keyboard Navigation', () => {
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a'])
-      .disableRules(['target-size', 'svg-img-alt'])
+      .disableRules(['svg-img-alt'])
       .withRules(['focusable-no-name'])
       .analyze();
 
@@ -253,7 +252,7 @@ test.describe('Screen Reader Compatibility', () => {
     await page.goto('/');
     
     const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(['target-size', 'svg-img-alt'])
+      .disableRules(['svg-img-alt'])
       .analyze();
 
     // Check for any critical ARIA violations, but not necessarily live regions
@@ -283,35 +282,25 @@ test.describe('Mobile Accessibility', () => {
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .disableRules(['target-size', 'svg-img-alt']) // Icons inside labeled buttons
+      .disableRules(['svg-img-alt']) // Icons inside labeled buttons
       .analyze();
 
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
-  test('documents touch target size issues', async ({ page }) => {
+  test('verifies carousel button sizes meet WCAG requirements', async ({ page }) => {
     await page.goto('/');
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withRules(['target-size'])
       .analyze();
 
-    // This test documents the known issue
-    // Carousel buttons are 8px x 8px but should be at least 24px x 24px
-    if (accessibilityScanResults.violations.length > 0) {
-      const targetSizeViolations = accessibilityScanResults.violations.filter(
-        v => v.id === 'target-size'
-      );
-      
-      // Document the violations for future fixing
-      console.log(`Found ${targetSizeViolations.length} touch target size violations`);
-      targetSizeViolations.forEach(v => {
-        console.log(`- ${v.help}: ${v.nodes.length} instances`);
-      });
-    }
+    // Carousel buttons should now be 40px × 40px (exceeds 24px minimum)
+    const targetSizeViolations = accessibilityScanResults.violations.filter(
+      v => v.id === 'target-size'
+    );
     
-    // Test passes - we're documenting, not enforcing (yet)
-    expect(true).toBe(true);
+    expect(targetSizeViolations).toHaveLength(0);
   });
 });
 
