@@ -12,6 +12,8 @@ import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
+import { createOrder, updateOrderWithPrintfulId, logFailedOrder, logOrderEvent, getOrderByStripeSessionId } from "./order-service";
+import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
 
 export function registerRoutes(app: Express): Server {
   // Apply API rate limiting to all /api routes
@@ -614,7 +616,52 @@ export function registerRoutes(app: Express): Server {
           
           if (!fullSession) {
             console.error('❌ Failed to retrieve full session data');
+            await sendAdminAlert(
+              'Failed to retrieve Stripe session',
+              `Could not fetch full session data for ${sessionId}`,
+              { sessionId }
+            );
             break;
+          }
+
+          // Create order record in database
+          try {
+            const orderData = {
+              stripeSessionId: sessionId,
+              stripePaymentIntentId: fullSession.payment_intent as string,
+              customerEmail: fullSession.customer_details?.email || '',
+              customerName: fullSession.customer_details?.name || undefined,
+              totalAmount: (fullSession.amount_total! / 100).toFixed(2),
+              currency: fullSession.currency || 'usd',
+              shippingAddress: (fullSession as any).shipping_details?.address ? {
+                name: (fullSession as any).shipping_details.name || '',
+                line1: (fullSession as any).shipping_details.address.line1 || '',
+                line2: (fullSession as any).shipping_details.address.line2,
+                city: (fullSession as any).shipping_details.address.city || '',
+                state: (fullSession as any).shipping_details.address.state || '',
+                postal_code: (fullSession as any).shipping_details.address.postal_code || '',
+                country: (fullSession as any).shipping_details.address.country || '',
+              } : undefined,
+              items: fullSession.line_items?.data.map(item => ({
+                printfulProductId: fullSession.metadata?.printful_product_id || '',
+                printfulVariantId: fullSession.metadata?.printful_variant_id || '',
+                name: item.description || '',
+                quantity: item.quantity || 1,
+                price: ((item.amount_total || 0) / 100).toFixed(2),
+                imageUrl: undefined,
+              })) || [],
+              metadata: fullSession.metadata || undefined,
+            };
+
+            const order = await createOrder(orderData);
+            console.log(`✅ Order created in database: ${order.id}`);
+          } catch (dbError) {
+            console.error('❌ Failed to create order in database:', dbError);
+            await sendAdminAlert(
+              'Database Error: Failed to create order',
+              `Error creating order for session ${sessionId}`,
+              { sessionId, error: String(dbError) }
+            );
           }
           
           // Get sync variant ID from metadata
@@ -622,6 +669,11 @@ export function registerRoutes(app: Express): Server {
           if (!syncVariantId) {
             console.error('❌ No Printful variant ID in session metadata');
             console.error('Session metadata:', fullSession.metadata);
+            await sendAdminAlert(
+              'Missing Printful Variant ID',
+              `No variant ID in metadata for session ${sessionId}`,
+              { sessionId, metadata: fullSession.metadata }
+            );
             break;
           }
 
@@ -632,17 +684,31 @@ export function registerRoutes(app: Express): Server {
           if (!catalogVariantId) {
             console.error(`❌ Could not resolve catalog variant ID for sync variant ${syncVariantId}`);
             console.error('⚠️  CRITICAL: Payment was successful but order cannot be auto-fulfilled');
-            console.error('This likely means:');
-            console.error('1. The variant does not exist in your Printful store (most common)');
-            console.error('2. The Printful API key is incorrect');
-            console.error('3. The sync variant ID in metadata is wrong');
-            console.error(`📋 Manual Action Required:`);
-            console.error(`   - Check session: https://dashboard.stripe.com/payments/${eventSession.id}`);
-            console.error(`   - Check variant: https://api.printful.com/store/variants/${syncVariantId}`);
-            console.error(`   - Manually create Printful order for: ${eventSession.customer_details?.email}`);
-            console.error(`   - Amount paid: $${eventSession.amount_total / 100} ${eventSession.currency.toUpperCase()}`);
-            // Don't break - continue processing webhook to acknowledge receipt
-            // But the order will need manual fulfillment
+            
+            // Store failed order and alert admin
+            await logFailedOrder(
+              sessionId,
+              'printful_variant_resolution_failed',
+              `Could not resolve catalog variant ID for sync variant ${syncVariantId}`,
+              {
+                syncVariantId,
+                customerEmail: eventSession.customer_details?.email,
+                amountPaid: eventSession.amount_total / 100,
+                currency: eventSession.currency,
+              }
+            );
+
+            await sendAdminAlert(
+              'CRITICAL: Printful Variant Resolution Failed',
+              `Payment successful but cannot fulfill order automatically.\n\nManual Action Required:\n- Check session: https://dashboard.stripe.com/payments/${eventSession.id}\n- Check variant: https://api.printful.com/store/variants/${syncVariantId}\n- Manually create Printful order for: ${eventSession.customer_details?.email}\n- Amount paid: $${eventSession.amount_total / 100} ${eventSession.currency.toUpperCase()}`,
+              {
+                sessionId: eventSession.id,
+                syncVariantId,
+                customerEmail: eventSession.customer_details?.email,
+                amountPaid: eventSession.amount_total / 100,
+              }
+            );
+            
             console.log('✅ Webhook acknowledged, but order needs manual fulfillment');
             break;
           }
@@ -678,17 +744,72 @@ export function registerRoutes(app: Express): Server {
                 sessionsArray.slice(-500).forEach(id => processedSessions.add(id));
               }
               
-              // TODO: Send confirmation email to customer
-              // TODO: Store order in database for tracking
+              // Update order with Printful ID
+              try {
+                const order = await getOrderByStripeSessionId(sessionId);
+                if (order) {
+                  await updateOrderWithPrintfulId(order.id, String(result.orderId!));
+                  
+                  // Send confirmation email to customer
+                  const items = [{
+                    name: 'Tales of Aneria Merchandise',
+                    quantity: 1,
+                    price: ((fullSession.amount_total || 0) / 100).toFixed(2),
+                  }];
+                  
+                  await sendOrderConfirmation(order, items);
+                  console.log(`✅ Order confirmation email sent to ${order.customerEmail}`);
+                } else {
+                  console.error('❌ Could not find order in database to update');
+                }
+              } catch (notificationError) {
+                console.error('❌ Error sending confirmation email:', notificationError);
+                await sendAdminAlert(
+                  'Failed to send order confirmation',
+                  `Email notification failed for session ${sessionId}`,
+                  { sessionId, error: String(notificationError) }
+                );
+              }
             } else {
               console.error(`❌ Failed to create Printful order: ${result.error}`);
               console.error('Order data:', JSON.stringify(orderData, null, 2));
-              // TODO: Alert admin about failed order creation
-              // TODO: Store failed order for manual processing
+              
+              // Store failed order in database
+              await logFailedOrder(
+                sessionId,
+                'printful_order_creation_failed',
+                result.error || 'Unknown error creating Printful order',
+                { orderData, error: result.error }
+              );
+
+              // Alert admin about failed order creation
+              await sendAdminAlert(
+                'Failed to create Printful order',
+                `Printful order creation failed for session ${sessionId}\n\nError: ${result.error}\n\nCustomer: ${eventSession.customer_details?.email}\nAmount: $${eventSession.amount_total / 100} ${eventSession.currency.toUpperCase()}`,
+                {
+                  sessionId,
+                  error: result.error,
+                  customerEmail: eventSession.customer_details?.email,
+                  orderData,
+                }
+              );
             }
           } else {
             console.error('❌ Could not extract order data from Stripe session');
             console.error('Session ID:', eventSession.id);
+            
+            await logFailedOrder(
+              sessionId,
+              'order_data_extraction_failed',
+              'Could not extract order data from Stripe session',
+              { sessionId }
+            );
+
+            await sendAdminAlert(
+              'Failed to extract order data',
+              `Could not extract order data from Stripe session ${sessionId}`,
+              { sessionId }
+            );
           }
           
           break;
@@ -696,13 +817,41 @@ export function registerRoutes(app: Express): Server {
 
         case 'checkout.session.async_payment_succeeded': {
           console.log('✅ Async payment succeeded');
-          // Handle delayed payment methods (bank transfers, etc.)
           const asyncEventSession = event.data.object as any;
           const asyncSession = await getCheckoutSession(asyncEventSession.id);
+          
           if (asyncSession) {
             const asyncOrderData = createPrintfulOrderFromSession(asyncSession);
             if (asyncOrderData) {
-              await createPrintfulOrder(asyncOrderData);
+              const result = await createPrintfulOrder(asyncOrderData);
+              
+              if (result.success && result.orderId) {
+                const order = await getOrderByStripeSessionId(asyncEventSession.id);
+                if (order) {
+                  await updateOrderWithPrintfulId(order.id, String(result.orderId));
+                  
+                  const items = [{
+                    name: 'Tales of Aneria Merchandise',
+                    quantity: 1,
+                    price: ((asyncSession.amount_total || 0) / 100).toFixed(2),
+                  }];
+                  
+                  await sendOrderConfirmation(order, items);
+                }
+              } else {
+                await logFailedOrder(
+                  asyncEventSession.id,
+                  'async_printful_order_failed',
+                  result.error || 'Unknown error',
+                  { error: result.error }
+                );
+                
+                await sendAdminAlert(
+                  'Async Printful order creation failed',
+                  `Failed to create Printful order for async payment session ${asyncEventSession.id}`,
+                  { sessionId: asyncEventSession.id, error: result.error }
+                );
+              }
             }
           }
           break;
@@ -712,7 +861,28 @@ export function registerRoutes(app: Express): Server {
           console.log('❌ Async payment failed');
           const failedSession = event.data.object as any;
           console.log('Failed session ID:', failedSession.id);
-          // TODO: Notify customer that payment failed
+          
+          const customerEmail = failedSession.customer_details?.email;
+          if (customerEmail) {
+            await sendPaymentFailureNotification(customerEmail, failedSession.id);
+          }
+
+          await logFailedOrder(
+            failedSession.id,
+            'async_payment_failed',
+            'Async payment method failed',
+            {
+              customerEmail,
+              reason: failedSession.last_payment_error?.message,
+            }
+          );
+
+          await sendAdminAlert(
+            'Async payment failed',
+            `Async payment failed for session ${failedSession.id}\n\nCustomer: ${customerEmail}`,
+            { sessionId: failedSession.id, customerEmail }
+          );
+          
           break;
         }
 
