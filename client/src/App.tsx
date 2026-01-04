@@ -9,7 +9,10 @@ import { useKonamiCode, ChaosGoblinMode } from "@/components/ChaosGoblinMode";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initGA, analytics } from "@/lib/analytics";
+import { reportWebVitals } from "@/lib/webVitals";
+import { initScrollTracking, initRageClickDetection, initSessionTracking } from "@/lib/userEngagement";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminAnalytics from "@/pages/AdminAnalytics";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminOrders from "@/pages/AdminOrders";
 import CharacterDetail from "@/pages/CharacterDetail";
@@ -40,9 +43,13 @@ function ScrollToTop() {
 function Analytics() {
   const [location] = useLocation();
 
-  // Initialize Google Analytics on mount
+  // Initialize Google Analytics and tracking on mount
   useEffect(() => {
     initGA();
+    reportWebVitals();
+    initScrollTracking();
+    initRageClickDetection();
+    initSessionTracking();
   }, []);
 
   // Track page views on route change
@@ -75,6 +82,7 @@ function Router() {
         {/* Admin Routes */}
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
+        <Route path="/admin/analytics" component={AdminAnalytics} />
         <Route path="/admin/orders" component={AdminOrders} />
         
         {/* Customer Order Tracking - Privacy Protected */}

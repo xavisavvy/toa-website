@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Package, DollarSign, AlertCircle, TrendingUp, LogOut, ShoppingBag } from 'lucide-react';
+import { Package, DollarSign, AlertCircle, TrendingUp, LogOut, ShoppingBag, BarChart3 } from 'lucide-react';
 
 interface DashboardStats {
   totalOrders: number;
@@ -137,13 +137,22 @@ export default function AdminDashboard() {
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Manage your store and orders</CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button
               className="h-24 flex flex-col items-center justify-center space-y-2"
               onClick={() => navigate('/admin/orders')}
             >
               <ShoppingBag className="h-8 w-8" />
               <span>View Orders</span>
+            </Button>
+
+            <Button
+              className="h-24 flex flex-col items-center justify-center space-y-2"
+              variant="outline"
+              onClick={() => navigate('/admin/analytics')}
+            >
+              <BarChart3 className="h-8 w-8" />
+              <span>Analytics</span>
             </Button>
 
             <Button

@@ -134,6 +134,67 @@ export const analytics = {
     });
   },
 
+  // Enhanced e-commerce funnel events
+  viewItemList: (items: any[], category?: string) => {
+    trackEvent('view_item_list', {
+      item_list_name: category || 'All Products',
+      items,
+    });
+  },
+
+  selectItem: (itemName: string, itemId?: string, listName?: string) => {
+    trackEvent('select_item', {
+      item_name: itemName,
+      item_id: itemId,
+      item_list_name: listName,
+    });
+  },
+
+  viewCart: (value: number, items: any[]) => {
+    trackEvent('view_cart', {
+      currency: 'USD',
+      value,
+      items,
+    });
+  },
+
+  addShippingInfo: (value: number, shippingTier?: string) => {
+    trackEvent('add_shipping_info', {
+      currency: 'USD',
+      value,
+      shipping_tier: shippingTier,
+    });
+  },
+
+  addPaymentInfo: (value: number, paymentType?: string) => {
+    trackEvent('add_payment_info', {
+      currency: 'USD',
+      value,
+      payment_type: paymentType || 'stripe',
+    });
+  },
+
+  // User engagement metrics
+  scrollDepth: (depth: number) => {
+    trackEvent('scroll', {
+      percent_scrolled: depth,
+    });
+  },
+
+  rageClick: (element: string) => {
+    trackEvent('rage_click', {
+      element,
+      frustration: true,
+    });
+  },
+
+  sessionQuality: (duration: number, pagesViewed: number) => {
+    trackEvent('session_quality', {
+      duration_seconds: Math.round(duration / 1000),
+      pages_viewed: pagesViewed,
+    });
+  },
+
   // Social interactions
   socialShare: (platform: string, contentType?: string, contentId?: string) => {
     trackEvent('share', {

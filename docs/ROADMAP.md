@@ -128,30 +128,144 @@
 #### 📱 Social Media Integration
 - [ ] TBD - Add items as you discover needs
 
+#### 🤝 Sponsor Portal
+- [ ] **Sponsor Management Portal** - Self-service portal for sponsors
+  - [ ] Database schema for sponsors (name, tier, logo, links, dates)
+  - [ ] Sponsor dashboard (/admin/sponsors)
+  - [ ] CRUD operations for sponsor records
+  - [ ] Upload sponsor logos (secure storage)
+  - [ ] Set sponsor tier (Bronze/Silver/Gold/Custom)
+  - [ ] Set active/inactive status
+  - [ ] Track sponsorship dates (start/end)
+  - [ ] Add sponsor links/social media
+  - [ ] Public sponsor showcase page integration
+  - [ ] Privacy controls (sponsor consent for display)
+  - [ ] Sponsor analytics (impressions, clicks)
+  - Related: Admin dashboard, sponsor showcase feature
+
 ---
 
 ### Medium Priority
 
-#### 📊 Analytics & Metrics
-- [ ] **Comprehensive Analytics & Metrics Enhancement** - Data-driven optimization
-  - **Full Roadmap:** See `docs/ANALYTICS_METRICS_ROADMAP.md`
-  - **Phase 1 (High Priority):**
-    - [ ] Enhanced e-commerce funnel (view_item_list, select_item, view_cart, etc.)
-    - [ ] Core Web Vitals tracking (LCP, FID/INP, CLS)
-    - [ ] Admin analytics dashboard (/admin/analytics)
-    - [ ] Security event dashboard
-    - [ ] Revenue analytics (AOV, CLV, conversion rate)
-  - **Phase 2 (Medium Priority):**
-    - [ ] User engagement metrics (scroll depth, session quality)
-    - [ ] Heatmaps & session recording (Microsoft Clarity)
-    - [ ] Backend performance dashboard
-    - [ ] A/B testing framework
-  - **Phase 3 (Low Priority):**
-    - [ ] SEO tracking (Google Search Console integration)
-    - [ ] Customer success metrics
-    - [ ] Advanced BI dashboards
-  - **Business Value:** Data-driven decisions, conversion optimization, UX improvements
-  - **Estimated Time:** 120-170 hours (3-4 weeks)
+#### 📊 Analytics & Metrics Enhancement
+- [x] **Phase 1: Critical Metrics (COMPLETE 2026-01-04)** ✅
+  - [x] Enhanced e-commerce funnel tracking
+    - [x] view_item_list, select_item, view_cart events
+    - [x] add_shipping_info, add_payment_info events
+    - [x] scrollDepth, rageClick, sessionQuality tracking
+  - [x] Core Web Vitals (Real User Monitoring)
+    - [x] Installed `web-vitals` npm package
+    - [x] Track LCP, FID/INP, CLS, TTFB, FCP
+    - [x] Send metrics to GA4
+    - [x] Auto-initialize on app load
+  - [x] Admin Analytics Dashboard (`/admin/analytics`)
+    - [x] Revenue charts (daily trend with dual-axis)
+    - [x] Top-selling products bar chart
+    - [x] Order status distribution pie chart
+    - [x] Key metrics cards (revenue, AOV, orders, conversion)
+    - [x] Time range selector (7d/30d/90d)
+    - [x] Security events summary
+  - [x] User Engagement Tracking
+    - [x] Scroll depth tracking (25%, 50%, 75%, 100%)
+    - [x] Rage click detection (frustration indicator)
+    - [x] Session quality metrics (duration, pages viewed)
+  - Related: client/src/lib/analytics.ts, webVitals.ts, userEngagement.ts, pages/AdminAnalytics.tsx, server/routes.ts
+  
+- [ ] **Comprehensive 3-Phase Analytics Plan (IN PROGRESS)** - Data-driven optimization & conversion improvement
+  - **Full Roadmap:** See `docs/ANALYTICS_METRICS_ROADMAP.md` (733 lines, comprehensive)
+  
+  - **Phase 2: UX Optimization (Week 3-4)** 🟡 MEDIUM PRIORITY - NEXT
+    - [ ] Heatmaps & Session Recording
+      - [ ] Install Microsoft Clarity (free, privacy-friendly)
+      - [ ] Configure privacy settings
+      - [ ] Analyze top pages for UX improvements
+    - [ ] Backend Performance Dashboard
+      - [ ] Database query performance tracking
+      - [ ] External API latency (Stripe, Printful, YouTube)
+      - [ ] Memory and CPU usage monitoring
+      - [ ] Queue depth tracking
+    - [ ] Advanced User Engagement
+      - [ ] Dead click detection
+      - [ ] Form field abandonment tracking
+      - [ ] User journey path analysis
+    - [ ] Revenue Analytics
+      - [ ] Average Order Value (AOV) tracking
+      - [ ] Customer Lifetime Value (CLV) estimation
+      - [ ] Cart abandonment value
+      - [ ] Revenue by traffic source
+      - [ ] Discount/coupon usage tracking
+    - **Estimated Time:** 40-60 hours
+  
+  - **Phase 2: UX Optimization (Week 3-4)** 🟡 MEDIUM PRIORITY
+    - [ ] User Engagement Metrics
+      - [ ] Scroll depth tracking (25%, 50%, 75%, 100%)
+      - [ ] Session quality metrics (duration, pages per session)
+      - [ ] Rage click detection (user frustration)
+      - [ ] Dead click tracking (non-interactive elements)
+      - [ ] Time on page tracking
+    - [ ] Backend Performance Monitoring
+      - [ ] Database query performance dashboard
+      - [ ] External API latency (Stripe, Printful, YouTube)
+      - [ ] Memory and CPU usage tracking
+      - [ ] Concurrent request handling metrics
+      - [ ] Slow query log and optimization
+    - [ ] Heatmaps & Session Recording
+      - [ ] Install Microsoft Clarity (free, privacy-friendly)
+      - [ ] Configure privacy settings (GDPR compliant)
+      - [ ] Click heatmaps for shop pages
+      - [ ] Scroll heatmaps for content pages
+      - [ ] Session replay for conversion funnel analysis
+    - [ ] A/B Testing Framework
+      - [ ] Feature flags infrastructure (LaunchDarkly/PostHog)
+      - [ ] Variant assignment logic
+      - [ ] Statistical significance tracking
+      - [ ] Multivariate testing support
+    - **Estimated Time:** 30-40 hours
+  
+  - **Phase 3: Advanced Analytics (Month 2)** 🟢 LOW PRIORITY
+    - [ ] SEO Performance Tracking
+      - [ ] Google Search Console integration
+      - [ ] Organic search rankings dashboard
+      - [ ] Click-through rate (CTR) from search
+      - [ ] Top-performing keywords
+      - [ ] Backlink tracking
+      - [ ] Core Web Vitals impact on rankings
+    - [ ] Customer Success Metrics
+      - [ ] Support ticket system integration (if added)
+      - [ ] Net Promoter Score (NPS) tracking
+      - [ ] Order fulfillment analytics
+      - [ ] Customer satisfaction (CSAT) scores
+    - [ ] Advanced BI Dashboards
+      - [ ] Geographic revenue map
+      - [ ] Customer acquisition cost (CAC)
+      - [ ] Inventory alerts (low stock)
+      - [ ] Email campaign analytics (future)
+    - **Estimated Time:** 50-70 hours
+  
+  - **North Star Metrics (Must Track):**
+    1. Revenue - Total sales
+    2. Conversion Rate - Visitors → Customers
+    3. Average Order Value (AOV)
+    4. Customer Acquisition Cost (CAC)
+    5. Customer Lifetime Value (CLV)
+  
+  - **Tools & Integrations:**
+    - ✅ Google Analytics 4 (already implemented)
+    - [ ] `web-vitals` npm package (performance)
+    - [ ] Microsoft Clarity (heatmaps, free)
+    - [ ] Google Search Console (SEO)
+    - [ ] Sentry (error tracking, optional)
+    - [ ] PostHog/LaunchDarkly (A/B testing, optional)
+  
+  - **Business Value:** 
+    - Identify conversion bottlenecks and optimize funnel
+    - Improve site performance (faster = higher conversions)
+    - Data-driven UX improvements
+    - Prevent security incidents
+    - Optimize marketing spend (ROI tracking)
+  
+  - **Total Estimated Time:** 120-170 hours (3-4 weeks full-time)
+  - **Success Criteria:** See `docs/ANALYTICS_METRICS_ROADMAP.md` lines 684-698
   - Related: `docs/ANALYTICS_METRICS_ROADMAP.md`, `client/src/lib/analytics.ts`, `server/monitoring.ts`
 
 #### 🧪 Testing Improvements
@@ -503,7 +617,6 @@ echo "- [ ] Feature name - Description" >> ROADMAP.md
 - Social proof (testimonials from current sponsors)
 - Sponsor showcase section on homepage
 - Automated media kit generation
-- Sponsor portal for tracking campaign performance
 - Integration with email marketing tools
 - Discord/community integration for sponsors
 - Exclusive sponsor content/perks

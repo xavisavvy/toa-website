@@ -1,7 +1,7 @@
 import { createServer, type Server } from "http";
 
 import express, { type Express } from "express";
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, gte, sql } from 'drizzle-orm';
 
 import { authenticateUser, getUserById } from "./auth";
 import { requireAdmin, optionalAuth } from "./auth-middleware";
@@ -245,6 +245,109 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('Error fetching order:', error);
       res.status(500).json({ error: 'Failed to fetch order' });
+    }
+  });
+
+  // Admin Analytics Dashboard
+  app.get("/api/admin/analytics", async (req, res) => {
+    try {
+      if (!db) {
+        return res.status(503).json({ error: 'Database not available' });
+      }
+
+      const { range = '30d' } = req.query;
+      
+      // Calculate date range
+      const daysMap: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90 };
+      const days = daysMap[range as string] || 30;
+      const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      
+      // Fetch orders in range
+      const recentOrders = await db
+        .select()
+        .from(orders)
+        .where(gte(orders.createdAt, startDate.toISOString()))
+        .orderBy(desc(orders.createdAt));
+
+      // Calculate daily revenue
+      const dailyRevenueMap: Record<string, { date: string; revenue: number; orders: number }> = {};
+      
+      recentOrders.forEach(order => {
+        const date = new Date(order.createdAt).toISOString().split('T')[0];
+        if (!dailyRevenueMap[date]) {
+          dailyRevenueMap[date] = { date, revenue: 0, orders: 0 };
+        }
+        if (order.status === 'completed' || order.status === 'processing') {
+          dailyRevenueMap[date].revenue += parseFloat(order.totalAmount);
+        }
+        dailyRevenueMap[date].orders += 1;
+      });
+
+      // Get top products
+      const allOrderItems = await db
+        .select()
+        .from(orderItems)
+        .innerJoin(orders, eq(orderItems.orderId, orders.id))
+        .where(gte(orders.createdAt, startDate.toISOString()));
+
+      const productStats: Record<string, { name: string; quantity: number; revenue: number }> = {};
+      
+      allOrderItems.forEach(({ order_items: item, orders: order }) => {
+        if (order.status === 'completed' || order.status === 'processing') {
+          if (!productStats[item.name]) {
+            productStats[item.name] = { name: item.name, quantity: 0, revenue: 0 };
+          }
+          productStats[item.name].quantity += item.quantity;
+          productStats[item.name].revenue += parseFloat(item.price) * item.quantity;
+        }
+      });
+
+      const topProducts = Object.values(productStats)
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 10);
+
+      // Orders by status
+      const statusCounts: Record<string, number> = {};
+      recentOrders.forEach(order => {
+        statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+      });
+
+      const ordersByStatus = Object.entries(statusCounts).map(([status, count]) => ({
+        status,
+        count,
+      }));
+
+      // Calculate metrics
+      const completedOrders = recentOrders.filter(o => o.status === 'completed' || o.status === 'processing');
+      const totalRevenue = completedOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0);
+      const avgOrderValue = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
+      
+      // Mock conversion rate (would need GA4 integration for real data)
+      const conversionRate = 2.5;
+
+      // Security events (last 30 days)
+      const securityStartDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      // Note: In production, fetch from security logs table
+      const securityEvents = {
+        failedLogins: 0,
+        suspiciousActivities: 0,
+      };
+
+      res.json({
+        dailyRevenue: Object.values(dailyRevenueMap).sort((a, b) => a.date.localeCompare(b.date)),
+        topProducts,
+        ordersByStatus,
+        metrics: {
+          totalRevenue,
+          avgOrderValue,
+          totalOrders: recentOrders.length,
+          conversionRate,
+        },
+        securityEvents,
+      });
+    } catch (error) {
+      safeLog('error', 'Error fetching analytics:', error);
+      res.status(500).json({ error: 'Failed to fetch analytics' });
     }
   });
 
