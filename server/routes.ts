@@ -207,110 +207,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Get analytics data
-  app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
-    try {
-      if (!db) {
-        return res.status(503).json({ error: 'Database not available' });
-      }
-
-      const { range = '30d' } = req.query;
-      const user = req.user;
-
-      // Audit log
-      if (user) {
-        await AuditService.log({
-          userId: user.id,
-          action: AuditAction.VIEW_ANALYTICS,
-          ipAddress: req.ip,
-          userAgent: req.get('user-agent'),
-        });
-      }
-
-      // Calculate date range
-      const days = parseInt(range.toString().replace('d', '')) || 30;
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-
-      // Fetch orders in range
-      const recentOrders = await db
-        .select()
-        .from(orders)
-        .where(gte(orders.createdAt, startDate))
-        .orderBy(desc(orders.createdAt));
-
-      // Fetch all order items for these orders
-      const orderIds = recentOrders.map(o => o.id);
-      const allOrderItems = orderIds.length > 0 
-        ? await db.select().from(orderItems).where(
-            eq(orderItems.orderId, orderIds[0]) // This needs improvement for multiple orders
-          )
-        : [];
-
-      // Calculate daily revenue
-      const dailyRevenueMap = new Map<string, { revenue: number; orders: number }>();
-      recentOrders.forEach(order => {
-        const date = order.createdAt.toISOString().split('T')[0];
-        const existing = dailyRevenueMap.get(date) || { revenue: 0, orders: 0 };
-        dailyRevenueMap.set(date, {
-          revenue: existing.revenue + parseFloat(order.totalAmount),
-          orders: existing.orders + 1,
-        });
-      });
-
-      const dailyRevenue = Array.from(dailyRevenueMap.entries())
-        .map(([date, data]) => ({ date, ...data }))
-        .sort((a, b) => a.date.localeCompare(b.date));
-
-      // Calculate top products
-      const productMap = new Map<string, { quantity: number; revenue: number }>();
-      allOrderItems.forEach(item => {
-        const existing = productMap.get(item.productName) || { quantity: 0, revenue: 0 };
-        productMap.set(item.productName, {
-          quantity: existing.quantity + item.quantity,
-          revenue: existing.revenue + parseFloat(item.price) * item.quantity,
-        });
-      });
-
-      const topProducts = Array.from(productMap.entries())
-        .map(([name, data]) => ({ name, ...data }))
-        .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 10);
-
-      // Calculate orders by status
-      const statusMap = new Map<string, number>();
-      recentOrders.forEach(order => {
-        statusMap.set(order.status, (statusMap.get(order.status) || 0) + 1);
-      });
-
-      const ordersByStatus = Array.from(statusMap.entries())
-        .map(([status, count]) => ({ status, count }));
-
-      // Calculate metrics
-      const totalRevenue = recentOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0);
-      const totalOrders = recentOrders.length;
-      const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-
-      res.json({
-        dailyRevenue,
-        topProducts,
-        ordersByStatus,
-        metrics: {
-          totalRevenue,
-          avgOrderValue,
-          totalOrders,
-          conversionRate: 0, // TODO: Implement conversion tracking
-        },
-        securityEvents: {
-          failedLogins: 0, // TODO: Implement from audit logs
-          suspiciousActivities: 0, // TODO: Implement from audit logs
-        },
-      });
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-      res.status(500).json({ error: 'Failed to fetch analytics' });
-    }
-  });
+  // Get analytics data - REMOVED DUPLICATE (kept better implementation at line 463)
 
   // Get all orders (with pagination and filtering)
   app.get("/api/admin/orders", async (req, res) => {
@@ -460,7 +357,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Admin Analytics Dashboard
-  app.get("/api/admin/analytics", async (req, res) => {
+  app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
     try {
       if (!db) {
         return res.status(503).json({ error: 'Database not available' });

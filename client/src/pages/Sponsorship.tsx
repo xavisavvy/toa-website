@@ -1,5 +1,5 @@
 import { Mail, Users, TrendingUp, Star, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import Footer from '@/components/Footer';
 import Navigation from '@/components/Navigation';
@@ -86,12 +86,6 @@ export default function Sponsorship() {
     setSubmitStatus('idle');
 
     try {
-      // Track sponsor inquiry
-      analytics.trackEvent('sponsor_inquiry_submitted', {
-        company: formData.company,
-        interest: formData.interest,
-      });
-
       const response = await fetch('/api/contact/sponsor', {
         method: 'POST',
         headers: {
@@ -106,6 +100,9 @@ export default function Sponsorship() {
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', company: '', interest: '', message: '' });
+      
+      // Track successful sponsor inquiry
+      analytics.formSubmit('sponsor_inquiry', true);
     } catch (error) {
       console.error('Error submitting sponsorship inquiry:', error);
       setSubmitStatus('error');
@@ -296,10 +293,10 @@ export default function Sponsorship() {
           <div className="max-w-2xl mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="font-serif text-3xl font-semibold mb-4">
-                Let's Work Together
+                Let&apos;s Work Together
               </h2>
               <p className="text-muted-foreground">
-                Fill out the form below and we'll get back to you within 24-48 hours to discuss how we can
+                Fill out the form below and we&apos;ll get back to you within 24-48 hours to discuss how we can
                 partner together.
               </p>
             </div>
@@ -308,7 +305,7 @@ export default function Sponsorship() {
               <Alert className="mb-6 border-green-500 bg-green-50 dark:bg-green-950">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertDescription className="text-green-600 dark:text-green-400">
-                  Thank you for your interest! We'll be in touch soon.
+                  Thank you for your interest! We&apos;ll be in touch soon.
                 </AlertDescription>
               </Alert>
             )}

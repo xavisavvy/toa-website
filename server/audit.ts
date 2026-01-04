@@ -1,8 +1,11 @@
-import { db } from "./db";
-import { auditLogs, type InsertAuditLog, type AuditLog } from "../shared/schema";
-import { logger } from "./logger";
-import { sanitizeObject } from "./log-sanitizer";
 import type { Request } from "express";
+
+import { auditLogs, type InsertAuditLog, type AuditLog } from "../shared/schema";
+
+import { db } from "./db";
+import { sanitizeObject } from "./log-sanitizer";
+import { logger } from "./logger";
+
 
 // Audit action types
 export const AuditAction = {
@@ -115,6 +118,9 @@ export class AuditService {
         metadata: context.metadata,
       };
 
+      // Debug: log what we're trying to insert
+      logger.debug({ auditEntry: this.maskSensitiveData(auditEntry as Record<string, unknown>) }, "Inserting audit log");
+      
       await db.insert(auditLogs).values(auditEntry);
 
       // Also log to application logger for real-time monitoring
