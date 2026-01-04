@@ -27,9 +27,9 @@ describe('Notification Service', () => {
       const result = await sendEmail(params);
 
       expect(result).toBe(true);
-      expect(console.log).toHaveBeenCalledWith('📧 Email would be sent:');
-      expect(console.log).toHaveBeenCalledWith(`  To: ${params.to}`);
-      expect(console.log).toHaveBeenCalledWith(`  Subject: ${params.subject}`);
+      expect(console.info).toHaveBeenCalledWith('📧 Email would be sent:');
+      expect(console.info).toHaveBeenCalledWith(`  To: ${params.to}`);
+      expect(console.info).toHaveBeenCalledWith(`  Subject: ${params.subject}`);
     });
 
     it('should handle HTML email content', async () => {
@@ -81,9 +81,9 @@ describe('Notification Service', () => {
     it('should send order confirmation email with all details', async () => {
       await sendOrderConfirmation(mockOrder, mockItems);
 
-      expect(console.log).toHaveBeenCalledWith('📧 Email would be sent:');
-      expect(console.log).toHaveBeenCalledWith(`  To: ${mockOrder.customerEmail}`);
-      expect(console.log).toHaveBeenCalledWith(
+      expect(console.info).toHaveBeenCalledWith('📧 Email would be sent:');
+      expect(console.info).toHaveBeenCalledWith(`  To: ${mockOrder.customerEmail}`);
+      expect(console.info).toHaveBeenCalledWith(
         expect.stringContaining(`✅ Order confirmation email sent to ${mockOrder.customerEmail}`)
       );
     });
@@ -92,7 +92,7 @@ describe('Notification Service', () => {
       await sendOrderConfirmation(mockOrder, mockItems);
 
       // Check that sendEmail was effectively called with order details
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
 
     it('should handle order without customer name', async () => {
@@ -100,7 +100,7 @@ describe('Notification Service', () => {
 
       await sendOrderConfirmation(orderWithoutName, mockItems);
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(console.info).toHaveBeenCalledWith(
         expect.stringContaining(`✅ Order confirmation email sent to ${orderWithoutName.customerEmail}`)
       );
     });
@@ -110,7 +110,7 @@ describe('Notification Service', () => {
 
       await sendOrderConfirmation(orderWithoutShipping, mockItems);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
 
     it('should include multiple items in email', async () => {
@@ -121,7 +121,7 @@ describe('Notification Service', () => {
 
       await sendOrderConfirmation(mockOrder, multipleItems);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
 
     it('should use environment variables for business info', async () => {
@@ -133,7 +133,7 @@ describe('Notification Service', () => {
 
       await sendOrderConfirmation(mockOrder, mockItems);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
 
       // Restore
       process.env.BUSINESS_NAME = originalBusinessName;
@@ -154,9 +154,9 @@ describe('Notification Service', () => {
 
       await sendPaymentFailureNotification(customerEmail, sessionId);
 
-      expect(console.log).toHaveBeenCalledWith('📧 Email would be sent:');
-      expect(console.log).toHaveBeenCalledWith(`  To: ${customerEmail}`);
-      expect(console.log).toHaveBeenCalledWith(
+      expect(console.info).toHaveBeenCalledWith('📧 Email would be sent:');
+      expect(console.info).toHaveBeenCalledWith(`  To: ${customerEmail}`);
+      expect(console.info).toHaveBeenCalledWith(
         `✅ Payment failure notification sent to ${customerEmail}`
       );
     });
@@ -167,7 +167,7 @@ describe('Notification Service', () => {
 
       await sendPaymentFailureNotification(customerEmail, sessionId);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
 
     it('should not throw if email fails', async () => {
@@ -188,8 +188,8 @@ describe('Notification Service', () => {
 
       await sendAdminAlert(subject, message);
 
-      expect(console.log).toHaveBeenCalledWith('📧 Email would be sent:');
-      expect(console.log).toHaveBeenCalledWith(`✅ Admin alert sent: ${subject}`);
+      expect(console.info).toHaveBeenCalledWith('📧 Email would be sent:');
+      expect(console.info).toHaveBeenCalledWith(`✅ Admin alert sent: ${subject}`);
     });
 
     it('should include metadata in alert', async () => {
@@ -203,7 +203,7 @@ describe('Notification Service', () => {
 
       await sendAdminAlert(subject, message, metadata);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
 
     it('should use ADMIN_EMAIL if set', async () => {
@@ -212,7 +212,7 @@ describe('Notification Service', () => {
 
       await sendAdminAlert('Test Alert', 'Test message');
 
-      expect(console.log).toHaveBeenCalledWith('  To: admin@example.com');
+      expect(console.info).toHaveBeenCalledWith('  To: admin@example.com');
 
       process.env.ADMIN_EMAIL = originalAdminEmail;
     });
@@ -226,7 +226,7 @@ describe('Notification Service', () => {
 
       await sendAdminAlert('Test Alert', 'Test message');
 
-      expect(console.log).toHaveBeenCalledWith('  To: support@example.com');
+      expect(console.info).toHaveBeenCalledWith('  To: support@example.com');
 
       process.env.ADMIN_EMAIL = originalAdminEmail;
       process.env.SUPPORT_EMAIL = originalSupportEmail;
@@ -241,7 +241,7 @@ describe('Notification Service', () => {
 
       await sendAdminAlert('Test Alert', 'Test message');
 
-      expect(console.log).toHaveBeenCalledWith('  To: admin@talesofaneria.com');
+      expect(console.info).toHaveBeenCalledWith('  To: admin@talesofaneria.com');
 
       process.env.ADMIN_EMAIL = originalAdminEmail;
       process.env.SUPPORT_EMAIL = originalSupportEmail;
@@ -255,7 +255,7 @@ describe('Notification Service', () => {
     it('should format subject with [ADMIN ALERT] prefix', async () => {
       await sendAdminAlert('Database Error', 'Connection failed');
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(console.info).toHaveBeenCalledWith(
         expect.stringContaining('Subject: [ADMIN ALERT] Database Error')
       );
     });
@@ -283,7 +283,7 @@ describe('Notification Service', () => {
 
       await sendOrderConfirmation(order, items);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
 
     it('should include support contact information', async () => {
@@ -307,7 +307,7 @@ describe('Notification Service', () => {
 
       await sendOrderConfirmation(order, items);
 
-      expect(console.log).toHaveBeenCalled();
+      expect(console.info).toHaveBeenCalled();
     });
   });
 });
