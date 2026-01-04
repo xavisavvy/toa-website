@@ -1,10 +1,16 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
 import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+
 import * as schema from '../shared/schema';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is not set');
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+  console.warn('⚠️  DATABASE_URL environment variable is not set. Order tracking will not be available.');
 }
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+// Create pool only if DATABASE_URL is provided
+const pool = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL }) : null;
+
+// Export db - will be null if DATABASE_URL not configured
+export const db = pool ? drizzle(pool, { schema }) : null as any;
