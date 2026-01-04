@@ -5,7 +5,8 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
-import { ArrowLeft, Package, CheckCircle, Clock, XCircle, AlertCircle, Truck, MapPin, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, Package, CheckCircle, Clock, XCircle, AlertCircle, Truck, MapPin, Mail, Phone, Copy, Check } from 'lucide-react';
+import AdminNav from '../components/layout/AdminNav';
 import type { Order, OrderItem } from '../../../shared/schema';
 
 export default function AdminOrderDetail() {
@@ -16,6 +17,7 @@ export default function AdminOrderDetail() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'admin')) {
@@ -75,6 +77,18 @@ export default function AdminOrderDetail() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const copyToClipboard = async (text: string, fieldName: string) => {
+    try {
+      if (typeof window !== 'undefined' && window.navigator && window.navigator.clipboard) {
+        await window.navigator.clipboard.writeText(text);
+        setCopiedField(fieldName);
+        setTimeout(() => setCopiedField(null), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
   if (authLoading || !user) {
@@ -144,15 +158,23 @@ export default function AdminOrderDetail() {
       {/* Header */}
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <AdminNav />
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/admin/orders')}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Orders
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
+              <div className="flex items-center gap-2">
                 <p className="text-sm text-gray-600">Order #{order.id}</p>
+                <button
+                  onClick={() => copyToClipboard(order.id, 'orderId')}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Copy Order ID"
+                >
+                  {copiedField === 'orderId' ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </button>
               </div>
             </div>
             {getStatusBadge(order.status)}
@@ -280,14 +302,40 @@ export default function AdminOrderDetail() {
                     <Mail className="h-4 w-4 mr-2" />
                     Email
                   </div>
-                  <p className="text-sm text-muted-foreground ml-6">{order.customerEmail}</p>
+                  <div className="flex items-center gap-2 ml-6">
+                    <p className="text-sm text-muted-foreground">{order.customerEmail}</p>
+                    <button
+                      onClick={() => copyToClipboard(order.customerEmail, 'email')}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                      title="Copy Email"
+                    >
+                      {copiedField === 'email' ? (
+                        <Check className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 {order.customerName && (
                   <div>
                     <div className="flex items-center text-sm font-medium mb-1">
                       Name
                     </div>
-                    <p className="text-sm text-muted-foreground">{order.customerName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">{order.customerName}</p>
+                      <button
+                        onClick={() => copyToClipboard(order.customerName || '', 'name')}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Copy Name"
+                      >
+                        {copiedField === 'name' ? (
+                          <Check className="h-3 w-3 text-green-500" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 )}
               </CardContent>

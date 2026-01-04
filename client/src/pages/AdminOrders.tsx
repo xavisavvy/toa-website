@@ -12,7 +12,8 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
-import { ArrowLeft, Package, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Package, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import AdminNav from '../components/layout/AdminNav';
 import type { Order } from '../../../shared/schema';
 
 export default function AdminOrders() {
@@ -30,6 +31,7 @@ export default function AdminOrders() {
     if (user && user.role === 'admin') {
       fetchOrders();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading]);
 
   const fetchOrders = async () => {
@@ -92,15 +94,10 @@ export default function AdminOrders() {
       {/* Header */}
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/admin/dashboard')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
-              <p className="text-sm text-gray-600">View and manage all customer orders</p>
-            </div>
+          <AdminNav />
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+            <p className="text-sm text-gray-600">View and manage all customer orders</p>
           </div>
         </div>
       </header>

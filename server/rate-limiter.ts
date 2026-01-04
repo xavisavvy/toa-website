@@ -28,7 +28,7 @@ try {
   console.warn('⚠️  Failed to initialize Redis for rate limiting, using in-memory store');
 }
 
-// General API rate limiter (100 requests per 15 minutes)
+// General API rate limiter (300 requests per 15 minutes)
 export const apiLimiter = rateLimit({
   store: redis ? new RedisStore({
     // @ts-expect-error - ioredis is compatible
@@ -36,7 +36,7 @@ export const apiLimiter = rateLimit({
     prefix: 'rl:api:',
   }) : undefined,
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 300,
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
   message: 'Too many requests from this IP, please try again later.',
@@ -44,11 +44,15 @@ export const apiLimiter = rateLimit({
   validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
   skip: (req: Request) => {
     // Skip rate limiting for health check endpoints (used by K8s probes)
-    if (req.path === '/api/health' || req.path === '/api/ready' || req.path === '/api/alive' || req.path === '/api/startup') {
+    const healthPaths = ['/api/health', '/api/ready', '/api/alive', '/api/startup'];
+    if (healthPaths.includes(req.path)) {
       return true;
     }
-    // Skip rate limiting for localhost in development
-    return process.env.NODE_ENV === 'development' && req.ip === '127.0.0.1';
+    // Skip rate limiting for auth check endpoint (called frequently by UI)
+    if (req.path === '/api/auth/me') {
+      return true;
+    }
+    return false;
   },
   handler: (req: Request, res: Response) => {
     res.status(429).json({

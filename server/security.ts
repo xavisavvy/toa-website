@@ -124,20 +124,9 @@ export function configureSecurity(app: Express) {
   );
 
   // A05: Security Misconfiguration - Rate Limiting (DoS Prevention)
-  const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    message: 'Too many requests from this IP, please try again later.',
-    // Skip rate limiting in development
-     
-    skip: () => process.env.NODE_ENV === 'development',
-  });
-
-  // Apply rate limiting to all API routes
-  app.use('/api/', apiLimiter);
-
+  // Note: General API rate limiting is applied in routes.ts using rate-limiter.ts
+  // This includes health check endpoint exceptions for Kubernetes probes
+  
   // Stricter rate limiting for potentially expensive operations
   const strictLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

@@ -42,6 +42,8 @@
     "check-quota": "node scripts/check-quota.mjs",
     "db:push": "drizzle-kit push",
     "create-admin": "tsx scripts/create-admin.ts",
+    "sync:orders": "tsx scripts/sync-orders.ts",
+    "sync:orders:dry-run": "tsx scripts/sync-orders.ts --dry-run",
     "update-taebrin-images": "tsx scripts/update-taebrin-with-custom-images.ts",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",

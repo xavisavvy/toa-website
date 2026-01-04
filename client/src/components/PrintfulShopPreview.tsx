@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingBag, AlertCircle, ExternalLink } from "lucide-react";
+import { useLocation } from "wouter";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,8 @@ interface Product {
 }
 
 export default function PrintfulShopPreview() {
+  const [, setLocation] = useLocation();
+  
   const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ['/api/printful/products', 4],
     queryFn: async () => {
@@ -26,6 +29,10 @@ export default function PrintfulShopPreview() {
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  const handleProductClick = (productId: string) => {
+    setLocation(`/shop?product=${productId}`);
+  };
 
   return (
     <div>
@@ -58,7 +65,7 @@ export default function PrintfulShopPreview() {
                 key={product.id}
                 className="overflow-hidden hover-elevate cursor-pointer transition-all"
                 data-testid={`card-printful-product-${product.id}`}
-                onClick={() => window.location.href = '/shop'}
+                onClick={() => handleProductClick(product.id)}
               >
                 <div className="relative aspect-square overflow-hidden">
                   <img
@@ -93,7 +100,7 @@ export default function PrintfulShopPreview() {
           <div className="text-center">
             <Button
               size="lg"
-              onClick={() => window.location.href = '/shop'}
+              onClick={() => setLocation('/shop')}
               data-testid="button-view-all-products"
             >
               <ShoppingBag className="mr-2 h-5 w-5" />

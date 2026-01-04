@@ -302,6 +302,19 @@
     - [x] Session quality metrics (duration, pages viewed)
   - Related: client/src/lib/analytics.ts, webVitals.ts, userEngagement.ts, pages/AdminAnalytics.tsx, server/routes.ts
   
+- [ ] **Correlation ID Tracking** - End-to-end request tracing for conversions and debugging
+  - [ ] Generate unique correlation IDs for user sessions
+  - [ ] Propagate correlation IDs through all transactions
+  - [ ] Track user journey from landing → browsing → cart → checkout → order
+  - [ ] Link analytics events to specific user sessions
+  - [ ] Store correlation IDs in orders, audit logs, and analytics events
+  - [ ] Admin dashboard: View user journey by correlation ID
+  - [ ] Debugging: Trace failed transactions across systems
+  - [ ] Conversion funnel analysis by session
+  - [ ] Performance: Link Core Web Vitals to specific user sessions
+  - [ ] Privacy: Auto-expire correlation IDs after 90 days (GDPR)
+  - Related: Analytics, audit system, order tracking
+  
 - [ ] **Comprehensive 3-Phase Analytics Plan (IN PROGRESS)** - Data-driven optimization & conversion improvement
   - **Full Roadmap:** See `docs/ANALYTICS_METRICS_ROADMAP.md` (733 lines, comprehensive)
   

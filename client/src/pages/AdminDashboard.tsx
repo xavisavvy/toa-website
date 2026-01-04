@@ -3,7 +3,8 @@ import { useLocation } from 'wouter';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Package, DollarSign, AlertCircle, TrendingUp, LogOut, ShoppingBag, BarChart3 } from 'lucide-react';
+import { Package, DollarSign, AlertCircle, TrendingUp, ShoppingBag, BarChart3 } from 'lucide-react';
+import AdminNav from '../components/layout/AdminNav';
 
 interface DashboardStats {
   totalOrders: number;
@@ -13,7 +14,7 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
@@ -45,10 +46,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -65,15 +62,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <AdminNav showBackButton={false} />
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
               <p className="text-sm text-gray-600">Welcome back, {user.email}</p>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
           </div>
         </div>
       </header>

@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, DollarSign, ShoppingCart, Users, AlertCircle, Package } from 'lucide-react';
+import AdminNav from '@/components/layout/AdminNav';
 
 interface AnalyticsData {
   dailyRevenue: { date: string; revenue: number; orders: number }[];
@@ -106,6 +107,7 @@ export default function AdminAnalytics() {
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <AdminNav />
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
@@ -216,9 +218,18 @@ export default function AdminAnalytics() {
                 <BarChart data={data?.topProducts || []} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={150} />
-                  <Tooltip />
-                  <Bar dataKey="revenue" fill="#8B5CF6" />
+                  <YAxis 
+                    dataKey="name" 
+                    type="category" 
+                    width={200} 
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => value.length > 30 ? value.substring(0, 27) + '...' : value}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`$${value.toFixed(2)}`, 'Revenue']}
+                    labelFormatter={(label) => `Product: ${label}`}
+                  />
+                  <Bar dataKey="revenue" fill="#8B5CF6" name="Revenue" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

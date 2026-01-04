@@ -61,6 +61,24 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
     staleTime: 5 * 60 * 1000,
   });
 
+  // Auto-open modal if product ID is in URL
+  useEffect(() => {
+    if (!products || typeof window === 'undefined') return;
+    
+    const urlParams = new window.URLSearchParams(window.location.search);
+    const productId = urlParams.get('product');
+    
+    if (productId) {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+        // Clean up URL without reload
+        window.history.replaceState({}, '', '/shop');
+      }
+    }
+  }, [products]);
+
   // Extract product types from names for filtering
   const productTypes = useMemo(() => {
     if (!products) {return [];}
