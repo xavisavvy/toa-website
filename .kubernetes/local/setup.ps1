@@ -8,7 +8,25 @@ docker build -t toa-website:local -f Dockerfile.dev .
 
 # 2. Deploy to Kubernetes
 Write-Host "☸️  Deploying to Kubernetes..." -ForegroundColor Yellow
-kubectl apply -f .kubernetes/local/
+
+# Create namespace first
+kubectl apply -f .kubernetes/local/namespace.yaml
+Start-Sleep -Seconds 3
+
+# Then deploy infrastructure
+kubectl apply -f .kubernetes/local/postgres.yaml
+kubectl apply -f .kubernetes/local/redis.yaml
+Start-Sleep -Seconds 2
+
+# Prepare app deployment with volume mounts
+$appDeploymentContent = Get-Content -Path .kubernetes/local/app-deployment.yaml -Raw
+$currentPath = (Get-Location).Path -replace '\\', '/'
+$appDeploymentContent = $appDeploymentContent -replace '\$\{PWD\}', $currentPath
+$appDeploymentContent | kubectl apply -f -
+
+# Deploy config and seed job
+kubectl apply -f .kubernetes/local/app-config.yaml
+kubectl apply -f .kubernetes/local/seed-job.yaml
 
 # 3. Wait for pods
 Write-Host "⏳ Waiting for pods to be ready..." -ForegroundColor Yellow
@@ -78,7 +96,13 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "✅ Application pod is ready!" -ForegroundColor Green
 }
 
-# 7. Show status
+# 7. Run database seeding
+Write-Host ""
+Write-Host "🌱 Seeding database..." -ForegroundColor Cyan
+Write-Host ""
+& "$PSScriptRoot\seed.ps1"
+
+# 8. Show status
 Write-Host ""
 Write-Host "✅ Setup complete!" -ForegroundColor Green
 Write-Host ""

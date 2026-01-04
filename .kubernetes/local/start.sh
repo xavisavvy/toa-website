@@ -4,17 +4,34 @@
 
 echo "🚀 Starting Tales of Aneria Kubernetes environment..."
 
-# Apply namespace first
-kubectl apply -f .kubernetes/local/namespace.yaml
-
-# Wait a moment for namespace to be fully ready
-sleep 2
-
-# Apply remaining resources
-kubectl apply -f .kubernetes/local/postgres-deployment.yaml
-kubectl apply -f .kubernetes/local/redis-deployment.yaml
-kubectl apply -f .kubernetes/local/app-config.yaml
-kubectl apply -f .kubernetes/local/app-deployment.yaml
+# Check if namespace exists
+if kubectl get namespace toa-local &> /dev/null; then
+    echo "   Namespace exists, scaling up deployments..."
+    # Scale deployments back up
+    kubectl scale deployment postgres -n toa-local --replicas=1
+    kubectl scale deployment redis -n toa-local --replicas=1
+    kubectl scale deployment toa-website -n toa-local --replicas=1
+else
+    echo "   Creating new environment..."
+    # Apply namespace first
+    kubectl apply -f .kubernetes/local/namespace.yaml
+    
+    # Wait for namespace to be ready
+    sleep 3
+    
+    # Apply infrastructure
+    kubectl apply -f .kubernetes/local/postgres.yaml
+    kubectl apply -f .kubernetes/local/redis.yaml
+    
+    # Wait a moment before app deployment
+    sleep 2
+    
+    kubectl apply -f .kubernetes/local/app-config.yaml
+    
+    # Prepare app deployment with volume mounts
+    CURRENT_PATH=$(pwd)
+    cat .kubernetes/local/app-deployment.yaml | sed "s|\${PWD}|${CURRENT_PATH}|g" | kubectl apply -f -
+fi
 
 echo ""
 echo "⏳ Waiting for pods to be ready..."

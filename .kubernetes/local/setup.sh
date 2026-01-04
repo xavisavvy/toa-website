@@ -9,7 +9,28 @@ docker build -t toa-website:local -f Dockerfile.dev .
 
 # 2. Deploy to Kubernetes
 echo "☸️  Deploying to Kubernetes..."
-kubectl apply -f .kubernetes/local/
+
+# Create namespace first
+kubectl apply -f .kubernetes/local/namespace.yaml
+
+# Wait for namespace to be ready
+echo "⏳ Waiting for namespace to be ready..."
+sleep 3
+
+# Apply database and cache
+kubectl apply -f .kubernetes/local/postgres.yaml
+kubectl apply -f .kubernetes/local/redis.yaml
+kubectl apply -f .kubernetes/local/seed-job.yaml
+
+# Wait another moment
+sleep 2
+
+# Apply app config
+kubectl apply -f .kubernetes/local/app-config.yaml
+
+# Prepare app deployment with volume mounts
+CURRENT_PATH=$(pwd)
+cat .kubernetes/local/app-deployment.yaml | sed "s|\${PWD}|${CURRENT_PATH}|g" | kubectl apply -f -
 
 # 3. Wait for pods
 echo "⏳ Waiting for pods to be ready..."
@@ -63,9 +84,20 @@ kill $PF_PID
 
 # 6. Wait for app to be ready
 echo "⏳ Waiting for application to be ready..."
-kubectl wait --for=condition=ready pod -l app=toa-website -n toa-local --timeout=120s
+if kubectl wait --for=condition=ready pod -l app=toa-website -n toa-local --timeout=120s 2>/dev/null; then
+    echo "✅ Application is ready!"
+else
+    echo "⚠️  Application pod not ready yet, checking status..."
+    kubectl get pods -n toa-local -l app=toa-website
+fi
 
-# 7. Show status
+# 7. Run database seeding
+echo ""
+echo "🌱 Seeding database..."
+echo ""
+bash "$(dirname "$0")/seed.sh"
+
+# 8. Show status
 echo ""
 echo "✅ Setup complete!"
 echo ""

@@ -47,7 +47,20 @@ DATABASE_URL="postgresql://postgres:devpassword123@localhost:5432/toa_dev" npm r
 DATABASE_URL="postgresql://postgres:devpassword123@localhost:5432/toa_dev" npx tsx scripts/create-admin-direct.ts
 ```
 
-### 6. Access Application
+### 6. Seed Test Data
+```bash
+# Windows
+.\seed.ps1
+
+# macOS/Linux
+./seed.sh
+```
+
+This creates:
+- Admin user: `admin@talesofaneria.com`
+- Test order: `test-order-12345678`
+
+### 7. Access Application
 ```bash
 # Option A: NodePort (already exposed at port 30000)
 http://localhost:30000

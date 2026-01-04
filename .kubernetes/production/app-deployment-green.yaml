@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toa-website-green
+  namespace: toa-production
+  labels:
+    app: toa-website
+    version: green
+    environment: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: toa-website
+      version: green
+  template:
+    metadata:
+      labels:
+        app: toa-website
+        version: green
+        environment: production
+    spec:
+      containers:
+      - name: toa-website
+        image: toa-website:production
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: toa-config
+        - secretRef:
+            name: toa-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/alive
+            port: 5000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/ready
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: toa-website-green
+  namespace: toa-production
+  labels:
+    app: toa-website
+    version: green
+spec:
+  type: ClusterIP
+  selector:
+    app: toa-website
+    version: green
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http

@@ -5,6 +5,7 @@ import { eq, desc, gte } from 'drizzle-orm';
 
 import { authenticateUser, getUserById } from "./auth";
 import { requireAdmin, optionalAuth } from "./auth-middleware";
+import { AuditService, AuditAction } from "./audit";
 import { db } from "./db";
 import { orders, orderItems, orderEvents } from "../shared/schema";
 import { getCharacterData } from "./dndbeyond";
@@ -60,7 +61,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Authenticate user
-      const user = await authenticateUser(result.data);
+      const user = await authenticateUser(result.data, req);
 
       if (!user) {
         // Security: Don't reveal if email exists
@@ -109,8 +110,21 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Logout endpoint
-  app.post("/api/auth/logout", (req, res) => {
-    const userEmail = req.session.user?.email;
+  app.post("/api/auth/logout", async (req, res) => {
+    const user = req.session.user;
+    const userEmail = user?.email;
+    const userId = user?.id;
+    
+    // Audit: Log logout before destroying session
+    if (user) {
+      await AuditService.logAuth(
+        AuditAction.LOGOUT,
+        "success",
+        req,
+        userEmail,
+        userId
+      );
+    }
     
     req.session.destroy((err) => {
       if (err) {
@@ -231,11 +245,23 @@ export function registerRoutes(app: Express): Server {
       }
 
       const { id } = req.params;
+      const user = req.user;
 
       const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
       
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
+      }
+
+      // Audit: Log PII access (order contains customer email and address)
+      if (user) {
+        await AuditService.logDataAccess(
+          "order",
+          order.id,
+          user.id,
+          user.email,
+          req
+        );
       }
 
       const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
@@ -245,6 +271,84 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('Error fetching order:', error);
       res.status(500).json({ error: 'Failed to fetch order' });
+    }
+  });
+
+  // Admin Audit Logs - GDPR & Compliance
+  app.get("/api/admin/audit-logs", async (req, res) => {
+    try {
+      if (!db) {
+        return res.status(503).json({ error: 'Database not available' });
+      }
+
+      const { 
+        category, 
+        severity, 
+        action,
+        userId,
+        startDate, 
+        endDate,
+        limit = '100',
+        page = '1'
+      } = req.query;
+
+      const user = req.user;
+
+      // Audit: Log admin accessing audit logs (meta!)
+      if (user) {
+        await AuditService.log({
+          userId: user.id,
+          userEmail: user.email,
+          userRole: user.role,
+          action: "audit_logs_access",
+          resource: "audit_logs",
+          category: "data_access",
+          severity: "info",
+          status: "success",
+          metadata: { filters: { category, severity, action, userId } },
+          req,
+        });
+      }
+
+      const limitNum = Math.min(parseInt(limit as string) || 100, 1000);
+      const pageNum = Math.max(parseInt(page as string) || 1, 1);
+      const offset = (pageNum - 1) * limitNum;
+
+      // Build query dynamically based on filters
+      const { auditLogs } = await import("@db/schema");
+      const { and, eq: eqOp, gte: gteOp, lte: lteOp } = await import("drizzle-orm");
+      
+      const conditions = [];
+      
+      if (category) conditions.push(eqOp(auditLogs.category, category as string));
+      if (severity) conditions.push(eqOp(auditLogs.severity, severity as string));
+      if (action) conditions.push(eqOp(auditLogs.action, action as string));
+      if (userId) conditions.push(eqOp(auditLogs.userId, userId as string));
+      if (startDate) conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string).toISOString()));
+      if (endDate) conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string).toISOString()));
+
+      let query = db.select().from(auditLogs);
+      
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions)) as any;
+      }
+
+      const logs = await query
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(limitNum)
+        .offset(offset);
+
+      res.json({ 
+        logs,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          hasMore: logs.length === limitNum,
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      res.status(500).json({ error: 'Failed to fetch audit logs' });
     }
   });
 
@@ -374,11 +478,11 @@ export function registerRoutes(app: Express): Server {
         return res.status(503).json({ error: 'Service temporarily unavailable' });
       }
 
-      // Security: Find order by ID and verify email matches
+      // Security: Find order by stripe session ID and verify email matches
       const [order] = await db
         .select()
         .from(orders)
-        .where(eq(orders.id, orderId))
+        .where(eq(orders.stripeSessionId, orderId))
         .limit(1);
 
       if (!order || order.customerEmail.toLowerCase() !== email.toLowerCase().trim()) {
@@ -395,7 +499,7 @@ export function registerRoutes(app: Express): Server {
       const items = await db
         .select()
         .from(orderItems)
-        .where(eq(orderItems.orderId, orderId));
+        .where(eq(orderItems.orderId, order.id));
 
       // Security: Return limited information (no payment details, no internal IDs)
       res.json({

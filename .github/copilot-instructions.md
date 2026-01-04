@@ -3,6 +3,14 @@
 ## 🎯 Project Context
 This is a TTRPG live play website showcasing enterprise-grade practices: comprehensive testing, security scanning, CI/CD automation, and WCAG 2.1 AA accessibility compliance.
 
+## ⚠️ CRITICAL: Cross-Platform Script Maintenance
+**ALWAYS maintain parity between PowerShell (.ps1) and Shell (.sh) scripts:**
+- When updating `.kubernetes/local/*.ps1` → Update corresponding `.sh` files
+- When updating any `scripts/*.ps1` → Update corresponding `.sh` files
+- Test both Windows and Unix paths/commands
+- Maintain identical functionality across platforms
+- This applies to ALL script changes in every session
+
 ## 🛠️ Technology Stack
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui
 - **Backend**: Express.js, Node.js, TypeScript

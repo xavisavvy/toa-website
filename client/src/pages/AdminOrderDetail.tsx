@@ -6,13 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
 import { ArrowLeft, Package, CheckCircle, Clock, XCircle, AlertCircle, Truck, MapPin, Mail, Phone } from 'lucide-react';
-import type { Order } from '../../../shared/schema';
+import type { Order, OrderItem } from '../../../shared/schema';
 
 export default function AdminOrderDetail() {
   const { user, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [, params] = useRoute('/admin/orders/:orderId');
   const [order, setOrder] = useState<Order | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,8 +37,8 @@ export default function AdminOrderDetail() {
 
       if (response.ok) {
         const data = await response.json();
-        // Backend returns { order, items, events } but order already has items as JSON
         setOrder(data.order);
+        setOrderItems(data.items || []);
       } else {
         setError('Order not found');
       }
@@ -136,7 +137,6 @@ export default function AdminOrderDetail() {
     return null;
   }
 
-  const orderItems = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
   const shippingAddress = typeof order.shippingAddress === 'string' ? JSON.parse(order.shippingAddress) : order.shippingAddress;
 
   return (

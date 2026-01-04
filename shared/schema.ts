@@ -106,3 +106,58 @@ export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type OrderEvent = typeof orderEvents.$inferSelect;
 export type InsertOrderEvent = z.infer<typeof insertOrderEventSchema>;
+
+// Audit Log Table - Comprehensive audit trail for compliance (GDPR, SOC2, etc.)
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Actor information
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  userEmail: text("user_email"), // Denormalized for audit trail even if user deleted
+  userRole: text("user_role"), // admin, customer, system
+  
+  // Action details
+  action: text("action").notNull(), // login, logout, create_order, update_order, delete_user, export_data, etc.
+  resource: text("resource").notNull(), // user, order, order_item, admin_settings, etc.
+  resourceId: text("resource_id"), // ID of affected resource
+  
+  // Event classification
+  category: text("category").notNull(), // authentication, authorization, data_access, data_modification, security, compliance
+  severity: text("severity").notNull().default("info"), // info, warning, critical
+  
+  // Request context
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  requestMethod: text("request_method"), // GET, POST, PUT, DELETE
+  requestPath: text("request_path"),
+  
+  // Outcome
+  status: text("status").notNull(), // success, failure, denied
+  statusCode: integer("status_code"), // HTTP status code
+  errorMessage: text("error_message"),
+  
+  // Data changes (sanitized)
+  changesBefore: json("changes_before").$type<Record<string, unknown>>(), // Previous state (PII masked)
+  changesAfter: json("changes_after").$type<Record<string, unknown>>(), // New state (PII masked)
+  
+  // Compliance markers
+  gdprRelevant: integer("gdpr_relevant").notNull().default(0), // 1 if GDPR relevant action
+  retentionPolicy: text("retention_policy").default("standard"), // standard, extended, permanent
+  
+  // Additional context
+  metadata: json("metadata").$type<Record<string, unknown>>(),
+  
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  userIdIdx: index("audit_user_id_idx").on(table.userId),
+  actionIdx: index("audit_action_idx").on(table.action),
+  categoryIdx: index("audit_category_idx").on(table.category),
+  severityIdx: index("audit_severity_idx").on(table.severity),
+  resourceIdx: index("audit_resource_idx").on(table.resource, table.resourceId),
+  createdAtIdx: index("audit_created_at_idx").on(table.createdAt),
+  gdprIdx: index("audit_gdpr_idx").on(table.gdprRelevant),
+}));
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs);
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;

@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: toa-seed
+  namespace: toa-local
+spec:
+  ttlSecondsAfterFinished: 300  # Auto-cleanup after 5 minutes
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: toa-seed
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: seed
+        image: toa-website:local
+        command: ["npx", "tsx", "scripts/seed-database.ts"]
+        envFrom:
+        - configMapRef:
+            name: toa-config
+        - secretRef:
+            name: toa-secrets

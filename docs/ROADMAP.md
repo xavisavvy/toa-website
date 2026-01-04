@@ -143,14 +143,35 @@
   - [ ] Sponsor analytics (impressions, clicks)
   - Related: Admin dashboard, sponsor showcase feature
 
-#### 🔍 Audit & Compliance System
-- [ ] **Comprehensive Audit Logging** - Track critical system events and user actions
-  - [ ] Database schema for audit logs
-    - [ ] User actions (login, logout, password changes)
-    - [ ] Admin actions (order updates, user management, sponsor changes)
-    - [ ] System events (payment processing, webhook events)
-    - [ ] Security events (failed logins, suspicious activity)
-    - [ ] Data changes (who, what, when, before/after values)
+#### 🔍 Audit & Compliance System ✅
+- [x] **Comprehensive Audit Logging** - Track critical system events and user actions
+  - [x] Database schema for audit logs
+    - [x] User actions (login, logout, password changes)
+    - [x] Admin actions (order updates, user management, sponsor changes)
+    - [x] System events (payment processing, webhook events)
+    - [x] Security events (failed logins, suspicious activity)
+    - [x] Data changes (who, what, when, before/after values)
+    - [x] GDPR relevance markers
+    - [x] Automatic PII masking
+  - [x] Audit Service implementation
+    - [x] Authentication event logging
+    - [x] Data access logging (GDPR-relevant)
+    - [x] Data modification tracking (before/after states)
+    - [x] Security event logging
+  - [x] Admin Dashboard integration
+    - [x] Audit log viewer with filters
+    - [x] Filter by category, severity, action, user, date
+    - [x] Pagination support
+  - [x] GDPR Compliance features
+    - [x] User audit trail export
+    - [x] User data anonymization (right to be forgotten)
+  - [x] Comprehensive test coverage
+    - [x] Unit tests for AuditService
+    - [x] E2E tests for admin audit log viewing
+  - [x] Documentation
+    - [x] API documentation
+    - [x] Usage examples
+    - [x] Best practices guide
   - [ ] Audit log retention policies
     - [ ] 90-day active logs in primary database
     - [ ] Archive older logs to cold storage
@@ -175,6 +196,83 @@
     - [ ] Batched database writes
     - [ ] Indexed queries for fast retrieval
   - Related: Authentication system, admin dashboard, order management
+
+#### ☸️ Kubernetes Infrastructure Optimization
+- [x] **Local Development Enhancements** ✅ COMPLETE (2026-01-04)
+  - [x] Init containers for database/redis readiness checks
+  - [x] Resource requests/limits tuning (250m-2 CPU, 512Mi-1Gi RAM)
+  - [x] Hot-reload support with volume mounts for source code
+  - [x] Optimized probe timings (reduced false positives)
+  - [x] Node modules cache with emptyDir
+  - [x] Enable Vite HMR port (5173) for hot module replacement
+  - [x] Polling-based file watchers for container compatibility
+  - Related: .kubernetes/local/app-deployment.yaml, setup scripts
+  - [ ] Hot-reload optimization for faster iteration
+  - Related: .kubernetes/local/
+
+- [ ] **Production Deployment & Security**
+  - [ ] Horizontal Pod Autoscaler (HPA) for app pods (CPU/memory-based)
+  - [ ] Production secrets management (Sealed Secrets/External Secrets Operator)
+  - [ ] Multi-environment separation (dev/staging/prod namespaces)
+  - [ ] Blue-green deployment automation scripts
+  - [ ] Network policies for pod-to-pod security
+  - [ ] Resource quotas per namespace
+  - [ ] Pod Security Standards (restricted mode)
+  - [ ] Image vulnerability scanning in CI/CD
+  - [ ] RBAC least-privilege for service accounts
+  - Related: .kubernetes/production/, CI/CD
+
+- [ ] **Observability & Monitoring**
+  - [ ] Prometheus/Grafana stack for metrics
+  - [ ] Loki for centralized logging
+  - [ ] Jaeger/Tempo for distributed tracing
+  - [ ] Custom dashboards for business metrics (orders, revenue)
+  - [ ] Alert rules (pod crashes, high error rates, database issues)
+  - [ ] SLO/SLI tracking (uptime, latency, error rate)
+  - Related: Monitoring infrastructure
+
+- [ ] **Database & Persistence**
+  - [ ] PostgreSQL StatefulSet for production (vs Deployment)
+  - [ ] Automated backup CronJobs (daily snapshots)
+  - [ ] Point-in-time recovery (PITR) configuration
+  - [ ] Read replicas for scalability
+  - [ ] Connection pooling optimization (PgBouncer)
+  - [ ] Database performance monitoring (pg_stat_statements)
+  - Related: .kubernetes/local/postgres-deployment.yaml
+
+- [ ] **CI/CD & GitOps**
+  - [ ] ArgoCD setup for production deployments
+  - [ ] Automated image builds on push (GitHub Actions → Docker Hub/GHCR)
+  - [ ] Kustomize overlays for environment-specific configs
+  - [ ] Automated database migrations on deploy
+  - [ ] Rollback automation on health check failures
+  - [ ] Deployment notifications (Slack/Discord)
+  - Related: .github/workflows/, .kubernetes/production/
+
+- [ ] **Performance & Scalability**
+  - [ ] CDN integration for static assets (Cloudflare)
+  - [ ] Redis cluster mode for high availability
+  - [ ] Database query optimization and indexing
+  - [ ] Application-level caching strategies
+  - [ ] Vertical Pod Autoscaler (VPA) for right-sizing
+  - [ ] Pod anti-affinity for high availability
+  - Related: Caching, database optimization
+
+- [ ] **Cost Optimization**
+  - [ ] Resource usage analysis and right-sizing
+  - [ ] Spot/preemptible instances for non-critical workloads
+  - [ ] Automatic cleanup of unused resources (CronJobs)
+  - [ ] PVC storage class optimization
+  - [ ] Multi-tenancy considerations (if applicable)
+  - Related: Infrastructure costs
+
+- [ ] **Disaster Recovery**
+  - [ ] Backup/restore procedures documentation
+  - [ ] Disaster recovery runbooks
+  - [ ] Multi-region setup (future consideration)
+  - [ ] Database failover automation
+  - [ ] Incident response playbooks
+  - Related: Operations documentation
 
 ---
 

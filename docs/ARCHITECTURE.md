@@ -358,7 +358,32 @@ Never committed to git:
 ### Docker Development
 - `.env.docker` - Docker-specific variables
 - PostgreSQL in container
+- Redis for rate limiting
 - File-based caching
+
+### Kubernetes Development (Local)
+- **Namespace**: `toa-local`
+- **Components**:
+  - PostgreSQL with persistent storage
+  - Redis for rate limiting & caching
+  - Application deployment with auto-scaling
+- **Configuration**:
+  - ConfigMaps for non-sensitive settings
+  - Secrets for credentials (DATABASE_URL, API keys)
+  - PersistentVolumeClaims for data persistence
+- **Networking**:
+  - NodePort service on port 30000
+  - Port forwarding available on 5000
+  - Internal DNS resolution between services
+- **Health Checks**:
+  - Liveness probes (container restart on failure)
+  - Readiness probes (traffic routing control)
+- **Scripts**:
+  - `setup.ps1` / `setup.sh` - Initial cluster setup with database migration
+  - `start.ps1` / `start.sh` - Start existing cluster
+  - `stop.ps1` / `stop.sh` - Stop cluster (preserves data)
+  - `teardown.ps1` / `teardown.sh` - Complete cleanup (deletes data)
+  - `seed.ps1` / `seed.sh` - Seed test data (admin user + test order)
 
 ### Production
 - GitHub Secrets - Secure credential storage
@@ -416,17 +441,48 @@ GitHub Actions
 
 ### Container Architecture
 
+#### Docker Compose (Development)
 ```
 Docker Compose Stack:
 ├── toa-website (Node.js app)
-└── toa-postgres (PostgreSQL 16)
+├── toa-postgres (PostgreSQL 16)
+└── redis (Redis 7 - rate limiting)
 
 Networks:
 └── app-network (internal)
 
 Volumes:
 ├── postgres-data (persistent)
+├── redis-data (persistent)
 └── cache/ directory (file-based)
+```
+
+#### Kubernetes (Local Development)
+```
+Namespace: toa-local
+├── Deployments:
+│   ├── toa-website (1 replica)
+│   │   ├── Container: toa-website:local
+│   │   ├── Resources: 256Mi-512Mi RAM, 100m-1000m CPU
+│   │   ├── Health: /api/alive, /api/ready
+│   │   └── Env: ConfigMap + Secrets
+│   ├── postgres (1 replica)
+│   │   ├── Container: postgres:16-alpine
+│   │   ├── PVC: postgres-pvc (1Gi)
+│   │   └── Port: 5432
+│   └── redis (1 replica)
+│       ├── Container: redis:7-alpine
+│       └── Port: 6379
+├── Services:
+│   ├── toa-website (NodePort 30000, LoadBalancer 80)
+│   ├── postgres (ClusterIP 5432)
+│   └── redis (ClusterIP 6379)
+├── ConfigMaps:
+│   ├── toa-config (app configuration)
+│   └── postgres-config (database settings)
+└── Secrets:
+    ├── toa-secrets (API keys, session secret)
+    └── postgres-secret (database credentials)
 ```
 
 ## Performance Optimization
@@ -516,12 +572,15 @@ Response:
 | | TypeScript | Type safety |
 | **Database** | PostgreSQL 16 | Relational data |
 | | Drizzle ORM | Database access |
-| **Cache** | File-based (JSON) | API response caching |
+| **Cache & Rate Limiting** | Redis 7 | Session storage, rate limiting |
+| | File-based (JSON) | API response caching |
 | **APIs** | YouTube Data API v3 | Video content |
 | | Printful API | Products |
 | | Stripe API | Payments |
 | **Analytics** | Google Analytics 4 | User analytics |
 | **Infrastructure** | Docker | Containerization |
+| | Kubernetes (k8s) | Container orchestration (local dev) |
+| | Rancher Desktop | Local Kubernetes runtime |
 | | GitHub Actions | CI/CD pipeline |
 | | Vercel/Replit | Hosting options |
 

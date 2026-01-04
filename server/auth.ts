@@ -4,6 +4,8 @@ import { users } from '../shared/schema';
 import type { User, UserWithPassword, LoginCredentials } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { maskEmail, safeLog } from './log-sanitizer';
+import { AuditService, AuditAction } from './audit';
+import type { Request } from 'express';
 
 // Security: Use strong work factor for bcrypt (10-12 recommended)
 const SALT_ROUNDS = 12;
@@ -94,9 +96,13 @@ export async function createUser(
  * Authenticate user with email and password
  * Security: Returns null on failure (don't reveal if email exists)
  * @param credentials Login credentials
+ * @param req Express request for audit logging
  * @returns User object if authenticated, null otherwise
  */
-export async function authenticateUser(credentials: LoginCredentials): Promise<User | null> {
+export async function authenticateUser(
+  credentials: LoginCredentials, 
+  req?: Request
+): Promise<User | null> {
   if (!db) {
     throw new Error('Database not initialized');
   }
@@ -113,12 +119,38 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<U
       // Security: Don't reveal if email exists
       // Still run bcrypt to prevent timing attacks
       await bcrypt.compare(credentials.password, '$2a$12$invalidhashtopreventtimingattack');
+      
+      // Audit: Log failed login attempt
+      if (req) {
+        await AuditService.logAuth(
+          AuditAction.LOGIN_FAILED,
+          "failure",
+          req,
+          credentials.email,
+          undefined,
+          "Invalid credentials"
+        );
+      }
+      
       return null;
     }
 
     // Security: Check if account is active
     if (user.isActive !== 1) {
       safeLog.warn(`Inactive account login attempt: ${maskEmail(user.email)}`);
+      
+      // Audit: Log inactive account attempt
+      if (req) {
+        await AuditService.logAuth(
+          AuditAction.LOGIN_FAILED,
+          "failure",
+          req,
+          user.email,
+          user.id,
+          "Account is inactive"
+        );
+      }
+      
       return null;
     }
 
@@ -126,6 +158,19 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<U
     const isValid = await verifyPassword(credentials.password, user.passwordHash);
     if (!isValid) {
       safeLog.warn(`Failed login attempt for: ${maskEmail(user.email)}`);
+      
+      // Audit: Log failed password attempt
+      if (req) {
+        await AuditService.logAuth(
+          AuditAction.LOGIN_FAILED,
+          "failure",
+          req,
+          user.email,
+          user.id,
+          "Invalid password"
+        );
+      }
+      
       return null;
     }
 
@@ -137,10 +182,34 @@ export async function authenticateUser(credentials: LoginCredentials): Promise<U
 
     safeLog.info(`Successful login: ${maskEmail(user.email)} (${user.role})`);
 
+    // Audit: Log successful login
+    if (req) {
+      await AuditService.logAuth(
+        AuditAction.LOGIN,
+        "success",
+        req,
+        user.email,
+        user.id
+      );
+    }
+
     // Security: Return user without password hash
     return sanitizeUser(user);
   } catch (error) {
     console.error('Authentication error:', error);
+    
+    // Audit: Log system error
+    if (req) {
+      await AuditService.logAuth(
+        AuditAction.LOGIN_FAILED,
+        "failure",
+        req,
+        credentials.email,
+        undefined,
+        error instanceof Error ? error.message : "System error"
+      );
+    }
+    
     return null;
   }
 }
