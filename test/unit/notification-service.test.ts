@@ -13,6 +13,7 @@ describe('Notification Service', () => {
     vi.clearAllMocks();
     // Clear console logs
     vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'info').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
