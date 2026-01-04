@@ -18,6 +18,7 @@ import NotFound from "@/pages/not-found";
 import PressKit from "@/pages/PressKit";
 import Privacy from "@/pages/Privacy";
 import Shop from "@/pages/Shop";
+import Sponsorship from "@/pages/Sponsorship";
 import Sponsors from "@/pages/Sponsors";
 import TermsOfService from "@/pages/TermsOfService";
 
@@ -58,6 +59,7 @@ function Router() {
         <Route path="/characters/:id" component={CharacterDetail} />
         <Route path="/shop" component={Shop} />
         <Route path="/checkout" component={Checkout} />
+        <Route path="/sponsorship" component={Sponsorship} />
         <Route path="/sponsors" component={Sponsors} />
         <Route path="/press-kit" component={PressKit} />
         <Route path="/checkout/success" component={CheckoutSuccess} />

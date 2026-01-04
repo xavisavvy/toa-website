@@ -17,6 +17,7 @@ export default function Navigation() {
     { label: "Characters", href: "#characters" },
     { label: "Lore", href: "#lore" },
     { label: "Shop", href: "/shop", isRoute: true },
+    { label: "Sponsorship", href: "/sponsorship", isRoute: true, highlight: true },
     { label: "About", href: "#about" },
   ];
 
@@ -66,7 +67,11 @@ export default function Navigation() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-foreground/80 hover:text-foreground transition-colors"
+                className={`transition-colors ${
+                  item.highlight
+                    ? 'text-primary font-semibold hover:text-primary/80'
+                    : 'text-foreground/80 hover:text-foreground'
+                }`}
                 data-testid={`link-nav-${item.label.toLowerCase()}`}
                 onClick={(e) => handleNavClick(e, item.href, item.isRoute)}
               >

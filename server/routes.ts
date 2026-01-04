@@ -801,5 +801,66 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Sponsorship contact form endpoint
+  app.post("/api/contact/sponsor", async (req, res) => {
+    try {
+      const { name, email, company, interest, message } = req.body;
+
+      // Basic validation
+      if (!name || !email || !message) {
+        return res.status(400).json({ error: 'Name, email, and message are required' });
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+
+      // Log the sponsorship inquiry
+      console.log('📧 Sponsorship Inquiry Received:', {
+        name,
+        email,
+        company: company || 'N/A',
+        interest: interest || 'N/A',
+        timestamp: new Date().toISOString(),
+      });
+
+      // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
+      // For now, we just log it. In production, you'd want to:
+      // 1. Send email notification to sponsors@talesofaneria.com
+      // 2. Store inquiry in database
+      // 3. Send auto-reply to inquirer
+      
+      // Simulate email sending (replace with actual email service)
+      const emailData = {
+        to: 'sponsors@talesofaneria.com',
+        from: 'noreply@talesofaneria.com',
+        subject: `New Sponsorship Inquiry from ${company || name}`,
+        html: `
+          <h2>New Sponsorship Inquiry</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Company:</strong> ${company || 'Not provided'}</p>
+          <p><strong>Interest:</strong> ${interest || 'Not specified'}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message.replace(/\n/g, '<br>')}</p>
+          <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+        `,
+      };
+
+      console.log('📧 Email would be sent:', emailData);
+
+      // Return success
+      res.json({
+        success: true,
+        message: 'Thank you for your interest! We will be in touch soon.',
+      });
+    } catch (error) {
+      console.error('Error processing sponsorship inquiry:', error);
+      res.status(500).json({ error: 'Failed to submit sponsorship inquiry' });
+    }
+  });
+
   return createServer(app);
 }
