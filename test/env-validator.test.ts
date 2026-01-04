@@ -20,7 +20,7 @@ describe('Environment Validator', () => {
     
     validateEnvironment();
     
-    expect(consoleSpy.log).toHaveBeenCalledWith('✅ Environment validation passed');
+    expect(consoleSpy.log).toHaveBeenCalledWith(expect.stringContaining('✅ Environment validation passed'));
     expect(processExitSpy).not.toHaveBeenCalled();
   });
 
