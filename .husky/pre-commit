@@ -1,3 +1,11 @@
+# Check for common coding mistakes
+echo "🔍 Checking for common mistakes..."
+npm run check:mistakes || {
+  echo ""
+  echo "❌ Please fix the issues above before committing"
+  exit 1
+}
+
 # Check if .env.example was modified
 if git diff --cached --name-only | grep -q "^\.env\.example$"; then
   echo "⚠️  .env.example was modified!"

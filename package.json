@@ -55,7 +55,8 @@
     "test:ses": "tsx scripts/test-ses.ts",
     "prepare": "husky",
     "lighthouse": "lhci autorun",
-    "lighthouse:ci": "npm run build && lhci autorun"
+    "lighthouse:ci": "npm run build && lhci autorun",
+    "check:mistakes": "node scripts/check-common-mistakes.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.962.0",

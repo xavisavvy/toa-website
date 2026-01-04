@@ -19,6 +19,21 @@ This is a TTRPG live play website showcasing enterprise-grade practices: compreh
 - **CI/CD**: GitHub Actions, Docker, automated versioning
 - **Security**: Trivy, Snyk, GitLeaks, npm audit
 
+## 🚫 Common Mistakes to Avoid
+
+### Wouter Navigation (CRITICAL)
+**NEVER use `useNavigate` with wouter!**
+- ❌ WRONG: `import { useNavigate } from 'wouter'` - THIS DOES NOT EXIST
+- ✅ CORRECT: `import { useLocation } from 'wouter'` then `const [, setLocation] = useLocation()`
+- Navigation: `setLocation('/path')` NOT `navigate('/path')`
+- See `.github/copilot-knowledge.md` for full reference
+
+### Script Parity (CRITICAL)
+**ALWAYS maintain parity between `.ps1` and `.sh` scripts!**
+- Any change to `.kubernetes/local/*.ps1` MUST be reflected in `.kubernetes/local/*.sh`
+- Any change to `scripts/*.ps1` MUST be reflected in `scripts/*.sh`
+- Both Windows (PowerShell) and Unix (Bash) users must have identical functionality
+
 ## 📁 Architecture
 
 ### Directory Structure
