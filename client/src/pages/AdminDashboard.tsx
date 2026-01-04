@@ -87,7 +87,10 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer hover:bg-accent transition-colors"
+            onClick={() => window.open('https://www.printful.com/dashboard/default/orders', '_blank')}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -98,7 +101,10 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer hover:bg-accent transition-colors"
+            onClick={() => window.open('https://www.printful.com/dashboard/default/orders', '_blank')}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Failed Orders</CardTitle>
               <AlertCircle className="h-4 w-4 text-destructive" />
@@ -109,7 +115,10 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className="cursor-pointer hover:bg-accent transition-colors"
+            onClick={() => window.open('https://dashboard.stripe.com/acct_1SkxsZGnjH6Eat84/payments', '_blank')}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Revenue</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />

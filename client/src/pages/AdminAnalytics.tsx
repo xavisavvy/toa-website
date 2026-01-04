@@ -18,6 +18,18 @@ interface AnalyticsData {
   securityEvents: {
     failedLogins: number;
     suspiciousActivities: number;
+    failedLoginDetails?: Array<{
+      timestamp: string;
+      ip: string;
+      email: string;
+      reason: string;
+    }>;
+    suspiciousActivityDetails?: Array<{
+      timestamp: string;
+      ip: string;
+      action: string;
+      details: string;
+    }>;
   };
 }
 
@@ -274,7 +286,7 @@ export default function AdminAnalytics() {
             <CardDescription>Last {timeRange} security activity</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <p className="text-sm text-gray-600">Failed Login Attempts</p>
                 <p className="text-2xl font-bold text-red-600">{data?.securityEvents.failedLogins || 0}</p>
@@ -284,6 +296,64 @@ export default function AdminAnalytics() {
                 <p className="text-2xl font-bold text-orange-600">{data?.securityEvents.suspiciousActivities || 0}</p>
               </div>
             </div>
+
+            {/* Failed Login Attempts Table */}
+            {data?.securityEvents.failedLoginDetails && data.securityEvents.failedLoginDetails.length > 0 && (
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold mb-3">Recent Failed Login Attempts</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-2 text-left">Timestamp</th>
+                        <th className="px-4 py-2 text-left">IP Address</th>
+                        <th className="px-4 py-2 text-left">Email</th>
+                        <th className="px-4 py-2 text-left">Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.securityEvents.failedLoginDetails.map((event, idx) => (
+                        <tr key={idx} className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-2">{new Date(event.timestamp).toLocaleString()}</td>
+                          <td className="px-4 py-2 font-mono">{event.ip}</td>
+                          <td className="px-4 py-2">{event.email}</td>
+                          <td className="px-4 py-2 text-red-600">{event.reason}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Suspicious Activities Table */}
+            {data?.securityEvents.suspiciousActivityDetails && data.securityEvents.suspiciousActivityDetails.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold mb-3">Recent Suspicious Activities</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-2 text-left">Timestamp</th>
+                        <th className="px-4 py-2 text-left">IP Address</th>
+                        <th className="px-4 py-2 text-left">Action</th>
+                        <th className="px-4 py-2 text-left">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.securityEvents.suspiciousActivityDetails.map((event, idx) => (
+                        <tr key={idx} className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-2">{new Date(event.timestamp).toLocaleString()}</td>
+                          <td className="px-4 py-2 font-mono">{event.ip}</td>
+                          <td className="px-4 py-2 font-semibold text-orange-600">{event.action}</td>
+                          <td className="px-4 py-2">{event.details}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>

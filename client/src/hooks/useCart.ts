@@ -132,7 +132,7 @@ export function useCart() {
 
   const getCartSummary = useCallback((): CartSummary => {
     return {
-      itemCount: cart.items.length,
+      itemCount: cart?.items?.length || 0,
       totalItems: getTotalItemCount(cart),
       subtotal: calculateCartTotal(cart),
     };

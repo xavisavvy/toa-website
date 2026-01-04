@@ -31,8 +31,8 @@ export default function AdminLogin() {
       await login(email, password);
       // Redirect to admin dashboard
       navigate('/admin/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -43,11 +43,13 @@ export default function AdminLogin() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <img 
-              src="/src/assets/logo-TOA.svg" 
-              alt="Tales of Aneria" 
-              className="h-24 w-auto"
-            />
+            <a href="/" className="hover:opacity-80 transition-opacity">
+              <img 
+                src="/src/assets/logo-TOA.svg" 
+                alt="Tales of Aneria" 
+                className="h-24 w-auto"
+              />
+            </a>
           </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>

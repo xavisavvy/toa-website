@@ -535,10 +535,36 @@ export function registerRoutes(app: Express): Server {
       // Mock conversion rate (would need GA4 integration for real data)
       const conversionRate = 2.5;
 
-      // Security events placeholder (would need security logs table)
+      // Security events from audit logs
+      const failedLoginEvents = await db
+        .select()
+        .from(db.auditLogs)
+        .where(db.sql`${db.auditLogs.action} = 'LOGIN_FAILED'`)
+        .orderBy(db.sql`${db.auditLogs.createdAt} DESC`)
+        .limit(5);
+
+      const suspiciousEvents = await db
+        .select()
+        .from(db.auditLogs)
+        .where(db.sql`${db.auditLogs.action} IN ('RATE_LIMIT_EXCEEDED', 'UNAUTHORIZED_ACCESS', 'INVALID_TOKEN')`)
+        .orderBy(db.sql`${db.auditLogs.createdAt} DESC`)
+        .limit(5);
+
       const securityEvents = {
-        failedLogins: 0,
-        suspiciousActivities: 0,
+        failedLogins: failedLoginEvents.length,
+        suspiciousActivities: suspiciousEvents.length,
+        failedLoginDetails: failedLoginEvents.map(log => ({
+          timestamp: log.createdAt,
+          ip: log.ipAddress,
+          email: log.metadata?.email || 'Unknown',
+          reason: log.metadata?.reason || 'Authentication failed',
+        })),
+        suspiciousActivityDetails: suspiciousEvents.map(log => ({
+          timestamp: log.createdAt,
+          ip: log.ipAddress,
+          action: log.action,
+          details: log.metadata?.details || log.action,
+        })),
       };
 
       res.json({
