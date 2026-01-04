@@ -3,9 +3,9 @@ import { useState, MouseEvent } from "react";
 import { Link, useLocation } from "wouter";
 
 import logoSvg from "@/assets/logo-TOA.svg";
-import { Button } from "@/components/ui/button";
 import { CartButton } from "@/components/CartButton";
 import { CartErrorBoundary } from "@/components/CartErrorBoundary";
+import { Button } from "@/components/ui/button";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);

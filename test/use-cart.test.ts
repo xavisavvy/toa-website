@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { useCart } from '@/hooks/useCart';
-import * as cartLib from '@/lib/cart';
 import * as analytics from '@/lib/analytics';
+import * as cartLib from '@/lib/cart';
 
 // Mock the cart library
 vi.mock('@/lib/cart', () => ({

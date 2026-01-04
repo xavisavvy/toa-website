@@ -5,17 +5,38 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  role: text("role").notNull().default("customer"), // admin, customer
+  isActive: integer("is_active").notNull().default(1), // 1 = active, 0 = disabled
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  emailIdx: index("user_email_idx").on(table.email),
+  roleIdx: index("user_role_idx").on(table.role),
+}));
+
+export const insertUserSchema = createInsertSchema(users, {
+  email: z.string().email("Invalid email address"),
+  passwordHash: z.string().min(60), // bcrypt hash length
+  role: z.enum(["admin", "customer"]),
+}).pick({
+  email: true,
+  passwordHash: true,
+  role: true,
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
+// Safe user type (excludes password hash)
+export type User = Omit<typeof users.$inferSelect, 'passwordHash'>;
+export type UserWithPassword = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type LoginCredentials = z.infer<typeof loginSchema>;
 
 export const orders = pgTable("orders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

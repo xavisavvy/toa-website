@@ -183,7 +183,10 @@ BUSINESS_NAME=Tales of Aneria
 SUPPORT_EMAIL=TalesOfAneria@gmail.com
 
 # Optional - Email notifications
-RESEND_API_KEY=re_...
+AWS_SES_REGION=us-east-1
+AWS_SES_ACCESS_KEY_ID=your_key
+AWS_SES_SECRET_ACCESS_KEY=your_secret
+AWS_SES_FROM_EMAIL=noreply@talesofaneria.com
 ```
 
 ## ✅ Current Status

@@ -284,6 +284,20 @@ ALLOWED_ORIGINS=https://your-domain.com
 YOUTUBE_API_KEY=your_youtube_api_key
 ETSY_API_KEY=your_etsy_api_key (optional)
 
+# AWS SES (Email)
+AWS_SES_REGION=us-east-1
+AWS_SES_ACCESS_KEY_ID=your_aws_key
+AWS_SES_SECRET_ACCESS_KEY=your_aws_secret
+AWS_SES_FROM_EMAIL=noreply@your-domain.com
+
+# Stripe
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Printful
+PRINTFUL_API_KEY=your_printful_key
+
 # Node
 NODE_ENV=production
 PORT=5000

@@ -1,6 +1,6 @@
 import { ShoppingCart, X } from 'lucide-react';
-import { Link, useLocation } from 'wouter';
 import { memo, useMemo, useCallback } from 'react';
+import { Link, useLocation } from 'wouter';
 
 import { CartItem as CartItemComponent } from '@/components/CartItem';
 import { QuantityControl } from '@/components/QuantityControl';

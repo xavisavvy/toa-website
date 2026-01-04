@@ -1,8 +1,9 @@
-import React, { Component, ReactNode } from 'react';
 import { AlertCircle, RefreshCw, ShoppingCart } from 'lucide-react';
+import React, { Component, ReactNode } from 'react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface CartErrorBoundaryProps {
   children: ReactNode;

@@ -1,3 +1,4 @@
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import type { Order } from '../shared/schema';
 
 export interface EmailParams {
@@ -7,16 +8,60 @@ export interface EmailParams {
   html?: string;
 }
 
+// Initialize AWS SES client
+const sesClient = process.env.AWS_SES_ACCESS_KEY_ID 
+  ? new SESClient({
+      region: process.env.AWS_SES_REGION || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SES_SECRET_ACCESS_KEY || '',
+      },
+    })
+  : null;
+
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
-  // For now, log the email that would be sent
-  console.log('📧 Email would be sent:');
-  console.log(`  To: ${params.to}`);
-  console.log(`  Subject: ${params.subject}`);
-  console.log(`  Body: ${params.body}`);
-  
-  // Return true to indicate "sent" for testing purposes
-  return true;
+  // If SES is not configured, log and return false
+  if (!sesClient || !process.env.AWS_SES_FROM_EMAIL) {
+    console.log('⚠️  AWS SES not configured. Email would be sent:');
+    console.log(`  To: ${params.to}`);
+    console.log(`  Subject: ${params.subject}`);
+    console.log(`  Body: ${params.body}`);
+    return false;
+  }
+
+  try {
+    const command = new SendEmailCommand({
+      Source: process.env.AWS_SES_FROM_EMAIL,
+      Destination: {
+        ToAddresses: [params.to],
+      },
+      Message: {
+        Subject: {
+          Data: params.subject,
+          Charset: 'UTF-8',
+        },
+        Body: {
+          Text: {
+            Data: params.body,
+            Charset: 'UTF-8',
+          },
+          ...(params.html && {
+            Html: {
+              Data: params.html,
+              Charset: 'UTF-8',
+            },
+          }),
+        },
+      },
+    });
+
+    await sesClient.send(command);
+    console.log(`✅ Email sent successfully to ${params.to}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to send email via AWS SES:', error);
+    throw error;
+  }
 }
 
 export async function sendOrderConfirmation(
@@ -43,7 +88,7 @@ ${order.shippingAddress ? `
 Shipping Address:
 ${order.shippingAddress.name}
 ${order.shippingAddress.line1}
-${order.shippingAddress.line2 ? order.shippingAddress.line2 + '\n' : ''}${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}
+${order.shippingAddress.line2 ? `${order.shippingAddress.line2  }\n` : ''}${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}
 ${order.shippingAddress.country}
 ` : ''}
 
@@ -75,7 +120,7 @@ ${process.env.BUSINESS_NAME || 'Tales of Aneria'}
         <p>
           ${order.shippingAddress.name}<br>
           ${order.shippingAddress.line1}<br>
-          ${order.shippingAddress.line2 ? order.shippingAddress.line2 + '<br>' : ''}
+          ${order.shippingAddress.line2 ? `${order.shippingAddress.line2  }<br>` : ''}
           ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}<br>
           ${order.shippingAddress.country}
         </p>

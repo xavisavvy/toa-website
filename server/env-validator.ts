@@ -48,22 +48,22 @@ function validateStripeConfig(): string[] {
     if (!publishableKey) {
       errors.push('STRIPE_PUBLISHABLE_KEY is required when Stripe is configured');
     } else if (!publishableKey.startsWith('pk_')) {
-      errors.push('STRIPE_PUBLISHABLE_KEY must start with "pk_" (got: ' + publishableKey.substring(0, 5) + '...)');
+      errors.push(`STRIPE_PUBLISHABLE_KEY must start with "pk_" (got: ${  publishableKey.substring(0, 5)  }...)`);
     }
 
-    /* eslint-disable security/detect-object-injection */
+     
     if (!secretKey) {
       errors.push('STRIPE_SECRET_KEY is required when Stripe is configured');
     } else if (!secretKey.startsWith('sk_')) {
-      errors.push('STRIPE_SECRET_KEY must start with "sk_" (got: ' + secretKey.substring(0, 5) + '...)');
+      errors.push(`STRIPE_SECRET_KEY must start with "sk_" (got: ${  secretKey.substring(0, 5)  }...)`);
     }
 
     if (!webhookSecret) {
       errors.push('STRIPE_WEBHOOK_SECRET is required when Stripe is configured');
     } else if (!webhookSecret.startsWith('whsec_')) {
-      errors.push('STRIPE_WEBHOOK_SECRET must start with "whsec_" (got: ' + webhookSecret.substring(0, 8) + '...)');
+      errors.push(`STRIPE_WEBHOOK_SECRET must start with "whsec_" (got: ${  webhookSecret.substring(0, 8)  }...)`);
     }
-    /* eslint-enable security/detect-object-injection */
+     
   }
 
   return errors;

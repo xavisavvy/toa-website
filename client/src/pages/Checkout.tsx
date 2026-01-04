@@ -1,25 +1,25 @@
+import { useQuery } from '@tanstack/react-query';
+import { Loader2, MapPin, Package, CreditCard, AlertCircle, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Loader2, MapPin, Package, CreditCard, AlertCircle, Trash2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 
+import { CartErrorBoundary } from '@/components/CartErrorBoundary';
 import Footer from '@/components/Footer';
 import Navigation from '@/components/Navigation';
+import { QuantityControl } from '@/components/QuantityControl';
 import SEO from '@/components/SEO';
-import { CartErrorBoundary } from '@/components/CartErrorBoundary';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { QuantityControl } from '@/components/QuantityControl';
 import { useCart } from '@/hooks/useCart';
 import { analytics } from '@/lib/analytics';
-import { createCheckout } from '@/lib/stripe';
 import { validateCartItems } from '@/lib/cart';
-import type { ShippingEstimate } from '@/types/cart';
-import { Badge } from '@/components/ui/badge';
+import { createCheckout } from '@/lib/stripe';
 import { loadZipCode, saveZipCode, clearZipCode } from '@/lib/zipCode';
+import type { ShippingEstimate } from '@/types/cart';
 
 export default function Checkout() {
   const [, setLocation] = useLocation();

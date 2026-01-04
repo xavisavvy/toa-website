@@ -63,6 +63,14 @@ Step-by-step implementation documentation
 
 ### 🎨 [Features & Content Management](../)
 Managing website content, integrations, and features
+- [Admin Dashboard](./ADMIN_DASHBOARD.md) - Admin interface & order management
+- [Authentication & Security](./AUTHENTICATION_SECURITY.md) - Login system & security
+- [Database Deployment](./DATABASE_DEPLOYMENT.md) - Schema deployment guide
+- [Payment Flow Implementation](./PAYMENT_FLOW_IMPLEMENTATION.md) - Stripe checkout flow
+- [Payment Flow Tests](./PAYMENT_FLOW_TESTS.md) - Payment testing results
+- [Cart System](./CART_SYSTEM.md) - Shopping cart implementation
+- [Shop Performance Optimization](./SHOP_PERFORMANCE_OPTIMIZATION.md) - Pagination & performance features
+- [Analytics & Metrics Roadmap](./ANALYTICS_METRICS_ROADMAP.md) - Comprehensive analytics best practices
 - [Character Images Guide](./CHARACTER_IMAGES.md) - Adding and managing character gallery images
 - [YouTube Channel Videos](./features/YOUTUBE_CHANNEL_VIDEOS.md) - Channel API integration
 - [Analytics Implementation](./ANALYTICS_IMPLEMENTATION.md) - Google Analytics 4 setup

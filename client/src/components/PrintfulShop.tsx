@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag, AlertCircle, Search, SlidersHorizontal } from "lucide-react";
-import { useState, useMemo } from "react";
+import { ShoppingBag, AlertCircle, Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 
-import ProductDetailModal from "@/components/ProductDetailModal";
-import { ProductCard } from "@/components/ProductCard";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { parsePrice } from "@/components/PriceDisplay";
+import { ProductCard } from "@/components/ProductCard";
+import ProductDetailModal from "@/components/ProductDetailModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,8 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "price-low" | "price-high">("name");
   const [filterType, setFilterType] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(12);
 
   const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ['/api/printful/products', limit],
@@ -123,6 +125,66 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
     });
   }, [products, searchQuery, filterType, sortBy]);
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterType, sortBy]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    if (!limit && currentPage > 1) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPage, limit]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(displayProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = limit ? displayProducts : displayProducts.slice(startIndex, endIndex);
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // Always show first page
+    pages.push(1);
+
+    let startPage = Math.max(2, currentPage - 1);
+    let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    if (currentPage <= 3) {
+      endPage = 4;
+    }
+    if (currentPage >= totalPages - 2) {
+      startPage = totalPages - 3;
+    }
+
+    if (startPage > 2) {
+      pages.push('...');
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    if (endPage < totalPages - 1) {
+      pages.push('...');
+    }
+
+    // Always show last page
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
   const handleProductClick = (product: Product) => {
     // Track product view
     const priceValue = parsePrice(product.price);
@@ -198,10 +260,30 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
             </Select>
           </div>
 
-          {/* Results count */}
-          <p className="text-sm text-muted-foreground">
-            Showing {displayProducts.length} {displayProducts.length === 1 ? 'product' : 'products'}
-          </p>
+          {/* Results count and items per page */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              Showing {displayProducts.length === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, displayProducts.length)} of {displayProducts.length} {displayProducts.length === 1 ? 'product' : 'products'}
+            </p>
+            
+            <Select 
+              value={itemsPerPage.toString()} 
+              onValueChange={(value) => {
+                setItemsPerPage(parseInt(value));
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Items per page" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="12">12 per page</SelectItem>
+                <SelectItem value="24">24 per page</SelectItem>
+                <SelectItem value="48">48 per page</SelectItem>
+                <SelectItem value="96">96 per page</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       )}
 
@@ -242,19 +324,74 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {displayProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              inStock={product.inStock}
-              onClick={() => handleProductClick(product)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {paginatedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                image={product.image}
+                inStock={product.inStock}
+                onClick={() => handleProductClick(product)}
+              />
+            ))}
+          </div>
+
+          {/* Pagination Controls - Only show if not limiting products and there are multiple pages */}
+          {!limit && totalPages > 1 && (
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Page info */}
+              <p className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </p>
+
+              {/* Pagination buttons */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+
+                <div className="flex gap-1">
+                  {getPageNumbers().map((pageNum, index) => (
+                    pageNum === '...' ? (
+                      <span key={`ellipsis-${index}`} className="px-3 py-2">
+                        ...
+                      </span>
+                    ) : (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum as number)}
+                        className="min-w-[40px]"
+                      >
+                        {pageNum}
+                      </Button>
+                    )
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
       </div>
     </>

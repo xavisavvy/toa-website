@@ -1,4 +1,7 @@
 import { useState } from 'react';
+
+import { PriceDisplay } from '@/components/PriceDisplay';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -6,8 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { PriceDisplay } from '@/components/PriceDisplay';
 
 interface Variant {
   id: string;

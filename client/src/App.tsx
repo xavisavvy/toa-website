@@ -1,6 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
+import { HelmetProvider } from "react-helmet-async";
 
 import { queryClient } from "./lib/queryClient";
 
@@ -8,6 +9,9 @@ import { useKonamiCode, ChaosGoblinMode } from "@/components/ChaosGoblinMode";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initGA, analytics } from "@/lib/analytics";
+import AdminDashboard from "@/pages/AdminDashboard";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminOrders from "@/pages/AdminOrders";
 import CharacterDetail from "@/pages/CharacterDetail";
 import Characters from "@/pages/Characters";
 import Checkout from "@/pages/Checkout";
@@ -18,9 +22,10 @@ import NotFound from "@/pages/not-found";
 import PressKit from "@/pages/PressKit";
 import Privacy from "@/pages/Privacy";
 import Shop from "@/pages/Shop";
-import Sponsorship from "@/pages/Sponsorship";
 import Sponsors from "@/pages/Sponsors";
+import Sponsorship from "@/pages/Sponsorship";
 import TermsOfService from "@/pages/TermsOfService";
+import TrackOrder from "@/pages/TrackOrder";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -66,6 +71,15 @@ function Router() {
         <Route path="/checkout/cancel" component={CheckoutCancel} />
         <Route path="/legal/privacy" component={Privacy} />
         <Route path="/legal/tos" component={TermsOfService} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin/dashboard" component={AdminDashboard} />
+        <Route path="/admin/orders" component={AdminOrders} />
+        
+        {/* Customer Order Tracking - Privacy Protected */}
+        <Route path="/track-order" component={TrackOrder} />
+        
         <Route component={NotFound} />
       </Switch>
     </>
@@ -97,19 +111,21 @@ function App() {
   });
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        
-        {/* Chaos Goblin Mode Easter Egg */}
-        <ChaosGoblinMode 
-          active={chaosMode} 
-          onComplete={() => setChaosMode(false)} 
-        />
-        
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          
+          {/* Chaos Goblin Mode Easter Egg */}
+          <ChaosGoblinMode 
+            active={chaosMode} 
+            onComplete={() => setChaosMode(false)} 
+          />
+          
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 

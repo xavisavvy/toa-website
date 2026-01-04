@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { Cart, CartItem, CartSummary } from '@/types/cart';
+
+import { analytics } from '@/lib/analytics';
 import {
   loadCart,
   saveCart,
@@ -12,7 +13,7 @@ import {
   isCartExpired,
   createEmptyCart,
 } from '@/lib/cart';
-import { analytics } from '@/lib/analytics';
+import type { Cart, CartItem, CartSummary } from '@/types/cart';
 
 // Custom event for cart updates within the same window
 const CART_UPDATE_EVENT = 'cart-updated';

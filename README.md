@@ -81,7 +81,10 @@ This project uses environment variables for configuration. All required and opti
 
 4. **Optional Variables:**
    - `VITE_YOUTUBE_API_KEY` - YouTube API key for client-side access
-   - `RESEND_API_KEY` - For email notifications (sponsor inquiries)
+   - `AWS_SES_REGION` - AWS region for SES (e.g., us-east-1)
+   - `AWS_SES_ACCESS_KEY_ID` - AWS access key for SES
+   - `AWS_SES_SECRET_ACCESS_KEY` - AWS secret key for SES
+   - `AWS_SES_FROM_EMAIL` - Verified sender email for SES
    - `BASE_URL` - Base URL for redirects (defaults to localhost)
 
 
@@ -276,9 +279,10 @@ Sends sponsor inquiry email and logs to database.
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS, Shadcn UI
 - **Backend**: Express.js, Node.js, PostgreSQL, Redis
-- **Integrations**: YouTube Data API v3, RSS Parser, Printful API, Stripe API, Resend (email)
+- **Integrations**: YouTube Data API v3, RSS Parser, Printful API, Stripe API, AWS SES (email)
 - **Payment**: Stripe Checkout
 - **Fulfillment**: Printful (print-on-demand)
+- **Email**: AWS SES for transactional emails
 - **Caching**: Redis (with graceful degradation)
 - **Styling**: Custom fantasy theme with purple and amber accents
 

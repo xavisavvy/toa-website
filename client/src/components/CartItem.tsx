@@ -1,8 +1,9 @@
-import { memo } from 'react';
 import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { memo } from 'react';
+
 import { QuantityControl } from '@/components/QuantityControl';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import type { CartItem as CartItemType } from '@/types/cart';
 
 interface CartItemProps {

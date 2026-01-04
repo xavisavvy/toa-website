@@ -1,14 +1,15 @@
-import { useState } from 'react';
 import { Mail, Users, TrendingUp, Star, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+
+import Footer from '@/components/Footer';
+import Navigation from '@/components/Navigation';
+import SEO from '@/components/SEO';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import Footer from '@/components/Footer';
-import Navigation from '@/components/Navigation';
-import SEO from '@/components/SEO';
 import { analytics } from '@/lib/analytics';
 
 interface SponsorshipTier {

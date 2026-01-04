@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import request from 'supertest';
 import type { Express } from 'express';
-import { createOrder, getOrderByStripeSessionId } from '../../server/order-service';
+import request from 'supertest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { sendOrderConfirmation, sendAdminAlert } from '../../server/notification-service';
+import { createOrder, getOrderByStripeSessionId } from '../../server/order-service';
 
 // Mock dependencies
 vi.mock('../../server/order-service');

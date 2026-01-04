@@ -24,6 +24,9 @@ Tales of Aneria website is a full-stack TypeScript application with React fronte
 │                    Express.js Backend (Node.js)                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │  API Routes:                                             │   │
+│  │  - /api/auth/*           (login, logout, session)       │   │
+│  │  - /api/admin/*          (dashboard, orders - RBAC)     │   │
+│  │  - /api/orders/track     (customer order tracking)      │   │
 │  │  - /api/youtube/*        (channel, playlist, shorts)    │   │
 │  │  - /api/printful/*       (products)                      │   │
 │  │  - /api/stripe/*         (checkout & webhooks)           │   │
@@ -35,9 +38,11 @@ Tales of Aneria website is a full-stack TypeScript application with React fronte
 │  │  Middleware:                                             │   │
 │  │  - CORS (configurable origins)                           │   │
 │  │  - Security Headers (helmet)                             │   │
+│  │  - Express Sessions (HTTP-only cookies)                  │   │
+│  │  - Authentication (bcrypt + sessions)                    │   │
+│  │  - Authorization (RBAC - admin/customer)                 │   │
 │  │  - Rate Limiting                                         │   │
 │  │  - Input Validation                                      │   │
-│  │  - Session Management                                    │   │
 │  │  - Error Handling                                        │   │
 │  └──────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
@@ -77,7 +82,13 @@ client/src/
 │   ├── Home.tsx                    # Landing page
 │   ├── Sponsors.tsx                # Sponsor information
 │   ├── CheckoutSuccess.tsx         # Post-purchase success
-│   └── CheckoutCancel.tsx          # Checkout cancellation
+│   ├── CheckoutCancel.tsx          # Checkout cancellation
+│   ├── AdminLogin.tsx              # Admin authentication
+│   ├── AdminDashboard.tsx          # Admin home page
+│   ├── AdminOrders.tsx             # Order management
+│   └── TrackOrder.tsx              # Customer order tracking (privacy-protected)
+├── hooks/
+│   └── useAuth.ts                  # Authentication state management
 ├── lib/
 │   ├── stripe.ts                   # Stripe client utilities
 │   └── utils.ts                    # Shared utilities
@@ -91,16 +102,27 @@ client/src/
 ```
 server/
 ├── routes.ts                       # API route definitions
+├── auth.ts                         # Authentication service (bcrypt, sessions)
+├── auth-middleware.ts              # Route protection (RBAC)
+├── db.ts                           # Database connection (Postgres)
+├── order-service.ts                # Order management
 ├── youtube.ts                      # YouTube API integration
 ├── printful.ts                     # Printful API integration
 ├── stripe.ts                       # Stripe payment processing
-├── email.ts                        # Email service (Resend)
-├── db/
-│   └── schema.ts                   # Drizzle ORM schema
-└── middleware/
-    ├── security.ts                 # Security headers
-    ├── rateLimit.ts                # Rate limiting
-    └── validation.ts               # Input validation
+├── notification-service.ts         # Email service (AWS SES)
+├── security.ts                     # Security utilities & logging
+├── rate-limiter.ts                 # Rate limiting middleware
+└── monitoring.ts                   # Metrics & health checks
+```
+
+### Database Schema
+
+```
+shared/schema.ts
+├── users                           # User accounts (authentication)
+├── orders                          # Customer orders
+├── orderItems                      # Order line items
+└── orderEvents                     # Order status audit trail
 ```
 
 ## Data Flow
@@ -137,6 +159,77 @@ server/
 14. Send confirmation email
     ↓
 15. Redirect user to success page
+```
+
+### Authentication Flow
+
+```
+1. Admin visits /admin/login
+   ↓
+2. Enters email + password
+   ↓
+3. POST to /api/auth/login
+   ↓
+4. Backend validates credentials
+   ├─ Look up user by email
+   ├─ Verify password with bcrypt.compare
+   └─ Check account is active
+   ↓
+5. Create session (HTTP-only cookie)
+   ↓
+6. Regenerate session ID (prevent fixation)
+   ↓
+7. Return user object (no password hash)
+   ↓
+8. Redirect to /admin/dashboard
+   ↓
+9. Subsequent requests include session cookie
+   ↓
+10. Middleware validates session on protected routes
+```
+
+### Admin Dashboard Flow
+
+```
+1. User authenticated as admin
+   ↓
+2. GET /api/admin/stats
+   ├─ Middleware: requireAdmin
+   ├─ Fetch order statistics
+   └─ Return dashboard metrics
+   ↓
+3. View orders: GET /api/admin/orders
+   ├─ Middleware: requireAdmin
+   ├─ Query orders with filters
+   └─ Return paginated results
+   ↓
+4. View order details: GET /api/admin/orders/:id
+   ├─ Middleware: requireAdmin
+   ├─ Fetch order + items + events
+   └─ Return complete order data
+```
+
+### Customer Order Tracking Flow (Privacy-Protected)
+
+```
+1. Customer receives order confirmation email
+   ↓
+2. Email contains Order ID + link to /track-order
+   ↓
+3. Customer visits /track-order (noindex, nofollow)
+   ↓
+4. Enters email + Order ID
+   ↓
+5. GET /api/orders/track?email=...&orderId=...
+   ├─ Validate input format
+   ├─ Look up order by ID
+   ├─ Verify email matches order
+   ├─ Log security event
+   └─ Return minimal order data (no payment info)
+   ↓
+6. Display order status to customer
+   ↓
+7. Auto-clear data after 10 minutes (security)
 ```
 
 ### Content Delivery Flow
@@ -201,28 +294,52 @@ server/
 ### API Security
 
 1. **Authentication**
-   - Session-based (secure cookies)
-   - Environment variable API keys
-   - Webhook signature verification
+   - bcrypt password hashing (12 rounds)
+   - Express sessions with HTTP-only cookies
+   - Session regeneration on login
+   - 7-day session expiration
+   - Account activation/deactivation
 
 2. **Authorization**
-   - Rate limiting (100 req/15min per IP)
-   - Input validation (Zod schemas)
-   - CORS restrictions
+   - Role-Based Access Control (RBAC): admin, customer
+   - Route-level protection middleware
+   - requireAuth, requireAdmin, requireCustomer
+   - Security event logging for audit trail
 
-3. **Data Protection**
+3. **Rate Limiting**
+   - API endpoints: 100 req/15min per IP
+   - Auth endpoints: Enhanced protection
+   - Webhook endpoints: Signature verification
+
+4. **Input Validation**
+   - Zod schemas for type safety
+   - SQL injection prevention (parameterized queries)
+   - XSS prevention (input sanitization)
+
+5. **Data Protection**
    - HTTPS required in production
    - Security headers (helmet)
+   - HTTP-only cookies (XSS protection)
+   - SameSite cookies (CSRF protection)
    - No sensitive data in client code
-   - Webhook signature verification
+   - Password hashes never exposed in APIs
+   - Minimal PII exposure in order tracking
+
+6. **Privacy Protection**
+   - robots.txt blocks admin & tracking pages
+   - Meta noindex tags on sensitive pages
+   - No analytics on order tracking
+   - Email verification for order lookup
+   - Auto-clear sensitive data (10-min timeout)
+   - Audit logging for compliance
 
 ### Secret Management
 
 ```
 Environment Variables (.env):
-├── Database credentials
+├── Database credentials (DATABASE_URL)
+├── Session secret (SESSION_SECRET)
 ├── API keys (YouTube, Printful, Stripe, Resend)
-├── Session secrets
 ├── Webhook secrets
 └── CORS origins
 

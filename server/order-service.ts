@@ -1,7 +1,10 @@
-import { db } from './db';
-import { orders, orderItems, orderEvents } from '../shared/schema';
-import type { InsertOrder, InsertOrderItem, InsertOrderEvent, Order } from '../shared/schema';
 import { eq } from 'drizzle-orm';
+
+import { orders, orderItems, orderEvents } from '../shared/schema';
+import type { InsertOrderEvent, Order } from '../shared/schema';
+
+import { db } from './db';
+
 
 export interface CreateOrderParams {
   stripeSessionId: string;
@@ -160,7 +163,7 @@ export async function logFailedOrder(
   metadata?: Record<string, any>
 ): Promise<void> {
   try {
-    let order = await getOrderByStripeSessionId(stripeSessionId);
+    const order = await getOrderByStripeSessionId(stripeSessionId);
     
     if (!order) {
       console.warn(`Order not found for session ${stripeSessionId}, attempting to create minimal record`);

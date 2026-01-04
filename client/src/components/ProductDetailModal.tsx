@@ -20,9 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/hooks/useCart";
 import { analytics } from "@/lib/analytics";
 import { createCheckout } from "@/lib/stripe";
-import { useCart } from "@/hooks/useCart";
 import { loadZipCode, saveZipCode } from "@/lib/zipCode";
 
 interface ProductVariant {

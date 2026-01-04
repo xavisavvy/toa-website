@@ -32,7 +32,7 @@ export const initGA = () => {
   window.gtag = function gtag() {
     window.dataLayer = window.dataLayer || [];
      
-    // eslint-disable-next-line prefer-rest-params
+     
     window.dataLayer.push(arguments);
   };
 

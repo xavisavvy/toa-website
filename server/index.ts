@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import session from 'express-session';
 
 import { validateEnvironment } from "./env-validator";
 import { metricsMiddleware } from "./monitoring";
@@ -21,6 +22,20 @@ if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT) {
 
 // A05: Security Misconfiguration - Apply security middleware FIRST
 configureSecurity(app);
+
+// Session middleware (BEFORE routes)
+// Security: HTTP-only cookies, secure in production, SameSite protection
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true, // Prevent XSS
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'lax', // CSRF protection
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  },
+}));
 
 // Add metrics middleware
 app.use(metricsMiddleware);

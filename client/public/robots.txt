@@ -6,6 +6,12 @@ Allow: /
 Disallow: /api/
 Disallow: /legal/privacy
 Disallow: /legal/tos
+Disallow: /admin
+Disallow: /admin/
+Disallow: /track-order
+Disallow: /track-order/
+Disallow: /checkout/success
+Disallow: /checkout/cancel
 
 # Sitemap location
 Sitemap: https://talesofaneria.com/sitemap.xml
@@ -16,12 +22,24 @@ Crawl-delay: 1
 # Common bot-specific rules
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /track-order
+Disallow: /checkout/success
+Disallow: /checkout/cancel
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /track-order
+Disallow: /checkout/success
+Disallow: /checkout/cancel
 
 User-agent: Slurp
 Allow: /
+Disallow: /admin
+Disallow: /track-order
+Disallow: /checkout/success
+Disallow: /checkout/cancel
 
 # Block bad bots
 User-agent: AhrefsBot

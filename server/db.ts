@@ -1,5 +1,5 @@
-import { Pool } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 
 import * as schema from '../shared/schema';
 
@@ -9,8 +9,12 @@ if (!DATABASE_URL) {
   console.warn('⚠️  DATABASE_URL environment variable is not set. Order tracking will not be available.');
 }
 
-// Create pool only if DATABASE_URL is provided
-const pool = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL }) : null;
+// Create connection - works with both Neon and standard PostgreSQL
+const queryClient = DATABASE_URL ? postgres(DATABASE_URL, {
+  max: 10,
+  idle_timeout: 20,
+  connect_timeout: 10,
+}) : null;
 
 // Export db - will be null if DATABASE_URL not configured
-export const db = pool ? drizzle(pool, { schema }) : null as any;
+export const db = queryClient ? drizzle(queryClient, { schema }) : null as any;

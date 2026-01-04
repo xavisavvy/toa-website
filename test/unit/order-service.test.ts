@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { db } from '../../server/db';
 import {
   createOrder,
@@ -9,7 +10,6 @@ import {
   logFailedOrder,
   type CreateOrderParams,
 } from '../../server/order-service';
-import { orders, orderItems, orderEvents } from '../../shared/schema';
 
 // Mock the database
 vi.mock('../../server/db', () => ({

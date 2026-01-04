@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [Unreleased]
+
+### Features
+
+* **email:** AWS SES integration for transactional emails ([2026-01-04])
+  - Integrated AWS SES SDK (@aws-sdk/client-ses)
+  - Implemented email sending for order confirmations, payment failures, and admin alerts
+  - Added graceful fallback to console logging when SES not configured
+  - Created comprehensive setup documentation (docs/integration/AWS_SES_SETUP.md)
+  - Added test script (npm run test:ses)
+  - Successfully tested with real AWS credentials
+  - Cost-effective solution (~$1-5/month vs $15-20/month for alternatives)
+  - HTML + plain text email support
+  - Updated all environment files (.env, .env.example, .env.docker)
+  - Updated documentation (README, ARCHITECTURE, ROADMAP, etc.)
+
 ## [1.31.0](https://github.com/xavisavvy/toa-website/compare/v1.30.0...v1.31.0) (2026-01-02)
 
 

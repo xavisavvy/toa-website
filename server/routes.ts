@@ -1,19 +1,33 @@
 import { createServer, type Server } from "http";
 
 import type { Express } from "express";
+import { eq, desc } from 'drizzle-orm';
 
+import { authenticateUser, getUserById, isValidSessionUser } from "./auth";
+import { requireAuth, requireAdmin, optionalAuth } from "./auth-middleware";
+import { db } from "./db";
+import { orders, orderItems, orderEvents } from "../shared/schema";
 import { getCharacterData } from "./dndbeyond";
 import { getShopListings } from "./etsy";
 import { registerHealthRoutes } from "./health";
 import { metrics } from "./monitoring";
+import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
+import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId } from "./order-service";
 import { getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
-import { createOrder, updateOrderWithPrintfulId, logFailedOrder, logOrderEvent, getOrderByStripeSessionId } from "./order-service";
-import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
+import type { User } from "../shared/schema";
+import { loginSchema } from "../shared/schema";
+
+// Extend Express Session to include user
+declare module 'express-session' {
+  interface SessionData {
+    user?: User;
+  }
+}
 
 export function registerRoutes(app: Express): Server {
   // Apply API rate limiting to all /api routes
@@ -21,6 +35,297 @@ export function registerRoutes(app: Express): Server {
 
   // Health check endpoints (for Kubernetes, Docker, monitoring)
   registerHealthRoutes(app);
+  
+  // ============================================
+  // AUTHENTICATION ROUTES
+  // ============================================
+  
+  // Login endpoint
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      // Validate request body
+      const result = loginSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        logSecurityEvent('INVALID_LOGIN_REQUEST', {
+          ip: req.ip,
+          errors: result.error.errors,
+        });
+        
+        return res.status(400).json({ 
+          error: 'Invalid request',
+          message: 'Please provide valid email and password',
+        });
+      }
+
+      // Authenticate user
+      const user = await authenticateUser(result.data);
+
+      if (!user) {
+        // Security: Don't reveal if email exists
+        logSecurityEvent('FAILED_LOGIN_ATTEMPT', {
+          ip: req.ip,
+          email: result.data.email,
+        });
+
+        return res.status(401).json({ 
+          error: 'Authentication failed',
+          message: 'Invalid email or password',
+        });
+      }
+
+      // Store user in session
+      req.session.user = user;
+
+      // Security: Regenerate session ID to prevent fixation attacks
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ 
+            error: 'Server error',
+            message: 'Failed to create session',
+          });
+        }
+
+        console.info(`User logged in: ${user.email} (${user.role})`);
+
+        res.json({ 
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+          },
+        });
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ 
+        error: 'Server error',
+        message: 'An error occurred during login',
+      });
+    }
+  });
+
+  // Logout endpoint
+  app.post("/api/auth/logout", (req, res) => {
+    const userEmail = req.session.user?.email;
+    
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ 
+          error: 'Server error',
+          message: 'Failed to logout',
+        });
+      }
+
+      if (userEmail) {
+        console.info(`User logged out: ${userEmail}`);
+      }
+
+      res.json({ success: true });
+    });
+  });
+
+  // Get current user endpoint
+  app.get("/api/auth/me", optionalAuth, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ 
+        error: 'Not authenticated',
+        user: null,
+      });
+    }
+
+    // Refresh user data from database
+    const currentUser = await getUserById(req.user.id);
+
+    if (!currentUser || currentUser.isActive !== 1) {
+      req.session.destroy(() => {});
+      return res.status(401).json({ 
+        error: 'Session invalid',
+        user: null,
+      });
+    }
+
+    res.json({ 
+      user: {
+        id: currentUser.id,
+        email: currentUser.email,
+        role: currentUser.role,
+      },
+    });
+  });
+
+  // ============================================
+  // ADMIN ROUTES (Protected)
+  // ============================================
+  
+  // All /api/admin routes require admin role
+  app.use("/api/admin", requireAdmin);
+
+  // Admin dashboard stats
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      if (!db) {
+        return res.status(503).json({ error: 'Database not available' });
+      }
+
+      // Get order statistics
+      const allOrders = await db.select().from(orders);
+      
+      const stats = {
+        totalOrders: allOrders.length,
+        pendingOrders: allOrders.filter(o => o.status === 'pending').length,
+        failedOrders: allOrders.filter(o => o.status === 'failed').length,
+        revenue: allOrders
+          .filter(o => o.status === 'completed')
+          .reduce((sum, o) => sum + parseFloat(o.totalAmount), 0) * 100, // Convert to cents
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ error: 'Failed to fetch statistics' });
+    }
+  });
+
+  // Get all orders (with pagination and filtering)
+  app.get("/api/admin/orders", async (req, res) => {
+    try {
+      if (!db) {
+        return res.status(503).json({ error: 'Database not available' });
+      }
+
+      const { status, limit = '50', offset = '0' } = req.query;
+      
+      let query = db.select().from(orders);
+      
+      // Filter by status if provided
+      if (status && typeof status === 'string') {
+        query = query.where(eq(orders.status, status));
+      }
+      
+      // Add pagination (cast to number with proper validation)
+      const limitNum = Math.min(parseInt(limit as string) || 50, 100);
+      const offsetNum = parseInt(offset as string) || 0;
+      
+      const results = await query
+        .orderBy(desc(orders.createdAt))
+        .limit(limitNum)
+        .offset(offsetNum);
+
+      res.json({ orders: results });
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+  });
+
+  // Get single order with items and events
+  app.get("/api/admin/orders/:id", async (req, res) => {
+    try {
+      if (!db) {
+        return res.status(503).json({ error: 'Database not available' });
+      }
+
+      const { id } = req.params;
+
+      const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+      
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+      const events = await db.select().from(orderEvents).where(eq(orderEvents.orderId, id)).orderBy(desc(orderEvents.createdAt));
+
+      res.json({ order, items, events });
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      res.status(500).json({ error: 'Failed to fetch order' });
+    }
+  });
+
+  // ============================================
+  // CUSTOMER ORDER TRACKING (Public - with strict validation)
+  // ============================================
+  
+  // Security: Public order tracking - requires email + order ID match
+  // Privacy: Rate limited, no PII exposure, noindex
+  app.get("/api/orders/track", async (req, res) => {
+    try {
+      const { email, orderId } = req.query;
+
+      // Validation
+      if (!email || !orderId || typeof email !== 'string' || typeof orderId !== 'string') {
+        logSecurityEvent('INVALID_ORDER_TRACKING_REQUEST', {
+          ip: req.ip,
+          hasEmail: !!email,
+          hasOrderId: !!orderId,
+        });
+        return res.status(400).json({ error: 'Email and Order ID required' });
+      }
+
+      if (!db) {
+        return res.status(503).json({ error: 'Service temporarily unavailable' });
+      }
+
+      // Security: Find order by ID and verify email matches
+      const [order] = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, orderId))
+        .limit(1);
+
+      if (!order || order.customerEmail.toLowerCase() !== email.toLowerCase().trim()) {
+        // Security: Generic error message (don't reveal if order exists)
+        logSecurityEvent('FAILED_ORDER_TRACKING', {
+          ip: req.ip,
+          email: email.toLowerCase().trim(),
+          orderId: orderId.slice(0, 8),
+        });
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      // Get order items
+      const items = await db
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, orderId));
+
+      // Security: Return limited information (no payment details, no internal IDs)
+      res.json({
+        order: {
+          id: order.id,
+          status: order.status,
+          totalAmount: order.totalAmount,
+          currency: order.currency,
+          customerEmail: order.customerEmail,
+          customerName: order.customerName,
+          shippingAddress: order.shippingAddress,
+          printfulOrderId: order.printfulOrderId, // For tracking
+          createdAt: order.createdAt,
+        },
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          imageUrl: item.imageUrl,
+        })),
+      });
+
+      logSecurityEvent('SUCCESSFUL_ORDER_TRACKING', {
+        ip: req.ip,
+        orderId: orderId.slice(0, 8),
+      });
+    } catch (error) {
+      console.error('Error tracking order:', error);
+      res.status(500).json({ error: 'Unable to track order' });
+    }
+  });
+
   
   // Metrics endpoint
   app.get("/api/metrics", (req, res) => {
