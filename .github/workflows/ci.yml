@@ -28,7 +28,9 @@ jobs:
           
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
-        
+        env:
+          HUSKY: 0  # Disable Husky in CI
+          
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
