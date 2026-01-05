@@ -203,9 +203,8 @@ describe('Stripe Webhook Integration with Order Service', async () => {
   });
 
   describe('checkout.session.completed - Failed Printful Order', () => {
-    // FIXME: This test needs refactoring - it's testing routes with partial mocks
-    // which causes issues with unmocked dependencies like logFailedOrder
-    it.skip('should log failed order and send admin alert', async () => {
+    // Test that verifies failed Printful orders are logged and admin is alerted
+    it('should log failed order and send admin alert', async () => {
       const mockEvent = {
         type: 'checkout.session.completed',
         data: {
@@ -224,21 +223,51 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         id: 'cs_test_123',
         customer_details: {
           email: 'customer@example.com',
+          name: 'Test Customer',
         },
         amount_total: 9999,
         currency: 'usd',
         metadata: {
           printful_variant_id: '12345',
+          printful_product_id: 'prod_123',
+        },
+        shipping_details: {
+          name: 'Test Customer',
+          address: {
+            line1: '123 Test St',
+            city: 'Test City',
+            state: 'CA',
+            postal_code: '12345',
+            country: 'US',
+          },
         },
         line_items: {
-          data: [],
+          data: [{
+            description: 'Test Product',
+            quantity: 1,
+            amount_total: 9999,
+          }],
         },
       };
 
       mockVerifyWebhook.mockReturnValueOnce(mockEvent as any);
       mockGetCheckoutSession.mockResolvedValueOnce(mockSession as any);
       mockGetCatalogVariantId.mockResolvedValueOnce('catalog-var-123');
-      mockCreatePrintfulOrderFromSession.mockReturnValueOnce({} as any);
+      mockCreatePrintfulOrderFromSession.mockReturnValueOnce({
+        recipient: {
+          name: 'Test Customer',
+          email: 'customer@example.com',
+          address1: '123 Test St',
+          city: 'Test City',
+          state_code: 'CA',
+          country_code: 'US',
+          zip: '12345',
+        },
+        items: [{
+          sync_variant_id: 12345,
+          quantity: 1,
+        }],
+      } as any);
       mockCreatePrintfulOrder.mockResolvedValueOnce({
         success: false,
         error: 'Printful API error',
@@ -382,8 +411,8 @@ describe('Stripe Webhook Integration with Order Service', async () => {
   });
 
   describe('idempotency', () => {
-    // FIXME: This test needs refactoring - the webhook verification mock needs to return same event twice
-    it.skip('should not process duplicate webhooks', async () => {
+    // Test that duplicate webhooks are properly detected and ignored
+    it('should not process duplicate webhooks', async () => {
       const mockEvent = {
         type: 'checkout.session.completed',
         data: {
@@ -401,12 +430,55 @@ describe('Stripe Webhook Integration with Order Service', async () => {
       mockVerifyWebhook.mockReturnValue(mockEvent as any);
       mockGetCheckoutSession.mockResolvedValue({
         id: 'cs_test_duplicate',
-        metadata: { printful_variant_id: '12345' },
-        line_items: { data: [] },
+        customer_details: {
+          email: 'customer@example.com',
+          name: 'Test Customer',
+        },
+        amount_total: 9999,
+        currency: 'usd',
+        metadata: {
+          printful_variant_id: '12345',
+          printful_product_id: 'prod_123',
+        },
+        shipping_details: {
+          name: 'Test Customer',
+          address: {
+            line1: '123 Test St',
+            city: 'Test City',
+            state: 'CA',
+            postal_code: '12345',
+            country: 'US',
+          },
+        },
+        line_items: {
+          data: [{
+            description: 'Test Product',
+            quantity: 1,
+            amount_total: 9999,
+          }],
+        },
       } as any);
       mockGetCatalogVariantId.mockResolvedValue('catalog-var-123');
-      mockCreatePrintfulOrderFromSession.mockReturnValue({} as any);
+      mockCreatePrintfulOrderFromSession.mockReturnValue({
+        recipient: {
+          name: 'Test Customer',
+          email: 'customer@example.com',
+          address1: '123 Test St',
+          city: 'Test City',
+          state_code: 'CA',
+          country_code: 'US',
+          zip: '12345',
+        },
+        items: [{
+          sync_variant_id: 12345,
+          quantity: 1,
+        }],
+      } as any);
       mockCreatePrintfulOrder.mockResolvedValue({ success: true, orderId: 123 });
+      mockCreateOrder.mockResolvedValue({
+        id: 'order-123',
+        stripeSessionId: 'cs_test_duplicate',
+      } as any);
 
       // First request
       const firstResponse = await request(app)

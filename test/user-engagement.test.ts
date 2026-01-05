@@ -62,6 +62,8 @@ describe('User Engagement Tracking', () => {
     });
 
     it.skip('should reset count if clicks are not rapid', async () => {
+      // FIXME: Flaky test - timing issues with Date.now() mocking in event handlers
+      // The counter logic is correct but the mock timing doesn't work reliably
       const mockNow = vi.spyOn(Date, 'now');
       const startTime = 1000000;
       mockNow.mockReturnValue(startTime);
