@@ -49,14 +49,40 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:coverage
         
+      - name: Check if E2E tests can run
+        id: check_e2e
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⚠️  DATABASE_URL not set - E2E tests will be skipped"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "✅ DATABASE_URL configured - E2E tests will run"
+          fi
+        
       - name: Run E2E tests
+        if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:e2e
         
+      - name: Skip E2E tests
+        if: steps.check_e2e.outputs.skip == 'true'
+        run: echo "⚠️  E2E tests skipped - DATABASE_URL not configured"
+        
       - name: Run contract tests
+        if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:contract
         
+      - name: Skip contract tests
+        if: steps.check_e2e.outputs.skip == 'true'
+        run: echo "⚠️  Contract tests skipped - DATABASE_URL not configured"
+        
       - name: Run visual regression tests
+        if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:visual
+        
+      - name: Skip visual tests
+        if: steps.check_e2e.outputs.skip == 'true'
+        run: echo "⚠️  Visual tests skipped - DATABASE_URL not configured"
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4

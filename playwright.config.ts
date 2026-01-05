@@ -10,6 +10,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,  // Reduced from 2 to 1 for faster CI
   workers: process.env.CI ? 2 : undefined,  // Increased from 1 to 2 for parallel execution
   reporter: 'html',
+  globalSetup: './e2e/global-setup.ts',
   
   use: {
     baseURL: 'http://localhost:5000',
