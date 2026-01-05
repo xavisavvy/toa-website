@@ -2,21 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [Unreleased]
+## [2.1.0](https://github.com/xavisavvy/toa-website/compare/v2.0.0...v2.1.0) (2026-01-05)
+
 
 ### Features
 
-* **email:** AWS SES integration for transactional emails ([2026-01-04])
-  - Integrated AWS SES SDK (@aws-sdk/client-ses)
-  - Implemented email sending for order confirmations, payment failures, and admin alerts
-  - Added graceful fallback to console logging when SES not configured
-  - Created comprehensive setup documentation (docs/integration/AWS_SES_SETUP.md)
-  - Added test script (npm run test:ses)
-  - Successfully tested with real AWS credentials
-  - Cost-effective solution (~$1-5/month vs $15-20/month for alternatives)
-  - HTML + plain text email support
-  - Updated all environment files (.env, .env.example, .env.docker)
-  - Updated documentation (README, ARCHITECTURE, ROADMAP, etc.)
+* add Docker Compose test environment for E2E tests ([eb4bf6a](https://github.com/xavisavvy/toa-website/commit/eb4bf6a78319de8cd8041196571e584248ef4f98))
+* skip E2E tests gracefully when database unavailable ([331cbee](https://github.com/xavisavvy/toa-website/commit/331cbee5035e27cb8bd444aa6be7ef0ea0ab26c3))
+
+
+### Bug Fixes
+
+* handle YouTube API gracefully in non-Replit environments ([5b7bef7](https://github.com/xavisavvy/toa-website/commit/5b7bef743a838ef69c9cba9a5a8af81ef4e1da75))
+* simplify rate limiting test to prevent timeout ([13c6633](https://github.com/xavisavvy/toa-website/commit/13c6633ce65db70c3af749dbda2e801c51d4cefe))
+* update Docker Compose syntax for v2 in GitHub Actions ([ea04a15](https://github.com/xavisavvy/toa-website/commit/ea04a15ac0d96cd6ca2ebd5bb3bbdd74d575d97f))
+* use GH_PAT for version workflow to bypass branch protection ([cf81e32](https://github.com/xavisavvy/toa-website/commit/cf81e325d1758603f2be9ff3e3d29c19b491b510))
 
 ## [1.31.0](https://github.com/xavisavvy/toa-website/compare/v1.30.0...v1.31.0) (2026-01-02)
 
