@@ -44,8 +44,11 @@ jobs:
       
       - name: Generate SBOM (SPDX)
         run: |
-          npm install -g @spdx/spdx-sbom-generator
-          spdx-sbom-generator -o sbom.spdx.json
+          # Install spdx-sbom-generator from GitHub releases
+          curl -Lo spdx-sbom-generator.tar.gz https://github.com/opensbom-generator/spdx-sbom-generator/releases/download/v0.0.15/spdx-sbom-generator-v0.0.15-linux-amd64.tar.gz
+          tar -xzf spdx-sbom-generator.tar.gz
+          chmod +x spdx-sbom-generator
+          ./spdx-sbom-generator -o sbom.spdx.json
         continue-on-error: true
       
       - name: Upload SBOM as artifact
