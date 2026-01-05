@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.3](https://github.com/xavisavvy/toa-website/compare/v2.1.2...v2.1.3) (2026-01-05)
+
+
+### Bug Fixes
+
+* resolve TypeScript errors in YouTube API handling ([2678917](https://github.com/xavisavvy/toa-website/commit/26789171c861a4502f628f9771d1b266765ada35))
+
 ### [2.1.2](https://github.com/xavisavvy/toa-website/compare/v2.1.1...v2.1.2) (2026-01-05)
 
 
