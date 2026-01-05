@@ -54,7 +54,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
     app = express.default();
     app.use(express.default.raw({ type: 'application/json' }));
     registerRoutes(app);
-  });
+  }, 20000); // Increase timeout for slow setup
 
   describe('checkout.session.completed - Success Flow', () => {
     it('should create order and send confirmation on successful payment', async () => {
