@@ -374,7 +374,7 @@ export function registerRoutes(app: Express): Server {
       const recentOrders = await db
         .select()
         .from(orders)
-        .where(gte(orders.createdAt, startDate.toISOString()))
+        .where(gte(orders.createdAt, startDate))
         .orderBy(desc(orders.createdAt));
 
       // Calculate daily revenue
@@ -396,7 +396,7 @@ export function registerRoutes(app: Express): Server {
         .select()
         .from(orderItems)
         .innerJoin(orders, eq(orderItems.orderId, orders.id))
-        .where(gte(orders.createdAt, startDate.toISOString()));
+        .where(gte(orders.createdAt, startDate));
 
       const productStats: Record<string, { name: string; quantity: number; revenue: number }> = {};
       
@@ -479,7 +479,7 @@ export function registerRoutes(app: Express): Server {
         securityEvents,
       });
     } catch (error) {
-      safeLog('error', 'Error fetching analytics:', error);
+      console.error('[ERROR] Analytics endpoint failed:', error);
       res.status(500).json({ error: 'Failed to fetch analytics' });
     }
   });

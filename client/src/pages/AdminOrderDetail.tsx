@@ -1,13 +1,14 @@
+import { ArrowLeft, Package, CheckCircle, Clock, XCircle, AlertCircle, Truck, MapPin, Mail, Phone, Copy, Check, ExternalLink } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useRoute } from 'wouter';
-import { useAuth } from '../hooks/useAuth';
+
+import type { Order, OrderItem } from '../../../shared/schema';
+import AdminNav from '../components/layout/AdminNav';
+import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
-import { ArrowLeft, Package, CheckCircle, Clock, XCircle, AlertCircle, Truck, MapPin, Mail, Phone, Copy, Check } from 'lucide-react';
-import AdminNav from '../components/layout/AdminNav';
-import type { Order, OrderItem } from '../../../shared/schema';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AdminOrderDetail() {
   const { user, loading: authLoading } = useAuth();
@@ -89,6 +90,30 @@ export default function AdminOrderDetail() {
     } catch (err) {
       console.error('Failed to copy:', err);
     }
+  };
+
+  const formatAddressForMaps = (address: any): string => {
+    const parts = [
+      address.address1,
+      address.address2,
+      address.city,
+      address.state_code,
+      address.zip,
+      address.country_code
+    ].filter(Boolean);
+    return encodeURIComponent(parts.join(', '));
+  };
+
+  const formatAddressForClipboard = (address: any): string => {
+    const parts = [];
+    if (address.name) {parts.push(address.name);}
+    if (address.address1) {parts.push(address.address1);}
+    if (address.address2) {parts.push(address.address2);}
+    const cityLine = [address.city, address.state_code, address.zip].filter(Boolean).join(', ');
+    if (cityLine) {parts.push(cityLine);}
+    if (address.country_code) {parts.push(address.country_code);}
+    if (address.phone) {parts.push(address.phone);}
+    return parts.join('\n');
   };
 
   if (authLoading || !user) {
@@ -345,10 +370,34 @@ export default function AdminOrderDetail() {
             {shippingAddress && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    Shipping Address
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center">
+                      <MapPin className="h-5 w-5 mr-2" />
+                      Shipping Address
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => copyToClipboard(formatAddressForClipboard(shippingAddress), 'address')}
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded hover:bg-gray-100"
+                        title="Copy Address"
+                      >
+                        {copiedField === 'address' ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </button>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${formatAddressForMaps(shippingAddress)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded hover:bg-gray-100"
+                        title="Open in Google Maps"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-sm space-y-1">

@@ -253,9 +253,9 @@ export function validateNumber(input: unknown, min: number = 1, max: number = 10
 
 /**
  * A09: Security Logging and Monitoring
- * Logs security-related events
+ * Logs security-related events to console and database
  */
-export function logSecurityEvent(event: string, details: Record<string, unknown>) {
+export async function logSecurityEvent(event: string, details: Record<string, unknown>) {
   const timestamp = new Date().toISOString();
   const logEntry = {
     timestamp,
@@ -263,6 +263,33 @@ export function logSecurityEvent(event: string, details: Record<string, unknown>
     ...details,
   };
 
-  // In production, this should integrate with a proper logging service
+  // Console logging
   console.warn('[SECURITY]', JSON.stringify(logEntry));
+  
+  // Database logging (async, don't await to avoid blocking)
+  try {
+    const { db, auditLogs } = await import('./db');
+    if (db) {
+      const severity = event.includes('FAILED') || event.includes('INVALID') || event.includes('SUSPICIOUS') 
+        ? 'high' 
+        : 'medium';
+      
+      await db.insert(auditLogs).values({
+        userId: details.userId as string || null,
+        userEmail: details.email as string || null,
+        action: event.toLowerCase().replace(/_/g, '_'),
+        resource: details.resource as string || null,
+        ipAddress: details.ip as string || null,
+        userAgent: details.userAgent as string || null,
+        status: details.status as 'success' | 'failure' || 'failure',
+        errorMessage: details.reason as string || details.message as string || null,
+        severity: severity as 'low' | 'medium' | 'high',
+      }).catch(err => {
+        console.error('[ERROR] Failed to write audit log:', err);
+      });
+    }
+  } catch (err) {
+    // Silently fail - audit logging should not break application flow
+    console.error('[ERROR] Failed to write audit log:', err);
+  }
 }

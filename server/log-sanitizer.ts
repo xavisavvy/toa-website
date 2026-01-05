@@ -61,12 +61,12 @@ const CONTAINER_FIELDS = [
 const REDACTED = '[REDACTED]';
 
 export function maskEmail(email: string): string {
-  if (!email || typeof email !== 'string') return REDACTED;
+  if (!email || typeof email !== 'string') {return REDACTED;}
   
   const [localPart, domain] = email.split('@');
-  if (!domain) return REDACTED;
+  if (!domain) {return REDACTED;}
   
-  const maskedLocal = localPart.charAt(0) + '***';
+  const maskedLocal = `${localPart.charAt(0)  }***`;
   return `${maskedLocal}@${domain}`;
 }
 
@@ -75,10 +75,10 @@ export function maskEmail(email: string): string {
  * Example: John Doe -> J*** D***
  */
 export function maskName(name: string): string {
-  if (!name || typeof name !== 'string') return '[REDACTED]';
+  if (!name || typeof name !== 'string') {return '[REDACTED]';}
   
   return name.split(' ')
-    .map(part => part.charAt(0) + '***')
+    .map(part => `${part.charAt(0)  }***`)
     .join(' ');
 }
 
@@ -86,7 +86,7 @@ export function maskName(name: string): string {
  * Masks an address partially
  */
 export function maskAddress(address: string): string {
-  if (!address || typeof address !== 'string') return '[REDACTED]';
+  if (!address || typeof address !== 'string') {return '[REDACTED]';}
   
   // Keep city/state for debugging, mask street
   const parts = address.split(',');
@@ -101,11 +101,11 @@ export function maskAddress(address: string): string {
  * Example: 555-123-4567 -> ***-***-4567
  */
 export function maskPhone(phone: string): string {
-  if (!phone || typeof phone !== 'string') return '[REDACTED]';
+  if (!phone || typeof phone !== 'string') {return '[REDACTED]';}
   
   const digits = phone.replace(/\D/g, '');
   if (digits.length >= 4) {
-    return '***-***-' + digits.slice(-4);
+    return `***-***-${  digits.slice(-4)}`;
   }
   return '[REDACTED]';
 }
@@ -113,8 +113,14 @@ export function maskPhone(phone: string): string {
 /**
  * Recursively sanitizes an object by masking PII fields
  */
-export function sanitizeObject(obj: SanitizableObject): SanitizableObject {
-  if (!obj || typeof obj !== 'object') return obj;
+export function sanitizeObject(obj: SanitizableObject, seen = new WeakSet()): SanitizableObject {
+  if (!obj || typeof obj !== 'object') {return obj;}
+  
+  // Prevent circular reference infinite loops
+  if (seen.has(obj)) {
+    return '[Circular Reference]' as any;
+  }
+  seen.add(obj);
   
   const sanitized: SanitizableObject = Array.isArray(obj) ? [] : {};
   
@@ -125,7 +131,7 @@ export function sanitizeObject(obj: SanitizableObject): SanitizableObject {
     const isDirectPII = DIRECT_PII_FIELDS.some(field => {
       const fieldLower = field.toLowerCase();
       // Exact match or ends with the field name (but exclude 'username' from 'name' matching)
-      if (field === 'name' && lowerKey === 'username') return false;
+      if (field === 'name' && lowerKey === 'username') {return false;}
       return lowerKey === fieldLower || lowerKey.endsWith(fieldLower);
     });
     const isAddressField = ADDRESS_FIELDS.some(field => lowerKey === field.toLowerCase() || lowerKey.endsWith(field.toLowerCase()));
@@ -149,9 +155,9 @@ export function sanitizeObject(obj: SanitizableObject): SanitizableObject {
     } else if (isAddressField && typeof value === 'string') {
       (sanitized as Record<string, unknown>)[key] = REDACTED;
     } else if ((isDirectPII || isAddressField || isContainer) && typeof value === 'object' && value !== null) {
-      (sanitized as Record<string, unknown>)[key] = sanitizeObject(value);
+      (sanitized as Record<string, unknown>)[key] = sanitizeObject(value, seen);
     } else if (typeof value === 'object' && value !== null) {
-      (sanitized as Record<string, unknown>)[key] = sanitizeObject(value);
+      (sanitized as Record<string, unknown>)[key] = sanitizeObject(value, seen);
     } else {
       (sanitized as Record<string, unknown>)[key] = value;
     }

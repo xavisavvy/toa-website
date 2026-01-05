@@ -1,6 +1,6 @@
 import { analytics } from './analytics';
 
-let scrollDepthTracked = new Set<number>();
+const scrollDepthTracked = new Set<number>();
 let lastClickTime = 0;
 let lastClickElement: string | null = null;
 let clickCount = 0;
@@ -37,7 +37,8 @@ export function initRageClickDetection() {
   document.addEventListener('click', (event) => {
     const now = Date.now();
     const target = event.target as HTMLElement;
-    const elementDesc = `${target.tagName}${target.className ? '.' + target.className.split(' ')[0] : ''}`;
+    const className = typeof target.className === 'string' ? target.className : '';
+    const elementDesc = `${target.tagName}${className ? `.${  className.split(' ')[0]}` : ''}`;
 
     if (now - lastClickTime < 1000 && elementDesc === lastClickElement) {
       clickCount++;

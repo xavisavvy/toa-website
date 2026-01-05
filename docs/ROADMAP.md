@@ -212,7 +212,7 @@
 
 #### 🧪 Test Coverage Completion (High Priority)
 **CREATED:** 2026-01-05  
-**Target:** Fix all 31 skipped tests, achieve 100% test pass rate
+**Target:** Fix all 31 skipped tests, achieve 100% test pass rate, improve maintainability
 
 - [ ] **Phase 1: Critical Business Logic** (11 tests) - Week 1
   - [ ] Printful webhook events (7 tests)
@@ -250,15 +250,53 @@
     - [ ] Cache performance benchmarks
     - [ ] Video sorting performance (<10ms for 1000 items)
 
+- [ ] **Phase 4: Test Quality & Architecture** 🆕 - Week 4
+  - [ ] **Test Organization**
+    - [ ] Create test helpers module (shared mocks, fixtures, utilities)
+    - [ ] Standardize test structure (Arrange-Act-Assert pattern)
+    - [ ] Extract common test setup into beforeEach hooks
+    - [ ] Create test data factories for consistent fixtures
+  - [ ] **Coverage Gaps Analysis**
+    - [ ] Admin routes: Order detail page, analytics API, audit logs
+    - [ ] Auth middleware: Session validation, role checks, rate limiting
+    - [ ] User engagement: SVG element tracking, scroll depth edge cases
+    - [ ] Error boundaries: Recovery mechanisms, fallback UI states
+    - [ ] Database operations: Transaction rollbacks, connection pooling
+  - [ ] **Integration Test Improvements**
+    - [ ] Admin login flow with rate limiting
+    - [ ] Order tracking with invalid email/ID combinations
+    - [ ] Cart state persistence across page reloads
+    - [ ] Webhook retry logic and failure scenarios
+    - [ ] Database migration safety (up/down testing)
+  - [ ] **E2E Test Coverage**
+    - [ ] Admin dashboard navigation and interactions
+    - [ ] Copy-to-clipboard functionality
+    - [ ] Direct product modal trigger from homepage
+    - [ ] Security event logging visibility
+    - [ ] Failed login attempt tracking
+  - [ ] **Test Performance**
+    - [ ] Parallelize independent test suites
+    - [ ] Reduce test database setup time
+    - [ ] Cache external API mocks
+    - [ ] Optimize slow-running tests
+  - [ ] **Test Maintainability**
+    - [ ] Document test patterns and conventions
+    - [ ] Create testing guidelines (docs/testing/GUIDELINES.md)
+    - [ ] Add pre-commit hook to run affected tests
+    - [ ] Setup test coverage reporting in CI
+    - [ ] Create test ownership matrix (CODEOWNERS)
+
 - [ ] **Quality Improvements**
   - [ ] Achieve 100% pass rate (10 consecutive runs)
   - [ ] All tests complete in <60 seconds
-  - [ ] Maintain 80%+ code coverage
+  - [ ] Maintain 85%+ code coverage (increased from 80%)
   - [ ] Zero flaky tests
   - [ ] CI/CD pipeline green on all branches
+  - [ ] Test execution time <30s for unit tests
+  - [ ] Test execution time <5min for full suite
 
 - **Documentation:** See `SKIPPED_TESTS_ANALYSIS.md` for detailed breakdown
-- Related: All test files, CI/CD pipeline
+- Related: All test files, CI/CD pipeline, docs/testing/
 
 ---
 
@@ -379,6 +417,19 @@
   - [ ] Performance: Link Core Web Vitals to specific user sessions
   - [ ] Privacy: Auto-expire correlation IDs after 90 days (GDPR)
   - Related: Analytics, audit system, order tracking
+
+- [ ] **GA4 Conversion Tracking & Real Analytics** - Replace mock conversion data with real user behavior tracking
+  - [ ] Set up GA4 ecommerce conversion events properly
+  - [ ] Track begin_checkout, add_payment_info, purchase events
+  - [ ] Configure enhanced ecommerce tracking with product details
+  - [ ] Create custom conversion events (sponsor_inquiry, newsletter_signup, etc.)
+  - [ ] Set up conversion goals in GA4 dashboard
+  - [ ] Build real-time conversion funnel visualization in admin dashboard
+  - [ ] Track traffic sources and conversion rates by channel
+  - [ ] A/B test tracking for conversion optimization
+  - [ ] Attribution modeling (first-click, last-click, multi-touch)
+  - [ ] Replace hardcoded 3.2% conversion rate with real data
+  - Related: Analytics system, admin dashboard, GA4 integration
   
 - [ ] **Comprehensive 3-Phase Analytics Plan (IN PROGRESS)** - Data-driven optimization & conversion improvement
   - **Full Roadmap:** See `docs/ANALYTICS_METRICS_ROADMAP.md` (733 lines, comprehensive)
