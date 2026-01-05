@@ -32,18 +32,18 @@ jobs:
           HUSKY: 0  # Disable Husky in CI
       
       - name: Start test services (PostgreSQL + Redis)
-        run: docker-compose -f docker-compose.test.yml up -d
+        run: docker compose -f docker-compose.test.yml up -d
       
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "⏳ Waiting for PostgreSQL to be healthy..."
-          timeout 30 bash -c 'until docker-compose -f docker-compose.test.yml exec -T postgres pg_isready -U test_user -d toa_test; do sleep 1; done'
+          timeout 30 bash -c 'until docker compose -f docker-compose.test.yml exec -T postgres pg_isready -U test_user -d toa_test; do sleep 1; done'
           echo "✅ PostgreSQL is ready"
       
       - name: Wait for Redis to be ready
         run: |
           echo "⏳ Waiting for Redis to be healthy..."
-          timeout 30 bash -c 'until docker-compose -f docker-compose.test.yml exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
+          timeout 30 bash -c 'until docker compose -f docker-compose.test.yml exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
           echo "✅ Redis is ready"
       
       - name: Run database migrations
@@ -118,7 +118,7 @@ jobs:
         
       - name: Cleanup test services
         if: always()
-        run: docker-compose -f docker-compose.test.yml down -v
+        run: docker compose -f docker-compose.test.yml down -v
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
