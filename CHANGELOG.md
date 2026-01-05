@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.1](https://github.com/xavisavvy/toa-website/compare/v2.2.0...v2.2.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* install Trivy before generating SBOM vulnerability report ([da5df21](https://github.com/xavisavvy/toa-website/commit/da5df215e8e5a1747db22692d75968ca3bca8723))
+
 ## [2.2.0](https://github.com/xavisavvy/toa-website/compare/v2.1.4...v2.2.0) (2026-01-05)
 
 
