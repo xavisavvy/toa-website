@@ -4,6 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'import.meta.env.VITE_GA_MEASUREMENT_ID': JSON.stringify('G-TEST123456'),
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
