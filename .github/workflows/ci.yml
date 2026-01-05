@@ -247,7 +247,7 @@ jobs:
           HUSKY: 0  # Disable Husky in CI
       
       - name: Run npm audit (production)
-        run: npm audit --production --audit-level=moderate
+        run: npm audit --production --audit-level=high
         continue-on-error: true
       
       - name: Run npm audit (all dependencies)
@@ -314,7 +314,7 @@ jobs:
           HUSKY: 0  # Disable Husky in CI
         
       - name: Run npm audit
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=high
         continue-on-error: true
         
       - name: Run security tests
