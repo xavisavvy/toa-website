@@ -280,6 +280,7 @@ export async function logSecurityEvent(event: string, details: Record<string, un
         userEmail: details.email as string || null,
         action: event.toLowerCase().replace(/_/g, '_'),
         resource: details.resource as string || 'authentication',
+        category: details.category as string || 'security',
         ipAddress: details.ip as string || null,
         userAgent: details.userAgent as string || null,
         status: details.status as 'success' | 'failure' || 'failure',
