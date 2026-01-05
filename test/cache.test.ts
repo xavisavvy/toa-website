@@ -9,21 +9,23 @@ describe('Generic Cache Behavior', () => {
 
   beforeEach(() => {
     // Clean up test cache before each test
-    if (fs.existsSync(testCacheFile)) {
-      fs.unlinkSync(testCacheFile);
-    }
-    if (fs.existsSync(testCacheDir)) {
-      fs.rmdirSync(testCacheDir);
+    try {
+      if (fs.existsSync(testCacheDir)) {
+        fs.rmSync(testCacheDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+      }
+    } catch {
+      // Ignore cleanup errors on Windows
     }
   });
 
   afterEach(() => {
     // Clean up test cache after each test
-    if (fs.existsSync(testCacheFile)) {
-      fs.unlinkSync(testCacheFile);
-    }
-    if (fs.existsSync(testCacheDir)) {
-      fs.rmSync(testCacheDir, { recursive: true, force: true });
+    try {
+      if (fs.existsSync(testCacheDir)) {
+        fs.rmSync(testCacheDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+      }
+    } catch {
+      // Ignore cleanup errors on Windows
     }
   });
 
