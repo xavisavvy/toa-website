@@ -41,7 +41,16 @@ app.use(session({
 app.use(metricsMiddleware);
 
 // Body parsing middleware (with size limits)
-app.use(express.json({ limit: '1mb' })); // A05: Limit request body size
+// Use verify callback to preserve raw body for webhook routes
+app.use(express.json({ 
+  limit: '1mb',
+  verify: (req: any, _res, buf) => {
+    // Store raw body for webhook signature verification
+    if (req.url === '/api/stripe/webhook' || req.url === '/api/webhooks/printful') {
+      req.rawBody = buf;
+    }
+  }
+}));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
 app.use((req, res, next) => {

@@ -1123,7 +1123,7 @@ export function registerRoutes(app: Express): Server {
   // Track processed sessions to prevent duplicate orders
   const processedSessions = new Set<string>();
 
-  app.post("/api/stripe/webhook", async (req, res) => {
+  app.post("/api/stripe/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
     const signature = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -1133,7 +1133,9 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
-      const event = verifyWebhookSignature(req.body, signature as string, webhookSecret);
+      // Use raw body for signature verification
+      const rawBody = (req as any).rawBody || req.body;
+      const event = verifyWebhookSignature(rawBody, signature as string, webhookSecret);
 
       if (!event) {
         return res.status(400).send('Invalid signature');
@@ -1468,7 +1470,9 @@ export function registerRoutes(app: Express): Server {
       if (webhookSecret && signature) {
         const crypto = await import('crypto');
         const hmac = crypto.createHmac('sha256', webhookSecret);
-        const digest = hmac.update(req.body).digest('hex');
+        // Use raw body for signature verification
+        const rawBody = (req as any).rawBody || req.body;
+        const digest = hmac.update(rawBody).digest('hex');
         
         if (digest !== signature) {
           logSecurityEvent('PRINTFUL_WEBHOOK_INVALID_SIGNATURE', {
@@ -1484,7 +1488,16 @@ export function registerRoutes(app: Express): Server {
       // If no secret is set, allow webhook (dev mode)
 
       // Parse the webhook payload
-      const payload = JSON.parse(req.body.toString());
+      const rawBody = (req as any).rawBody || req.body;
+      let payload;
+      if (Buffer.isBuffer(rawBody)) {
+        payload = JSON.parse(rawBody.toString());
+      } else if (typeof rawBody === 'string') {
+        payload = JSON.parse(rawBody);
+      } else {
+        // Already parsed as JSON object
+        payload = rawBody;
+      }
       const { type, data } = payload;
 
       console.log('[Printful Webhook] Event received:', type);
