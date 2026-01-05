@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.2](https://github.com/xavisavvy/toa-website/compare/v2.1.1...v2.1.2) (2026-01-05)
+
+
+### Bug Fixes
+
+* adjust npm audit level to high and document esbuild vulnerability ([86af5cb](https://github.com/xavisavvy/toa-website/commit/86af5cb1b96d3f0a2a61bb547248532eeda72ee1))
+
 ### [2.1.1](https://github.com/xavisavvy/toa-website/compare/v2.1.0...v2.1.1) (2026-01-05)
 
 
