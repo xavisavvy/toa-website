@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/xavisavvy/toa-website/compare/v2.1.4...v2.2.0) (2026-01-05)
+
+
+### Features
+
+* add E2E test database seeding infrastructure ([05f5ea3](https://github.com/xavisavvy/toa-website/commit/05f5ea3ed3ba2911ed060ffa2c1eca49c830f064))
+
 ### [2.1.4](https://github.com/xavisavvy/toa-website/compare/v2.1.3...v2.1.4) (2026-01-05)
 
 
