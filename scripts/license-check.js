@@ -8,8 +8,8 @@
  */
 
 import checker from 'license-checker';
-import { writeFileSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
 
 // Approved licenses (permissive and business-friendly)
 const APPROVED_LICENSES = [
@@ -152,6 +152,11 @@ checker.init(
 
     // Write detailed report
     const reportPath = join(process.cwd(), 'reports', 'license-compliance.json');
+    
+    // Ensure reports directory exists
+    const reportDir = dirname(reportPath);
+    mkdirSync(reportDir, { recursive: true });
+    
     writeFileSync(reportPath, JSON.stringify(results, null, 2));
     console.log(`📄 Detailed report: ${reportPath}\n`);
 
