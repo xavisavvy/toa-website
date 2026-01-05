@@ -661,6 +661,12 @@ export function registerRoutes(app: Express): Server {
       }
 
       const stats = await getChannelStats(channelId);
+      if (!stats) {
+        return res.status(503).json({ 
+          error: 'YouTube API not configured',
+          message: 'YouTube features are currently unavailable' 
+        });
+      }
       res.json(stats);
     } catch (error) {
       console.error('Error fetching YouTube channel stats:', error);

@@ -60,7 +60,7 @@ export async function getUncachableYouTubeClient() {
   const accessToken = await getAccessToken();
   
   if (!accessToken) {
-    throw new Error('YouTube API not configured - set YOUTUBE_API_KEY environment variable');
+    return null; // Return null instead of throwing - let caller handle gracefully
   }
   
   const oauth2Client = new google.auth.OAuth2();
@@ -674,6 +674,10 @@ export async function getChannelStats(channelId: string): Promise<ChannelStats> 
     console.log(`Fetching fresh channel stats for ${channelId}...`);
     
     const youtube = await getUncachableYouTubeClient();
+    
+    if (!youtube) {
+      return null; // YouTube API not configured
+    }
     
     const response = await youtube.channels.list({
       part: ['statistics', 'contentDetails'],
