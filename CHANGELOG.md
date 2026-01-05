@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.2](https://github.com/xavisavvy/toa-website/compare/v2.2.1...v2.2.2) (2026-01-05)
+
+
+### Bug Fixes
+
+* correct SPDX SBOM generator and flaky monitoring tests ([82a6156](https://github.com/xavisavvy/toa-website/commit/82a61562d7c340ee534d870cdd30e9d885bed534))
+* correct SPDX SBOM generator installation ([58b89e9](https://github.com/xavisavvy/toa-website/commit/58b89e962c5abd4d453ec1cba2e817a4b82c6824))
+
 ### [2.2.1](https://github.com/xavisavvy/toa-website/compare/v2.2.0...v2.2.1) (2026-01-05)
 
 
