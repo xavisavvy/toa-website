@@ -15,6 +15,7 @@ regexTarget = "match"
 # Allowlist for test files and examples
 paths = [
   '''\.env\.example$''',
+  '''\.env\.docker$''',
   '''test/.*\.test\.ts$''',
   '''test/.*\.spec\.ts$''',
   '''e2e/.*\.spec\.ts$''',
