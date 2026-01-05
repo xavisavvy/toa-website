@@ -2,7 +2,20 @@
 
 **Last Updated:** 2026-01-04
 
-## 🎯 Current Sprint - COMPLETE ✅
+## 🎯 Current Sprint - Contract Testing & Quality
+
+### In Progress
+- [ ] **Contract Testing Coverage** 🔴 HIGH PRIORITY
+  - [ ] Un-skip 9 Stripe contract tests (test/contract/stripe.contract.test.ts)
+  - [ ] Fix 6 Printful webhook tests (test/printful-webhook.test.ts)
+  - [ ] Add Printful webhook contract tests (12 new tests)
+  - [ ] Add Stripe webhook contract tests (8 new tests)
+  - [ ] Add database schema contract tests (15 new tests)
+  - [ ] Add admin API contract tests (10 new tests)
+  - [ ] Total: ~60 contract tests to ensure external API compliance
+  - Related: docs/CONTRACT_TEST_GAPS.md, SKIPPED_TESTS_ANALYSIS.md
+
+## ✅ Previously Completed Sprints
 
 ### Completed
 - [x] **Admin Dashboard & Authentication** ✅ COMPLETE (2026-01-04)
@@ -196,6 +209,58 @@
     - [ ] Batched database writes
     - [ ] Indexed queries for fast retrieval
   - Related: Authentication system, admin dashboard, order management
+
+#### 🧪 Test Coverage Completion (High Priority)
+**CREATED:** 2026-01-05  
+**Target:** Fix all 31 skipped tests, achieve 100% test pass rate
+
+- [ ] **Phase 1: Critical Business Logic** (11 tests) - Week 1
+  - [ ] Printful webhook events (7 tests)
+    - [ ] package_shipped event handler
+    - [ ] package_returned event handler
+    - [ ] order_failed event handler
+    - [ ] order_canceled event handler
+    - [ ] Webhook security validation
+    - [ ] Error handling
+  - [ ] Webhook integration tests (2 tests)
+    - [ ] Failed order logging and admin alerts
+    - [ ] Duplicate webhook prevention (idempotency)
+  - [ ] Test infrastructure fixes (2 tests)
+    - [ ] Async middleware isolation (monitoring.test.ts)
+    - [ ] Timing-dependent tests with fake timers (user-engagement.test.ts)
+
+- [ ] **Phase 2: API Contracts** (9 tests) - Week 2
+  - [ ] Stripe contract tests (9 tests)
+    - [ ] Session creation with Printful metadata
+    - [ ] Shipping address collection validation
+    - [ ] Price validation (minimum 1 cent)
+    - [ ] Session retrieval with shipping details
+    - [ ] Session ID format validation
+    - [ ] USD currency handling
+    - [ ] Quantity variations
+    - [ ] Metadata field naming consistency (printful_variant_id)
+    - [ ] Metadata field naming consistency (printful_product_id)
+
+- [ ] **Phase 3: Feature Coverage** (~10 tests) - Week 3
+  - [ ] YouTube routes (1 full suite)
+    - [ ] Re-enable all YouTube Shorts API route tests
+    - [ ] Error handling validation
+    - [ ] Caching behavior tests
+  - [ ] Performance benchmarks (2 tests)
+    - [ ] Cache performance benchmarks
+    - [ ] Video sorting performance (<10ms for 1000 items)
+
+- [ ] **Quality Improvements**
+  - [ ] Achieve 100% pass rate (10 consecutive runs)
+  - [ ] All tests complete in <60 seconds
+  - [ ] Maintain 80%+ code coverage
+  - [ ] Zero flaky tests
+  - [ ] CI/CD pipeline green on all branches
+
+- **Documentation:** See `SKIPPED_TESTS_ANALYSIS.md` for detailed breakdown
+- Related: All test files, CI/CD pipeline
+
+---
 
 #### ☸️ Kubernetes Infrastructure Optimization
 - [x] **Local Development Enhancements** ✅ COMPLETE (2026-01-04)
