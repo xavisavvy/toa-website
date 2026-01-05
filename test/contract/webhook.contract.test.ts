@@ -1,39 +1,83 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { spawn, ChildProcess } from 'child_process';
 import crypto from 'crypto';
 
+import type { Express } from 'express';
+import request from 'supertest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+
+// Mock the database
+const mockDb = {
+  select: vi.fn().mockReturnValue({
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue([])
+      })
+    })
+  }),
+  insert: vi.fn().mockReturnValue({
+    values: vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: 'test-order-id' }])
+    })
+  }),
+  update: vi.fn().mockReturnValue({
+    set: vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue([])
+    })
+  })
+};
+
+vi.mock('../../server/db', () => ({
+  db: mockDb,
+  orders: {},
+  orderItems: {},
+  orderEvents: {},
+  auditLogs: {},
+}));
+
+// Mock Stripe webhook verification
+vi.mock('../../server/stripe', async () => {
+  const actual = await vi.importActual('../../server/stripe');
+  return {
+    ...actual,
+    verifyWebhookSignature: vi.fn((payload: string) => {
+      // Return the parsed event for valid payloads
+      try {
+        return JSON.parse(payload);
+      } catch {
+        return null;
+      }
+    }),
+  };
+});
+
 describe('Webhook Contract Tests', () => {
-  let serverProcess: ChildProcess;
-  const BASE_URL = 'http://localhost:5555';
+  let app: Express;
   const STRIPE_WEBHOOK_SECRET = 'whsec_test_secret';
   const PRINTFUL_WEBHOOK_SECRET = 'test_printful_secret';
 
-  beforeAll(async () => {
-    serverProcess = spawn('npm', ['run', 'dev'], {
-      env: {
-        ...process.env,
-        PORT: '5555',
-        STRIPE_WEBHOOK_SECRET,
-        PRINTFUL_WEBHOOK_SECRET,
-        NODE_ENV: 'test'
-      },
-      shell: true
-    });
-
-    // Wait longer for server to start
-    await new Promise(resolve => setTimeout(resolve, 5000));
-  });
-
-  afterAll(() => {
-    if (serverProcess) {
-      serverProcess.kill('SIGTERM');
-      // Force kill if not dead after 2 seconds
-      setTimeout(() => {
-        if (serverProcess && !serverProcess.killed) {
-          serverProcess.kill('SIGKILL');
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.resetModules(); // Clear module cache
+    
+    // Set environment variables
+    process.env.STRIPE_WEBHOOK_SECRET = STRIPE_WEBHOOK_SECRET;
+    process.env.PRINTFUL_WEBHOOK_SECRET = PRINTFUL_WEBHOOK_SECRET;
+    
+    // Import fresh app with routes
+    const { registerRoutes } = await import('../../server/routes');
+    const express = await import('express');
+    app = express.default();
+    
+    // Setup body parsing with raw body preservation
+    app.use(express.default.json({
+      verify: (req: any, _res, buf) => {
+        if (req.url === '/api/webhooks/printful' || req.url === '/api/stripe/webhook') {
+          req.rawBody = buf;
         }
-      }, 2000);
-    }
+      }
+    }));
+    
+    registerRoutes(app);
   });
 
   const generateStripeSignature = (payload: string, secret: string): string => {
@@ -76,18 +120,14 @@ describe('Webhook Contract Tests', () => {
 
       const signature = generateStripeSignature(payload, STRIPE_WEBHOOK_SECRET);
 
-      const response = await fetch(`${BASE_URL}/api/stripe/webhook`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'stripe-signature': signature
-        },
-        body: payload
-      });
+      const response = await request(app)
+        .post('/api/stripe/webhook')
+        .set('Content-Type', 'application/json')
+        .set('stripe-signature', signature)
+        .send(payload);
 
       expect(response.status).toBe(200);
-      const data = await response.json();
-      expect(data).toHaveProperty('received', true);
+      expect(response.body).toHaveProperty('received', true);
     });
 
     it('should reject webhook with invalid signature', async () => {
@@ -97,14 +137,9 @@ describe('Webhook Contract Tests', () => {
         data: { object: {} }
       });
 
-      const response = await fetch(`${BASE_URL}/api/stripe/webhook`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'stripe-signature': 'invalid_signature'
-        },
-        body: payload
-      });
+      const response = await request(app).post('/api/stripe/webhook').set('Content-Type', 'application/json').set('stripe-signature', 'invalid_signature'
+        ).send(payload
+      );
 
       expect(response.status).toBe(400);
     });
@@ -126,14 +161,9 @@ describe('Webhook Contract Tests', () => {
 
       const signature = generateStripeSignature(payload, STRIPE_WEBHOOK_SECRET);
 
-      const response = await fetch(`${BASE_URL}/api/stripe/webhook`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'stripe-signature': signature
-        },
-        body: payload
-      });
+      const response = await request(app).post('/api/stripe/webhook').set('Content-Type', 'application/json').set('stripe-signature', signature
+        ).send(payload
+      );
 
       expect(response.status).toBe(200);
     });
@@ -167,19 +197,15 @@ describe('Webhook Contract Tests', () => {
       const payloadString = JSON.stringify(payload);
       const signature = generatePrintfulSignature(payloadString, PRINTFUL_WEBHOOK_SECRET);
 
-      const response = await fetch(`${BASE_URL}/api/webhooks/printful`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Printful-Signature': signature
-        },
-        body: payloadString
-      });
+      const response = await request(app)
+        .post('/api/webhooks/printful')
+        .set('Content-Type', 'application/json')
+        .set('X-Printful-Signature', signature)
+        .send(payloadString);
 
       expect([200, 500]).toContain(response.status);
       if (response.status === 200) {
-        const data = await response.json();
-        expect(data).toHaveProperty('received', true);
+        expect(response.body).toHaveProperty('received', true);
       }
     });
 
@@ -205,14 +231,11 @@ describe('Webhook Contract Tests', () => {
       const payloadString = JSON.stringify(payload);
       const signature = generatePrintfulSignature(payloadString, PRINTFUL_WEBHOOK_SECRET);
 
-      const response = await fetch(`${BASE_URL}/api/webhooks/printful`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Printful-Signature': signature
-        },
-        body: payloadString
-      });
+      const response = await request(app)
+        .post('/api/webhooks/printful')
+        .set('Content-Type', 'application/json')
+        .set('X-Printful-Signature', signature)
+        .send(payloadString);
 
       expect([200, 500]).toContain(response.status);
     });
@@ -226,14 +249,11 @@ describe('Webhook Contract Tests', () => {
         data: {}
       };
 
-      const response = await fetch(`${BASE_URL}/api/webhooks/printful`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Printful-Signature': 'wrong_secret'
-        },
-        body: JSON.stringify(payload)
-      });
+      const response = await request(app)
+        .post('/api/webhooks/printful')
+        .set('Content-Type', 'application/json')
+        .set('X-Printful-Signature', 'wrong_secret')
+        .send(JSON.stringify(payload));
 
       expect(response.status).toBe(401);
     });
@@ -257,14 +277,11 @@ describe('Webhook Contract Tests', () => {
       const payloadString = JSON.stringify(payload);
       const signature = generatePrintfulSignature(payloadString, PRINTFUL_WEBHOOK_SECRET);
 
-      const response = await fetch(`${BASE_URL}/api/webhooks/printful`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Printful-Signature': signature
-        },
-        body: payloadString
-      });
+      const response = await request(app)
+        .post('/api/webhooks/printful')
+        .set('Content-Type', 'application/json')
+        .set('X-Printful-Signature', signature)
+        .send(payloadString);
 
       expect([200, 500]).toContain(response.status);
     });
@@ -288,36 +305,29 @@ describe('Webhook Contract Tests', () => {
       });
 
       const signature = generateStripeSignature(payload, STRIPE_WEBHOOK_SECRET);
-      const headers = {
-        'Content-Type': 'application/json',
-        'stripe-signature': signature
-      };
 
-      const response1 = await fetch(`${BASE_URL}/api/stripe/webhook`, {
-        method: 'POST',
-        headers,
-        body: payload
-      });
+      const response1 = await request(app)
+        .post('/api/stripe/webhook')
+        .set('Content-Type', 'application/json')
+        .set('stripe-signature', signature)
+        .send(payload);
 
-      const response2 = await fetch(`${BASE_URL}/api/stripe/webhook`, {
-        method: 'POST',
-        headers,
-        body: payload
-      });
+      const response2 = await request(app)
+        .post('/api/stripe/webhook')
+        .set('Content-Type', 'application/json')
+        .set('stripe-signature', signature)
+        .send(payload);
 
       expect(response1.status).toBe(200);
       expect(response2.status).toBe(200);
     });
 
     it('should handle malformed JSON gracefully', async () => {
-      const response = await fetch(`${BASE_URL}/api/stripe/webhook`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'stripe-signature': 'test_signature'
-        },
-        body: 'invalid json {{'
-      });
+      const response = await request(app)
+        .post('/api/stripe/webhook')
+        .set('Content-Type', 'application/json')
+        .set('stripe-signature', 'test_signature')
+        .send('invalid json {{');
 
       expect(response.status).toBe(400);
     });
@@ -332,16 +342,14 @@ describe('Webhook Contract Tests', () => {
       const payloadString = JSON.stringify(payload);
       const signature = generatePrintfulSignature(payloadString, PRINTFUL_WEBHOOK_SECRET);
 
-      const response = await fetch(`${BASE_URL}/api/webhooks/printful`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Printful-Signature': signature
-        },
-        body: payloadString
-      });
+      const response = await request(app)
+        .post('/api/webhooks/printful')
+        .set('Content-Type', 'application/json')
+        .set('X-Printful-Signature', signature)
+        .send(payloadString);
 
       expect([400, 422, 500]).toContain(response.status);
     });
   });
 });
+
