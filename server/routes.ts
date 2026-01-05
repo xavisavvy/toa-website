@@ -193,11 +193,11 @@ export function registerRoutes(app: Express): Server {
       
       const stats = {
         totalOrders: allOrders.length,
-        pendingOrders: allOrders.filter(o => o.status === 'pending').length,
-        failedOrders: allOrders.filter(o => o.status === 'failed').length,
+        pendingOrders: allOrders.filter((o: typeof allOrders[0]) => o.status === 'pending').length,
+        failedOrders: allOrders.filter((o: typeof allOrders[0]) => o.status === 'failed').length,
         revenue: allOrders
-          .filter(o => o.status === 'completed')
-          .reduce((sum, o) => sum + parseFloat(o.totalAmount), 0) * 100, // Convert to cents
+          .filter((o: typeof allOrders[0]) => o.status === 'completed')
+          .reduce((sum: number, o: typeof allOrders[0]) => sum + parseFloat(o.totalAmount), 0) * 100, // Convert to cents
       };
 
       res.json(stats);
@@ -328,8 +328,8 @@ export function registerRoutes(app: Express): Server {
       if (severity) {conditions.push(eqOp(auditLogs.severity, severity as string));}
       if (action) {conditions.push(eqOp(auditLogs.action, action as string));}
       if (userId) {conditions.push(eqOp(auditLogs.userId, userId as string));}
-      if (startDate) {conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string).toISOString()));}
-      if (endDate) {conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string).toISOString()));}
+      if (startDate) {conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string)));}
+      if (endDate) {conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string)));}
 
       let query = db.select().from(auditLogs);
       
@@ -380,7 +380,7 @@ export function registerRoutes(app: Express): Server {
       // Calculate daily revenue
       const dailyRevenueMap: Record<string, { date: string; revenue: number; orders: number }> = {};
       
-      recentOrders.forEach(order => {
+      recentOrders.forEach((order: typeof recentOrders[0]) => {
         const date = new Date(order.createdAt).toISOString().split('T')[0];
         if (!dailyRevenueMap[date]) {
           dailyRevenueMap[date] = { date, revenue: 0, orders: 0 };
@@ -400,7 +400,7 @@ export function registerRoutes(app: Express): Server {
 
       const productStats: Record<string, { name: string; quantity: number; revenue: number }> = {};
       
-      allOrderItems.forEach(({ order_items: item, orders: order }) => {
+      allOrderItems.forEach(({ order_items: item, orders: order }: typeof allOrderItems[0]) => {
         if (order.status === 'completed' || order.status === 'processing') {
           const productName = item.name;
           if (!productStats[productName]) {
@@ -417,7 +417,7 @@ export function registerRoutes(app: Express): Server {
 
       // Orders by status
       const statusCounts: Record<string, number> = {};
-      recentOrders.forEach(order => {
+      recentOrders.forEach((order: typeof recentOrders[0]) => {
         statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
       });
 
@@ -427,8 +427,8 @@ export function registerRoutes(app: Express): Server {
       }));
 
       // Calculate metrics
-      const completedOrders = recentOrders.filter(o => o.status === 'completed' || o.status === 'processing');
-      const totalRevenue = completedOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0);
+      const completedOrders = recentOrders.filter((o: typeof recentOrders[0]) => o.status === 'completed' || o.status === 'processing');
+      const totalRevenue = completedOrders.reduce((sum: number, o: typeof completedOrders[0]) => sum + parseFloat(o.totalAmount), 0);
       const avgOrderValue = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
       
       // Mock conversion rate (would need GA4 integration for real data)
@@ -452,13 +452,13 @@ export function registerRoutes(app: Express): Server {
       const securityEvents = {
         failedLogins: failedLoginEvents.length,
         suspiciousActivities: suspiciousEvents.length,
-        failedLoginDetails: failedLoginEvents.map(log => ({
+        failedLoginDetails: failedLoginEvents.map((log: typeof failedLoginEvents[0]) => ({
           timestamp: log.createdAt,
           ip: log.ipAddress || 'Unknown',
           email: log.userEmail || 'Unknown',
           reason: log.errorMessage || 'Authentication failed',
         })),
-        suspiciousActivityDetails: suspiciousEvents.map(log => ({
+        suspiciousActivityDetails: suspiciousEvents.map((log: typeof suspiciousEvents[0]) => ({
           timestamp: log.createdAt,
           ip: log.ipAddress || 'Unknown',
           action: log.action,
@@ -544,7 +544,7 @@ export function registerRoutes(app: Express): Server {
           printfulOrderId: order.printfulOrderId, // For tracking
           createdAt: order.createdAt,
         },
-        items: items.map(item => ({
+        items: items.map((item: typeof items[0]) => ({
           id: item.id,
           name: item.name,
           quantity: item.quantity,
