@@ -38,7 +38,11 @@ const mockDb = {
 };
 
 vi.mock('../server/db', () => ({
-  db: mockDb
+  db: mockDb,
+  orders: {},
+  orderItems: {},
+  orderEvents: {},
+  auditLogs: {},
 }));
 
 describe('Printful Webhook', () => {
@@ -60,12 +64,20 @@ describe('Printful Webhook', () => {
     const { registerRoutes } = await import('../server/routes');
     const express = await import('express');
     app = express.default();
-    app.use(express.default.json());
-    app.use(express.default.raw({ type: 'application/json' }));
+    
+    // Setup body parsing with raw body preservation for webhooks (like production)
+    app.use(express.default.json({
+      verify: (req: any, _res, buf) => {
+        if (req.url === '/api/webhooks/printful') {
+          req.rawBody = buf;
+        }
+      }
+    }));
+    
     registerRoutes(app);
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     // Clean up
     delete process.env.PRINTFUL_WEBHOOK_SECRET;
   });
@@ -74,7 +86,7 @@ describe('Printful Webhook', () => {
     return crypto.createHmac('sha256', webhookSecret).update(payload).digest('hex');
   };
 
-  describe.skip('package_shipped event', () => {
+  describe('package_shipped event', () => {
     it('should update order status to shipped and add tracking info', async () => {
       const payload = {
         type: 'package_shipped',
@@ -111,7 +123,7 @@ describe('Printful Webhook', () => {
     });
   });
 
-  describe.skip('package_returned event', () => {
+  describe('package_returned event', () => {
     it('should update order status to returned', async () => {
       const payload = {
         type: 'package_returned',
@@ -141,7 +153,7 @@ describe('Printful Webhook', () => {
     });
   });
 
-  describe.skip('order_failed event', () => {
+  describe('order_failed event', () => {
     it('should update order status to failed with reason', async () => {
       const payload = {
         type: 'order_failed',
@@ -169,7 +181,7 @@ describe('Printful Webhook', () => {
     });
   });
 
-  describe.skip('order_canceled event', () => {
+  describe('order_canceled event', () => {
     it('should update order status to cancelled', async () => {
       const payload = {
         type: 'order_canceled',
@@ -196,7 +208,7 @@ describe('Printful Webhook', () => {
     });
   });
 
-  describe.skip('webhook security', () => {
+  describe('webhook security', () => {
     it('should reject webhook with invalid signature', async () => {
       const payload = {
         type: 'package_shipped',
@@ -261,7 +273,7 @@ describe('Printful Webhook', () => {
     });
   });
 
-  describe.skip('error handling', () => {
+  describe('error handling', () => {
     it('should return 400 for webhook without order ID', async () => {
       const payload = {
         type: 'package_shipped',
