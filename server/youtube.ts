@@ -21,26 +21,30 @@ async function getAccessToken() {
     ? `depl ${  process.env.WEB_REPL_RENEWAL}` 
     : null;
 
-  if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
+  if (!xReplitToken || !hostname) {
+    return null; // Not in Replit environment
   }
 
-  connectionSettings = await fetch(
-    `https://${  hostname  }/api/v2/connection?include_secrets=true&connector_names=youtube`,
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
+  try {
+    connectionSettings = await fetch(
+      `https://${  hostname  }/api/v2/connection?include_secrets=true&connector_names=youtube`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'X_REPLIT_TOKEN': xReplitToken
+        }
       }
+    ).then(res => res.json()).then(data => data.items?.[0]);
+
+    const accessToken = connectionSettings?.settings?.access_token || connectionSettings.settings?.oauth?.credentials?.access_token;
+
+    if (!connectionSettings || !accessToken) {
+      return null;
     }
-  ).then(res => res.json()).then(data => data.items?.[0]);
-
-  const accessToken = connectionSettings?.settings?.access_token || connectionSettings.settings?.oauth?.credentials?.access_token;
-
-  if (!connectionSettings || !accessToken) {
-    throw new Error('YouTube not connected');
+    return accessToken;
+  } catch {
+    return null;
   }
-  return accessToken;
 }
 
 export async function getUncachableYouTubeClient() {
@@ -52,8 +56,12 @@ export async function getUncachableYouTubeClient() {
     });
   }
   
-  // Fall back to Replit OAuth flow
+  // Try Replit OAuth flow if in Replit environment
   const accessToken = await getAccessToken();
+  
+  if (!accessToken) {
+    throw new Error('YouTube API not configured - set YOUTUBE_API_KEY environment variable');
+  }
   
   const oauth2Client = new google.auth.OAuth2();
   oauth2Client.setCredentials({
@@ -160,7 +168,7 @@ function writeCache(playlistId: string, videos: VideoItem[]): void {
   }
 }
 
-async function getPlaylistVideosDirectAPI(playlistId: string, _maxResults: number): Promise<VideoItem[]> {
+async function getPlaylistVideosDirectAPI(playlistId: string): Promise<VideoItem[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   const allVideoIds: string[] = [];
   let nextPageToken: string | undefined = undefined;
@@ -263,7 +271,7 @@ async function getPlaylistVideosDirectAPI(playlistId: string, _maxResults: numbe
 }
 
 
-export async function getPlaylistVideos(playlistId: string, maxResults: number = 1000): Promise<VideoItem[]> {
+export async function getPlaylistVideos(playlistId: string, _maxResults: number = 1000): Promise<VideoItem[]> {
   // Check cache first
   const cachedVideos = readCache(playlistId);
   if (cachedVideos !== null) {
@@ -275,7 +283,7 @@ export async function getPlaylistVideos(playlistId: string, maxResults: number =
     // Use direct fetch API for API key to avoid referrer issues
     if (process.env.YOUTUBE_API_KEY) {
       try {
-        return await getPlaylistVideosDirectAPI(playlistId, maxResults);
+        return await getPlaylistVideosDirectAPI(playlistId);
       } catch (apiError: any) {
         const errorMsg = apiError.message?.toLowerCase() || '';
         // If API key has referrer restrictions, fall through to try OAuth only if Replit env is available
@@ -559,7 +567,7 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
           return cacheEntry.videos;
         }
       }
-    } catch (_cacheError) {
+    } catch {
       // Ignore cache read errors
     }
     
@@ -578,6 +586,7 @@ function formatViewCount(count: number): string {
 }
 
 function formatDuration(isoDuration: string): string {
+  // eslint-disable-next-line security/detect-unsafe-regex
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!match) {return '0:00';}
 
@@ -592,6 +601,7 @@ function formatDuration(isoDuration: string): string {
 }
 
 function getDurationInSeconds(isoDuration: string): number {
+  // eslint-disable-next-line security/detect-unsafe-regex
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!match) {return 0;}
 

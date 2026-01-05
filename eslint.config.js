@@ -81,6 +81,9 @@ export default [
       'jsx-a11y': jsxA11y
     },
     rules: {
+      // Disable base rule as it can report incorrect errors with TypeScript
+      'no-unused-vars': 'off',
+      
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': ['error', { 
         argsIgnorePattern: '^_',
