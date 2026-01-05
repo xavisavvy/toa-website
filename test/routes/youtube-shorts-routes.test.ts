@@ -17,6 +17,10 @@ vi.mock('../../server/youtube', () => ({
   ]))
 }));
 
+// Note: YouTube Shorts feature not implemented yet
+// Route /api/youtube/shorts doesn't exist in routes.ts
+// getYouTubeShorts function doesn't exist (only getChannelShorts exists)
+// Will implement when YouTube Shorts feature is prioritized
 describe.skip('YouTube Shorts Routes', () => {
   let app: express.Application;
 

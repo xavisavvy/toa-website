@@ -61,12 +61,11 @@ describe('User Engagement Tracking', () => {
       document.body.removeChild(button);
     });
 
-    it.skip('should reset count if clicks are not rapid', async () => {
-      // FIXME: Flaky test - timing issues with Date.now() mocking in event handlers
-      // The counter logic is correct but the mock timing doesn't work reliably
-      const mockNow = vi.spyOn(Date, 'now');
-      const startTime = 1000000;
-      mockNow.mockReturnValue(startTime);
+    it('should reset count if clicks are not rapid', () => {
+      // Use fake timers for reliable time control
+      vi.useFakeTimers();
+      const baseTime = 1000000;
+      vi.setSystemTime(baseTime);
       
       initRageClickDetection();
 
@@ -74,19 +73,26 @@ describe('User Engagement Tracking', () => {
       button.className = 'test-button';
       document.body.appendChild(button);
 
+      // First click
       button.click();
       
-      // Advance time more than 1 second
-      mockNow.mockReturnValue(startTime + 1100);
+      // Advance time more than 1 second (counter should reset)
+      vi.setSystemTime(baseTime + 1100);
       
+      // Second click (counter resets to 1)
       button.click();
+      
+      // Advance time again
+      vi.setSystemTime(baseTime + 2200);
+      
+      // Third click (counter resets to 1 again)
       button.click();
 
-      // Should not trigger rage click (counter reset)
+      // Should not trigger rage click (counter never reached 3)
       expect(analytics.rageClick).not.toHaveBeenCalled();
 
       document.body.removeChild(button);
-      mockNow.mockRestore();
+      vi.useRealTimers();
     });
   });
 
