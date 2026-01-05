@@ -181,6 +181,8 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0  # Disable Husky in CI
       
       - name: Run npm audit (production)
         run: npm audit --production --audit-level=moderate
@@ -246,6 +248,8 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0  # Disable Husky in CI
         
       - name: Run npm audit
         run: npm audit --audit-level=moderate
@@ -271,6 +275,8 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0  # Disable Husky in CI
       
       - name: Run license compliance check
         run: npm run license:check
@@ -300,6 +306,8 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0  # Disable Husky in CI
       
       - name: Build application
         run: npm run build
@@ -341,6 +349,8 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0  # Disable Husky in CI
           
       - name: Run incremental mutation testing
         run: npm run test:mutation:incremental
@@ -369,6 +379,8 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0  # Disable Husky in CI
         
       - name: Run TypeScript compiler
         run: npx tsc --noEmit
