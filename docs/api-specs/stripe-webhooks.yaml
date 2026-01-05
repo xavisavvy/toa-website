@@ -1,0 +1,445 @@
+openapi: 3.0.3
+info:
+  title: Tales of Aneria - Stripe Webhooks API
+  version: 1.0.0
+  description: |
+    Contract specification for Stripe webhook integration.
+    This defines the expected webhook events and payloads from Stripe.
+  contact:
+    name: Tales of Aneria Development Team
+    url: https://github.com/xavisavvy/toa-website
+
+servers:
+  - url: https://talesofaneria.com
+    description: Production
+  - url: http://localhost:5555
+    description: Local development
+
+paths:
+  /api/stripe/webhook:
+    post:
+      summary: Stripe Webhook Endpoint
+      description: Receives webhook events from Stripe for payment processing and order fulfillment
+      operationId: handleStripeWebhook
+      tags:
+        - Webhooks
+        - Stripe
+      
+      parameters:
+        - name: stripe-signature
+          in: header
+          required: true
+          description: Stripe webhook signature for verification (HMAC SHA256)
+          schema:
+            type: string
+            example: "t=1609459200,v1=abc123...,v0=def456..."
+      
+      requestBody:
+        required: true
+        description: Stripe event payload (raw JSON)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StripeEvent'
+            examples:
+              checkoutSessionCompleted:
+                $ref: '#/components/examples/CheckoutSessionCompleted'
+              paymentIntentSucceeded:
+                $ref: '#/components/examples/PaymentIntentSucceeded'
+              paymentIntentPaymentFailed:
+                $ref: '#/components/examples/PaymentIntentPaymentFailed'
+      
+      responses:
+        '200':
+          description: Webhook successfully processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+                  duplicate:
+                    type: boolean
+                    description: True if webhook was already processed (idempotency)
+                    example: false
+        
+        '400':
+          description: Invalid webhook signature or malformed payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Webhook signature verification failed"
+        
+        '500':
+          description: Internal server error processing webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+      security:
+        - StripeWebhookSignature: []
+
+components:
+  schemas:
+    StripeEvent:
+      type: object
+      required:
+        - id
+        - object
+        - api_version
+        - created
+        - data
+        - type
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the event
+          example: "evt_1Abc2DefGhi3Jkl4"
+        object:
+          type: string
+          enum: [event]
+          example: "event"
+        api_version:
+          type: string
+          description: Stripe API version
+          example: "2023-10-16"
+        created:
+          type: integer
+          format: int64
+          description: Unix timestamp when event was created
+          example: 1609459200
+        data:
+          type: object
+          required:
+            - object
+          properties:
+            object:
+              oneOf:
+                - $ref: '#/components/schemas/CheckoutSession'
+                - $ref: '#/components/schemas/PaymentIntent'
+        type:
+          type: string
+          description: Event type identifier
+          enum:
+            - checkout.session.completed
+            - checkout.session.async_payment_succeeded
+            - checkout.session.async_payment_failed
+            - payment_intent.succeeded
+            - payment_intent.payment_failed
+            - payment_intent.canceled
+            - charge.refunded
+          example: "checkout.session.completed"
+        livemode:
+          type: boolean
+          description: Whether event occurred in live mode or test mode
+          example: false
+        pending_webhooks:
+          type: integer
+          description: Number of pending webhook deliveries
+          example: 1
+        request:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            idempotency_key:
+              type: string
+              nullable: true
+
+    CheckoutSession:
+      type: object
+      required:
+        - id
+        - object
+        - amount_total
+        - currency
+        - customer_details
+        - payment_status
+      properties:
+        id:
+          type: string
+          description: Unique checkout session ID
+          example: "cs_test_abc123"
+        object:
+          type: string
+          enum: [checkout.session]
+        amount_total:
+          type: integer
+          description: Total amount in cents
+          example: 2499
+          minimum: 1
+        currency:
+          type: string
+          description: Three-letter ISO currency code
+          example: "usd"
+          pattern: '^[a-z]{3}$'
+        customer_details:
+          $ref: '#/components/schemas/CustomerDetails'
+        payment_status:
+          type: string
+          enum: [paid, unpaid, no_payment_required]
+          example: "paid"
+        payment_intent:
+          type: string
+          description: ID of the PaymentIntent
+          example: "pi_1Abc2DefGhi3Jkl4"
+        metadata:
+          $ref: '#/components/schemas/SessionMetadata'
+        shipping_details:
+          $ref: '#/components/schemas/ShippingDetails'
+        line_items:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/LineItem'
+
+    CustomerDetails:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: "customer@example.com"
+        name:
+          type: string
+          example: "John Doe"
+        phone:
+          type: string
+          nullable: true
+          example: "+1234567890"
+
+    SessionMetadata:
+      type: object
+      description: Custom metadata attached to checkout session
+      required:
+        - printful_variant_id
+        - printful_product_id
+      properties:
+        printful_variant_id:
+          type: string
+          description: Printful sync variant ID
+          example: "456"
+        printful_product_id:
+          type: string
+          description: Printful sync product ID
+          example: "123"
+        product_image_url:
+          type: string
+          format: uri
+          description: Product image URL
+          example: "https://example.com/product.jpg"
+
+    ShippingDetails:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        address:
+          $ref: '#/components/schemas/Address'
+
+    Address:
+      type: object
+      required:
+        - line1
+        - city
+        - state
+        - postal_code
+        - country
+      properties:
+        line1:
+          type: string
+          example: "123 Main St"
+        line2:
+          type: string
+          nullable: true
+          example: "Apt 4B"
+        city:
+          type: string
+          example: "San Francisco"
+        state:
+          type: string
+          example: "CA"
+        postal_code:
+          type: string
+          example: "94102"
+        country:
+          type: string
+          description: Two-letter country code (ISO 3166-1 alpha-2)
+          example: "US"
+          pattern: '^[A-Z]{2}$'
+
+    LineItem:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+          example: "Tales of Aneria T-Shirt"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 1
+        amount_total:
+          type: integer
+          description: Total amount in cents
+          example: 2499
+
+    PaymentIntent:
+      type: object
+      required:
+        - id
+        - object
+        - amount
+        - currency
+        - status
+      properties:
+        id:
+          type: string
+          example: "pi_1Abc2DefGhi3Jkl4"
+        object:
+          type: string
+          enum: [payment_intent]
+        amount:
+          type: integer
+          description: Amount in cents
+          example: 2499
+        currency:
+          type: string
+          example: "usd"
+        status:
+          type: string
+          enum:
+            - succeeded
+            - processing
+            - requires_payment_method
+            - requires_confirmation
+            - requires_action
+            - canceled
+            - requires_capture
+          example: "succeeded"
+        last_payment_error:
+          type: object
+          nullable: true
+          properties:
+            message:
+              type: string
+            type:
+              type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid signature"
+        message:
+          type: string
+          example: "Webhook signature verification failed"
+
+  examples:
+    CheckoutSessionCompleted:
+      summary: Checkout Session Completed Event
+      description: Fired when a customer completes a checkout session
+      value:
+        id: "evt_1Abc2DefGhi3Jkl4"
+        object: "event"
+        api_version: "2023-10-16"
+        created: 1609459200
+        type: "checkout.session.completed"
+        livemode: false
+        data:
+          object:
+            id: "cs_test_abc123xyz"
+            object: "checkout.session"
+            amount_total: 2499
+            currency: "usd"
+            customer_details:
+              email: "fan@talesofaneria.com"
+              name: "Jane Doe"
+            payment_status: "paid"
+            payment_intent: "pi_1Abc2DefGhi3Jkl4"
+            metadata:
+              printful_variant_id: "456"
+              printful_product_id: "123"
+              product_image_url: "https://example.com/taebrin-shirt.jpg"
+            shipping_details:
+              name: "Jane Doe"
+              address:
+                line1: "123 Fantasy Lane"
+                line2: "Apt 7"
+                city: "Portland"
+                state: "OR"
+                postal_code: "97205"
+                country: "US"
+            line_items:
+              data:
+                - id: "li_abc123"
+                  description: "Tales of Aneria - Taebrin Character Shirt"
+                  quantity: 1
+                  amount_total: 2499
+
+    PaymentIntentSucceeded:
+      summary: Payment Intent Succeeded Event
+      value:
+        id: "evt_2Xyz3UvwRst4Opq5"
+        object: "event"
+        type: "payment_intent.succeeded"
+        data:
+          object:
+            id: "pi_1Abc2DefGhi3Jkl4"
+            object: "payment_intent"
+            amount: 2499
+            currency: "usd"
+            status: "succeeded"
+
+    PaymentIntentPaymentFailed:
+      summary: Payment Intent Failed Event
+      value:
+        id: "evt_3Mno4PqrStu5Vwx6"
+        object: "event"
+        type: "payment_intent.payment_failed"
+        data:
+          object:
+            id: "pi_1Abc2DefGhi3Jkl4"
+            object: "payment_intent"
+            amount: 2499
+            currency: "usd"
+            status: "requires_payment_method"
+            last_payment_error:
+              message: "Your card was declined."
+              type: "card_error"
+
+  securitySchemes:
+    StripeWebhookSignature:
+      type: apiKey
+      in: header
+      name: stripe-signature
+      description: |
+        HMAC SHA256 signature computed using webhook secret.
+        Format: t=timestamp,v1=signature,v0=old_signature
+        
+        Verification process:
+        1. Extract timestamp (t) and signature (v1)
+        2. Construct signed payload: timestamp.raw_body
+        3. Compute HMAC: hmac_sha256(webhook_secret, signed_payload)
+        4. Compare computed signature with v1
+        5. Check timestamp is within 5 minutes to prevent replay attacks
+
+tags:
+  - name: Webhooks
+    description: Webhook endpoints for third-party integrations
+  - name: Stripe
+    description: Stripe payment processing webhooks

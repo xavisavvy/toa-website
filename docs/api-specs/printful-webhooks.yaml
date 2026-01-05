@@ -1,0 +1,475 @@
+openapi: 3.0.3
+info:
+  title: Tales of Aneria - Printful Webhooks API
+  version: 1.0.0
+  description: |
+    Contract specification for Printful webhook integration.
+    Defines expected webhook events for order fulfillment and shipping notifications.
+  contact:
+    name: Tales of Aneria Development Team
+    url: https://github.com/xavisavvy/toa-website
+
+servers:
+  - url: https://talesofaneria.com
+    description: Production
+  - url: http://localhost:5555
+    description: Local development
+
+paths:
+  /api/webhooks/printful:
+    post:
+      summary: Printful Webhook Endpoint
+      description: Receives webhook events from Printful for order tracking and fulfillment updates
+      operationId: handlePrintfulWebhook
+      tags:
+        - Webhooks
+        - Printful
+      
+      parameters:
+        - name: x-printful-signature
+          in: header
+          required: false
+          description: HMAC SHA256 signature for webhook verification (optional in dev mode)
+          schema:
+            type: string
+            example: "abc123def456..."
+      
+      requestBody:
+        required: true
+        description: Printful webhook event payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintfulWebhookEvent'
+            examples:
+              packageShipped:
+                $ref: '#/components/examples/PackageShipped'
+              packageReturned:
+                $ref: '#/components/examples/PackageReturned'
+              orderFailed:
+                $ref: '#/components/examples/OrderFailed'
+              orderUpdated:
+                $ref: '#/components/examples/OrderUpdated'
+      
+      responses:
+        '200':
+          description: Webhook successfully processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+                  warning:
+                    type: string
+                    description: Warning message (e.g. order not found)
+                    example: "Order not found"
+        
+        '400':
+          description: Invalid payload or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        
+        '401':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid signature"
+
+      security:
+        - PrintfulWebhookSignature: []
+
+components:
+  schemas:
+    PrintfulWebhookEvent:
+      type: object
+      required:
+        - type
+        - data
+      properties:
+        type:
+          type: string
+          description: Event type identifier
+          enum:
+            - package_shipped
+            - package_returned
+            - order_failed
+            - order_updated
+            - order_canceled
+            - product_synced
+            - stock_updated
+          example: "package_shipped"
+        created:
+          type: integer
+          format: int64
+          description: Unix timestamp when event occurred
+          example: 1609459200
+        retries:
+          type: integer
+          description: Number of delivery attempts
+          example: 0
+        store:
+          type: integer
+          description: Store ID
+          example: 123456
+        data:
+          type: object
+          description: Event-specific payload
+          oneOf:
+            - $ref: '#/components/schemas/ShipmentData'
+            - $ref: '#/components/schemas/OrderData'
+
+    ShipmentData:
+      type: object
+      description: Package shipment information
+      required:
+        - order
+        - shipment
+      properties:
+        order:
+          $ref: '#/components/schemas/OrderInfo'
+        shipment:
+          $ref: '#/components/schemas/ShipmentInfo'
+
+    OrderData:
+      type: object
+      description: Order event data
+      required:
+        - order
+      properties:
+        order:
+          $ref: '#/components/schemas/OrderInfo'
+        reason:
+          type: string
+          description: Reason for failure/update
+          example: "Out of stock"
+
+    OrderInfo:
+      type: object
+      required:
+        - id
+        - external_id
+        - status
+      properties:
+        id:
+          type: string
+          description: Printful order ID
+          example: "123456789"
+        external_id:
+          type: string
+          description: Your order reference ID
+          example: "ORDER-2024-001"
+        status:
+          type: string
+          enum:
+            - draft
+            - pending
+            - failed
+            - canceled
+            - onhold
+            - inprocess
+            - partial
+            - fulfilled
+          example: "fulfilled"
+        shipping:
+          type: string
+          description: Shipping method
+          example: "STANDARD"
+        created:
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1609459200
+        updated:
+          type: integer
+          format: int64
+          example: 1609465000
+        recipient:
+          $ref: '#/components/schemas/Recipient'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        costs:
+          $ref: '#/components/schemas/OrderCosts'
+
+    ShipmentInfo:
+      type: object
+      required:
+        - carrier
+        - service
+        - tracking_number
+        - tracking_url
+      properties:
+        id:
+          type: string
+          description: Shipment ID
+          example: "987654321"
+        carrier:
+          type: string
+          description: Shipping carrier name
+          example: "USPS"
+        service:
+          type: string
+          description: Shipping service level
+          example: "First-Class Package Service"
+        tracking_number:
+          type: string
+          description: Package tracking number
+          example: "9400111899223344556677"
+        tracking_url:
+          type: string
+          format: uri
+          description: URL to track package
+          example: "https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111899223344556677"
+        created:
+          type: integer
+          format: int64
+          description: Ship date (Unix timestamp)
+          example: 1609459200
+        ship_date:
+          type: string
+          format: date
+          description: Ship date (ISO 8601)
+          example: "2024-01-05"
+        estimated_delivery:
+          type: string
+          format: date
+          description: Estimated delivery date
+          example: "2024-01-12"
+        items:
+          type: array
+          description: Items in this shipment
+          items:
+            type: object
+            properties:
+              item_id:
+                type: integer
+              quantity:
+                type: integer
+
+    Recipient:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Jane Doe"
+        address1:
+          type: string
+          example: "123 Fantasy Lane"
+        address2:
+          type: string
+          nullable: true
+          example: "Apt 7"
+        city:
+          type: string
+          example: "Portland"
+        state_code:
+          type: string
+          example: "OR"
+        state_name:
+          type: string
+          example: "Oregon"
+        country_code:
+          type: string
+          description: Two-letter country code (ISO 3166-1 alpha-2)
+          example: "US"
+        country_name:
+          type: string
+          example: "United States"
+        zip:
+          type: string
+          example: "97205"
+        phone:
+          type: string
+          nullable: true
+          example: "+1234567890"
+        email:
+          type: string
+          format: email
+          example: "customer@example.com"
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Line item ID
+          example: 123
+        external_id:
+          type: string
+          description: Your item reference
+          example: "item-001"
+        variant_id:
+          type: integer
+          description: Printful catalog variant ID
+          example: 4011
+        sync_variant_id:
+          type: integer
+          description: Printful sync variant ID
+          example: 789
+        quantity:
+          type: integer
+          minimum: 1
+          example: 1
+        price:
+          type: string
+          description: Item price
+          example: "24.99"
+        retail_price:
+          type: string
+          description: Retail price shown to customer
+          example: "29.99"
+        name:
+          type: string
+          example: "Tales of Aneria - Taebrin Character Shirt"
+        product:
+          type: object
+          properties:
+            variant_id:
+              type: integer
+            product_id:
+              type: integer
+            name:
+              type: string
+            image:
+              type: string
+              format: uri
+
+    OrderCosts:
+      type: object
+      properties:
+        currency:
+          type: string
+          example: "USD"
+        subtotal:
+          type: string
+          example: "24.99"
+        discount:
+          type: string
+          example: "0.00"
+        shipping:
+          type: string
+          example: "5.95"
+        tax:
+          type: string
+          example: "2.50"
+        total:
+          type: string
+          example: "33.44"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid signature"
+        message:
+          type: string
+          example: "Webhook signature verification failed"
+
+  examples:
+    PackageShipped:
+      summary: Package Shipped Event
+      description: Fired when Printful ships a package
+      value:
+        type: "package_shipped"
+        created: 1609459200
+        retries: 0
+        store: 123456
+        data:
+          order:
+            id: "123456789"
+            external_id: "cs_test_abc123xyz"
+            status: "fulfilled"
+            shipping: "STANDARD"
+            created: 1609459200
+            updated: 1609465000
+            recipient:
+              name: "Jane Doe"
+              address1: "123 Fantasy Lane"
+              address2: "Apt 7"
+              city: "Portland"
+              state_code: "OR"
+              country_code: "US"
+              zip: "97205"
+              email: "fan@talesofaneria.com"
+          shipment:
+            id: "987654321"
+            carrier: "USPS"
+            service: "First-Class Package Service"
+            tracking_number: "9400111899223344556677"
+            tracking_url: "https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111899223344556677"
+            ship_date: "2024-01-05"
+            estimated_delivery: "2024-01-12"
+            items:
+              - item_id: 123
+                quantity: 1
+
+    PackageReturned:
+      summary: Package Returned Event
+      value:
+        type: "package_returned"
+        created: 1609459200
+        store: 123456
+        data:
+          order:
+            id: "123456789"
+            external_id: "cs_test_abc123xyz"
+            status: "canceled"
+          shipment:
+            tracking_number: "9400111899223344556677"
+            carrier: "USPS"
+
+    OrderFailed:
+      summary: Order Failed Event
+      value:
+        type: "order_failed"
+        created: 1609459200
+        store: 123456
+        data:
+          order:
+            id: "123456789"
+            external_id: "cs_test_abc123xyz"
+            status: "failed"
+          reason: "Out of stock"
+
+    OrderUpdated:
+      summary: Order Updated Event
+      value:
+        type: "order_updated"
+        created: 1609459200
+        store: 123456
+        data:
+          order:
+            id: "123456789"
+            external_id: "cs_test_abc123xyz"
+            status: "inprocess"
+            shipping: "STANDARD"
+
+  securitySchemes:
+    PrintfulWebhookSignature:
+      type: apiKey
+      in: header
+      name: x-printful-signature
+      description: |
+        HMAC SHA256 signature for webhook authentication.
+        
+        Verification process:
+        1. Get webhook secret from Printful dashboard
+        2. Compute HMAC: hmac_sha256(webhook_secret, raw_request_body)
+        3. Compare with x-printful-signature header
+        4. If secret is not set, webhooks are allowed (dev mode)
+
+tags:
+  - name: Webhooks
+    description: Webhook endpoints for third-party integrations
+  - name: Printful
+    description: Printful print-on-demand fulfillment webhooks
