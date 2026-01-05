@@ -43,6 +43,8 @@
     "clear-cache": "node scripts/clear-cache.mjs",
     "check-quota": "node scripts/check-quota.mjs",
     "db:push": "drizzle-kit push",
+    "db:seed": "tsx scripts/seed-database.ts",
+    "db:seed:e2e": "tsx scripts/seed-e2e-tests.ts",
     "create-admin": "tsx scripts/create-admin.ts",
     "sync:orders": "tsx scripts/sync-orders.ts",
     "sync:orders:dry-run": "tsx scripts/sync-orders.ts --dry-run",

@@ -51,6 +51,14 @@ jobs:
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
           
+      - name: Seed E2E test database
+        run: npm run db:seed:e2e
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          ADMIN_EMAIL: admin@talesofaneria.com
+          ADMIN_PASSWORD: ChangeMe123!
+          TEST_ADMIN_PASSWORD: testpassword
+          
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
