@@ -316,6 +316,11 @@ export async function getPlaylistVideos(playlistId: string, _maxResults: number 
     
     const youtube = await getUncachableYouTubeClient();
     
+    if (!youtube) {
+      console.log('⚠️  YouTube API not configured');
+      return [];
+    }
+    
     const allVideoIds: string[] = [];
     let nextPageToken: string | undefined = undefined;
     
@@ -656,7 +661,7 @@ const CHANNEL_STATS_CACHE_FILE = path.join(CACHE_DIR, 'youtube-channel-stats.jso
  * @param channelId - YouTube channel ID (starts with UC)
  * @returns Channel statistics including subscribers, videos, views, and estimated watch hours
  */
-export async function getChannelStats(channelId: string): Promise<ChannelStats> {
+export async function getChannelStats(channelId: string): Promise<ChannelStats | null> {
   try {
     // Check cache first
     if (fs.existsSync(CHANNEL_STATS_CACHE_FILE)) {
