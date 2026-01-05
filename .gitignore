@@ -10,6 +10,7 @@ vite.config.ts.*
 .env.local
 .env.*.local
 .env.production
+.env.test  # Test environment (use .env.test.example as template)
 
 # Test artifacts
 coverage/

@@ -30,6 +30,26 @@ jobs:
         run: npm ci --prefer-offline --no-audit
         env:
           HUSKY: 0  # Disable Husky in CI
+      
+      - name: Start test services (PostgreSQL + Redis)
+        run: docker-compose -f docker-compose.test.yml up -d
+      
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          echo "⏳ Waiting for PostgreSQL to be healthy..."
+          timeout 30 bash -c 'until docker-compose -f docker-compose.test.yml exec -T postgres pg_isready -U test_user -d toa_test; do sleep 1; done'
+          echo "✅ PostgreSQL is ready"
+      
+      - name: Wait for Redis to be ready
+        run: |
+          echo "⏳ Waiting for Redis to be healthy..."
+          timeout 30 bash -c 'until docker-compose -f docker-compose.test.yml exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
+          echo "✅ Redis is ready"
+      
+      - name: Run database migrations
+        run: npm run db:push
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
           
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -59,10 +79,16 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
             echo "✅ DATABASE_URL configured - E2E tests will run"
           fi
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
         
       - name: Run E2E tests
         if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
         
       - name: Skip E2E tests
         if: steps.check_e2e.outputs.skip == 'true'
@@ -71,6 +97,9 @@ jobs:
       - name: Run contract tests
         if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:contract
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          REDIS_URL: redis://localhost:6379
         
       - name: Skip contract tests
         if: steps.check_e2e.outputs.skip == 'true'
@@ -79,10 +108,17 @@ jobs:
       - name: Run visual regression tests
         if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:visual
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          REDIS_URL: redis://localhost:6379
         
       - name: Skip visual tests
         if: steps.check_e2e.outputs.skip == 'true'
         run: echo "⚠️  Visual tests skipped - DATABASE_URL not configured"
+        
+      - name: Cleanup test services
+        if: always()
+        run: docker-compose -f docker-compose.test.yml down -v
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
