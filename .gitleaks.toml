@@ -16,6 +16,7 @@ regexTarget = "match"
 paths = [
   '''\.env\.example$''',
   '''\.env\.docker$''',
+  '''docs/security/MARKDOWN_SECRET_PREVENTION\.md$''',
   '''test/.*\.test\.ts$''',
   '''test/.*\.spec\.ts$''',
   '''e2e/.*\.spec\.ts$''',
@@ -30,6 +31,10 @@ regexes = [
   '''placeholder''',
   '''your-.*-here''',
   '''xxx+''',
+  '''sk_test_51SkxsyKIWXnqSsOf1234567890''', # Example from documentation
+  '''sk_live_abc123xyz''', # Example from documentation
+  '''REDACTED''', # Documentation placeholders
+  '''DO_NOT_USE''', # Marked as example
 ]
 
 # Custom rules for this project

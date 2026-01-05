@@ -1,5 +1,11 @@
 # Markdown Secret Prevention Guide
 
+<!-- 
+  NOTE: This file contains EXAMPLE patterns for documentation purposes.
+  All keys shown are placeholders and safe to commit.
+  This file is allowlisted in .gitleaks.toml to prevent false positives.
+-->
+
 ## Overview
 
 This repository has **automated secret scanning** for markdown files to prevent accidental exposure of API keys, tokens, and credentials in documentation.
