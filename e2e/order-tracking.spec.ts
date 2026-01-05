@@ -209,7 +209,7 @@ test.describe('Order Tracking E2E', () => {
     await expect(content).toBeVisible();
   });
 
-  test('should handle missing session gracefully on success page', async ({ page }) => {
+  test('should handle missing session gracefully without error', async ({ page }) => {
     await page.goto('/checkout/success');
 
     // Page loads successfully (may show generic message or redirect)
