@@ -129,7 +129,10 @@ Our security testing includes:
 
 ### Before Committing
 ```bash
-# Check for secrets
+# Check for secrets in markdown files
+npm run check:markdown-secrets
+
+# Check for secrets in all files
 npm run check:secrets  # or use gitleaks
 
 # Run security tests
@@ -150,6 +153,7 @@ npm run license:check
 - **Follow least privilege** - Minimize permissions
 - **Secure defaults** - Fail closed, not open
 - **Defense in depth** - Multiple security layers
+- **Use placeholders in docs** - Never use real keys in markdown files (see [Markdown Secret Prevention](./docs/security/MARKDOWN_SECRET_PREVENTION.md))
 
 ### Dependencies
 - Keep dependencies up to date

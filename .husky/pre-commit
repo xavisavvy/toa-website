@@ -6,6 +6,14 @@ npm run check:mistakes || {
   exit 1
 }
 
+# Check markdown files for secrets
+echo "🔒 Scanning markdown files for secrets..."
+node scripts/check-markdown-secrets.mjs || {
+  echo ""
+  echo "❌ Secret exposure detected in markdown files!"
+  exit 1
+}
+
 # Check if .env.example was modified
 if git diff --cached --name-only | grep -q "^\.env\.example$"; then
   echo "⚠️  .env.example was modified!"

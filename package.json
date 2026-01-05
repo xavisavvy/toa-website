@@ -50,6 +50,7 @@
     "release:major": "standard-version --release-as minor",
     "release:patch": "standard-version --release-as patch",
     "license:check": "node scripts/license-check.js",
+    "check:markdown-secrets": "node scripts/check-markdown-secrets.mjs",
     "env:check": "node scripts/sync-env.js check",
     "env:sync": "node scripts/sync-env.js sync",
     "test:ses": "tsx scripts/test-ses.ts",
