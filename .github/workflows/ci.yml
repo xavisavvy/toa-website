@@ -15,6 +15,8 @@ jobs:
   test:
     name: Tests & Coverage
     runs-on: ubuntu-latest
+    # Skip CI for version bump commits
+    if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
     steps:
       - name: Checkout code

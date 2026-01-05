@@ -1,8 +1,12 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Versioning"]
+    types:
+      - completed
+    branches:
+      - main
   workflow_dispatch: # Allow manual triggers
     inputs:
       rollback_to:
@@ -15,6 +19,8 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     environment: production
+    # Only deploy if versioning succeeded (or manual trigger)
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
       - name: Checkout code

@@ -1,12 +1,17 @@
 name: Versioning
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
     branches:
       - main
 
 jobs:
   version:
+    # Only run if CI passed
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -53,9 +58,10 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: npm run release
 
-      - name: Push changes
+      - name: Push changes with skip CI
         if: steps.check.outputs.skip == 'false'
         run: |
+          # Push with [skip ci] to prevent triggering CI again
           git push --follow-tags origin main
         env:
           HUSKY: 0  # Disable hooks for version push
