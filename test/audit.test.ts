@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AuditService, AuditAction, AuditCategory } from '../server/audit';
 import type { Request } from 'express';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+import { AuditService, AuditAction, AuditCategory } from '../server/audit';
 
 // Mock dependencies
 vi.mock('../server/db', () => ({

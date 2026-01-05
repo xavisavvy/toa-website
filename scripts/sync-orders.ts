@@ -11,10 +11,11 @@
  *   npm run sync:orders [--days=30] [--dry-run]
  */
 
+import { eq } from 'drizzle-orm';
 import Stripe from 'stripe';
+
 import { db } from '../server/db';
 import { orders, orderItems } from '../server/db/schema';
-import { eq } from 'drizzle-orm';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
@@ -176,7 +177,7 @@ async function syncPrintfulOrders(dryRun: boolean, stats: SyncStats): Promise<vo
     .where(eq(orders.printfulOrderId, null));
 
   for (const order of ordersWithPrintful) {
-    if (!order.printfulOrderId) continue;
+    if (!order.printfulOrderId) {continue;}
 
     stats.printfulOrdersChecked++;
 

@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
 import crypto from 'crypto';
+
+import { test, expect } from '@playwright/test';
 
 test.describe('Printful Webhook E2E', () => {
   const webhookSecret = process.env.PRINTFUL_WEBHOOK_SECRET || 'test_secret';

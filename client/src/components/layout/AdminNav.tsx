@@ -1,6 +1,7 @@
-import { Button } from '../ui/button';
 import { ArrowLeft, LogOut } from 'lucide-react';
 import { useLocation } from 'wouter';
+
+import { Button } from '../ui/button';
 
 interface AdminNavProps {
   showBackButton?: boolean;

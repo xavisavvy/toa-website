@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { analytics, trackEvent, trackPageView } from '@/lib/analytics';
 
 describe('Analytics Library', () => {

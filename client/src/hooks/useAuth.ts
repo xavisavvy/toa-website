@@ -1,11 +1,11 @@
+import type { User } from '@shared/schema';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import type { User } from '@shared/schema';
 
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (_email: string, _password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }

@@ -1,0 +1,1229 @@
+
+> rest-express@1.31.0 lint
+> eslint . --ext .ts,.tsx
+
+The prop value with an expression type of MetaProperty could not be resolved. Please file an issue ( https://github.com/jsx-eslint/jsx-ast-utils/issues/new ) to get this fixed immediately.
+
+C:\Users\Preston\git\toa-website\client\src\App.tsx
+   4:1  warning  `react-helmet-async` import should occur before import of `wouter`                      import/order
+  13:1  warning  `@/lib/userEngagement` import should occur before import of `@/lib/webVitals`           import/order
+  15:1  warning  `@/pages/AdminAnalytics` import should occur before import of `@/pages/AdminDashboard`  import/order
+  18:1  warning  `@/pages/AdminOrderDetail` import should occur before import of `@/pages/AdminOrders`   import/order
+
+C:\Users\Preston\git\toa-website\client\src\components\AboutSection.tsx
+  112:15  warning  Define a constant instead of duplicating this literal 5 times  sonarjs/no-duplicate-string
+
+C:\Users\Preston\git\toa-website\client\src\components\CartButton.tsx
+  1:24  error  'X' is defined but never used                                                      no-unused-vars
+  1:24  error  'X' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+  2:10  error  'memo' is defined but never used                                                   no-unused-vars
+  2:10  error  'memo' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  6:10  error  'QuantityControl' is defined but never used                                        no-unused-vars
+  6:10  error  'QuantityControl' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\components\CartErrorBoundary.tsx
+  11:14  error  'error' is defined but never used      no-unused-vars
+  11:28  error  'errorInfo' is defined but never used  no-unused-vars
+  78:18  error  'navigator' is not defined             no-undef
+  98:7   error  'localStorage' is not defined          no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\CartItem.tsx
+  11:14  error  'itemId' is defined but never used    no-unused-vars
+  12:22  error  'itemId' is defined but never used    no-unused-vars
+  12:38  error  'quantity' is defined but never used  no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\components\CommunitySection.tsx
+  145:21  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  149:57  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  163:21  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  164:62  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  164:71  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  165:42  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  166:65  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  167:77  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  168:37  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  168:58  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  169:30  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  183:21  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  184:26  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  184:31  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  184:51  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\components\Hero.tsx
+  43:19  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Preston\git\toa-website\client\src\components\LatestEpisodes.tsx
+   28:38  error    'error' is assigned a value but never used                                               no-unused-vars
+   28:38  error    'error' is assigned a value but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+   36:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   43:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   47:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   49:35  warning  Forbidden non-null assertion                                                             @typescript-eslint/no-non-null-assertion
+   83:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  142:44  error    'index' is defined but never used                                                        no-unused-vars
+  142:44  error    'index' is defined but never used. Allowed unused args must match /^_/u                  @typescript-eslint/no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\components\LatestShorts.tsx
+  23:36  error    'error' is assigned a value but never used                                               no-unused-vars
+  23:36  error    'error' is assigned a value but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  27:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  34:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\client\src\components\PodcastSection.tsx
+    9:10  error    'apiRequest' is defined but never used                                                   no-unused-vars
+    9:10  error    'apiRequest' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  135:23  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  137:45  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\client\src\components\PrintfulShop.tsx
+  66:53  error  Expected { after 'if' condition  curly
+
+C:\Users\Preston\git\toa-website\client\src\components\PromotionsSection.tsx
+   1:10  error    'Gift' is defined but never used                                                         no-unused-vars
+   1:10  error    'Gift' is defined but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+  47:16  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                          react/no-unescaped-entities
+  57:30  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\client\src\components\SponsorshipForm.tsx
+  172:25  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  172:43  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\components\VariantSelector.tsx
+   24:21  error  'variantId' is defined but never used  no-unused-vars
+  134:21  error  'variantId' is defined but never used  no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\components\__tests__\printful-shop-pagination.test.tsx
+   2:1   warning  `@testing-library/react` import should occur before import of `vitest`       import/order
+   4:1   warning  `@testing-library/user-event` import should occur before import of `vitest`  import/order
+   5:1   warning  There should be at least one empty line between import groups                import/order
+   5:1   warning  `@tanstack/react-query` import should occur before import of `vitest`        import/order
+  26:37  error    'React' is not defined                                                       no-undef
+  44:5   error    'global' is not defined                                                      no-undef
+  48:12  error    'Response' is not defined                                                    no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\layout\AdminNav.tsx
+  1:1  warning  There should be at least one empty line between import groups  import/order
+  1:1  warning  `../ui/button` import should occur after import of `wouter`    import/order
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\carousel.tsx
+  19:13  error  'api' is defined but never used  no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\chart.tsx
+   12:4  error    'k' is defined but never used  no-unused-vars
+  354:7  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\input-otp.tsx
+  36:44  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\input.tsx
+  5:32  error  'HTMLInputElement' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\pagination.tsx
+  18:3  error  'HTMLUListElement' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\resizable.tsx
+  11:4  error  'React' is not defined  no-undef
+  27:4  error  'React' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\sidebar.tsx
+   38:13  error    'open' is defined but never used                               no-unused-vars
+   40:19  error    'open' is defined but never used                               no-unused-vars
+   67:19  error    'open' is defined but never used                               no-unused-vars
+   77:25  error    'value' is defined but never used                              no-unused-vars
+   98:35  error    'KeyboardEvent' is not defined                                 no-undef
+  433:9   warning  Define a constant instead of duplicating this literal 5 times  sonarjs/no-duplicate-string
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\skeleton.tsx
+  6:4  error  'React' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\table.tsx
+   6:3   error  'HTMLTableElement' is not defined         no-undef
+   7:24  error  'HTMLTableElement' is not defined         no-undef
+  20:3   error  'HTMLTableSectionElement' is not defined  no-undef
+  21:24  error  'HTMLTableSectionElement' is not defined  no-undef
+  28:3   error  'HTMLTableSectionElement' is not defined  no-undef
+  29:24  error  'HTMLTableSectionElement' is not defined  no-undef
+  40:3   error  'HTMLTableSectionElement' is not defined  no-undef
+  41:24  error  'HTMLTableSectionElement' is not defined  no-undef
+  55:3   error  'HTMLTableRowElement' is not defined      no-undef
+  56:24  error  'HTMLTableRowElement' is not defined      no-undef
+  70:3   error  'HTMLTableCellElement' is not defined     no-undef
+  71:26  error  'HTMLTableCellElement' is not defined     no-undef
+  85:3   error  'HTMLTableCellElement' is not defined     no-undef
+  86:26  error  'HTMLTableCellElement' is not defined     no-undef
+  97:3   error  'HTMLTableCaptionElement' is not defined  no-undef
+  98:24  error  'HTMLTableCaptionElement' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\components\ui\textarea.tsx
+  6:3  error  'HTMLTextAreaElement' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\hooks\use-toast.ts
+   18:7   error  'actionTypes' is assigned a value but only used as a type. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  129:25  error  'state' is defined but never used                                                                no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\hooks\useAuth.ts
+  3:1   warning  `@shared/schema` type import should occur before import of `react`  import/order
+  8:11  error    'email' is defined but never used                                   no-unused-vars
+  8:26  error    'password' is defined but never used                                no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\hooks\useCart.ts
+  22:28  error  'Event' is not defined         no-undef
+  45:37  error  'StorageEvent' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\client\src\lib\analytics.ts
+  9:16  error  'args' is defined but never used  no-unused-vars
+
+C:\Users\Preston\git\toa-website\client\src\lib\queryClient.ts
+   3:37  error  'Response' is not defined                   no-undef
+  14:12  error  'Response' is not defined                   no-undef
+  27:30  error  'options' is defined but never used         no-unused-vars
+  41:12  error  Redundant use of `await` on a return value  no-return-await
+
+C:\Users\Preston\git\toa-website\client\src\lib\structuredData.ts
+  4:15  warning  Define a constant instead of duplicating this literal 6 times  sonarjs/no-duplicate-string
+  6:11  warning  Define a constant instead of duplicating this literal 6 times  sonarjs/no-duplicate-string
+
+C:\Users\Preston\git\toa-website\client\src\lib\webVitals.ts
+  1:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\Users\Preston\git\toa-website\client\src\lib\youtube.ts
+   21:35  error    Unsafe Regular Expression                 security/detect-unsafe-regex
+   95:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  126:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\client\src\lib\zipCode.ts
+  25:10  error  Unsafe Regular Expression  security/detect-unsafe-regex
+  67:10  error  Unsafe Regular Expression  security/detect-unsafe-regex
+
+C:\Users\Preston\git\toa-website\client\src\pages\AdminAnalytics.tsx
+    2:1   warning  There should be at least one empty line between import groups                               import/order
+    3:1   warning  There should be at least one empty line between import groups                               import/order
+    4:1   warning  `recharts` import should occur before import of `wouter`                                    import/order
+    5:1   warning  There should be at least one empty line between import groups                               import/order
+    5:1   warning  `lucide-react` import should occur before import of `react`                                 import/order
+    6:1   warning  `@/components/layout/AdminNav` import should occur before import of `@/components/ui/card`  import/order
+  238:67  warning  Unexpected string concatenation                                                             prefer-template
+
+C:\Users\Preston\git\toa-website\client\src\pages\AdminDashboard.tsx
+  2:1  warning  There should be at least one empty line between import groups                            import/order
+  4:1  warning  `../components/ui/button` import should occur before import of `../hooks/useAuth`        import/order
+  5:1  warning  There should be at least one empty line between import groups                            import/order
+  5:1  warning  `../components/ui/card` import should occur before import of `../hooks/useAuth`          import/order
+  6:1  warning  There should be at least one empty line between import groups                            import/order
+  6:1  warning  `lucide-react` import should occur before import of `react`                              import/order
+  7:1  warning  `../components/layout/AdminNav` import should occur before import of `../hooks/useAuth`  import/order
+
+C:\Users\Preston\git\toa-website\client\src\pages\AdminLogin.tsx
+  2:1  warning  There should be at least one empty line between import groups                      import/order
+  4:1  warning  `../components/ui/button` import should occur before import of `../hooks/useAuth`  import/order
+  5:1  warning  `../components/ui/input` import should occur before import of `../hooks/useAuth`   import/order
+  6:1  warning  `../components/ui/label` import should occur before import of `../hooks/useAuth`   import/order
+  7:1  warning  `../components/ui/card` import should occur before import of `../hooks/useAuth`    import/order
+  8:1  warning  There should be at least one empty line between import groups                      import/order
+  8:1  warning  `../components/ui/alert` import should occur before import of `../hooks/useAuth`   import/order
+  9:1  warning  `lucide-react` import should occur before import of `react`                        import/order
+
+C:\Users\Preston\git\toa-website\client\src\pages\AdminOrderDetail.tsx
+   95:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\client\src\pages\AdminOrders.tsx
+   2:1  warning  There should be at least one empty line between import groups                            import/order
+   4:1  warning  `../components/ui/button` import should occur before import of `../hooks/useAuth`        import/order
+   5:1  warning  `../components/ui/card` import should occur before import of `../hooks/useAuth`          import/order
+   6:1  warning  `../components/ui/table` import should occur before import of `../hooks/useAuth`         import/order
+  14:1  warning  There should be at least one empty line between import groups                            import/order
+  14:1  warning  `../components/ui/badge` import should occur before import of `../hooks/useAuth`         import/order
+  15:1  warning  There should be at least one empty line between import groups                            import/order
+  15:1  warning  `lucide-react` import should occur before import of `react`                              import/order
+  16:1  warning  `../components/layout/AdminNav` import should occur before import of `../hooks/useAuth`  import/order
+  17:1  warning  `../../../shared/schema` type import should occur before import of `../hooks/useAuth`    import/order
+
+C:\Users\Preston\git\toa-website\client\src\pages\Characters.tsx
+  100:23  warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  100:23  warning  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+C:\Users\Preston\git\toa-website\client\src\pages\CheckoutCancel.tsx
+  31:88  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\pages\CheckoutSuccess.tsx
+  15:42  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  22:24  error    'URLSearchParams' is not defined                                 no-undef
+  41:41  warning  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  87:23  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\pages\PressKit.tsx
+  332:21  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\pages\Shop.tsx
+  128:19   warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  128:154  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\pages\Sponsors.tsx
+  144:23  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\pages\TermsOfService.tsx
+   38:71  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   38:77  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   59:88  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   59:96  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  114:71  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  200:75  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  220:89  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  237:58  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  237:64  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  347:23  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  347:36  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\Preston\git\toa-website\client\src\pages\TrackOrder.tsx
+   1:1   warning  There should be at least one empty line between import groups                                 import/order
+   5:1   warning  `../components/ui/card` import should occur before import of `../components/ui/input`         import/order
+   6:1   warning  `../components/ui/alert` import should occur before import of `../components/ui/button`       import/order
+   7:1   warning  There should be at least one empty line between import groups                                 import/order
+   7:1   warning  `../components/ui/badge` import should occur before import of `../components/ui/button`       import/order
+   8:1   warning  There should be at least one empty line between import groups                                 import/order
+   8:1   warning  `lucide-react` import should occur before import of `react`                                   import/order
+   9:1   warning  There should be at least one empty line between import groups                                 import/order
+   9:1   warning  `../../../shared/schema` type import should occur before import of `../components/ui/button`  import/order
+  10:1   warning  There should be at least one empty line between import groups                                 import/order
+  10:1   warning  `react-helmet-async` import should occur before import of `../components/ui/button`           import/order
+  12:1   warning  `@/assets/logo-TOA.svg` import should occur before import of `@/components/Footer`            import/order
+  55:19  warning  Unexpected any. Specify a different type                                                      @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\e2e\order-tracking.spec.ts
+  229:66  warning  Async arrow function has no 'await' expression  require-await
+  244:58  warning  Async arrow function has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\e2e\printful-webhook.spec.ts
+  1:1  warning  There should be at least one empty line between import groups     import/order
+  2:1  warning  `crypto` import should occur before import of `@playwright/test`  import/order
+
+C:\Users\Preston\git\toa-website\e2e\seo.spec.ts
+   14:12  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   15:12  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   56:29  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  283:30  error    Unsafe Regular Expression     security/detect-unsafe-regex
+
+C:\Users\Preston\git\toa-website\index.ts
+   40:44  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   60:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  100:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  106:17  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  140:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  145:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  147:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  153:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  155:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\check-common-mistakes.mjs
+  63:3  error  'console' is not defined  no-undef
+  65:5  error  'console' is not defined  no-undef
+  66:5  error  'console' is not defined  no-undef
+  68:7  error  'console' is not defined  no-undef
+  70:5  error  'console' is not defined  no-undef
+  72:3  error  'process' is not defined  no-undef
+  74:3  error  'console' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\check-env-changes.mjs
+   13:10  error  'readFileSync' is defined but never used  no-unused-vars
+   16:34  error  'process' is not defined                  no-undef
+   29:10  error  'parseEnvFile' is defined but never used  no-unused-vars
+   61:12  error  'error' is defined but never used         no-unused-vars
+   93:3   error  'console' is not defined                  no-undef
+   94:3   error  'console' is not defined                  no-undef
+   95:3   error  'console' is not defined                  no-undef
+   99:3   error  'console' is not defined                  no-undef
+  100:3   error  'console' is not defined                  no-undef
+  101:3   error  'console' is not defined                  no-undef
+  102:3   error  'console' is not defined                  no-undef
+  103:3   error  'console' is not defined                  no-undef
+  104:3   error  'console' is not defined                  no-undef
+  105:3   error  'console' is not defined                  no-undef
+  110:5   error  'console' is not defined                  no-undef
+  131:5   error  'console' is not defined                  no-undef
+  132:32  error  'console' is not defined                  no-undef
+  133:5   error  'console' is not defined                  no-undef
+  137:5   error  'console' is not defined                  no-undef
+  138:34  error  'console' is not defined                  no-undef
+  139:5   error  'console' is not defined                  no-undef
+  144:3   error  'console' is not defined                  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\check-markdown-secrets.mjs
+  105:7  error  'console' is not defined  no-undef
+  141:3  error  'console' is not defined  no-undef
+  152:5  error  'console' is not defined  no-undef
+  153:5  error  'process' is not defined  no-undef
+  157:5  error  'console' is not defined  no-undef
+  158:5  error  'process' is not defined  no-undef
+  161:3  error  'console' is not defined  no-undef
+  171:5  error  'console' is not defined  no-undef
+  172:5  error  'process' is not defined  no-undef
+  176:3  error  'console' is not defined  no-undef
+  177:3  error  'console' is not defined  no-undef
+  184:5  error  'console' is not defined  no-undef
+  186:7  error  'console' is not defined  no-undef
+  187:7  error  'console' is not defined  no-undef
+  188:7  error  'console' is not defined  no-undef
+  193:5  error  'console' is not defined  no-undef
+  195:7  error  'console' is not defined  no-undef
+  196:7  error  'console' is not defined  no-undef
+  197:7  error  'console' is not defined  no-undef
+  202:5  error  'console' is not defined  no-undef
+  204:7  error  'console' is not defined  no-undef
+  205:7  error  'console' is not defined  no-undef
+  206:7  error  'console' is not defined  no-undef
+  210:3  error  'console' is not defined  no-undef
+  211:3  error  'console' is not defined  no-undef
+  212:3  error  'console' is not defined  no-undef
+  213:3  error  'console' is not defined  no-undef
+  214:3  error  'console' is not defined  no-undef
+  215:3  error  'console' is not defined  no-undef
+  216:3  error  'console' is not defined  no-undef
+  217:3  error  'console' is not defined  no-undef
+  218:3  error  'console' is not defined  no-undef
+  219:3  error  'console' is not defined  no-undef
+  220:3  error  'console' is not defined  no-undef
+  221:3  error  'console' is not defined  no-undef
+  222:3  error  'console' is not defined  no-undef
+  223:3  error  'console' is not defined  no-undef
+  225:3  error  'process' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\check-quota.mjs
+   27:1  error  'console' is not defined  no-undef
+   28:1  error  'console' is not defined  no-undef
+   32:3  error  'console' is not defined  no-undef
+   33:3  error  'console' is not defined  no-undef
+   35:3  error  'console' is not defined  no-undef
+   36:3  error  'console' is not defined  no-undef
+   37:3  error  'console' is not defined  no-undef
+   38:3  error  'console' is not defined  no-undef
+   39:3  error  'console' is not defined  no-undef
+   41:3  error  'console' is not defined  no-undef
+   42:3  error  'console' is not defined  no-undef
+   43:3  error  'console' is not defined  no-undef
+   45:3  error  'process' is not defined  no-undef
+   54:3  error  'console' is not defined  no-undef
+   55:3  error  'console' is not defined  no-undef
+   56:3  error  'console' is not defined  no-undef
+   57:3  error  'console' is not defined  no-undef
+   69:5  error  'console' is not defined  no-undef
+   70:5  error  'console' is not defined  no-undef
+   71:5  error  'console' is not defined  no-undef
+   72:5  error  'console' is not defined  no-undef
+   73:5  error  'console' is not defined  no-undef
+   77:3  error  'console' is not defined  no-undef
+   78:3  error  'console' is not defined  no-undef
+   80:3  error  'console' is not defined  no-undef
+   81:3  error  'console' is not defined  no-undef
+   82:3  error  'console' is not defined  no-undef
+   83:3  error  'console' is not defined  no-undef
+   84:3  error  'console' is not defined  no-undef
+   91:3  error  'console' is not defined  no-undef
+   92:3  error  'console' is not defined  no-undef
+   93:3  error  'console' is not defined  no-undef
+   94:3  error  'console' is not defined  no-undef
+   95:3  error  'console' is not defined  no-undef
+   96:3  error  'console' is not defined  no-undef
+   99:3  error  'console' is not defined  no-undef
+  100:3  error  'console' is not defined  no-undef
+  103:5  error  'console' is not defined  no-undef
+  104:5  error  'console' is not defined  no-undef
+  106:5  error  'console' is not defined  no-undef
+  107:5  error  'console' is not defined  no-undef
+  109:5  error  'console' is not defined  no-undef
+  110:5  error  'console' is not defined  no-undef
+  112:5  error  'console' is not defined  no-undef
+  113:5  error  'console' is not defined  no-undef
+  115:3  error  'console' is not defined  no-undef
+  118:3  error  'console' is not defined  no-undef
+  119:3  error  'console' is not defined  no-undef
+  120:3  error  'console' is not defined  no-undef
+  121:3  error  'console' is not defined  no-undef
+  122:3  error  'console' is not defined  no-undef
+  123:3  error  'console' is not defined  no-undef
+  124:3  error  'console' is not defined  no-undef
+  125:3  error  'console' is not defined  no-undef
+  127:3  error  'console' is not defined  no-undef
+  128:3  error  'console' is not defined  no-undef
+  129:3  error  'console' is not defined  no-undef
+  130:3  error  'console' is not defined  no-undef
+  133:3  error  'console' is not defined  no-undef
+  134:3  error  'process' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\check-shop-variants.mjs
+   7:1   error  'console' is not defined  no-undef
+   9:24  error  'fetch' is not defined    no-undef
+  12:1   error  'console' is not defined  no-undef
+  15:3   error  'console' is not defined  no-undef
+  16:3   error  'console' is not defined  no-undef
+  17:3   error  'console' is not defined  no-undef
+  18:3   error  'console' is not defined  no-undef
+  21:5   error  'console' is not defined  no-undef
+  23:7   error  'console' is not defined  no-undef
+  24:7   error  'console' is not defined  no-undef
+  25:7   error  'console' is not defined  no-undef
+  28:3   error  'console' is not defined  no-undef
+  31:1   error  'console' is not defined  no-undef
+  32:1   error  'console' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\cleanup-github-caches.cjs
+   41:14  error  'process' is not defined            no-undef
+   59:1   error  'console' is not defined            no-undef
+   60:1   error  'console' is not defined            no-undef
+   67:3   error  'console' is not defined            no-undef
+   68:10  error  'error' is defined but never used   no-unused-vars
+   69:8   error  'process' is not defined            no-undef
+   70:5   error  'console' is not defined            no-undef
+   71:5   error  'console' is not defined            no-undef
+   72:5   error  'console' is not defined            no-undef
+   73:5   error  'console' is not defined            no-undef
+   74:5   error  'console' is not defined            no-undef
+   75:5   error  'console' is not defined            no-undef
+   76:5   error  'console' is not defined            no-undef
+   77:5   error  'console' is not defined            no-undef
+   78:5   error  'console' is not defined            no-undef
+   81:3   error  'console' is not defined            no-undef
+   98:10  error  'error' is defined but never used   no-unused-vars
+   99:3   error  'console' is not defined            no-undef
+  100:3   error  'console' is not defined            no-undef
+  104:1   error  'console' is not defined            no-undef
+  128:7   error  'console' is not defined            no-undef
+  136:7   error  'console' is not defined            no-undef
+  154:30  error  'fetch' is not defined              no-undef
+  158:40  error  'process' is not defined            no-undef
+  183:7   error  'console' is not defined            no-undef
+  201:12  error  'error' is defined but never used   no-unused-vars
+  211:28  error  'fetch' is not defined              no-undef
+  216:38  error  'process' is not defined            no-undef
+  224:12  error  'error' is defined but never used   no-unused-vars
+  234:3   error  'console' is not defined            no-undef
+  240:5   error  'console' is not defined            no-undef
+  244:3   error  'console' is not defined            no-undef
+  249:3   error  'console' is not defined            no-undef
+  257:5   error  'console' is not defined            no-undef
+  270:5   error  'console' is not defined            no-undef
+  287:43  error  'branch' is defined but never used  no-unused-vars
+  293:43  error  'branch' is defined but never used  no-unused-vars
+  302:5   error  'console' is not defined            no-undef
+  303:5   error  'console' is not defined            no-undef
+  307:5   error  'console' is not defined            no-undef
+  312:3   error  'console' is not defined            no-undef
+  316:5   error  'console' is not defined            no-undef
+  317:5   error  'console' is not defined            no-undef
+  324:3   error  'console' is not defined            no-undef
+  328:5   error  'console' is not defined            no-undef
+  329:5   error  'console' is not defined            no-undef
+  334:3   error  'console' is not defined            no-undef
+  335:3   error  'console' is not defined            no-undef
+  337:32  error  'setTimeout' is not defined         no-undef
+  340:3   error  'console' is not defined            no-undef
+  353:7   error  'console' is not defined            no-undef
+  356:7   error  'console' is not defined            no-undef
+  360:34  error  'setTimeout' is not defined         no-undef
+  363:3   error  'console' is not defined            no-undef
+  364:3   error  'console' is not defined            no-undef
+  365:3   error  'console' is not defined            no-undef
+  366:3   error  'console' is not defined            no-undef
+  367:3   error  'console' is not defined            no-undef
+  372:3   error  'console' is not defined            no-undef
+
+C:\Users\Preston\git\toa-website\scripts\clear-cache.mjs
+  17:1  error  'console' is not defined  no-undef
+  21:3  error  'console' is not defined  no-undef
+  22:3  error  'console' is not defined  no-undef
+  23:3  error  'process' is not defined  no-undef
+  33:3  error  'console' is not defined  no-undef
+  34:3  error  'console' is not defined  no-undef
+  35:3  error  'console' is not defined  no-undef
+  38:5  error  'console' is not defined  no-undef
+  43:7  error  'console' is not defined  no-undef
+  47:3  error  'console' is not defined  no-undef
+  51:3  error  'console' is not defined  no-undef
+  52:3  error  'console' is not defined  no-undef
+  55:3  error  'console' is not defined  no-undef
+  56:3  error  'console' is not defined  no-undef
+  57:3  error  'process' is not defined  no-undef
+  60:1  error  'console' is not defined  no-undef
+  61:1  error  'console' is not defined  no-undef
+  62:1  error  'console' is not defined  no-undef
+  63:1  error  'console' is not defined  no-undef
+  64:1  error  'console' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\create-admin-direct.ts
+  10:1  warning  `bcryptjs` import should occur before import of `pg`                                     import/order
+  19:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  20:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  27:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  30:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  34:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  44:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  45:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  46:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  47:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  48:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\create-admin-quick.ts
+  15:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  20:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  21:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  22:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  23:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  26:19  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\scripts\create-admin.ts
+   16:1  warning  There should be at least one empty line between import groups                            import/order
+   17:1  warning  `readline` import should occur before import of `../server/auth.js`                      import/order
+   83:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   84:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  106:5  warning  Potential timing attack, left side: true                                                 security/detect-possible-timing-attacks
+  111:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  116:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  117:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  118:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  119:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\license-check.js
+   52:1   error  'console' is not defined  no-undef
+   56:12  error  'process' is not defined  no-undef
+   63:7   error  'console' is not defined  no-undef
+   64:7   error  'process' is not defined  no-undef
+  154:29  error  'process' is not defined  no-undef
+  161:5   error  'console' is not defined  no-undef
+  164:5   error  'console' is not defined  no-undef
+  165:5   error  'console' is not defined  no-undef
+  166:5   error  'console' is not defined  no-undef
+  167:5   error  'console' is not defined  no-undef
+  168:5   error  'console' is not defined  no-undef
+  169:5   error  'console' is not defined  no-undef
+  173:7   error  'console' is not defined  no-undef
+  176:9   error  'console' is not defined  no-undef
+  177:9   error  'console' is not defined  no-undef
+  178:9   error  'console' is not defined  no-undef
+  181:7   error  'console' is not defined  no-undef
+  182:7   error  'console' is not defined  no-undef
+  183:7   error  'console' is not defined  no-undef
+  184:7   error  'console' is not defined  no-undef
+  185:7   error  'console' is not defined  no-undef
+  187:7   error  'process' is not defined  no-undef
+  190:5   error  'console' is not defined  no-undef
+  191:5   error  'process' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\optimize-character-images.ts
+  27:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  28:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  36:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  55:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  56:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  57:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  58:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  59:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\optimize-images.ts
+  41:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  42:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  54:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  75:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  76:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  77:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  78:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\seed-database.ts
+   3:1   warning  `drizzle-orm` import should occur before import of `drizzle-orm/node-postgres`    import/order
+   4:1   warning  There should be at least one empty line between import groups                     import/order
+   7:1   warning  `../server/logger.js` import should occur before import of `../shared/schema.ts`  import/order
+  19:14  error    '_err' is defined but never used                                                  no-unused-vars
+  19:14  error    '_err' is defined but never used                                                  @typescript-eslint/no-unused-vars
+  34:7   error    'client' is never reassigned. Use 'const' instead                                 prefer-const
+
+C:\Users\Preston\git\toa-website\scripts\seed-test-order.ts
+    2:1  warning  There should be at least one empty line between import groups                            import/order
+   14:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   46:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   89:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   91:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   92:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   93:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   94:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   95:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   96:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   97:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   98:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   99:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  100:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  101:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  102:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\setup-printful-webhook.ts
+  16:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  17:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  48:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  49:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  61:7  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  62:7  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\sync-env.js
+   56:3   error  'console' is not defined  no-undef
+   68:5   error  'console' is not defined  no-undef
+   69:35  error  'console' is not defined  no-undef
+   70:5   error  'console' is not defined  no-undef
+   77:5   error  'console' is not defined  no-undef
+   78:36  error  'console' is not defined  no-undef
+   79:5   error  'console' is not defined  no-undef
+   85:5   error  'console' is not defined  no-undef
+   86:33  error  'console' is not defined  no-undef
+   87:5   error  'console' is not defined  no-undef
+   92:5   error  'console' is not defined  no-undef
+   93:34  error  'console' is not defined  no-undef
+   94:5   error  'console' is not defined  no-undef
+   98:5   error  'console' is not defined  no-undef
+  100:5   error  'console' is not defined  no-undef
+  101:5   error  'process' is not defined  no-undef
+  111:5   error  'console' is not defined  no-undef
+  115:3   error  'console' is not defined  no-undef
+  116:30  error  'console' is not defined  no-undef
+  172:3   error  'console' is not defined  no-undef
+  177:3   error  'console' is not defined  no-undef
+  186:5   error  'console' is not defined  no-undef
+  188:5   error  'console' is not defined  no-undef
+  196:5   error  'console' is not defined  no-undef
+  198:5   error  'console' is not defined  no-undef
+  201:3   error  'console' is not defined  no-undef
+  202:3   error  'console' is not defined  no-undef
+  206:17  error  'process' is not defined  no-undef
+  213:3   error  'console' is not defined  no-undef
+  214:3   error  'console' is not defined  no-undef
+  215:3   error  'console' is not defined  no-undef
+  216:3   error  'process' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\sync-orders.ts
+   14:1   warning  There should be at least one empty line between import groups                            import/order
+   16:1   warning  There should be at least one empty line between import groups                            import/order
+   17:1   warning  `drizzle-orm` import should occur before import of `stripe`                              import/order
+  100:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  124:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  133:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  160:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  171:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  179:33  error    Expected { after 'if' condition                                                          curly
+  207:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  220:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  229:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  236:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  254:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  265:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  266:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  268:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  270:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  286:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  287:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  288:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  289:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  290:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  291:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  292:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  293:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  294:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  297:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  298:37  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  302:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  303:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\test-printful-variant.mjs
+   7:23  error  'process' is not defined  no-undef
+   8:16  error  'process' is not defined  no-undef
+  11:3   error  'console' is not defined  no-undef
+  12:3   error  'process' is not defined  no-undef
+  15:1   error  'console' is not defined  no-undef
+  20:5   error  'console' is not defined  no-undef
+  22:28  error  'fetch' is not defined    no-undef
+  29:5   error  'console' is not defined  no-undef
+  30:5   error  'console' is not defined  no-undef
+  34:7   error  'console' is not defined  no-undef
+  35:7   error  'console' is not defined  no-undef
+  36:7   error  'process' is not defined  no-undef
+  40:5   error  'console' is not defined  no-undef
+  41:5   error  'console' is not defined  no-undef
+  42:5   error  'console' is not defined  no-undef
+  47:7   error  'console' is not defined  no-undef
+  48:7   error  'process' is not defined  no-undef
+  51:5   error  'console' is not defined  no-undef
+  52:5   error  'console' is not defined  no-undef
+  53:5   error  'console' is not defined  no-undef
+  54:5   error  'console' is not defined  no-undef
+  55:5   error  'console' is not defined  no-undef
+  56:5   error  'console' is not defined  no-undef
+  61:7   error  'console' is not defined  no-undef
+  62:7   error  'console' is not defined  no-undef
+  63:7   error  'process' is not defined  no-undef
+  66:5   error  'console' is not defined  no-undef
+  68:5   error  'console' is not defined  no-undef
+  69:5   error  'process' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\scripts\test-ses.ts
+    5:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   10:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   11:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   12:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   13:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   14:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   15:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   19:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   20:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   21:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   22:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   23:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   28:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   29:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   78:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   79:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   80:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   90:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   91:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   92:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   93:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   95:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   96:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   97:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   98:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  100:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  101:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  102:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\update-all-characters.ts
+   68:66  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   91:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   97:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   98:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   99:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  102:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  106:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  107:16  error    'error' is defined but never used                                                        no-unused-vars
+  107:16  error    'error' is defined but never used                                                        @typescript-eslint/no-unused-vars
+  115:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  116:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  117:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  128:11  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  132:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  135:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  143:43  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  158:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  164:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  165:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  166:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\update-aneria-characters.ts
+   51:66  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   74:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   79:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   82:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   87:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   98:11  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  102:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  105:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  113:43  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  128:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  134:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\update-pterrordale-characters.ts
+   45:66  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   68:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   73:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   76:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   81:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   92:11  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   96:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+   99:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  107:43  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  122:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  128:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\update-taebrin-characters.ts
+   46:66  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   69:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   74:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   77:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   82:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   93:11  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   97:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  100:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  108:43  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  123:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  129:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\scripts\update-taebrin-with-custom-images.ts
+   47:66  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+   81:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   92:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  104:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  107:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  112:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  116:13  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  120:30  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  121:9   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  136:11  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  140:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  142:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  157:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  164:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  165:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  166:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  167:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  168:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  169:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  170:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  171:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  172:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  174:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\server\auth-middleware.ts
+  1:1  warning  There should be at least one empty line between import groups  import/order
+  2:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\Users\Preston\git\toa-website\server\auth.ts
+    1:1   warning  There should be at least one empty line between import groups                        import/order
+    2:1   warning  There should be at least one empty line between import groups                        import/order
+    3:1   warning  `../shared/schema` import should occur before import of `./db`                       import/order
+    4:1   warning  There should be at least one empty line between import groups                        import/order
+    4:1   warning  `../shared/schema` type import should occur before import of `./db`                  import/order
+    5:1   warning  There should be at least one empty line between import groups                        import/order
+    5:1   warning  `drizzle-orm` import should occur before import of `./db`                            import/order
+    7:1   warning  There should be at least one empty line between import groups                        import/order
+    7:1   warning  `./audit` import should occur before import of `./db`                                import/order
+    8:1   warning  `express` type import should occur before import of `./db`                           import/order
+   24:8   warning  Async function 'hashPassword' has no 'await' expression                              require-await
+   38:8   warning  Async function 'verifyPassword' has no 'await' expression                            require-await
+   56:21  warning  Define a constant instead of duplicating this literal 5 times                        sonarjs/no-duplicate-string
+  102:23  warning  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+
+C:\Users\Preston\git\toa-website\server\cache.ts
+  12:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\db.ts
+  30:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\env-validator.ts
+   93:19  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  101:19  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  109:19  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+C:\Users\Preston\git\toa-website\server\etsy.ts
+   70:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   74:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   95:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  113:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  119:22  error    'URLSearchParams' is not defined                                                         no-undef
+  136:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  140:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  181:11  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  189:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\server\feature-flags.ts
+  107:23  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  110:13  warning  Generic Object Injection Sink               security/detect-object-injection
+  111:11  warning  Generic Object Injection Sink               security/detect-object-injection
+  111:34  warning  Generic Object Injection Sink               security/detect-object-injection
+  121:18  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  164:12  warning  Generic Object Injection Sink               security/detect-object-injection
+  171:9   warning  Generic Object Injection Sink               security/detect-object-injection
+  172:7   warning  Generic Object Injection Sink               security/detect-object-injection
+  184:13  warning  Generic Object Injection Sink               security/detect-object-injection
+  185:11  warning  Generic Object Injection Sink               security/detect-object-injection
+  185:34  warning  Generic Object Injection Sink               security/detect-object-injection
+  211:44  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  211:54  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  211:65  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  226:16  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  226:26  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  226:37  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\health.ts
+  15:28  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  59:66  warning  Define a constant instead of duplicating this literal 5 times  sonarjs/no-duplicate-string
+  64:1   warning  Async function 'checkCache' has no 'await' expression          require-await
+
+C:\Users\Preston\git\toa-website\server\index.ts
+  47:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:51  error    '_next' is defined but never used         no-unused-vars
+
+C:\Users\Preston\git\toa-website\server\log-sanitizer.ts
+   61:18  warning  Define a constant instead of duplicating this literal 6 times                            sonarjs/no-duplicate-string
+  116:17  warning  Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed      sonarjs/cognitive-complexity
+  151:9   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  153:9   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  155:9   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  157:9   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  159:9   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  162:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  164:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  166:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  168:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  170:7   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  214:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  217:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  220:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\server\logger.ts
+  51:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:94  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\monitoring.ts
+   38:23  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+   93:9   warning  Generic Object Injection Sink             security/detect-object-injection
+  141:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\notification-service.ts
+   1:1   warning  There should be at least one empty line between import groups                   import/order
+   2:1   warning  There should be at least one empty line between import groups                   import/order
+   3:1   warning  `../shared/schema` type import should occur before import of `./log-sanitizer`  import/order
+  99:32  warning  Define a constant instead of duplicating this literal 6 times                   sonarjs/no-duplicate-string
+
+C:\Users\Preston\git\toa-website\server\order-service.ts
+   33:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   73:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   86:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  163:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\podcast.ts
+   48:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   52:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+   73:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  114:11  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\server\printful.ts
+  574:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\rate-limiter.ts
+  24:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  35:41  warning  Forbidden non-null assertion                                                             @typescript-eslint/no-non-null-assertion
+  70:41  warning  Forbidden non-null assertion                                                             @typescript-eslint/no-non-null-assertion
+  93:41  warning  Forbidden non-null assertion                                                             @typescript-eslint/no-non-null-assertion
+
+C:\Users\Preston\git\toa-website\server\routes.ts
+   188:46  warning  Define a constant instead of duplicating this literal 5 times  sonarjs/no-duplicate-string
+   337:52  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+   385:14  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   386:11  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   389:11  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   391:9   warning  Generic Object Injection Sink                                  security/detect-object-injection
+   406:16  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   407:13  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   409:11  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   410:11  warning  Generic Object Injection Sink                                  security/detect-object-injection
+   590:58  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+   617:56  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+   644:56  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+   697:54  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+   775:21  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+   802:54  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+   821:54  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+  1182:29  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+  1299:68  warning  Forbidden non-null assertion                                   @typescript-eslint/no-non-null-assertion
+  1756:53  warning  Async arrow function has no 'await' expression                 require-await
+
+C:\Users\Preston\git\toa-website\server\storage.ts
+   9:11  error    'id' is defined but never used                           no-unused-vars
+  10:18  error    'email' is defined but never used                        no-unused-vars
+  11:14  error    'user' is defined but never used                         no-unused-vars
+  21:3   warning  Async method 'getUser' has no 'await' expression         require-await
+  25:3   warning  Async method 'getUserByEmail' has no 'await' expression  require-await
+  31:3   warning  Async method 'createUser' has no 'await' expression      require-await
+
+C:\Users\Preston\git\toa-website\server\stripe.ts
+  12:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Preston\git\toa-website\server\vite.ts
+  16:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\server\youtube.ts
+    6:25  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  114:24  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  121:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  125:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  151:5   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  157:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  163:63  error    '_maxResults' is defined but never used                                                  no-unused-vars
+  174:33  warning  Forbidden non-null assertion                                                             @typescript-eslint/no-non-null-assertion
+  193:19  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  213:33  warning  Forbidden non-null assertion                                                             @typescript-eslint/no-non-null-assertion
+  224:64  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  266:23  warning  Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed      sonarjs/cognitive-complexity
+  279:26  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  283:11  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  290:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  291:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  305:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  328:21  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  397:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  399:11  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  408:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  421:23  warning  Refactor this function to reduce its Cognitive Complexity from 24 to the 15 allowed      sonarjs/cognitive-complexity
+  433:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  467:21  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  482:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  486:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  507:66  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  545:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  556:28  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  558:11  warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  562:14  error    '_cacheError' is defined but never used                                                  no-unused-vars
+  562:14  error    '_cacheError' is defined but never used                                                  @typescript-eslint/no-unused-vars
+  566:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  581:35  error    Unsafe Regular Expression                                                                security/detect-unsafe-regex
+  595:35  error    Unsafe Regular Expression                                                                security/detect-unsafe-regex
+  655:26  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  659:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  664:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  710:5   warning  Generic Object Injection Sink                                                            security/detect-object-injection
+  720:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  730:26  warning  Variable Assigned to Object Injection Sink                                               security/detect-object-injection
+  733:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\test\analytics.test.ts
+  1:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\Users\Preston\git\toa-website\test\audit.test.ts
+  1:1  warning  There should be at least one empty line between import groups  import/order
+  2:1  warning  There should be at least one empty line between import groups  import/order
+  3:1  warning  `express` type import should occur before import of `vitest`   import/order
+
+C:\Users\Preston\git\toa-website\test\cache.test.ts
+  285:15  warning  Generic Object Injection Sink  security/detect-object-injection
+  285:35  warning  Generic Object Injection Sink  security/detect-object-injection
+  296:9   warning  Generic Object Injection Sink  security/detect-object-injection
+  327:9   warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Preston\git\toa-website\test\chaos\network-resilience.test.ts
+    2:32  error    'beforeEach' is defined but never used                                        no-unused-vars
+    2:32  error    'beforeEach' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+    2:44  error    'vi' is defined but never used                                                no-unused-vars
+    2:44  error    'vi' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+    7:30  error    'AbortController' is not defined                                              no-undef
+   40:16  error    'error' is defined but never used                                             no-unused-vars
+   40:16  error    'error' is defined but never used                                             @typescript-eslint/no-unused-vars
+   73:40  warning  Async arrow function has no 'await' expression                                require-await
+   91:59  warning  Async arrow function has no 'await' expression                                require-await
+  154:41  warning  Async arrow function has no 'await' expression                                require-await
+  161:18  error    'error' is defined but never used                                             no-unused-vars
+  161:18  error    'error' is defined but never used                                             @typescript-eslint/no-unused-vars
+  184:16  error    'error' is defined but never used                                             no-unused-vars
+  184:16  error    'error' is defined but never used                                             @typescript-eslint/no-unused-vars
+  214:49  error    'data' is defined but never used                                              no-unused-vars
+  214:49  error    'data' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  247:19  error    'refillRate' is defined but never used                                        no-unused-vars
+  285:19  error    'maxRequests' is defined but never used                                       no-unused-vars
+  286:19  error    'windowMs' is defined but never used                                          no-unused-vars
+  334:29  error    'capacity' is defined but never used                                          no-unused-vars
+  338:25  warning  Forbidden non-null assertion                                                  @typescript-eslint/no-non-null-assertion
+
+C:\Users\Preston\git\toa-website\test\client-libs.test.ts
+  28:9  warning  Async method 'json' has no 'await' expression  require-await
+  35:9  warning  Async method 'json' has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\test\components\cart-error-boundary.test.tsx
+   17:5   error  'localStorage' is not defined  no-undef
+  171:7   error  'localStorage' is not defined  no-undef
+  179:14  error  'localStorage' is not defined  no-undef
+  192:14  error  'localStorage' is not defined  no-undef
+
+C:\Users\Preston\git\toa-website\test\contract\printful.contract.test.ts
+   51:11  warning  Async method 'json' has no 'await' expression  require-await
+   69:11  warning  Async method 'json' has no 'await' expression  require-await
+  131:9   warning  Async method 'json' has no 'await' expression  require-await
+  148:9   warning  Async method 'text' has no 'await' expression  require-await
+  162:11  warning  Async method 'json' has no 'await' expression  require-await
+  180:11  warning  Async method 'json' has no 'await' expression  require-await
+  206:9   warning  Async method 'json' has no 'await' expression  require-await
+  289:9   warning  Async method 'json' has no 'await' expression  require-await
+  341:9   warning  Async method 'json' has no 'await' expression  require-await
+  366:9   warning  Async method 'text' has no 'await' expression  require-await
+  381:9   warning  Async method 'json' has no 'await' expression  require-await
+  401:9   warning  Async method 'json' has no 'await' expression  require-await
+  425:9   warning  Async method 'json' has no 'await' expression  require-await
+  441:9   warning  Async method 'json' has no 'await' expression  require-await
+  461:9   warning  Async method 'json' has no 'await' expression  require-await
+  482:11  warning  Async method 'json' has no 'await' expression  require-await
+  496:11  warning  Async method 'json' has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\test\contract\stripe.contract.test.ts
+  137:66  warning  Async arrow function has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\test\contract\youtube.contract.test.ts
+  113:18  warning  Function Call Object Injection Sink  security/detect-object-injection
+
+C:\Users\Preston\git\toa-website\test\contracts\youtube-api.contract.test.ts
+   74:31  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  330:18  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  334:20  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+C:\Users\Preston\git\toa-website\test\load\load-test.ts
+  11:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  12:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  13:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  23:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  24:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  25:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  26:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  27:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  28:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  29:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  35:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  63:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  72:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  73:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  74:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  75:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  76:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  77:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  78:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  81:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  83:48  warning  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  85:7   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+  96:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error, info  no-console
+
+C:\Users\Preston\git\toa-website\test\log-sanitizer.test.ts
+  1:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\Users\Preston\git\toa-website\test\printful-webhook.test.ts
+  53:22  warning  Async arrow function has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\test\routes\printful-routes.test.ts
+   52:11  warning  Async method 'json' has no 'await' expression  require-await
+   70:11  warning  Async method 'json' has no 'await' expression  require-await
+  120:9   warning  Async method 'text' has no 'await' expression  require-await
+  136:9   warning  Async method 'json' has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\test\routes\printful-shipping.test.ts
+  18:83  warning  Async arrow function has no 'await' expression  require-await
+  61:43  warning  Async arrow function has no 'await' expression  require-await
+
+C:\Users\Preston\git\toa-website\test\youtube-integration.test.ts
+   33:9  warning  Async method 'json' has no 'await' expression  require-await
+   39:9  warning  Async method 'text' has no 'await' expression  require-await
+   60:9  warning  Async method 'json' has no 'await' expression  require-await
+   80:9  warning  Async method 'json' has no 'await' expression  require-await
+  107:9  warning  Async method 'json' has no 'await' expression  require-await
+  122:9  warning  Async method 'json' has no 'await' expression  require-await
+  136:9  warning  Async method 'json' has no 'await' expression  require-await
+  157:9  warning  Async method 'json' has no 'await' expression  require-await
+  170:9  warning  Async method 'json' has no 'await' expression  require-await
+  197:9  warning  Async method 'json' has no 'await' expression  require-await
+  215:9  warning  Async method 'json' has no 'await' expression  require-await
+  249:9  warning  Async method 'json' has no 'await' expression  require-await
+  281:9  warning  Async method 'json' has no 'await' expression  require-await
+  309:9  warning  Async method 'json' has no 'await' expression  require-await
+  390:9  warning  Async method 'json' has no 'await' expression  require-await
+  416:9  warning  Async method 'json' has no 'await' expression  require-await
+  424:9  warning  Async method 'json' has no 'await' expression  require-await
+
+Γ£û 990 problems (416 errors, 574 warnings)
+  3 errors and 85 warnings potentially fixable with the `--fix` option.
+

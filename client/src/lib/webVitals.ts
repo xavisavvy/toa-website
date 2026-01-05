@@ -1,4 +1,5 @@
 import { onCLS, onFCP, onLCP, onTTFB, onINP, Metric } from 'web-vitals';
+
 import { trackEvent } from './analytics';
 
 export function reportWebVitals() {

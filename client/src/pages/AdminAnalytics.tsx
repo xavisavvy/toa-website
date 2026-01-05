@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'wouter';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, DollarSign, ShoppingCart, Users, AlertCircle, Package } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useLocation } from 'wouter';
+
 import AdminNav from '@/components/layout/AdminNav';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface AnalyticsData {
   dailyRevenue: { date: string; revenue: number; orders: number }[];
@@ -235,7 +236,7 @@ export default function AdminAnalytics() {
                     type="category" 
                     width={200} 
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => value.length > 30 ? value.substring(0, 27) + '...' : value}
+                    tickFormatter={(value) => value.length > 30 ? `${value.substring(0, 27)  }...` : value}
                   />
                   <Tooltip 
                     formatter={(value: number) => [`$${value.toFixed(2)}`, 'Revenue']}

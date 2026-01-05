@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import pkg from 'pg';
+
 const { Client } = pkg;
-import { users, orders, orderItems } from '../shared/schema.ts';
 import { logger } from '../server/logger.js';
+import { users, orders, orderItems } from '../shared/schema.ts';
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://toa_user:toa_password@localhost:5432/toa_dev';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@talesofaneria.com';
@@ -31,7 +32,7 @@ async function waitForDatabase(client: typeof Client.prototype, maxRetries = 30,
 async function seedDatabase() {
   logger.info('🌱 Seeding database...\n');
   
-  let client = new Client({ connectionString: DATABASE_URL });
+  const client = new Client({ connectionString: DATABASE_URL });
   
   try {
     await waitForDatabase(client);

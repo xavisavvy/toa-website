@@ -1,6 +1,10 @@
+import { Package, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '../hooks/useAuth';
+
+import type { Order } from '../../../shared/schema';
+import AdminNav from '../components/layout/AdminNav';
+import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import {
@@ -11,10 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table';
-import { Badge } from '../components/ui/badge';
-import { Package, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
-import AdminNav from '../components/layout/AdminNav';
-import type { Order } from '../../../shared/schema';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AdminOrders() {
   const { user, loading: authLoading } = useAuth();

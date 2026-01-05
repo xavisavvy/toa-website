@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import { AlertCircle, RefreshCw, ShoppingCart } from 'lucide-react';
 import React, { Component, ReactNode } from 'react';
 

@@ -1,10 +1,11 @@
+import { Package, DollarSign, AlertCircle, TrendingUp, ShoppingBag, BarChart3 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '../hooks/useAuth';
+
+import AdminNav from '../components/layout/AdminNav';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Package, DollarSign, AlertCircle, TrendingUp, ShoppingBag, BarChart3 } from 'lucide-react';
-import AdminNav from '../components/layout/AdminNav';
+import { useAuth } from '../hooks/useAuth';
 
 interface DashboardStats {
   totalOrders: number;

@@ -1,12 +1,13 @@
+import { AlertCircle } from 'lucide-react';
 import { useState, FormEvent } from 'react';
 import { useLocation } from 'wouter';
-import { useAuth } from '../hooks/useAuth';
+
+import { Alert, AlertDescription } from '../components/ui/alert';
 import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');

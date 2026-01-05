@@ -1,6 +1,8 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import { safeLog, maskEmail } from './log-sanitizer';
+
 import type { Order } from '../shared/schema';
+
+import { safeLog, maskEmail } from './log-sanitizer';
 
 export interface EmailParams {
   to: string;

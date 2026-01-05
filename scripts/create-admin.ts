@@ -13,8 +13,9 @@
  * - Creates admin user in database
  */
 
-import { createUser } from '../server/auth.js';
 import * as readline from 'readline';
+
+import { createUser } from '../server/auth.js';
 
 const rl = readline.createInterface({
   input: process.stdin,

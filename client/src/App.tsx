@@ -1,7 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Switch, Route, useLocation } from "wouter";
 import { HelmetProvider } from "react-helmet-async";
+import { Switch, Route, useLocation } from "wouter";
 
 import { queryClient } from "./lib/queryClient";
 
@@ -9,13 +9,13 @@ import { useKonamiCode, ChaosGoblinMode } from "@/components/ChaosGoblinMode";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initGA, analytics } from "@/lib/analytics";
-import { reportWebVitals } from "@/lib/webVitals";
 import { initScrollTracking, initRageClickDetection, initSessionTracking } from "@/lib/userEngagement";
-import AdminDashboard from "@/pages/AdminDashboard";
+import { reportWebVitals } from "@/lib/webVitals";
 import AdminAnalytics from "@/pages/AdminAnalytics";
+import AdminDashboard from "@/pages/AdminDashboard";
 import AdminLogin from "@/pages/AdminLogin";
-import AdminOrders from "@/pages/AdminOrders";
 import AdminOrderDetail from "@/pages/AdminOrderDetail";
+import AdminOrders from "@/pages/AdminOrders";
 import CharacterDetail from "@/pages/CharacterDetail";
 import Characters from "@/pages/Characters";
 import Checkout from "@/pages/Checkout";

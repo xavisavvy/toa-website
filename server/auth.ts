@@ -1,11 +1,14 @@
 import bcrypt from 'bcryptjs';
-import { db } from './db';
+import { eq } from 'drizzle-orm';
+import type { Request } from 'express';
+
 import { users } from '../shared/schema';
 import type { User, UserWithPassword, LoginCredentials } from '../shared/schema';
-import { eq } from 'drizzle-orm';
-import { maskEmail, safeLog } from './log-sanitizer';
+
 import { AuditService, AuditAction } from './audit';
-import type { Request } from 'express';
+import { db } from './db';
+import { maskEmail, safeLog } from './log-sanitizer';
+
 
 // Security: Use strong work factor for bcrypt (10-12 recommended)
 const SALT_ROUNDS = 12;

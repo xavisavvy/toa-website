@@ -1,5 +1,4 @@
 import { X } from 'lucide-react';
-import { memo } from 'react';
 
 import { QuantityControl } from '@/components/QuantityControl';
 import { Badge } from '@/components/ui/badge';
@@ -8,8 +7,8 @@ import type { CartItem as CartItemType } from '@/types/cart';
 
 interface CartItemProps {
   item: CartItemType;
-  onRemove: (itemId: string) => void;
-  onQuantityChange: (itemId: string, quantity: number) => void;
+  onRemove: (_itemId: string) => void;
+  onQuantityChange: (_itemId: string, _quantity: number) => void;
 }
 
 /**

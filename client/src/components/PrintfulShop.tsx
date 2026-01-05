@@ -63,7 +63,7 @@ export default function PrintfulShop({ enableCheckout = false, limit }: Printful
 
   // Auto-open modal if product ID is in URL
   useEffect(() => {
-    if (!products || typeof window === 'undefined') return;
+    if (!products || typeof window === 'undefined') {return;}
     
     const urlParams = new window.URLSearchParams(window.location.search);
     const productId = urlParams.get('product');

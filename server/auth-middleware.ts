@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
+
 import type { User } from '../shared/schema';
+
 import { isValidSessionUser } from './auth';
 import { logSecurityEvent } from './security';
 
