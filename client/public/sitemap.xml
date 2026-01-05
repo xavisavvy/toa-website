@@ -23,7 +23,15 @@
     <loc>https://talesofaneria.com/shop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-05</lastmod>
+  </url>
+  
+  <!-- Track Order Page -->
+  <url>
+    <loc>https://talesofaneria.com/track-order</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+    <lastmod>2026-01-05</lastmod>
   </url>
   
   <!-- Sponsors Page -->
