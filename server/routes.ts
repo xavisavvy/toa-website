@@ -770,12 +770,69 @@ export function registerRoutes(app: Express): Server {
 
         // Get the final URL after redirects
         const finalUrl = response.url;
+
+        if (!finalUrl) {
+          logSecurityEvent('AUDIO_PROXY_INVALID_FINAL_URL', { originalUrl: decodedUrl, ip: req.ip });
+          return res.status(500).json({ error: 'Failed to resolve audio URL' });
+        }
+
+        // Validate final URL to prevent SSRF via redirects
+        const finalUrlValidation = validateUrl(finalUrl);
+        if (!finalUrlValidation.valid) {
+          logSecurityEvent('SSRF_ATTEMPT_FINAL_URL', {
+            originalUrl: decodedUrl,
+            finalUrl,
+            ip: req.ip,
+            error: finalUrlValidation.error,
+          });
+          return res.status(400).json({ error: finalUrlValidation.error });
+        }
+
+        const finalUrlObj = new URL(finalUrl);
+        const isFinalAllowed = allowedDomains.some(domain =>
+          finalUrlObj.hostname.endsWith(domain) || finalUrlObj.hostname === domain
+        );
+
+        if (!isFinalAllowed) {
+          logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN_FINAL', {
+            originalUrl: decodedUrl,
+            finalUrl,
+            ip: req.ip,
+          });
+          return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
+        }
         
         // Redirect client to the actual audio source
         res.redirect(302, finalUrl);
       } catch {
         globalThis.clearTimeout(timeout);
-        // If HEAD request fails, try direct redirect
+
+        // As a fallback, only redirect to the original decodedUrl
+        // if it still passes validation and domain checks
+        const fallbackValidation = validateUrl(decodedUrl);
+        if (!fallbackValidation.valid) {
+          logSecurityEvent('SSRF_ATTEMPT_FALLBACK_URL', {
+            url: decodedUrl,
+            ip: req.ip,
+            error: fallbackValidation.error,
+          });
+          return res.status(400).json({ error: fallbackValidation.error });
+        }
+
+        const fallbackUrlObj = new URL(decodedUrl);
+        const isFallbackAllowed = allowedDomains.some(domain =>
+          fallbackUrlObj.hostname.endsWith(domain) || fallbackUrlObj.hostname === domain
+        );
+
+        if (!isFallbackAllowed) {
+          logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN_FALLBACK', {
+            url: decodedUrl,
+            ip: req.ip,
+          });
+          return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
+        }
+
+        // If all checks pass, redirect directly to the original URL
         res.redirect(302, decodedUrl);
       }
     } catch (error: any) {
