@@ -25,7 +25,7 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
   // Prefer channel over playlists if both are provided
   const useChannel = !!channelId;
   
-  const { data: episodes, isLoading, error } = useQuery<Episode[]>({
+  const { data: episodes, isLoading, error: _fetchError } = useQuery<Episode[]>({
     queryKey: useChannel 
       ? ['/api/youtube/channel', channelId]
       : ['/api/youtube/playlists', playlistIds],
@@ -139,9 +139,9 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayEpisodes.map((episode, index) => (
+            {displayEpisodes.map((episode, _idx) => (
               <Card 
-                key={episode.id} 
+                key={episode.id}
                 className="overflow-hidden hover-elevate cursor-pointer transition-all"
                 data-testid={`card-episode-${episode.id}`}
                 onClick={() => {
@@ -154,6 +154,9 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
                     src={episode.thumbnail}
                     alt={episode.title}
                     className="object-cover w-full h-full"
+                    width="480"
+                    height="270"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-background/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">

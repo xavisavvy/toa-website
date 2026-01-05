@@ -72,6 +72,9 @@ export default function PrintfulShopPreview() {
                     src={product.image}
                     alt={product.name}
                     className="object-cover w-full h-full"
+                    width="400"
+                    height="400"
+                    loading="lazy"
                   />
                   {!product.inStock && (
                     <Badge 

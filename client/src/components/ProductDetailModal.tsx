@@ -203,6 +203,9 @@ export default function ProductDetailModal({
               src={product.image}
               alt={product.name}
               className="w-full h-full object-cover"
+              width="600"
+              height="600"
+              loading="lazy"
             />
           </div>
 

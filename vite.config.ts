@@ -52,8 +52,8 @@ export default defineConfig({
     },
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
-    // Enable sourcemaps only in development
-    sourcemap: process.env.NODE_ENV === 'development',
+    // Enable sourcemaps for production debugging
+    sourcemap: true,
   },
   server: {
     host: '0.0.0.0', // Allow access from any host

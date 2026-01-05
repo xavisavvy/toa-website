@@ -164,6 +164,9 @@ function LazyBackgroundImage({ src, alt, className }: LazyBackgroundImageProps) 
           src={src}
           alt={alt}
           className={className}
+          width="1200"
+          height="800"
+          loading="lazy"
         />
       )}
     </div>

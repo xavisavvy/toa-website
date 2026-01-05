@@ -83,6 +83,9 @@ export default function Characters() {
                 src={character.featuredImage}
                 alt={character.name}
                 className="object-cover w-full h-full"
+                width="300"
+                height="400"
+                loading="lazy"
               />
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -100,6 +103,13 @@ export default function Characters() {
                       <div 
                         onClick={(e) => e.preventDefault()}
                         onMouseDown={(e) => e.stopPropagation()}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                          }
+                        }}
                       >
                         <Badge 
                           variant="secondary" 

@@ -118,6 +118,9 @@ export default function Sponsors() {
                         src={sponsor.logo} 
                         alt={`${sponsor.name} logo`}
                         className="h-20 w-auto mb-4 object-contain"
+                        width="160"
+                        height="80"
+                        loading="lazy"
                       />
                       <h3 className="font-semibold text-lg mb-2">{sponsor.name}</h3>
                       <Badge variant="outline" className="mb-4">{sponsor.tier} Sponsor</Badge>

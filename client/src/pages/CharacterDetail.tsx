@@ -133,6 +133,9 @@ export default function CharacterDetail() {
             src={character.featuredImage}
             alt={character.name}
             className="absolute inset-0 w-full h-full object-cover opacity-30"
+            width="1920"
+            height="384"
+            loading="eager"
           />
         )}
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 h-full flex items-end pb-12">
@@ -242,6 +245,9 @@ export default function CharacterDetail() {
                               src={image.url}
                               alt={image.caption}
                               className="object-cover w-full h-full"
+                              width="300"
+                              height="400"
+                              loading="lazy"
                               itemProp="image"
                             />
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">

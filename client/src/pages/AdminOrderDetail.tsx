@@ -230,6 +230,9 @@ export default function AdminOrderDetail() {
                         src={item.image || '/src/assets/logo-TOA.svg'}
                         alt={item.name}
                         className="w-20 h-20 object-cover rounded-md"
+                        width="80"
+                        height="80"
+                        loading="lazy"
                       />
                       <div className="flex-1">
                         <h3 className="font-semibold">{item.name}</h3>

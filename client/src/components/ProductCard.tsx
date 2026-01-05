@@ -31,6 +31,8 @@ export function ProductCard({
           src={image}
           alt={name}
           className="object-cover w-full h-full"
+          width="400"
+          height="400"
           loading="lazy"
         />
         {!inStock && (

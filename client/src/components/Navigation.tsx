@@ -58,6 +58,8 @@ export default function Navigation() {
               src={logoSvg} 
               alt="Tales of Aneria" 
               className="h-8 md:h-10 w-auto dark:invert"
+              width="40"
+              height="40"
               data-testid="img-nav-logo"
             />
           </Link>

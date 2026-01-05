@@ -20,7 +20,7 @@ interface LatestShortsProps {
 }
 
 export default function LatestShorts({ channelId }: LatestShortsProps) {
-  const { data: shorts, isLoading, error } = useQuery<Short[]>({
+  const { data: shorts, isLoading, error: _fetchError } = useQuery<Short[]>({
     queryKey: ['/api/youtube/channel/shorts', channelId],
     enabled: !!channelId,
     queryFn: async () => {
@@ -99,6 +99,9 @@ export default function LatestShorts({ channelId }: LatestShortsProps) {
                     src={short.thumbnail}
                     alt={short.title}
                     className="object-cover w-full h-full"
+                    width="270"
+                    height="480"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-background/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">

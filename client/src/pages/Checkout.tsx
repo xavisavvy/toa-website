@@ -239,6 +239,9 @@ export default function Checkout() {
                         src={item.imageUrl}
                         alt={item.productName}
                         className="w-24 h-24 object-cover rounded-md"
+                        width="96"
+                        height="96"
+                        loading="lazy"
                       />
                       <div className="flex-1">
                         <div className="flex justify-between">

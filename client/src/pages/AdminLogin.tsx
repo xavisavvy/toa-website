@@ -49,6 +49,8 @@ export default function AdminLogin() {
                 src="/src/assets/logo-TOA.svg" 
                 alt="Tales of Aneria" 
                 className="h-24 w-auto"
+                width="96"
+                height="96"
               />
             </a>
           </div>

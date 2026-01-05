@@ -78,6 +78,9 @@ export default function CharactersSection() {
                       src={character.featuredImage}
                       alt={character.name}
                       className="object-cover w-full h-full"
+                      width="300"
+                      height="400"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground">

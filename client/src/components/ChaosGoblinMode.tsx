@@ -251,6 +251,9 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
                 src={character.featuredImage}
                 alt={character.name}
                 className={`w-auto ${heightClass} object-contain`}
+                width="200"
+                height="200"
+                loading="lazy"
                 style={{
                   filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.8))',
                 }}
@@ -269,6 +272,9 @@ export function ChaosGoblinMode({ active, onComplete }: ChaosGoblinModeProps) {
           src="/chaos-goblin.svg"
           alt="Dancing Chaos Goblin"
           className="w-64 h-64"
+          width="256"
+          height="256"
+          loading="eager"
           style={{
             animation: 'goblin-dance 0.5s ease-in-out infinite alternate, goblin-spin 2s linear infinite',
           }}

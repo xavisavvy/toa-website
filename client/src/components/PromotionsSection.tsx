@@ -1,4 +1,4 @@
-import { Gift, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import creepyForest from "@/assets/creepy-forest.webp";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +61,8 @@ export default function PromotionsSection() {
                   src={promo.image}
                   alt={promo.title}
                   className="object-cover w-full h-full"
+                  width="640"
+                  height="360"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />

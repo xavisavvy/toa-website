@@ -8,9 +8,9 @@ import type { CartItem as CartItemType } from '@/types/cart';
 
 interface CartItemProps {
   item: CartItemType;
-  // eslint-disable-next-line no-unused-vars
+   
   onRemove: (itemId: string) => void;
-  // eslint-disable-next-line no-unused-vars
+   
   onQuantityChange: (itemId: string, quantity: number) => void;
 }
 
@@ -30,6 +30,9 @@ export const CartItem = memo<CartItemProps>(({ item, onRemove, onQuantityChange 
         src={item.imageUrl}
         alt={item.productName}
         className="w-20 h-20 object-cover rounded"
+        width="80"
+        height="80"
+        loading="lazy"
       />
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start mb-2">

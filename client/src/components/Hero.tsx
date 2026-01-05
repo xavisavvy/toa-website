@@ -125,18 +125,24 @@ export default function Hero() {
       </div>
 
       <div className="absolute bottom-8 right-8 flex gap-2 z-20">
-        {heroImages.map((_, index) => (
+        {heroImages.map((_, idx) => (
           <button
-            key={index}
-            onClick={() => setCurrentImageIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              index === currentImageIndex 
-                ? 'bg-primary w-8' 
-                : 'bg-foreground/30 hover:bg-foreground/50'
+            key={idx}
+            onClick={() => setCurrentImageIndex(idx)}
+            className={`min-w-12 min-h-12 p-3 rounded-full transition-all flex items-center justify-center ${
+              idx === currentImageIndex
+                ? 'bg-primary/20' 
+                : 'bg-foreground/10 hover:bg-foreground/20'
             }`}
-            aria-label={`Go to slide ${index + 1}`}
-            data-testid={`button-carousel-${index}`}
-          />
+            aria-label={`Go to slide ${idx + 1}`}
+            data-testid={`button-carousel-${idx}`}
+          >
+            <span className={`w-2 h-2 rounded-full transition-all ${
+              idx === currentImageIndex
+                ? 'bg-primary w-6' 
+                : 'bg-foreground/50'
+            }`} />
+          </button>
         ))}
       </div>
     </section>
