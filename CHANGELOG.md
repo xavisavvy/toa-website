@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.3](https://github.com/xavisavvy/toa-website/compare/v2.2.2...v2.2.3) (2026-01-05)
+
+
+### Bug Fixes
+
+* add skip condition to ALL CI jobs for version commits ([95ce469](https://github.com/xavisavvy/toa-website/commit/95ce4692715565a350d598d1e6555449ebba6a30))
+* implement proper workflow chain and prevent infinite loops ([7e966e7](https://github.com/xavisavvy/toa-website/commit/7e966e7620b268711f835228916fbc1ce485a0f3))
+
 ### [2.2.2](https://github.com/xavisavvy/toa-website/compare/v2.2.1...v2.2.2) (2026-01-05)
 
 
