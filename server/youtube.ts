@@ -92,7 +92,11 @@ interface CachedPlaylistData {
   [playlistId: string]: PlaylistCacheEntry;
 }
 
-function isCacheValid(cacheEntry: PlaylistCacheEntry): boolean {
+interface BaseCacheEntry {
+  timestamp: number;
+}
+
+function isCacheValid(cacheEntry: BaseCacheEntry): boolean {
   const now = Date.now();
   const age = now - cacheEntry.timestamp;
   return age < CACHE_DURATION;

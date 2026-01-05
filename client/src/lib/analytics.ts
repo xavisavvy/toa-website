@@ -6,10 +6,8 @@
 
 declare global {
   interface Window {
-     
-    gtag?: () => void;
-     
-    dataLayer?: any[];
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
@@ -31,14 +29,12 @@ export const initGA = () => {
   document.head.appendChild(script);
 
   // Initialize gtag
-  window.gtag = function gtag() {
+  window.gtag = function gtag(...args: unknown[]) {
     window.dataLayer = window.dataLayer || [];
-     
-     
-    window.dataLayer.push(arguments);
+    window.dataLayer.push(args);
   };
 
-  window.gtag('js', new Date().toISOString());
+  window.gtag('js', new Date());
   window.gtag('config', GA_MEASUREMENT_ID, {
     send_page_view: false, // We'll handle pageviews manually
   });

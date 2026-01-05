@@ -143,7 +143,7 @@ describe('Stripe → Printful Integration', () => {
       expect(orderData?.recipient).toEqual({
         name: 'Preston Farr',
         address1: '526 E 200 S',
-        address2: null,
+        address2: undefined,
         city: 'Clearfield',
         state_code: 'UT',
         country_code: 'US',

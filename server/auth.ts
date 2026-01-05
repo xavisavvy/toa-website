@@ -339,15 +339,29 @@ function sanitizeUser(user: UserWithPassword): User {
  * @returns True if valid
  */
 export function isValidSessionUser(user: unknown, requiredRole?: 'admin' | 'customer'): user is User {
-  if (!user || !user.id || !user.email || !user.role) {
+  if (!user || typeof user !== 'object') {
+    return false;
+  }
+  
+  const u = user as Record<string, unknown>;
+  
+  if (!u.id || typeof u.id !== 'string') {
+    return false;
+  }
+  
+  if (!u.email || typeof u.email !== 'string') {
+    return false;
+  }
+  
+  if (!u.role || (u.role !== 'admin' && u.role !== 'customer')) {
     return false;
   }
 
-  if (user.isActive !== 1) {
+  if (u.isActive !== 1) {
     return false;
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && u.role !== requiredRole) {
     return false;
   }
 

@@ -12,6 +12,7 @@ export interface CacheMetrics {
   misses: number;
   sets: number;
   deletes: number;
+  hitRate: number;
 }
 
 export interface ErrorMetrics {
@@ -21,7 +22,7 @@ export interface ErrorMetrics {
 
 class MetricsCollector {
   private apiLatency: Map<string, number[]> = new Map();
-  private cacheMetrics: CacheMetrics = { hits: 0, misses: 0, sets: 0, deletes: 0 };
+  private cacheMetrics: CacheMetrics = { hits: 0, misses: 0, sets: 0, deletes: 0, hitRate: 0 };
   private errorMetrics: ErrorMetrics = { 
     errors: 0, 
     errorsByType: new Map() 
@@ -81,11 +82,12 @@ class MetricsCollector {
 
   getMetrics() {
     const uptime = Date.now() - this.startTime;
-    const cacheHitRate = this.cacheMetrics.hits + this.cacheMetrics.misses > 0
-      ? this.cacheMetrics.hits / (this.cacheMetrics.hits + this.cacheMetrics.misses)
+    const total = this.cacheMetrics.hits + this.cacheMetrics.misses;
+    const cacheHitRate = total > 0
+      ? (this.cacheMetrics.hits / total) * 100
       : 0;
 
-    const latencyStats: Record<string, any> = {};
+    const latencyStats: Record<string, unknown> = {};
     for (const [endpoint, values] of this.apiLatency.entries()) {
       if (values.length > 0) {
         latencyStats[endpoint] = {
@@ -126,7 +128,7 @@ class MetricsCollector {
 
   reset() {
     this.apiLatency.clear();
-    this.cacheMetrics = { hits: 0, misses: 0, sets: 0, deletes: 0 };
+    this.cacheMetrics = { hits: 0, misses: 0, sets: 0, deletes: 0, hitRate: 0 };
     this.errorMetrics = { errors: 0, errorsByType: new Map() };
     this.requestCount = 0;
     this.startTime = Date.now();

@@ -50,7 +50,7 @@ interface Character {
   images: CharacterImage[];
   backstory: string;
   personality: string;
-  dndbeyond: string;
+  dndbeyond?: string;
   dndbeyondId?: string;
   playlist?: string;
   status: string;

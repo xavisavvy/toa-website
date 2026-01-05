@@ -118,11 +118,19 @@ export function sanitizeObject(obj: SanitizableObject, seen = new WeakSet()): Sa
   
   // Prevent circular reference infinite loops
   if (seen.has(obj)) {
-    return '[Circular Reference]' as any;
+    return '[Circular Reference]' as unknown as SanitizableObject;
   }
   seen.add(obj);
   
-  const sanitized: SanitizableObject = Array.isArray(obj) ? [] : {};
+  const sanitized: SanitizableObject = Array.isArray(obj) ? {} : {};
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => 
+      typeof item === 'object' && item !== null 
+        ? sanitizeObject(item as SanitizableObject, seen) 
+        : item
+    ) as unknown as SanitizableObject;
+  }
   
   for (const [key, value] of Object.entries(obj)) {
     const lowerKey = key.toLowerCase();
@@ -153,13 +161,13 @@ export function sanitizeObject(obj: SanitizableObject, seen = new WeakSet()): Sa
     } else if (isDirectPII && (value === null || value === undefined)) {
       (sanitized as Record<string, unknown>)[key] = REDACTED;
     } else if (isAddressField && typeof value === 'string') {
-      (sanitized as Record<string, unknown>)[key] = REDACTED;
+      sanitized[key] = REDACTED;
     } else if ((isDirectPII || isAddressField || isContainer) && typeof value === 'object' && value !== null) {
-      (sanitized as Record<string, unknown>)[key] = sanitizeObject(value, seen);
+      sanitized[key] = sanitizeObject(value as SanitizableObject, seen);
     } else if (typeof value === 'object' && value !== null) {
-      (sanitized as Record<string, unknown>)[key] = sanitizeObject(value, seen);
+      sanitized[key] = sanitizeObject(value as SanitizableObject, seen);
     } else {
-      (sanitized as Record<string, unknown>)[key] = value;
+      sanitized[key] = value;
     }
   }
   
@@ -171,33 +179,42 @@ export function sanitizeObject(obj: SanitizableObject, seen = new WeakSet()): Sa
  */
 export const safeLog = {
   info: (message: string, data?: unknown) => {
-    if (data) {
-      console.info(message, sanitizeObject(data));
+    if (data && typeof data === 'object' && data !== null) {
+      console.info(message, sanitizeObject(data as SanitizableObject));
+    } else if (data) {
+      console.info(message, data);
     } else {
       console.info(message);
     }
   },
   
   warn: (message: string, data?: unknown) => {
-    if (data) {
-      console.warn(message, sanitizeObject(data));
+    if (data && typeof data === 'object' && data !== null) {
+      console.warn(message, sanitizeObject(data as SanitizableObject));
+    } else if (data) {
+      console.warn(message, data);
     } else {
       console.warn(message);
     }
   },
   
   error: (message: string, data?: unknown) => {
-    if (data) {
-      console.error(message, sanitizeObject(data));
+    if (data && typeof data === 'object' && data !== null) {
+      console.error(message, sanitizeObject(data as SanitizableObject));
+    } else if (data) {
+      console.error(message, data);
     } else {
       console.error(message);
     }
   },
   
   log: (message: string, data?: unknown) => {
-    if (data) {
+    if (data && typeof data === 'object' && data !== null) {
       // Note: console.log used for debugging - consider removing in production
-      console.log(message, sanitizeObject(data));
+      console.log(message, sanitizeObject(data as SanitizableObject));
+    } else if (data) {
+      // Note: console.log used for debugging - consider removing in production
+      console.log(message, data);
     } else {
       // Note: console.log used for debugging - consider removing in production
       console.log(message);

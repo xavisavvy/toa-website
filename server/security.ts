@@ -268,7 +268,8 @@ export async function logSecurityEvent(event: string, details: Record<string, un
   
   // Database logging (async, don't await to avoid blocking)
   try {
-    const { db, auditLogs } = await import('./db');
+    const { db } = await import('./db');
+    const { auditLogs } = await import('../shared/schema');
     if (db) {
       const severity = event.includes('FAILED') || event.includes('INVALID') || event.includes('SUSPICIOUS') 
         ? 'high' 
@@ -284,7 +285,7 @@ export async function logSecurityEvent(event: string, details: Record<string, un
         status: details.status as 'success' | 'failure' || 'failure',
         errorMessage: details.reason as string || details.message as string || null,
         severity: severity as 'low' | 'medium' | 'high',
-      }).catch(err => {
+      }).catch((err: Error) => {
         console.error('[ERROR] Failed to write audit log:', err);
       });
     }

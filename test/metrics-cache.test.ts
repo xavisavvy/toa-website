@@ -142,7 +142,7 @@ describe('MetricsCache', () => {
       cache.get('nonexistent'); // miss
       
       const metricsData = metrics.getMetrics();
-      expect(metricsData.cache.hitRate).toBeCloseTo(0.67, 1);
+      expect(metricsData.cache.hitRate).toBeCloseTo(67, 0); // 67% hit rate (2 hits / 3 total)
     });
 
     test('should track misses for expired entries', async () => {

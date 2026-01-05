@@ -48,6 +48,8 @@ export const orders = pgTable("orders", {
   customerName: text("customer_name"),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("usd"),
+  trackingNumber: text("tracking_number"),
+  trackingUrl: text("tracking_url"),
   shippingAddress: json("shipping_address").$type<{
     name: string;
     line1: string;

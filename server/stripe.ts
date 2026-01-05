@@ -9,7 +9,7 @@ if (!stripeSecretKey) {
 
 export const stripe = stripeSecretKey 
   ? new Stripe(stripeSecretKey, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2024-12-18.acacia' as any, // Using older API version for compatibility
       typescript: true,
     })
   : null;
@@ -202,11 +202,26 @@ export interface PrintfulOrderData {
 export function createPrintfulOrderFromSession(
   session: Stripe.Checkout.Session
 ): PrintfulOrderData | null {
-  if (!session.shipping_details || !session.customer_details) {
+  // Type assertion for shipping_details which exists but may not be in older type definitions
+  const sessionWithShipping = session as Stripe.Checkout.Session & {
+    shipping_details?: {
+      address?: {
+        city?: string | null;
+        country?: string | null;
+        line1?: string | null;
+        line2?: string | null;
+        postal_code?: string | null;
+        state?: string | null;
+      };
+      name?: string | null;
+    };
+  };
+  
+  if (!sessionWithShipping.shipping_details || !session.customer_details) {
     return null;
   }
 
-  const shipping = session.shipping_details;
+  const shipping = sessionWithShipping.shipping_details;
   const customer = session.customer_details;
 
   const variantId = session.metadata?.printful_variant_id;
@@ -218,7 +233,7 @@ export function createPrintfulOrderFromSession(
     recipient: {
       name: shipping.name || customer.name || 'Customer',
       address1: shipping.address?.line1 || '',
-      address2: shipping.address?.line2,
+      address2: shipping.address?.line2 || undefined,
       city: shipping.address?.city || '',
       state_code: shipping.address?.state || '',
       country_code: shipping.address?.country || 'US',

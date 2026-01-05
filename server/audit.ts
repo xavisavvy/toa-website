@@ -149,7 +149,7 @@ export class AuditService {
       // Critical: audit logging failure should be logged but not throw
       logger.error({ 
         error, 
-        context: this.maskSensitiveData(context as Record<string, unknown>) 
+        context: this.maskSensitiveData((context || {}) as unknown as Record<string, unknown>) 
       }, "Failed to write audit log");
     }
   }

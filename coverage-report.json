@@ -1,0 +1,48 @@
+
+> rest-express@1.31.0 test:coverage
+> vitest --coverage server/routes.ts --reporter=json
+
+JSON report written to C:/Users/Preston/git/toa-website/reports/test-results.json
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |       0 |        0 |       0 |       0 |                   
+ client/src        |       0 |        0 |       0 |       0 |                   
+  App.tsx          |       0 |        0 |       0 |       0 | 35-132            
+ client/src/lib    |       0 |        0 |       0 |       0 |                   
+  analytics.ts     |       0 |        0 |       0 |       0 | 16-241            
+  cart.ts          |       0 |        0 |       0 |       0 | 3-214             
+  shipping.ts      |       0 |        0 |       0 |       0 | 13-108            
+  stripe.ts        |       0 |        0 |       0 |       0 | 3-72              
+  ...cturedData.ts |       0 |      100 |       0 |       0 | 3-100             
+  ...Engagement.ts |       0 |        0 |       0 |       0 | 3-70              
+  webVitals.ts     |       0 |        0 |       0 |       0 | 5-20              
+  youtube.ts       |       0 |        0 |       0 |       0 | 12-153            
+  zipCode.ts       |       0 |        0 |       0 |       0 | 16-67             
+ client/src/types  |       0 |        0 |       0 |       0 |                   
+  cart.ts          |       0 |        0 |       0 |       0 |                   
+ server            |       0 |        0 |       0 |       0 |                   
+  audit.ts         |       0 |        0 |       0 |       0 | 11-313            
+  ...middleware.ts |       0 |        0 |       0 |       0 | 20-164            
+  auth.ts          |       0 |        0 |       0 |       0 | 11-354            
+  cache.ts         |       0 |        0 |       0 |       0 | 13-90             
+  db.ts            |       0 |        0 |       0 |       0 | 6-30              
+  dndbeyond.ts     |       0 |        0 |       0 |       0 | 22-73             
+  env-validator.ts |       0 |        0 |       0 |       0 | 12-153            
+  etsy.ts          |       0 |        0 |       0 |       0 | 40-190            
+  feature-flags.ts |       0 |        0 |       0 |       0 | 22-233            
+  health.ts        |       0 |        0 |       0 |       0 | 34-413            
+  log-sanitizer.ts |       0 |        0 |       0 |       0 | 11-203            
+  logger.ts        |       0 |        0 |       0 |       0 | 3-95              
+  monitoring.ts    |       0 |        0 |       0 |       0 | 23-154            
+  ...on-service.ts |       0 |        0 |       0 |       0 | 13-211            
+  order-service.ts |       0 |        0 |       0 |       0 | 37-183            
+  podcast.ts       |       0 |        0 |       0 |       0 | 16-122            
+  printful.ts      |       0 |        0 |       0 |       0 | 99-586            
+  rate-limiter.ts  |       0 |        0 |       0 |       0 | 7-120             
+  routes.ts        |       0 |        0 |       0 |       0 | 38-1816           
+  security.ts      |       0 |        0 |       0 |       0 | 12-293            
+  stripe.ts        |       0 |        0 |       0 |       0 | 4-335             
+  youtube.ts       |       0 |        0 |       0 |       0 | 8-748             
+-------------------|---------|----------|---------|---------|-------------------

@@ -92,10 +92,11 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
 
   // Validate session user
   if (!isValidSessionUser(req.session.user, 'admin')) {
+    const sessionUser = req.session.user as { id?: string; role?: string };
     logSecurityEvent('ADMIN_FORBIDDEN_ACCESS', {
       ip: req.ip,
-      userId: req.session.user.id,
-      role: req.session.user.role,
+      userId: sessionUser.id || 'unknown',
+      role: sessionUser.role || 'unknown',
       path: req.path,
     });
 

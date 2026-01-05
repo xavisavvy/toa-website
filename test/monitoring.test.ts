@@ -80,7 +80,7 @@ describe('Monitoring & Metrics', () => {
       
       const metricsData = metrics.getMetrics();
       
-      expect(metricsData.cache.hitRate).toBeCloseTo(0.67, 1);
+      expect(metricsData.cache.hitRate).toBeCloseTo(67, 0); // 67% hit rate
       expect(metricsData.cache.hits).toBe(2);
       expect(metricsData.cache.misses).toBe(1);
     });
@@ -131,7 +131,7 @@ describe('Monitoring & Metrics', () => {
       expect(res.body.cache.hits).toBe(1);
       expect(res.body.cache.misses).toBe(1);
       expect(res.body.cache.sets).toBe(1);
-      expect(res.body.cache.hitRate).toBe(0.5);
+      expect(res.body.cache.hitRate).toBe(50); // 50% hit rate (percentage)
     });
   });
 

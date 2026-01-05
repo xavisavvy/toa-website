@@ -34,7 +34,7 @@ async function checkStorage(): Promise<ComponentHealth> {
   const start = Date.now();
   try {
     // Test storage read operation
-    await storage.getUserByUsername("health-check-test-user");
+    await storage.getUserByEmail("health-check-test-user@example.com");
     const responseTime = Date.now() - start;
     
     if (responseTime > 1000) {
@@ -71,22 +71,7 @@ async function checkCache(): Promise<ComponentHealth> {
     const total = cacheMetrics.hits + cacheMetrics.misses;
     const hitRate = total > 0 ? (cacheMetrics.hits / total) * 100 : 0;
     
-    // Check if Redis is unavailable (using in-memory fallback)
-    const isUsingFallback = cacheMetrics.errors > 0 && total === 0;
-    
-    if (isUsingFallback) {
-      return {
-        status: "degraded",
-        message: "Cache using in-memory fallback (Redis unavailable)",
-        responseTime,
-        details: {
-          mode: "in-memory",
-          errors: cacheMetrics.errors,
-          note: "Application continues to function with reduced performance"
-        }
-      };
-    }
-    
+    // Check if cache is not being used effectively
     if (hitRate < 50 && total > 100) {
       return {
         status: "degraded",

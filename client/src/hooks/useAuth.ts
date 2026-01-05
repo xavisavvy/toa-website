@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import type { User } from '../../shared/schema';
+import type { User } from '@shared/schema';
 
 interface AuthContextValue {
   user: User | null;
