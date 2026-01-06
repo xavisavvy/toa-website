@@ -179,7 +179,6 @@ jobs:
           output: 'trivy-results.json'
           severity: 'CRITICAL,HIGH,MEDIUM'
           exit-code: '0'
-          version: 'v0.68.2'
       
       # SARIF format disabled - requires GitHub Advanced Security for upload
       # - name: Run Trivy vulnerability scanner (SARIF format)
