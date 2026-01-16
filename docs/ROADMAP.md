@@ -1,6 +1,6 @@
 # Tales of Aneria - Feature Roadmap & Checklist
 
-**Last Updated:** 2026-01-05
+**Last Updated:** 2026-01-15
 
 ## 🎯 Current Sprint - Technical Debt Cleanup ✅ COMPLETE!
 
@@ -135,6 +135,90 @@
 - [x] Create production admin user ✅ **COMPLETE 2026-01-05**
 - [ ] Test end-to-end checkout flow in production
 - [ ] Test admin dashboard with real data
+
+---
+
+## 🏢 Enterprise CI/CD Enhancements ✅ COMPLETE! (2026-01-15)
+
+### ✅ Code Review & Ownership
+- [x] **CODEOWNERS File** - Define code ownership for review requirements
+  - [x] Security-critical files require careful review (auth.ts, security.ts, stripe.ts)
+  - [x] Infrastructure & CI/CD files (workflows, Dockerfile, Kubernetes)
+  - [x] Database schema changes (schema.ts, migrations)
+  - [x] AI context files (CLAUDE.md, copilot-instructions)
+  - Related: .github/CODEOWNERS
+
+- [x] **PR Template** - Standardized pull request checklist
+  - [x] Summary and type of change sections
+  - [x] Testing checklist (unit, E2E, manual)
+  - [x] Security checklist (secrets, validation, rate limiting, SQL injection, XSS)
+  - [x] Database changes section with rollback plan
+  - [x] Script parity reminder (PowerShell ↔ Shell)
+  - [x] Accessibility checklist for UI changes
+  - Related: .github/pull_request_template.md
+
+### ✅ Database Migrations
+- [x] **Production-Safe Migrations** - Replace db:push with versioned migrations
+  - [x] `npm run db:generate` - Generate migration files from schema changes
+  - [x] `npm run db:migrate` - Apply migrations with history
+  - [x] `npm run db:studio` - Visual database browser
+  - [x] `npm run db:check` - Validate schema consistency
+  - Related: package.json, drizzle.config.ts
+
+### ✅ Multi-Environment Deployment Pipeline
+- [x] **Staging → Production Flow** - Environment promotion strategy
+  - [x] Staging environment deploys first (automatic on version workflow)
+  - [x] Production requires staging success (or manual skip with caution)
+  - [x] Manual deployment via workflow_dispatch with environment selector
+  - [x] Rollback capability with commit SHA input
+  - [x] Skip staging option for emergency production deploys
+  - [x] Health checks at each stage (30s stabilization, 5 retries)
+  - [x] Smoke tests on staging before production promotion
+  - [x] Deployment metadata artifacts (SHA, timestamp, environment)
+  - Related: .github/workflows/deploy.yml
+
+### ✅ Supply Chain Security
+- [x] **SLSA Provenance & SBOM** - Container build attestation
+  - [x] SLSA provenance generation on Docker builds
+  - [x] Software Bill of Materials (SBOM) in container images
+  - [x] Build attestation for supply chain verification
+  - Related: .github/workflows/ci.yml (container-security job)
+
+### ✅ Application Performance Monitoring (APM)
+- [x] **Sentry Integration** - Optional error tracking and performance monitoring
+  - [x] Dynamic import (Sentry package optional)
+  - [x] Error tracking with breadcrumbs
+  - [x] Performance monitoring (transactions, spans)
+  - [x] Release tracking and user context
+  - [x] Sensitive data filtering (auth headers, cookies, API keys)
+  - [x] Express middleware helpers (request handler, error handler)
+  - Configure: Set `SENTRY_DSN` environment variable to enable
+  - Related: server/sentry.ts
+
+### ✅ SLO/Error Budget Tracking
+- [x] **Service Level Objectives** - Track availability, latency, error rates
+  - [x] Availability target: 99.9% (43.2 min downtime/month allowed)
+  - [x] Latency target: p95 < 200ms
+  - [x] Error rate target: < 0.1%
+  - [x] Error budget calculation and alerting
+  - [x] Express middleware for automatic tracking
+  - [x] API endpoint for SLO metrics (/api/slo)
+  - [x] Alert generation for budget warnings/critical
+  - Related: server/slo.ts
+
+### GitHub Secrets Required for New Features
+```bash
+# Staging environment (optional)
+STAGING_URL          # e.g., https://staging.talesofaneria.com
+STAGING_DEPLOY_WEBHOOK  # Staging deployment trigger
+
+# Production environment (existing)
+PRODUCTION_URL       # e.g., https://talesofaneria.com
+REPLIT_DEPLOY_WEBHOOK  # Production deployment trigger
+
+# APM (optional)
+SENTRY_DSN           # Sentry project DSN
+```
 
 ---
 
@@ -625,7 +709,7 @@ interface SponsorInvoice {
   - [ ] Test execution time <30s for unit tests
   - [ ] Test execution time <5min for full suite
 
-- **Documentation:** See `SKIPPED_TESTS_ANALYSIS.md` for detailed breakdown
+- **Documentation:** See `testing/SKIPPED_TESTS_ANALYSIS.md` for detailed breakdown
 - Related: All test files, CI/CD pipeline, docs/testing/
 
 ---

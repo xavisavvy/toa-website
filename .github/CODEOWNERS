@@ -1,0 +1,90 @@
+# CODEOWNERS - Define code ownership for review requirements
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @Preston
+
+# ============================================
+# SECURITY-CRITICAL FILES (Require careful review)
+# ============================================
+
+# Authentication and authorization
+server/auth.ts @Preston
+server/auth-middleware.ts @Preston
+
+# Security utilities and validation
+server/security.ts @Preston
+
+# Payment processing (Stripe)
+server/stripe.ts @Preston
+
+# External API integrations with sensitive data
+server/printful.ts @Preston
+
+# Session and secrets handling
+server/session.ts @Preston
+
+# Environment validation (controls secret access)
+server/env-validator.ts @Preston
+
+# ============================================
+# INFRASTRUCTURE & CI/CD
+# ============================================
+
+# GitHub Actions workflows
+.github/workflows/ @Preston
+
+# Docker configuration
+Dockerfile @Preston
+docker-compose*.yml @Preston
+.dockerignore @Preston
+
+# Kubernetes manifests
+.kubernetes/ @Preston
+
+# Security scanning configuration
+.gitleaks.toml @Preston
+.snyk @Preston
+
+# ============================================
+# DATABASE & SCHEMA
+# ============================================
+
+# Database schema changes require careful review
+shared/schema.ts @Preston
+drizzle.config.ts @Preston
+migrations/ @Preston
+
+# ============================================
+# CONFIGURATION FILES
+# ============================================
+
+# Package dependencies
+package.json @Preston
+package-lock.json @Preston
+
+# TypeScript configuration
+tsconfig.json @Preston
+
+# Build configuration
+vite.config.ts @Preston
+vitest.config.ts @Preston
+
+# ============================================
+# DOCUMENTATION
+# ============================================
+
+# Security documentation
+docs/security/ @Preston
+SECURITY.md @Preston
+
+# CI/CD documentation
+docs/ci-cd/ @Preston
+
+# ============================================
+# AI CONTEXT (Keep aligned with practices)
+# ============================================
+
+CLAUDE.md @Preston
+.ai/ @Preston
+.github/copilot-instructions.md @Preston

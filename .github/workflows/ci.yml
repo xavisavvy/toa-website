@@ -170,6 +170,9 @@ jobs:
           tags: toa-website:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # SLSA provenance and SBOM for supply chain security
+          provenance: true
+          sbom: true
       
       - name: Run Trivy vulnerability scanner (JSON format)
         uses: aquasecurity/trivy-action@0.28.0

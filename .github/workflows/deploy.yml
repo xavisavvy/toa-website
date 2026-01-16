@@ -7,58 +7,83 @@ on:
       - completed
     branches:
       - main
-  workflow_dispatch: # Allow manual triggers
+  workflow_dispatch:
     inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
       rollback_to:
         description: 'Rollback to specific commit SHA (leave empty for normal deployment)'
         required: false
         type: string
-    
+      skip_staging:
+        description: 'Skip staging and deploy directly to production (use with caution)'
+        required: false
+        default: false
+        type: boolean
+
 jobs:
-  deploy:
-    name: Deploy to Production
+  # ============================================
+  # STAGING DEPLOYMENT
+  # ============================================
+  deploy-staging:
+    name: Deploy to Staging
     runs-on: ubuntu-latest
-    environment: production
-    # Only deploy if versioning succeeded (or manual trigger)
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    
+    environment: staging
+    # Deploy to staging on automated runs or when explicitly selected
+    if: |
+      (github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'workflow_dispatch' &&
+       (github.event.inputs.environment == 'staging' ||
+        (github.event.inputs.environment == 'production' && github.event.inputs.skip_staging != 'true')))
+
+    outputs:
+      deployment_sha: ${{ steps.metadata.outputs.sha }}
+      staging_healthy: ${{ steps.post_health.outputs.health_passed }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Checkout specific commit if rolling back
           ref: ${{ github.event.inputs.rollback_to || github.sha }}
-          fetch-depth: 10 # Get history for rollback reference
-        
+          fetch-depth: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
-      # Save previous deployment info for potential rollback
+
       - name: Save deployment metadata
+        id: metadata
         run: |
           mkdir -p deployment-metadata
           echo "${{ github.sha }}" > deployment-metadata/current-sha.txt
+          echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "environment=staging" >> deployment-metadata/environment.txt
           echo "${{ github.event.inputs.rollback_to || 'normal-deployment' }}" > deployment-metadata/rollback-info.txt
           git log -1 --format="%H %s" > deployment-metadata/commit-info.txt
-          
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > deployment-metadata/deployed-at.txt
+
       - name: Install dependencies
         run: npm ci
         env:
-          HUSKY: 0  # Disable Husky in CI
-          
-      # Quick smoke tests instead of full coverage
+          HUSKY: 0
+
       - name: Run quick tests
         id: tests
         run: npm run test:quick
         continue-on-error: true
-        
+
       - name: Build application
         id: build
         run: npm run build
-        
+
       - name: Verify build artifacts
         id: verify
         run: |
@@ -71,8 +96,180 @@ jobs:
             exit 1
           fi
           echo "✅ Build artifacts verified"
-      
-      # Health check before deployment
+
+      - name: Deploy to Staging
+        id: deploy
+        run: |
+          echo "🚀 Deploying to STAGING environment..."
+          # Add your staging deployment commands here
+          # Examples:
+          # - Deploy to staging server
+          # - Deploy to staging Kubernetes namespace
+          # - Deploy to staging cloud environment
+          echo "Staging deployment placeholder - add your staging deployment script"
+
+      - name: Trigger Staging Deployment (Replit/Custom)
+        id: staging_deploy
+        if: success()
+        run: |
+          if [ -n "${{ secrets.STAGING_DEPLOY_WEBHOOK }}" ]; then
+            echo "🚀 Triggering staging deployment..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.STAGING_DEPLOY_WEBHOOK }}" \
+              -H "Content-Type: application/json" \
+              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "environment": "staging", "actor": "${{ github.actor }}"}')
+
+            STATUS_CODE=$(echo "$RESPONSE" | tail -n1)
+            if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
+              echo "✅ Staging deployment triggered successfully!"
+              echo "deployment_triggered=true" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Staging deployment failed with status code: $STATUS_CODE"
+              echo "deployment_triggered=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          else
+            echo "ℹ️ STAGING_DEPLOY_WEBHOOK not configured, skipping webhook trigger"
+            echo "deployment_triggered=skip" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post-deployment health check (Staging)
+        id: post_health
+        if: success()
+        run: |
+          if [ -n "${{ secrets.STAGING_URL }}" ]; then
+            echo "⏳ Waiting 30s for staging deployment to stabilize..."
+            sleep 30
+
+            echo "🏥 Checking staging health..."
+            MAX_RETRIES=5
+            RETRY_COUNT=0
+            HEALTH_OK=false
+
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.STAGING_URL }}/api/health" || echo "000")
+              echo "Health check attempt $((RETRY_COUNT+1)): $HEALTH_STATUS"
+
+              if [ "$HEALTH_STATUS" = "200" ]; then
+                HEALTH_BODY=$(curl -s "${{ secrets.STAGING_URL }}/api/health")
+                if echo "$HEALTH_BODY" | grep -q '"status"'; then
+                  HEALTH_OK=true
+                  echo "✅ Staging health check passed!"
+                  break
+                fi
+              fi
+
+              RETRY_COUNT=$((RETRY_COUNT+1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⏳ Retrying in 10s..."
+                sleep 10
+              fi
+            done
+
+            if [ "$HEALTH_OK" = false ]; then
+              echo "❌ Staging health check failed after $MAX_RETRIES attempts"
+              echo "health_passed=false" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "health_passed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "ℹ️ STAGING_URL not configured, skipping health check"
+            echo "health_passed=skip" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run smoke tests (Staging)
+        if: success() && steps.post_health.outputs.health_passed == 'true'
+        run: |
+          if [ -n "${{ secrets.STAGING_URL }}" ]; then
+            echo "🧪 Running smoke tests against staging..."
+            # Homepage loads
+            curl -f -s "${{ secrets.STAGING_URL }}" | grep -q "Tales of Aneria" || exit 1
+            # API responds
+            curl -f "${{ secrets.STAGING_URL }}/api/health" || exit 1
+            echo "✅ Smoke tests passed!"
+          fi
+
+      - name: Upload staging deployment metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-deployment-metadata
+          path: deployment-metadata/
+          retention-days: 30
+
+      - name: Notify staging deployment
+        if: success()
+        run: |
+          echo "✅ Staging deployment successful!"
+          echo "Deployed commit: ${{ github.sha }}"
+          echo "Environment: staging"
+
+  # ============================================
+  # PRODUCTION DEPLOYMENT
+  # ============================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+    needs: [deploy-staging]
+    # Only deploy to production after staging succeeds
+    # Or if manual dispatch directly to production with skip_staging
+    if: |
+      always() &&
+      ((needs.deploy-staging.result == 'success') ||
+       (github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.environment == 'production' &&
+        github.event.inputs.skip_staging == 'true'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.rollback_to || github.sha }}
+          fetch-depth: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Save deployment metadata
+        run: |
+          mkdir -p deployment-metadata
+          echo "${{ github.sha }}" > deployment-metadata/current-sha.txt
+          echo "environment=production" >> deployment-metadata/environment.txt
+          echo "${{ github.event.inputs.rollback_to || 'normal-deployment' }}" > deployment-metadata/rollback-info.txt
+          git log -1 --format="%H %s" > deployment-metadata/commit-info.txt
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > deployment-metadata/deployed-at.txt
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: 0
+
+      - name: Run quick tests
+        id: tests
+        run: npm run test:quick
+        continue-on-error: true
+
+      - name: Build application
+        id: build
+        run: npm run build
+
+      - name: Verify build artifacts
+        id: verify
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Build failed - dist directory not found"
+            exit 1
+          fi
+          if [ ! -f "dist/index.js" ]; then
+            echo "❌ Build failed - dist/index.js not found"
+            exit 1
+          fi
+          echo "✅ Build artifacts verified"
+
       - name: Pre-deployment health check
         id: pre_health
         run: |
@@ -89,31 +286,30 @@ jobs:
             echo "ℹ️ PRODUCTION_URL not configured, skipping health check"
             echo "health_status=skip" >> $GITHUB_OUTPUT
           fi
-          
-      - name: Deploy
+
+      - name: Deploy to Production
         id: deploy
         run: |
-          echo "Deploy to your hosting platform here"
-          echo "This is a placeholder for your deployment script"
-          echo "Add your deployment commands (e.g., Vercel, Netlify, AWS, etc.)"
-          
-      # Replit Deployment Webhook
-      - name: Trigger Replit Deployment
+          echo "🚀 Deploying to PRODUCTION environment..."
+          # Add your production deployment commands here
+          echo "Production deployment placeholder - add your production deployment script"
+
+      - name: Trigger Production Deployment (Replit)
         id: replit_deploy
         if: success()
         run: |
           if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
-            echo "🚀 Triggering Replit deployment..."
+            echo "🚀 Triggering production deployment..."
             RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
               -H "Content-Type: application/json" \
-              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "actor": "${{ github.actor }}"}')
-            
+              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "environment": "production", "actor": "${{ github.actor }}"}')
+
             STATUS_CODE=$(echo "$RESPONSE" | tail -n1)
             if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
-              echo "✅ Replit deployment triggered successfully!"
+              echo "✅ Production deployment triggered successfully!"
               echo "deployment_triggered=true" >> $GITHUB_OUTPUT
             else
-              echo "❌ Replit deployment failed with status code: $STATUS_CODE"
+              echo "❌ Production deployment failed with status code: $STATUS_CODE"
               echo "deployment_triggered=false" >> $GITHUB_OUTPUT
               exit 1
             fi
@@ -121,8 +317,7 @@ jobs:
             echo "ℹ️ REPLIT_DEPLOY_WEBHOOK not configured, skipping Replit deployment"
             echo "deployment_triggered=skip" >> $GITHUB_OUTPUT
           fi
-      
-      # Post-deployment health check with automated rollback
+
       - name: Post-deployment health check
         id: post_health
         if: success()
@@ -130,18 +325,17 @@ jobs:
           if [ -n "${{ secrets.PRODUCTION_URL }}" ]; then
             echo "⏳ Waiting 30s for deployment to stabilize..."
             sleep 30
-            
+
             echo "🏥 Checking post-deployment health..."
             MAX_RETRIES=5
             RETRY_COUNT=0
             HEALTH_OK=false
-            
+
             while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
               HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
               echo "Health check attempt $((RETRY_COUNT+1)): $HEALTH_STATUS"
-              
+
               if [ "$HEALTH_STATUS" = "200" ]; then
-                # Verify response body contains expected fields
                 HEALTH_BODY=$(curl -s "${{ secrets.PRODUCTION_URL }}/api/health")
                 if echo "$HEALTH_BODY" | grep -q '"status"'; then
                   HEALTH_OK=true
@@ -149,14 +343,14 @@ jobs:
                   break
                 fi
               fi
-              
+
               RETRY_COUNT=$((RETRY_COUNT+1))
               if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
                 echo "⏳ Retrying in 10s..."
                 sleep 10
               fi
             done
-            
+
             if [ "$HEALTH_OK" = false ]; then
               echo "❌ Post-deployment health check failed after $MAX_RETRIES attempts"
               echo "health_passed=false" >> $GITHUB_OUTPUT
@@ -168,29 +362,25 @@ jobs:
             echo "ℹ️ PRODUCTION_URL not configured, skipping post-deployment health check"
             echo "health_passed=skip" >> $GITHUB_OUTPUT
           fi
-      
-      # Automated rollback on failure
+
       - name: Automated Rollback
         if: failure() && steps.post_health.outcome == 'failure'
         run: |
           echo "🔄 INITIATING AUTOMATED ROLLBACK"
           echo "Deployment failed health checks, rolling back to previous version"
-          
-          # Get previous commit
+
           PREVIOUS_SHA=$(git rev-parse HEAD~1)
           echo "Previous SHA: $PREVIOUS_SHA"
-          
-          # Trigger rollback deployment
+
           if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
             echo "🚀 Triggering rollback deployment..."
             curl -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
               -H "Content-Type: application/json" \
               -d "{\"ref\": \"$PREVIOUS_SHA\", \"rollback\": true, \"failed_sha\": \"${{ github.sha }}\"}"
-            
+
             echo "⏳ Waiting for rollback to complete..."
             sleep 30
-            
-            # Verify rollback health
+
             ROLLBACK_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
             if [ "$ROLLBACK_HEALTH" = "200" ]; then
               echo "✅ Rollback successful - application healthy"
@@ -202,29 +392,29 @@ jobs:
             echo "❌ Cannot perform automated rollback - REPLIT_DEPLOY_WEBHOOK not configured"
             echo "⚠️ MANUAL ROLLBACK REQUIRED"
           fi
-          
-      - name: Upload deployment metadata
+
+      - name: Upload production deployment metadata
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-metadata
+          name: production-deployment-metadata
           path: deployment-metadata/
           retention-days: 30
-          
-      - name: Notify deployment
+
+      - name: Notify production deployment
         if: success()
         run: |
-          echo "✅ Deployment successful!"
+          echo "✅ Production deployment successful!"
           echo "Deployed commit: ${{ github.sha }}"
           echo "Deployed by: ${{ github.actor }}"
           if [ -n "${{ github.event.inputs.rollback_to }}" ]; then
             echo "🔄 This was a ROLLBACK to: ${{ github.event.inputs.rollback_to }}"
           fi
-      
+
       - name: Notify failure
         if: failure()
         run: |
-          echo "❌ Deployment failed!"
+          echo "❌ Production deployment failed!"
           echo "Failed commit: ${{ github.sha }}"
           echo "Check logs above for details"
           if [ "${{ steps.post_health.outputs.health_passed }}" = "false" ]; then
