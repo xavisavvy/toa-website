@@ -169,6 +169,34 @@
       "featuredImage": "/characters/titheus-cillbrost.webp"
     },
     {
+      "id": "eve-faraque",
+      "name": "Eve",
+      "player": "Torrey",
+      "playerId": "torrey-woolsey",
+      "campaign": "Aneria - Wayward Watch",
+      "race": "Half Elf",
+      "class": "Paladin 9/Warlock 1/Bard 1",
+      "level": 11,
+      "alignment": "Neutral Good",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Eve - Wayward Watch",
+          "type": "portrait",
+          "isFeatured": true,
+          "copyright": "Tales of Aneria",
+          "isAiGenerated": false,
+          "url": ""
+        }
+      ],
+      "backstory": "Eve travels the wilds not as a conqueror, but as a listener.\n\nKnown for her empathy, restraint, and quiet authority, Eve serves as a steady presence amid a world shaped by conflict and unchecked power. Where others rush toward answers, she pauses to hear what the land, the living, and the forgotten have to say. Her path is guided by balance rather than ambition, and her choices are shaped by what must endure after the storm has passed.\n\nAt her side moves Darian, a massive antlered bounder. Part jackrabbit, part living myth, Darian crosses forests, stone, and open ground with silent grace and impossible leaps. He is not a beast to be commanded, but a companion who chose Eve as willingly as she chose her path.\n\nTogether, they embody a different kind of strength. Eve listens. Darian watches. Where they pass, the wild is not tamed, but respected.",
+      "personality": "She listens. She watches. She endures.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/NA",
+      "dndbeyondId": "NA",
+      "status": "inactive",
+      "featuredImage": ""
+    },
+    {
       "id": "bolt",
       "name": "Bolt",
       "player": "Scott",
@@ -217,8 +245,8 @@
           "url": "https://www.dndbeyond.com/avatars/17207/125/1581111423-46268811.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
         }
       ],
-      "backstory": "“Oh merciful Blade in the Shadows, and keepers of the creed.\nGrant me swiftness, silence, and a target who trips on his own sword.\nMay their armor be decorative, their aim laughable,\nAnd their final words deeply ironic.\nBless this mess, sharpen my wit—\nAnd may the bloodstains come out of my cloak th",
-      "personality": "I would rather make a new friend than a new enemy.",
+      "backstory": "Victor Udonta walks through Aneria with a blindfold tied firmly in place and blades that seem to know where to strike before he does. Raised within the traditions of the Eight Rings, Victor was shaped by ritual, discipline, and consequence long before he ever joined the Wayward Watch.\n\nTo some, he is unsettling. To others, oddly reassuring. Victor does not seek attention, yet stories seem to gather around him anyway. He fights with a calm precision that feels less like aggression and more like inevitability, as if he is always listening to a rhythm no one else can hear.\n\nVictor is deeply loyal, fiercely private, and slow to trust. He believes in chosen bonds, but carries the quiet weight of someone who has learned that nothing stays unchanged forever. When others rush toward power, Victor hesitates. When chaos breaks loose, he steps forward.\n\nThere are rumors about pacts, trials, and things best left unnamed. Victor never confirms them.\n\nTrained in a rare and disciplined fighting style, Victor treats his blades as extensions of his own will—moving with precision, rhythm, and an unsettling sense of inevitability. What is certain is this: when the world begins to fracture, Victor Udonta is rarely far from the fault line.",
+      "personality": "I don't look away from what's coming.",
       "dndbeyond": "https://www.dndbeyond.com/characters/46268811",
       "dndbeyondId": "46268811",
       "status": "inactive",

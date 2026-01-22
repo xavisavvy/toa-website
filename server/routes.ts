@@ -1566,6 +1566,12 @@ export function registerRoutes(app: Express): Server {
       console.log('[Printful Webhook] Event received:', type);
       console.log('[Printful Webhook] Data:', JSON.stringify(data, null, 2));
 
+      // Validate required fields
+      if (!data) {
+        console.error('❌ Missing data field in webhook payload');
+        return res.status(400).json({ error: 'Missing data field' });
+      }
+
       // Find the order by Printful order ID
       const printfulOrderId = data.order?.id || data.id;
       if (!printfulOrderId) {

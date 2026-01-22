@@ -8,6 +8,9 @@ import {
   Music,
 } from "lucide-react";
 import { useRoute, Link } from "wouter";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
+import remarkGfm from "remark-gfm";
 
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
@@ -204,9 +207,14 @@ export default function CharacterDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
-                  {character.backstory}
-                </p>
+                <div className="prose prose-sm max-w-none text-muted-foreground dark:prose-invert">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeSanitize]}
+                  >
+                    {character.backstory}
+                  </ReactMarkdown>
+                </div>
               </CardContent>
             </Card>
 
