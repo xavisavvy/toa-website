@@ -7,10 +7,10 @@ import {
   Heart,
   Music,
 } from "lucide-react";
-import { useRoute, Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
+import { useRoute, Link } from "wouter";
 
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
