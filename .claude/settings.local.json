@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run test:quick:*)",
+      "Bash(npx eslint:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: add enterprise CI/CD enhancements\n\n- Add CODEOWNERS for code review ownership\n- Add PR template with security/testing checklists\n- Add multi-environment deploy pipeline \\(staging → production\\)\n- Add SLSA provenance and SBOM to container builds\n- Add Sentry APM integration \\(optional, set SENTRY_DSN\\)\n- Add SLO/Error budget tracking with /api/slo endpoint\n- Add database migration scripts \\(db:generate, db:migrate\\)\n- Update CLAUDE.md with new patterns and observability docs\n- Reorganize docs into ci-cd/, testing/ subdirectories\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)"
+    ]
+  }
+}

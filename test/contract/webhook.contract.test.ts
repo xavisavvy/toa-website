@@ -78,7 +78,7 @@ describe('Webhook Contract Tests', () => {
     }));
     
     registerRoutes(app);
-  });
+  }, 30000); // Increased timeout for module reset and import
 
   const generateStripeSignature = (payload: string, secret: string): string => {
     const timestamp = Math.floor(Date.now() / 1000);
