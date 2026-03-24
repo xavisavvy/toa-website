@@ -175,7 +175,7 @@ jobs:
           sbom: true
       
       - name: Run Trivy vulnerability scanner (JSON format)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: toa-website:${{ github.sha }}
           format: 'json'
@@ -185,7 +185,7 @@ jobs:
       
       # SARIF format disabled - requires GitHub Advanced Security for upload
       # - name: Run Trivy vulnerability scanner (SARIF format)
-      #   uses: aquasecurity/trivy-action@0.28.0
+      #   uses: aquasecurity/trivy-action@0.35.0
       #   with:
       #     image-ref: toa-website:${{ github.sha }}
       #     format: 'sarif'
