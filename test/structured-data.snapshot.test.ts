@@ -236,6 +236,52 @@ describe('Structured Data Snapshot Tests', () => {
     });
   });
 
+  describe('Person Schema (character page integration)', () => {
+    const wayne = {
+      playerName: 'Preston Farr',
+      characterName: 'Wayne "Archivist of Lies"',
+      race: 'Changeling',
+      class: 'Wizard',
+      sameAs: [
+        'https://www.youtube.com/@fuzzysquirrel',
+        'https://x.com/prestonbfarr',
+        'https://www.instagram.com/fuzzysquirreltv',
+        'https://www.twitch.tv/fuzzysquirrel',
+        'https://prestonfarr.com',
+      ],
+    };
+
+    it('description template includes player + character context', () => {
+      const description = `${wayne.playerName} plays ${wayne.characterName}, a ${wayne.race} ${wayne.class}, in Tales of Aneria.`;
+      const schema = getPersonSchema({
+        name: wayne.playerName,
+        description,
+        sameAs: wayne.sameAs,
+      });
+      expect(schema.name).toBe('Preston Farr');
+      expect(schema.description).toContain('Wayne');
+      expect(schema.description).toContain('Changeling Wizard');
+      expect(schema.description).toContain('Tales of Aneria');
+      expect(schema).toMatchSnapshot();
+    });
+
+    it('emits sameAs only when input array is provided', () => {
+      const withSameAs = getPersonSchema({
+        name: 'Preston Farr',
+        sameAs: ['https://prestonfarr.com'],
+      });
+      expect(withSameAs.sameAs).toEqual(['https://prestonfarr.com']);
+
+      const withoutSameAs = getPersonSchema({ name: 'Cory Avis' });
+      expect(withoutSameAs.sameAs).toBeUndefined();
+    });
+
+    it('omits image when not provided (Phase 2 cast avatars are bundled assets)', () => {
+      const schema = getPersonSchema({ name: 'Preston Farr' });
+      expect(schema.image).toBeUndefined();
+    });
+  });
+
   describe('CreativeWork Schema', () => {
     it('generates character creative work schema', () => {
       const character = {

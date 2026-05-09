@@ -205,6 +205,27 @@ exports[`Structured Data Snapshot Tests > Organization Schema > includes contact
 }
 `;
 
+exports[`Structured Data Snapshot Tests > Person Schema (character page integration) > description template includes player + character context 1`] = `
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "description": "Preston Farr plays Wayne "Archivist of Lies", a Changeling Wizard, in Tales of Aneria.",
+  "image": undefined,
+  "memberOf": {
+    "@type": "Organization",
+    "name": "Tales of Aneria",
+  },
+  "name": "Preston Farr",
+  "sameAs": [
+    "https://www.youtube.com/@fuzzysquirrel",
+    "https://x.com/prestonbfarr",
+    "https://www.instagram.com/fuzzysquirreltv",
+    "https://www.twitch.tv/fuzzysquirrel",
+    "https://prestonfarr.com",
+  ],
+}
+`;
+
 exports[`Structured Data Snapshot Tests > Person Schema > generates complete person schema 1`] = `
 {
   "@context": "https://schema.org",
