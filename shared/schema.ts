@@ -226,3 +226,56 @@ export const EpisodesFileSchema = z.object({
 
 export type Campaign = z.infer<typeof CampaignSchema>;
 export type Episode = z.infer<typeof EpisodeSchema>;
+
+// =============================================================================
+// Character Page Enhancements (Phase 2) — characters.json static-data schema
+// =============================================================================
+// Authored content shipped via client/src/data/characters.json. Validates lore
+// fields, image source taxonomy ('official' | 'fan'), and AI-generated flag at
+// build time (test/data/characters-data.test.ts) so a malformed entry, bad
+// enum value, or non-URL artistUrl fails CI rather than ships to production.
+// Additive only — no Drizzle tables introduced.
+
+const characterImageSourceEnum = z.enum(["official", "fan"]);
+
+export const CharacterImageSchema = z.object({
+  id: z.string().min(1),
+  url: z.string().optional(),
+  caption: z.string().min(1),
+  type: z.string().min(1),
+  isFeatured: z.boolean().optional(),
+  artist: z.string().optional(),
+  artistUrl: z.string().url().optional(),
+  copyright: z.string().optional(),
+  isAiGenerated: z.boolean().optional(),
+  source: characterImageSourceEnum.default("official"),
+});
+
+export const CharacterSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  player: z.string().min(1),
+  playerId: z.string().min(1),
+  campaign: z.string().min(1),
+  race: z.string().min(1),
+  class: z.string().min(1),
+  level: z.number().int().nonnegative(),
+  alignment: z.string().min(1),
+  featuredImage: z.string().optional(),
+  images: z.array(CharacterImageSchema),
+  backstory: z.string(),
+  personality: z.string(),
+  dndbeyond: z.string().optional(),
+  dndbeyondId: z.string().optional(),
+  playlist: z.string().url().optional(),
+  status: z.string().min(1),
+  motivations: z.string().optional(),
+  arcSummary: z.string().optional(),
+});
+
+export const CharactersFileSchema = z.object({
+  characters: z.array(CharacterSchema),
+});
+
+export type Character = z.infer<typeof CharacterSchema>;
+export type CharacterImage = z.infer<typeof CharacterImageSchema>;
