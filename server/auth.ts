@@ -330,7 +330,7 @@ export async function reactivateUser(userId: string): Promise<void> {
  * @returns User without password hash
  */
 function sanitizeUser(user: UserWithPassword): User {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { passwordHash, ...safeUser } = user;
   return safeUser;
 }

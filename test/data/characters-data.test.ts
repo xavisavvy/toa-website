@@ -1,11 +1,11 @@
-import { describe, it, expect } from "vitest";
-
-import charactersData from "@/data/characters.json";
-import castData from "@/data/cast.json";
 import {
   CharactersFileSchema,
   CharacterImageSchema,
 } from "@shared/schema";
+import { describe, it, expect } from "vitest";
+
+import castData from "@/data/cast.json";
+import charactersData from "@/data/characters.json";
 
 /**
  * Build-time integrity guard for client/src/data/characters.json.
@@ -32,7 +32,7 @@ describe("characters static data", () => {
     const ids = new Set(castData.cast.map((c) => c.id));
     const orphans: string[] = [];
     for (const ch of charactersData.characters) {
-      if (ch.playerId === "tbd") continue; // documented holiday-special-1 placeholder
+      if (ch.playerId === "tbd") {continue;} // documented holiday-special-1 placeholder
       if (!ids.has(ch.playerId)) {
         orphans.push(`${ch.id} -> ${ch.playerId}`);
       }

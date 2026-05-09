@@ -12,7 +12,7 @@ export type Cast = (typeof castData.cast)[number];
 export function getCastMemberById(
   playerId: string | undefined
 ): Cast | undefined {
-  if (!playerId || playerId === "tbd") return undefined;
+  if (!playerId || playerId === "tbd") {return undefined;}
   return castData.cast.find((c) => c.id === playerId);
 }
 

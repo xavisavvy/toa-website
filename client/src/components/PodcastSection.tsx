@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { analytics } from "@/lib/analytics";
-import { apiRequest } from "@/lib/queryClient";
 
 interface PodcastEpisode {
   id: string;
