@@ -15,6 +15,7 @@ export default function Navigation() {
     { label: "Episodes", href: "#episodes" },
     { label: "Podcast", href: "#podcast" },
     { label: "Characters", href: "#characters" },
+    { label: "Campaigns", href: "/campaigns", isRoute: true },
     { label: "Lore", href: "#lore" },
     { label: "Shop", href: "/shop", isRoute: true },
     { label: "Sponsorship", href: "/sponsorship", isRoute: true, highlight: true },
