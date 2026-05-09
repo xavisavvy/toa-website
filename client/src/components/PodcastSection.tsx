@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Headphones } from "lucide-react";
 import { SiSpotify, SiApplepodcasts, SiYoutubemusic } from "react-icons/si";
 
+import PodcastSubscribeStrip from "@/components/PodcastSubscribeStrip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { analytics } from "@/lib/analytics";
 
 interface PodcastEpisode {
   id: string;
@@ -145,54 +145,13 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
                     Audio Player Placeholder
                   </div>
                 )}
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-sm text-muted-foreground">Listen on:</span>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    data-testid="button-spotify"
-                    onClick={() => {
-                      if (spotifyUrl) {
-                        analytics.podcastPlay('Spotify');
-                        window.open(spotifyUrl, '_blank');
-                      }
-                    }}
-                    disabled={!spotifyUrl}
-                  >
-                    <SiSpotify className="h-4 w-4 mr-2" />
-                    Spotify
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    data-testid="button-apple-podcasts"
-                    onClick={() => {
-                      if (applePodcastsUrl) {
-                        analytics.podcastPlay('Apple Podcasts');
-                        window.open(applePodcastsUrl, '_blank');
-                      }
-                    }}
-                    disabled={!applePodcastsUrl}
-                  >
-                    <SiApplepodcasts className="h-4 w-4 mr-2" />
-                    Apple
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    data-testid="button-youtube-music"
-                    onClick={() => {
-                      if (youtubeMusicUrl) {
-                        analytics.podcastPlay('YouTube Music');
-                        window.open(youtubeMusicUrl, '_blank');
-                      }
-                    }}
-                    disabled={!youtubeMusicUrl}
-                  >
-                    <SiYoutubemusic className="h-4 w-4 mr-2" />
-                    YouTube Music
-                  </Button>
-                </div>
+                <PodcastSubscribeStrip
+                  spotifyUrl={spotifyUrl}
+                  applePodcastsUrl={applePodcastsUrl}
+                  youtubeMusicUrl={youtubeMusicUrl}
+                  trackAnalytics
+                />
+
               </CardContent>
             </Card>
 
