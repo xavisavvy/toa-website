@@ -5,6 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
+    "up": "docker compose up -d --wait db && npm run db:push && npm run dev",
+    "up:full": "docker compose -f docker-compose.dev.yml up -d --wait",
+    "down": "docker compose down",
+    "down:full": "docker compose -f docker-compose.dev.yml down",
+    "down:volumes": "docker compose down -v",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "esbuild index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
