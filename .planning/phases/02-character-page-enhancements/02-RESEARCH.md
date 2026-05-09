@@ -681,15 +681,15 @@ ogImageAlt={`${character.name} — official character art`}
 
 > Mark RESOLVED when planner closes them in PLAN.md (Phase 1 lesson learned).
 
-1. **Should `motivations` / `arcSummary` render via ReactMarkdown or plain `<p>`?** — recommended: plain `<p>` for v1 (matches `personality` field at line 230). ReactMarkdown is already imported, so an upgrade is one-line if any character's lore needs it later. **PENDING planner decision.**
+1. **Should `motivations` / `arcSummary` render via ReactMarkdown or plain `<p>`?** — **RESOLVED:** Render motivations and arcSummary as plain `<p>` (mirrors existing Personality block); ReactMarkdown stays scoped to Backstory.
 
-2. **Should the planner extract `<CharacterGalleryImage>` into its own file?** — recommended: yes (90+ LoC of badge/caption logic per image cell, will exceed 100 with Phase 2 additions). CONTEXT says planner judges. **PENDING planner decision.**
+2. **Should the planner extract `<CharacterGalleryImage>` into its own file?** — **RESOLVED:** Do NOT extract `<CharacterGalleryImage>` in Phase 2; defer to a follow-up cleanup commit.
 
-3. **Fix `melly.playerId` from `"brigette-s"` to `"brigette-streeper"` in the same migration commit?** — recommended: yes; otherwise the data integrity test must permit the orphan. **PENDING planner decision.**
+3. **Fix `melly.playerId` from `"brigette-s"` to `"brigette-streeper"` in the same migration commit?** — **RESOLVED:** Fix `melly.playerId` to `"brigette-streeper"` in the migration commit (Task 3).
 
-4. **Use absolute URLs (`https://talesofaneria.com/cast/...`) for Person.image and emit a follow-up to also fix `getCreativeWorkSchema` image to be absolute?** — recommended: yes for new Person.image (clean from start); leave existing CreativeWork relative as-is to avoid scope creep (capture as Phase 5 SEO polish item). **PENDING planner decision.**
+4. **Use absolute URLs (`https://talesofaneria.com/cast/...`) for Person.image and emit a follow-up to also fix `getCreativeWorkSchema` image to be absolute?** — **RESOLVED:** Omit `image` from Person JSON-LD in v1 — cast avatars are bundled assets with no public URL; revisit when public cast portraits ship.
 
-5. **Add `cast.socialLinks.website` as `Person.url` (in addition to `sameAs`)?** — recommended: opt in cheaply since the data is already in cast.json and Person.url is a recommended schema.org property. Adds one line to the factory call. **PENDING planner decision.**
+5. **Add `cast.socialLinks.website` as `Person.url` (in addition to `sameAs`)?** — **RESOLVED:** Pass `cast.socialLinks.website` (when populated) into `sameAs` alongside socials; do NOT modify `getPersonSchema` factory.
 
 ## Environment Availability
 
