@@ -163,3 +163,66 @@ export const auditLogs = pgTable("audit_logs", {
 export const insertAuditLogSchema = createInsertSchema(auditLogs);
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+
+// =============================================================================
+// Campaign Archive (Phase 1) — static-data Zod schemas
+// =============================================================================
+// Authored content shipped via client/src/data/campaigns.json + episodes.json.
+// These schemas validate the JSON files at build time (test/data/campaigns-data.test.ts)
+// so a malformed entry, dangling reference, or duplicate episode tuple fails CI
+// rather than ships to production. Additive only — no Drizzle tables introduced.
+
+const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+const kebabCaseRegex = /^[a-z0-9-]+$/;
+const youtubeHostRegex = /youtube\.com|youtu\.be/;
+
+export const CampaignSchema = z.object({
+  slug: z
+    .string()
+    .min(1)
+    .regex(kebabCaseRegex, "slug must be kebab-case (a-z, 0-9, hyphens only)"),
+  name: z.string().min(1),
+  summary: z.string().min(1),
+  description: z.string().min(1),
+  status: z.enum(["active", "concluded"]),
+  startDate: z
+    .string()
+    .regex(isoDateRegex, "startDate must be ISO date (YYYY-MM-DD)"),
+  endDate: z
+    .string()
+    .regex(isoDateRegex, "endDate must be ISO date (YYYY-MM-DD)")
+    .optional(),
+  cast: z.array(z.string()),
+  thumbnail: z.string().optional(),
+});
+
+export const EpisodeSchema = z.object({
+  id: z.string().min(1),
+  campaignSlug: z.string().min(1),
+  episodeNumber: z.number().int().positive(),
+  title: z.string().min(1),
+  summary: z.string().min(1),
+  airDate: z
+    .string()
+    .regex(isoDateRegex, "airDate must be ISO date (YYYY-MM-DD)"),
+  youtubeUrl: z
+    .string()
+    .url()
+    .refine((u) => youtubeHostRegex.test(u), {
+      message: "youtubeUrl must be a youtube.com or youtu.be URL",
+    }),
+  podcastUrl: z.string().url().optional(),
+  thumbnail: z.string().optional(),
+  duration: z.string().optional(), // ISO 8601 e.g. "PT1H30M"
+});
+
+export const CampaignsFileSchema = z.object({
+  campaigns: z.array(CampaignSchema),
+});
+
+export const EpisodesFileSchema = z.object({
+  episodes: z.array(EpisodeSchema),
+});
+
+export type Campaign = z.infer<typeof CampaignSchema>;
+export type Episode = z.infer<typeof EpisodeSchema>;
