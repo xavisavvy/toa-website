@@ -200,9 +200,9 @@ export default function CharacterDetail() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-amber-500 text-white border-amber-600 cursor-help"
+                      <Badge
+                        variant="secondary"
+                        className="bg-amber-700 text-white border-amber-800 cursor-help"
                         data-testid="badge-ai-featured"
                       >
                         AI Art
@@ -335,7 +335,7 @@ export default function CharacterDetail() {
                                 variant="secondary"
                                 role="img"
                                 aria-label="AI-generated image"
-                                className="absolute top-2 right-2 z-10 bg-amber-500/95 text-white border-amber-600 backdrop-blur-sm shadow-md gap-1"
+                                className="absolute top-2 right-2 z-10 bg-amber-700 text-white border-amber-800 shadow-md gap-1"
                                 data-testid={`badge-ai-${image.id}`}
                               >
                                 <Sparkles
