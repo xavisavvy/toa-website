@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/SHOP_PERFORMANCE_OPTIMIZATION.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Shop Performance Optimization - Implementation Summary",
+  "summary": "Implementation summary of pagination, filtering, sorting, and performance optimizations for the Printful product catalog shop page.",
+  "scope": ["PrintfulShop component", "product catalog", "pagination", "filtering", "sorting", "shop performance"],
+  "cross_refs": ["client/src/components/PrintfulShop.tsx"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Manifest declared PRD; content reads more like a post-hoc implementation summary/DOC than a forward-looking PRD, but manifest is authoritative."
+}

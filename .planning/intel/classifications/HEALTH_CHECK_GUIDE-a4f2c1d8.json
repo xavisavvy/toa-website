@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/deployment/HEALTH_CHECK_GUIDE.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Health Check & Monitoring Guide",
+  "summary": "Specifies health check endpoints, response schemas, status levels, and component checks for Kubernetes, Docker, and load balancer monitoring.",
+  "scope": ["health checks", "monitoring", "Kubernetes probes", "API endpoints", "observability"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

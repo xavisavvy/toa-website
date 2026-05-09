@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/security/SECURITY.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Security Policy",
+  "summary": "Security policy documenting supported versions, implemented security features, vulnerability reporting process, and compliance posture for the project.",
+  "scope": ["security policy", "vulnerability reporting", "OWASP Top 10", "container security", "CI/CD security", "webhook verification", "session management"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Classified per MANIFEST_TYPE=SPEC override; content reads as a policy/security documentation rather than a strict technical contract, but manifest is authoritative."
+}
