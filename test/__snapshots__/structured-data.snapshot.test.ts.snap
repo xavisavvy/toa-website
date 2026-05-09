@@ -253,6 +253,114 @@ exports[`Structured Data Snapshot Tests > Person Schema > includes organization 
 }
 `;
 
+exports[`Structured Data Snapshot Tests > PodcastEpisode Schema > generates valid PodcastEpisode schema 1`] = `
+{
+  "@context": "https://schema.org",
+  "@type": "PodcastEpisode",
+  "associatedMedia": {
+    "@type": "MediaObject",
+    "contentUrl": "https://anchor.fm/talesofaneria/episodes/ep-1",
+  },
+  "datePublished": "2024-03-15",
+  "description": "The party descends into the Mire.",
+  "name": "Ep 1: Into the Mire",
+  "partOfSeries": {
+    "@type": "PodcastSeries",
+    "name": "The Forgotten Gods Saga",
+  },
+}
+`;
+
+exports[`Structured Data Snapshot Tests > TVEpisode Schema > generates complete TVEpisode schema with embedded VideoObject 1`] = `
+{
+  "@context": "https://schema.org",
+  "@type": "TVEpisode",
+  "datePublished": "2024-03-15",
+  "description": "Our heroes descend into the Mire of Forgotten Names.",
+  "episodeNumber": 1,
+  "image": "https://i.ytimg.com/vi/PLACEHOLDER1/hqdefault.jpg",
+  "name": "Into the Mire",
+  "partOfSeries": {
+    "@type": "TVSeries",
+    "name": "The Forgotten Gods Saga",
+    "url": "https://talesofaneria.com/campaigns/forgotten-gods-saga",
+  },
+  "url": "https://talesofaneria.com/campaigns/forgotten-gods-saga/episodes/1",
+  "video": {
+    "@type": "VideoObject",
+    "contentUrl": "https://www.youtube.com/watch?v=PLACEHOLDER1",
+    "description": "Our heroes descend into the Mire of Forgotten Names.",
+    "duration": "PT2H15M",
+    "embedUrl": "https://www.youtube.com/watch?v=PLACEHOLDER1",
+    "name": "Into the Mire",
+    "thumbnailUrl": "https://i.ytimg.com/vi/PLACEHOLDER1/hqdefault.jpg",
+    "uploadDate": "2024-03-15",
+  },
+}
+`;
+
+exports[`Structured Data Snapshot Tests > TVSeries Schema > generates complete TVSeries schema 1`] = `
+{
+  "@context": "https://schema.org",
+  "@type": "TVSeries",
+  "actor": [
+    {
+      "@type": "Person",
+      "name": "Cory Avis",
+    },
+    {
+      "@type": "Person",
+      "name": "Preston Farr",
+    },
+  ],
+  "description": "An epic saga of forgotten deities returning to Aneria",
+  "genre": [
+    "Fantasy",
+    "Tabletop RPG",
+    "Dungeons & Dragons",
+    "Live Play",
+  ],
+  "name": "The Forgotten Gods Saga",
+  "numberOfEpisodes": 12,
+  "productionCompany": {
+    "@type": "Organization",
+    "name": "Tales of Aneria",
+  },
+  "startDate": "2024-03-15",
+  "url": "https://talesofaneria.com/campaigns/forgotten-gods-saga",
+}
+`;
+
+exports[`Structured Data Snapshot Tests > TVSeries Schema > includes endDate and image when provided 1`] = `
+{
+  "@context": "https://schema.org",
+  "@type": "TVSeries",
+  "actor": [
+    {
+      "@type": "Person",
+      "name": "Cast Member",
+    },
+  ],
+  "description": "Test",
+  "endDate": "2024-12-31",
+  "genre": [
+    "Fantasy",
+    "Tabletop RPG",
+    "Dungeons & Dragons",
+    "Live Play",
+  ],
+  "image": "https://example.com/thumb.jpg",
+  "name": "Test",
+  "numberOfEpisodes": 5,
+  "productionCompany": {
+    "@type": "Organization",
+    "name": "Tales of Aneria",
+  },
+  "startDate": "2024-01-01",
+  "url": "https://talesofaneria.com/campaigns/test",
+}
+`;
+
 exports[`Structured Data Snapshot Tests > Video Schema > generates complete video schema 1`] = `
 {
   "@context": "https://schema.org",
