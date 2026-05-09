@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Play, Clock, Eye } from "lucide-react";
+import { Link } from "wouter";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -104,13 +105,24 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
               Catch up on our most recent adventures
             </p>
           </div>
-          <Button 
-            variant="outline"
-            data-testid="button-view-all-episodes"
-            onClick={() => window.open(channelUrl, '_blank', 'noopener,noreferrer')}
-          >
-            View All Episodes
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              asChild
+              variant="outline"
+              data-testid="button-view-all-episodes"
+            >
+              <Link href="/videos">View All Episodes</Link>
+            </Button>
+            <a
+              href={channelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-foreground"
+              data-testid="link-youtube-channel"
+            >
+              Visit YouTube channel
+            </a>
+          </div>
         </div>
 
         {isLoading ? (

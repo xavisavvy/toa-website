@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Headphones } from "lucide-react";
 import { SiSpotify, SiApplepodcasts, SiYoutubemusic } from "react-icons/si";
+import { Link } from "wouter";
 
 import PodcastSubscribeStrip from "@/components/PodcastSubscribeStrip";
 import { Badge } from "@/components/ui/badge";
@@ -60,13 +61,22 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
   return (
     <section id="podcast" className="py-20 lg:py-32 bg-card">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="font-serif text-4xl md:text-5xl font-semibold mb-3" data-testid="text-podcast-title">
-            Podcast
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Dive deeper into the world of Aneria with exclusive content
-          </p>
+        <div className="flex items-center justify-between mb-12 flex-wrap gap-4">
+          <div>
+            <h2 className="font-serif text-4xl md:text-5xl font-semibold mb-3" data-testid="text-podcast-title">
+              Podcast
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Dive deeper into the world of Aneria with exclusive content
+            </p>
+          </div>
+          <Button
+            asChild
+            variant="outline"
+            data-testid="button-browse-all-podcast"
+          >
+            <Link href="/podcast">Browse all episodes</Link>
+          </Button>
         </div>
 
         {isLoading ? (

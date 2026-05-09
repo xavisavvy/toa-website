@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Play, Clock, Eye } from "lucide-react";
+import { Link } from "wouter";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,13 +55,24 @@ export default function LatestShorts({ channelId }: LatestShortsProps) {
               Quick glimpses into our adventures
             </p>
           </div>
-          <Button 
-            variant="outline"
-            data-testid="button-view-all-shorts"
-            onClick={() => window.open(shortsUrl, '_blank', 'noopener,noreferrer')}
-          >
-            View All Shorts
-          </Button>
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              asChild
+              variant="outline"
+              data-testid="button-view-all-shorts"
+            >
+              <Link href="/videos">View All Shorts</Link>
+            </Button>
+            <a
+              href={shortsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-foreground"
+              data-testid="link-youtube-shorts"
+            >
+              Visit YouTube Shorts
+            </a>
+          </div>
         </div>
 
         {isLoading ? (
@@ -92,7 +104,7 @@ export default function LatestShorts({ channelId }: LatestShortsProps) {
                 key={short.id} 
                 className="overflow-hidden hover-elevate cursor-pointer transition-all"
                 data-testid={`card-short-${short.id}`}
-                onClick={() => window.open(`https://www.youtube.com/shorts/${short.id}`, '_blank')}
+                onClick={() => window.open(`https://www.youtube.com/shorts/${short.id}`, '_blank', 'noopener,noreferrer')}
               >
                 <div className="relative aspect-[9/16] overflow-hidden">
                   <img
