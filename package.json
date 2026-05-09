@@ -237,8 +237,10 @@
   "overrides": {
     "tmp": "^0.2.4",
     "minimatch": "^10.2.5",
-    "brace-expansion": "^2.0.3",
-    "ajv": "^8.20.0",
+    "brace-expansion": "^5.0.5",
+    "@stryker-mutator/core": {
+      "ajv": "^8.20.0"
+    },
     "esbuild": "^0.25.12"
   },
   "lint-staged": {
