@@ -32,6 +32,11 @@ import {
 function NotFound() {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Episode Not Found - Tales of Aneria"
+        description="This episode could not be found."
+        noindex={true}
+      />
       <Navigation />
       <div className="flex items-center justify-center py-20 pt-24">
         <div className="text-center">

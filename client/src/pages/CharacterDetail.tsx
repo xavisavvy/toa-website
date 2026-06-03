@@ -82,6 +82,11 @@ export default function CharacterDetail() {
   if (!character) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO
+          title="Character Not Found - Tales of Aneria"
+          description="This character could not be found."
+          noindex={true}
+        />
         <Navigation />
         <div className="flex items-center justify-center py-20 pt-24">
           <div className="text-center">

@@ -47,6 +47,11 @@ export default function CampaignDetail() {
   if (!campaign) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO
+          title="Campaign Not Found - Tales of Aneria"
+          description="This campaign could not be found."
+          noindex={true}
+        />
         <Navigation />
         <div className="flex items-center justify-center py-20 pt-24">
           <div className="text-center">
