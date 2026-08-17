@@ -7,6 +7,9 @@ import {
   getVideoSchema,
   getPersonSchema,
   getCreativeWorkSchema,
+  getTVSeriesSchema,
+  getTVEpisodeSchema,
+  getPodcastEpisodeSchema,
 } from '../client/src/lib/structuredData';
 
 /**
@@ -233,6 +236,52 @@ describe('Structured Data Snapshot Tests', () => {
     });
   });
 
+  describe('Person Schema (character page integration)', () => {
+    const wayne = {
+      playerName: 'Preston Farr',
+      characterName: 'Wayne "Archivist of Lies"',
+      race: 'Changeling',
+      class: 'Wizard',
+      sameAs: [
+        'https://www.youtube.com/@fuzzysquirrel',
+        'https://x.com/prestonbfarr',
+        'https://www.instagram.com/fuzzysquirreltv',
+        'https://www.twitch.tv/fuzzysquirrel',
+        'https://prestonfarr.com',
+      ],
+    };
+
+    it('description template includes player + character context', () => {
+      const description = `${wayne.playerName} plays ${wayne.characterName}, a ${wayne.race} ${wayne.class}, in Tales of Aneria.`;
+      const schema = getPersonSchema({
+        name: wayne.playerName,
+        description,
+        sameAs: wayne.sameAs,
+      });
+      expect(schema.name).toBe('Preston Farr');
+      expect(schema.description).toContain('Wayne');
+      expect(schema.description).toContain('Changeling Wizard');
+      expect(schema.description).toContain('Tales of Aneria');
+      expect(schema).toMatchSnapshot();
+    });
+
+    it('emits sameAs only when input array is provided', () => {
+      const withSameAs = getPersonSchema({
+        name: 'Preston Farr',
+        sameAs: ['https://prestonfarr.com'],
+      });
+      expect(withSameAs.sameAs).toEqual(['https://prestonfarr.com']);
+
+      const withoutSameAs = getPersonSchema({ name: 'Cory Avis' });
+      expect(withoutSameAs.sameAs).toBeUndefined();
+    });
+
+    it('omits image when not provided (Phase 2 cast avatars are bundled assets)', () => {
+      const schema = getPersonSchema({ name: 'Preston Farr' });
+      expect(schema.image).toBeUndefined();
+    });
+  });
+
   describe('CreativeWork Schema', () => {
     it('generates character creative work schema', () => {
       const character = {
@@ -295,6 +344,148 @@ describe('Structured Data Snapshot Tests', () => {
       
       expect(schema).toMatchSnapshot();
       expect(schema.image).toBeUndefined();
+    });
+  });
+
+  describe('TVSeries Schema', () => {
+    it('generates complete TVSeries schema', () => {
+      const schema = getTVSeriesSchema({
+        name: 'The Forgotten Gods Saga',
+        slug: 'forgotten-gods-saga',
+        description: 'An epic saga of forgotten deities returning to Aneria',
+        startDate: '2024-03-15',
+        numberOfEpisodes: 12,
+        cast: [{ name: 'Cory Avis' }, { name: 'Preston Farr' }],
+      });
+
+      expect(schema).toMatchSnapshot();
+
+      expect(schema['@context']).toBe('https://schema.org');
+      expect(schema['@type']).toBe('TVSeries');
+      expect(schema.name).toBe('The Forgotten Gods Saga');
+      expect(schema.url).toContain('/campaigns/forgotten-gods-saga');
+      expect(Array.isArray(schema.actor)).toBe(true);
+      expect((schema.actor as Array<{ '@type': string }>)[0]['@type']).toBe('Person');
+      expect(schema.genre).toContain('Tabletop RPG');
+    });
+
+    it('omits endDate and image when undefined', () => {
+      const schema = getTVSeriesSchema({
+        name: 'Test',
+        slug: 'test',
+        description: 'Test',
+        startDate: '2024-01-01',
+        numberOfEpisodes: 1,
+        cast: [],
+      });
+
+      expect((schema as Record<string, unknown>).endDate).toBeUndefined();
+      expect((schema as Record<string, unknown>).image).toBeUndefined();
+    });
+
+    it('includes endDate and image when provided', () => {
+      const schema = getTVSeriesSchema({
+        name: 'Test',
+        slug: 'test',
+        description: 'Test',
+        startDate: '2024-01-01',
+        endDate: '2024-12-31',
+        thumbnailUrl: 'https://example.com/thumb.jpg',
+        numberOfEpisodes: 5,
+        cast: [{ name: 'Cast Member' }],
+      });
+
+      expect((schema as Record<string, unknown>).endDate).toBe('2024-12-31');
+      expect((schema as Record<string, unknown>).image).toBe('https://example.com/thumb.jpg');
+
+      expect(schema).toMatchSnapshot();
+    });
+  });
+
+  describe('TVEpisode Schema', () => {
+    it('generates complete TVEpisode schema with embedded VideoObject', () => {
+      const schema = getTVEpisodeSchema({
+        campaignName: 'The Forgotten Gods Saga',
+        campaignSlug: 'forgotten-gods-saga',
+        episodeNumber: 1,
+        title: 'Into the Mire',
+        summary: 'Our heroes descend into the Mire of Forgotten Names.',
+        airDate: '2024-03-15',
+        url: 'https://talesofaneria.com/campaigns/forgotten-gods-saga/episodes/1',
+        youtubeUrl: 'https://www.youtube.com/watch?v=PLACEHOLDER1',
+        thumbnailUrl: 'https://i.ytimg.com/vi/PLACEHOLDER1/hqdefault.jpg',
+        duration: 'PT2H15M',
+      });
+
+      expect(schema).toMatchSnapshot();
+
+      expect(schema['@type']).toBe('TVEpisode');
+      // CAMP-04 required Google fields on the embedded VideoObject
+      const video = (schema as Record<string, unknown>).video as Record<string, unknown>;
+      expect(video).toBeDefined();
+      expect(video['@type']).toBe('VideoObject');
+      expect(video.name).toBeTruthy();
+      expect(video.thumbnailUrl).toBeTruthy();
+      expect(video.uploadDate).toBeTruthy();
+    });
+
+    it('partOfSeries references the campaign', () => {
+      const schema = getTVEpisodeSchema({
+        campaignName: 'Test Saga',
+        campaignSlug: 'test-saga',
+        episodeNumber: 3,
+        title: 'Test Ep',
+        summary: 'Test',
+        airDate: '2024-01-01',
+        url: 'https://talesofaneria.com/campaigns/test-saga/episodes/3',
+        youtubeUrl: 'https://www.youtube.com/watch?v=PLACEHOLDER',
+      });
+
+      const partOfSeries = (schema as Record<string, unknown>).partOfSeries as Record<string, unknown>;
+      expect(partOfSeries['@type']).toBe('TVSeries');
+      expect(partOfSeries.name).toBe('Test Saga');
+      expect(partOfSeries.url).toContain('/campaigns/test-saga');
+    });
+
+    it('omits duration and image when undefined', () => {
+      const schema = getTVEpisodeSchema({
+        campaignName: 'Test',
+        campaignSlug: 'test',
+        episodeNumber: 1,
+        title: 'Test',
+        summary: 'Test',
+        airDate: '2024-01-01',
+        url: 'https://talesofaneria.com/campaigns/test/episodes/1',
+        youtubeUrl: 'https://www.youtube.com/watch?v=PLACEHOLDER',
+      });
+
+      expect((schema as Record<string, unknown>).image).toBeUndefined();
+      const video = (schema as Record<string, unknown>).video as Record<string, unknown>;
+      expect(video.duration).toBeUndefined();
+      expect(video.thumbnailUrl).toBeUndefined();
+    });
+  });
+
+  describe('PodcastEpisode Schema', () => {
+    it('generates valid PodcastEpisode schema', () => {
+      const schema = getPodcastEpisodeSchema({
+        title: 'Ep 1: Into the Mire',
+        summary: 'The party descends into the Mire.',
+        airDate: '2024-03-15',
+        podcastUrl: 'https://anchor.fm/talesofaneria/episodes/ep-1',
+        campaignName: 'The Forgotten Gods Saga',
+      });
+
+      expect(schema).toMatchSnapshot();
+
+      expect(schema['@context']).toBe('https://schema.org');
+      expect(schema['@type']).toBe('PodcastEpisode');
+      expect(schema.name).toBe('Ep 1: Into the Mire');
+      const associatedMedia = (schema as Record<string, unknown>).associatedMedia as Record<string, unknown>;
+      expect(associatedMedia['@type']).toBe('MediaObject');
+      expect(associatedMedia.contentUrl).toContain('anchor.fm');
+      const partOfSeries = (schema as Record<string, unknown>).partOfSeries as Record<string, unknown>;
+      expect(partOfSeries['@type']).toBe('PodcastSeries');
     });
   });
 

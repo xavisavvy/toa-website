@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/integration/SHIPPING_IMPLEMENTATION_SUMMARY.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Printful Shipping Integration - Complete Summary",
+  "summary": "Technical summary of Printful shipping integration including new shipping estimate endpoint and updated Stripe checkout endpoint with shipping/tax data.",
+  "scope": ["Printful API", "Stripe checkout", "shipping estimation", "tax calculation", "checkout flow"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

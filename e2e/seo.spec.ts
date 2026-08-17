@@ -280,6 +280,7 @@ test.describe('SEO Best Practices', () => {
     
     const htmlLang = await page.locator('html').getAttribute('lang');
     expect(htmlLang).toBeTruthy();
+    // eslint-disable-next-line security/detect-unsafe-regex -- BCP-47 lang tag; anchored & bounded
     expect(htmlLang).toMatch(/^[a-z]{2}(-[A-Z]{2})?$/); // e.g., 'en' or 'en-US'
   });
 });

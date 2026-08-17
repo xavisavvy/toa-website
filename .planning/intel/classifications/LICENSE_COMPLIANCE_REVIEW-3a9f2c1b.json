@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/security/LICENSE_COMPLIANCE_REVIEW.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "License Compliance Review",
+  "summary": "Reviews and approves all dependency licenses for commercial use, including LGPL exceptions for sharp binary libraries used via dynamic linking.",
+  "scope": ["dependency licensing", "LGPL compliance", "sharp library", "commercial use approval"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Manifest declared as ADR; document records a legal/licensing decision and approval, consistent with ADR classification. No explicit Status: Accepted marker so locked=false."
+}

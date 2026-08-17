@@ -1,5 +1,5 @@
-import { ShoppingCart, X } from 'lucide-react';
-import { memo, useCallback, useMemo } from 'react';
+import { ShoppingCart } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 
 import { CartItem as CartItemComponent } from '@/components/CartItem';

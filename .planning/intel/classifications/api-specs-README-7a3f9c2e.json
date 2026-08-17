@@ -1,0 +1,17 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/api-specs/README.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "API Contract Specifications",
+  "summary": "Index document describing OpenAPI 3.0 contract specifications for Stripe and Printful webhook integrations, including contract testing approach.",
+  "scope": ["api-contracts", "stripe-webhooks", "printful-webhooks", "openapi", "contract-testing"],
+  "cross_refs": [
+    "docs/api-specs/stripe-webhooks.yaml",
+    "docs/api-specs/printful-webhooks.yaml",
+    "test/contract/openapi-validation.test.ts"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/ENVIRONMENT_MANAGEMENT.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Environment Variable Management Best Practices",
+  "summary": "Defines the multi-layered process and tooling contract for keeping .env, .env.docker, and .env.example synchronized across local, Docker, and production environments.",
+  "scope": [".env.example", ".env", ".env.docker", "npm env:check", "npm env:sync", "pre-commit hook", "environment variables", "secrets management"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

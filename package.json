@@ -5,8 +5,14 @@
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
+    "up": "docker compose up -d --wait db && npm run db:push && npm run dev",
+    "up:full": "docker compose -f docker-compose.dev.yml up -d --wait",
+    "down": "docker compose down",
+    "down:full": "docker compose -f docker-compose.dev.yml down",
+    "down:volumes": "docker compose down -v",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build",
+    "build:client": "npm run sitemap:generate && vite build",
+    "sitemap:generate": "tsx scripts/generate-sitemap.ts",
     "build:server": "esbuild index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "build:parallel": "npm-run-all --parallel build:client build:server",
     "preview": "vite preview",
@@ -112,7 +118,7 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.39.1",
+    "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",
     "express": "^4.21.2",
@@ -230,7 +236,13 @@
     "bufferutil": "^4.0.8"
   },
   "overrides": {
-    "tmp": "^0.2.4"
+    "tmp": "^0.2.4",
+    "minimatch": "^10.2.5",
+    "brace-expansion": "^5.0.5",
+    "@stryker-mutator/core": {
+      "ajv": "^8.20.0"
+    },
+    "esbuild": "^0.25.12"
   },
   "lint-staged": {
     ".env.example": [

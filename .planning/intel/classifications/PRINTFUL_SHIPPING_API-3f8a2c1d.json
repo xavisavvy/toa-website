@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/integration/PRINTFUL_SHIPPING_API.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Printful Shipping API Integration - Implementation Guide",
+  "summary": "Technical specification for integrating Printful Shipping Rates API with Stripe checkout, including endpoints, request/response schemas, and two-step checkout flow.",
+  "scope": ["Printful Shipping API", "Stripe checkout", "shipping rate calculation", "tax calculation", "checkout flow"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}

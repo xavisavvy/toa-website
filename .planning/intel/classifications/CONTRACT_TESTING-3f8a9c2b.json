@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/CONTRACT_TESTING.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Contract Testing Strategy",
+  "summary": "Defines contract testing strategy and test coverage for external API integrations including Stripe, Printful, and YouTube.",
+  "scope": ["contract testing", "Stripe integration", "Printful integration", "YouTube integration", "API contracts", "webhook verification"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/features/YOUTUBE_CHANNEL_VIDEOS.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "YouTube Channel Videos Feature",
+  "summary": "Documents the YouTube channel videos API endpoint that fetches all videos from a channel sorted newest first with caching and rate limiting.",
+  "scope": ["YouTube API integration", "channel videos endpoint", "server/youtube.ts"],
+  "cross_refs": ["server/youtube.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

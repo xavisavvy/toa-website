@@ -4,236 +4,135 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Tales of Aneria is a TTRPG (tabletop role-playing game) live play website with enterprise-grade practices: comprehensive testing, security scanning, CI/CD automation, and WCAG 2.1 AA accessibility compliance.
+Tales of Aneria is a TTRPG live play website. It runs as an Express + Vite app with React 18 on the client, PostgreSQL via Drizzle ORM on the server, and integrates YouTube, Stripe, Printful, and AWS SES.
 
-## Common Commands
+## Critical Patterns (read first)
 
-```bash
-# Development
-npm run dev                    # Start dev server (Express + Vite on port 5000)
-npm run build                  # Build client and server for production
-npm run check                  # TypeScript type checking
-npm run lint                   # ESLint (add --fix to auto-fix)
-
-# Testing
-npm run test                   # Run unit tests (Vitest)
-npm run test:coverage          # Unit tests with coverage report
-npm run test:e2e               # E2E tests (Playwright)
-npm run test:e2e:headed        # E2E tests with browser visible
-npm run test:quick             # Fast unit tests without coverage
-npm run test:watch             # Watch mode for development
-vitest run path/to/test.ts     # Run a single test file
-
-# Database
-npm run db:push                # Push schema directly (dev mode only)
-npm run db:generate            # Generate migration files from schema changes
-npm run db:migrate             # Apply migrations with history (production-safe)
-npm run db:studio              # Visual database browser
-npm run db:seed                # Seed database with initial data
-
-# Specialized Testing
-npm run test:mutation          # Mutation testing with Stryker
-npm run test:contract          # Contract tests (Pact)
-npm run test:security          # Security tests
-npm run test:chaos             # Chaos/resilience tests
-
-# Security & Quality
-npm run check:markdown-secrets # Scan markdown for accidental secrets
-npm run check:mistakes         # Check for common import errors (wouter, etc.)
-```
-
-## Architecture
-
-### Tech Stack
-- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + wouter (routing)
-- **Backend**: Express.js + TypeScript + PostgreSQL + Drizzle ORM
-- **Testing**: Vitest (unit), Playwright (E2E), Stryker (mutation), Pact (contract)
-- **Security**: Trivy, Snyk, Gitleaks, npm audit, OWASP Top 10 protection
-- **Integrations**: YouTube Data API, Printful, Stripe, AWS SES
-
-### Directory Structure
-```
-client/src/
-├── components/          # React components (PascalCase.tsx)
-│   ├── layout/          # Header, Footer, etc.
-│   └── ui/              # shadcn/ui components
-├── pages/               # Page components
-├── hooks/               # Custom React hooks
-├── lib/                 # Utilities and helpers
-└── data/                # Static JSON data (cast.json, social-links.json)
-
-server/
-├── routes.ts            # All Express route handlers
-├── db.ts                # Database connection (Drizzle)
-├── auth.ts              # Authentication logic
-├── security.ts          # Security utilities, validation, logging
-├── sentry.ts            # APM integration (optional, set SENTRY_DSN)
-├── slo.ts               # SLO/Error budget tracking
-├── stripe.ts            # Stripe integration (webhook verification)
-├── printful.ts          # Printful API integration
-├── youtube.ts           # YouTube API integration
-└── cache.ts             # Redis caching layer
-
-shared/
-├── schema.ts            # Drizzle ORM schema + Zod validation
-└── types/               # Shared TypeScript types
-
-.ai/                     # AI context files
-├── architecture.md      # System design overview
-└── prompts.md           # Effective prompt patterns
-
-test/                    # Unit & integration tests
-e2e/                     # Playwright E2E tests
-```
-
-## Critical Patterns
-
-### Wouter Navigation (CRITICAL)
-**Never use `useNavigate`** - it does not exist in wouter.
+### Wouter routing — `useNavigate` does not exist
+This is the most common AI-introduced bug in this repo. Wouter has no `useNavigate` export.
 ```typescript
 // CORRECT
 import { useLocation } from 'wouter';
 const [, setLocation] = useLocation();
 setLocation('/path');
-
-// WRONG - DOES NOT EXIST
-import { useNavigate } from 'wouter';
 ```
 
-### API Routes
-All backend routes are in `server/routes.ts`. Every endpoint must have:
-- Zod validation for all inputs
-- Rate limiting (`apiLimiter` or `expensiveLimiter`)
-- try/catch error handling
-- Return format: `{ success: boolean, data/error }`
+### API routes live in a single file
+All Express handlers are in `server/routes.ts`. Every endpoint must include:
+- Zod validation for inputs
+- A rate limiter (`apiLimiter` for standard, `expensiveLimiter` for resource-heavy)
+- try/catch with `{ success, data | error }` response shape
+- `logSecurityEvent()` from `server/security.ts` on failures
 
-### Database
-Drizzle ORM with PostgreSQL. Schema in `shared/schema.ts`. After schema changes, run `npm run db:push`.
+### Script parity (PowerShell ↔ Shell)
+When editing any `.ps1` script under `.kubernetes/local/` or `scripts/`, update the matching `.sh` file with identical functionality, and vice versa.
 
-**Path Aliases**:
-- `@/` → `client/src/`
-- `@shared/` → `shared/`
+## Common Commands
 
-## Security Requirements
+```bash
+# Dev / build
+npm run dev                    # Express + Vite, port 5000 (entry: server/index.ts)
+npm run build                  # build:client (vite) + build:server (esbuild)
+npm run check                  # tsc type check
+npm run lint                   # eslint .ts/.tsx (--fix variant: npm run lint:fix)
 
-### Application Security
-- **Input Validation**: ALL user inputs validated with Zod
-- **Rate Limiting**: ALL public API endpoints must have rate limiting
-- **SQL Injection**: ONLY use Drizzle ORM prepared statements (no raw SQL)
-- **Webhook Verification**: Stripe and Printful webhooks use HMAC signature verification
-- **Session Security**: Regenerate session ID after login to prevent fixation attacks
-- **Security Logging**: Log security events via `logSecurityEvent()` in `server/security.ts`
+# Tests
+npm run test                   # Vitest (watch mode by default)
+npm run test:quick             # Single run, dot reporter, no coverage
+npm run test:coverage          # Run with coverage (used by pre-push hook)
+npm run test:changed           # Only files changed since HEAD~1
+vitest run path/to/file.test.ts                       # Single file
+vitest run --testNamePattern="should handle errors"   # Single test by name
 
-### Secret Prevention
-- Never commit secrets to any file including markdown documentation
-- Use placeholders like `sk_test_your_key_here` or `[REDACTED]` in docs
-- Pre-commit hooks scan markdown files for real API keys
-- Run `npm run check:markdown-secrets` to manually verify
+# E2E (Playwright)
+npm run test:e2e               # Headless
+npm run test:e2e:headed        # Visible browser
+npm run test:e2e:setup         # Bring up docker-compose test stack
+npm run test:visual            # Visual regression
+npm run test:visual:update     # Update snapshots
+npm run test:load              # Load tests via Playwright
+npm run test:load:autocannon   # Autocannon-based load test (test/load/load-test.ts)
 
-### Security Scanning (CI/CD)
-- **Trivy**: Container vulnerability scanning
-- **Snyk**: Dependency vulnerability scanning
-- **Gitleaks**: Secret detection in commits
-- **npm audit**: Package vulnerability scanning
+# Specialized
+npm run test:mutation          # Stryker
+npm run test:contract          # Pact contract tests
+npm run test:security          # test/security suite
+npm run test:chaos             # test/chaos suite
+npm run lighthouse:ci          # Lighthouse CI (builds first)
 
-## Testing Requirements
+# Database (Drizzle)
+npm run db:push                # Direct schema push (dev only)
+npm run db:generate            # Generate migration from schema diff
+npm run db:migrate             # Apply migrations (production-safe)
+npm run db:studio              # Visual browser
+npm run db:seed                # Seed (scripts/seed-database.ts)
+npm run db:seed:e2e            # E2E test data
 
-### Pre-commit Hooks (Automatic)
-- ESLint with auto-fix
-- Related unit tests via `vitest related --run`
-- Markdown secret scanning
-- Commit blocked if tests fail
-
-### Pre-push Hooks (Automatic)
-- Full unit test suite with coverage
-- Coverage thresholds enforced (40% global minimum)
-- Higher thresholds for critical files:
-  - `server/routes.ts`: 40% lines, 47% functions
-  - `server/security.ts`: 60% lines, 50% functions
-  - `server/env-validator.ts`: 77% lines, 80% functions
-- Push blocked if coverage drops below thresholds
-
-### E2E Testing
-Include accessibility checks in all E2E tests:
-```typescript
-await expect(page).toPassAxeCheck(); // WCAG 2.1 AA compliance
+# Utilities
+npm run create-admin           # scripts/create-admin.ts
+npm run sync:orders            # Pull Printful orders (use --dry-run first)
+npm run env:check              # Verify .env vs .env.example
+npm run check:markdown-secrets # Scan markdown for accidental keys
+npm run check:mistakes         # Scan for known anti-patterns (e.g. wouter useNavigate)
+npm run test:ses               # Verify AWS SES sender works
 ```
 
-## Script Parity (CRITICAL)
+## Architecture
 
-**Always maintain parity between PowerShell and Shell scripts:**
-- `.kubernetes/local/*.ps1` ↔ `.kubernetes/local/*.sh`
-- `scripts/*.ps1` ↔ `scripts/*.sh`
+### Build entry points
+- **Dev**: `npm run dev` → `tsx server/index.ts` (Express boots Vite middleware)
+- **Production build**: `vite build` produces the client; `esbuild index.ts` (the **root-level** `index.ts`) bundles the server to `dist/index.js`
+- **Production runtime**: `node dist/index.js`
 
-When updating any script, update BOTH versions with identical functionality.
+The root-level `index.ts` is the production server entry — not `server/index.ts`. The `server/index.ts` file is the dev entry.
+
+### Server modules (`server/`)
+Single-file routing in `routes.ts`; everything else is feature- or concern-scoped. Notable modules:
+- Auth: `auth.ts`, `auth-middleware.ts` (`requireAdmin`, `optionalAuth`)
+- Security/observability: `security.ts`, `rate-limiter.ts`, `audit.ts`, `logger.ts`, `log-sanitizer.ts`, `monitoring.ts`, `sentry.ts`, `slo.ts`, `health.ts`, `env-validator.ts`, `feature-flags.ts`
+- Data: `db.ts`, `storage.ts`, `cache.ts`, `cache/`
+- Integrations: `stripe.ts`, `printful.ts`, `youtube.ts`, `podcast.ts`, `etsy.ts`, `dndbeyond.ts`, `notification-service.ts`, `order-service.ts`
+- Dev infra: `vite.ts` (Vite middleware mount), `index.ts` (dev entry)
+
+### Client (`client/src/`)
+React + wouter routing. Components in PascalCase (`components/`, with `layout/` and `ui/` for shadcn). Path aliases: `@/` → `client/src/`, `@shared/` → `shared/`.
+
+### Shared (`shared/`)
+`schema.ts` is the source of truth — Drizzle table definitions plus `drizzle-zod` validation schemas. Type changes flow from here.
+
+### Root config files
+`drizzle.config.ts`, `vite.config.ts`, `vitest.config.ts`, `vitest.report.config.ts`, `playwright.config.ts`, `tailwind.config.ts`, `index.ts` (prod server entry).
+
+## Pre-commit / Pre-push Hooks
+
+Husky enforces these automatically:
+- **Pre-commit**: ESLint --fix on staged `.ts/.tsx`, `vitest related --run` for impacted tests, markdown secret scan
+- **Pre-push**: `npm run test:coverage` with thresholds enforced
+
+Coverage thresholds (Vitest config):
+- Global: 40% lines/functions/statements
+- `server/routes.ts`: 40% lines, 47% functions
+- `server/security.ts`: 60% lines, 50% functions
+- `server/env-validator.ts`: 77% lines, 80% functions
+
+## Code Review Sensitivity
+
+Touch carefully — these are security-critical and warrant extra review:
+- `server/auth.ts`, `server/auth-middleware.ts` — authentication
+- `server/security.ts`, `server/rate-limiter.ts` — security primitives
+- `server/stripe.ts`, `server/printful.ts` — payments and webhook HMAC verification
+- `shared/schema.ts` — schema/validation boundary
+
+`server/routes.ts` is the standard place to add endpoints, but note it imports from the security-critical modules above; changes there can still affect auth/payment flows.
 
 ## Commit Messages
 
-Use Conventional Commits format for automatic versioning:
-```
-feat: add new feature        # Minor version bump
-fix: resolve bug             # Patch version bump
-feat!: breaking change       # Major version bump
-docs: update documentation
-test: add tests
-refactor: code cleanup
-perf: performance improvement
-```
+Conventional Commits (drives `standard-version` automatic versioning):
+- `feat:` minor bump · `fix:` patch · `feat!:` major
+- `docs:` `test:` `refactor:` `perf:` `chore:`
 
-## Git Push Status Reporting
+## Further Reading
 
-At the end of every task summary involving code changes, always report git status:
-```
-## Git Status
-**Status:** [PUSHED | NOT PUSHED]
-- Branch: main
-- Pushed to GitHub: [YES | NO]
-**Action Required:** [If needed: "Run `git push` to deploy"]
-```
-
-## Code Review Zones
-
-### Human-Review Required (Security-Critical)
-- `server/auth.ts` - Authentication logic
-- `server/security.ts` - Security utilities
-- `server/stripe.ts` - Payment processing
-- Any code handling passwords, tokens, or payments
-
-### AI-Safe (Can modify freely)
-- `server/routes.ts` - API endpoints (with patterns)
-- `client/src/components/` - React components
-- `test/` - Test files
-- `client/src/data/` - Static JSON data
-
-## Environment Variables
-
-Required variables documented in `.env.example`. Key ones:
-- `DATABASE_URL` - PostgreSQL connection string
-- `YOUTUBE_API_KEY` - Server-side YouTube API key
-- `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` - Stripe keys
-- `STRIPE_WEBHOOK_SECRET` - Webhook signature verification
-- `PRINTFUL_API_KEY` - Printful integration
-- `SESSION_SECRET` - Session encryption
-- `SENTRY_DSN` - (Optional) Sentry APM integration
-
-## Observability
-
-### SLO Tracking (`server/slo.ts`)
-Track service level objectives with the SLO middleware:
-- Availability target: 99.9%
-- Latency p95 target: < 200ms
-- Error rate target: < 0.1%
-- Endpoint: GET `/api/slo` for metrics
-
-### APM Integration (`server/sentry.ts`)
-Optional Sentry integration for error tracking and performance monitoring.
-Enable by setting `SENTRY_DSN` environment variable.
-
-## Documentation
-
-- `docs/ci-cd/` - CI/CD and GitHub Actions
-- `docs/testing/` - Testing strategies
-- `docs/security/` - Security practices, secret prevention
-- `docs/deployment/` - Docker, Kubernetes, Replit deployment
-- `.github/copilot-instructions.md` - Detailed coding standards and patterns
-- `.ai/` - Architecture overview and effective prompts
+- `.github/copilot-instructions.md` — full coding standards, code samples, and trigger-word patterns. Most "how to write a route / component / test" details live there; this file is the higher-level orientation.
+- `.ai/architecture.md` — system design overview
+- `docs/ci-cd/`, `docs/testing/`, `docs/security/`, `docs/deployment/`, `docs/features/`

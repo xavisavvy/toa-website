@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('Network Resilience & Chaos Tests', () => {
   describe('YouTube API Resilience', () => {
@@ -37,7 +37,7 @@ describe('Network Resilience & Chaos Tests', () => {
 
       try {
         await fetchWithRetry('https://httpstat.us/500');
-      } catch (error) {
+      } catch (_error) {
         expect(attempts).toBeGreaterThanOrEqual(1);
         expect(attempts).toBeLessThanOrEqual(maxRetries + 1);
       }
@@ -158,7 +158,7 @@ describe('Network Resilience & Chaos Tests', () => {
       for (let i = 0; i < 3; i++) {
         try {
           await breaker.execute(failingOperation);
-        } catch (error) {
+        } catch (_error) {
           // Expected to fail
         }
       }
@@ -181,7 +181,7 @@ describe('Network Resilience & Chaos Tests', () => {
       try {
         JSON.parse(corruptedData);
         expect.fail('Should have thrown parse error');
-      } catch (error) {
+      } catch (_error) {
         const fallbackData = { videos: [], timestamp: Date.now() };
         expect(fallbackData).toHaveProperty('videos');
         expect(fallbackData).toHaveProperty('timestamp');
@@ -211,7 +211,7 @@ describe('Network Resilience & Chaos Tests', () => {
       let writeCount = 0;
       const locks = new Map<string, Promise<void>>();
 
-      const writeWithLock = async (key: string, data: any) => {
+      const writeWithLock = async (key: string, _data: any) => {
         if (locks.has(key)) {
           await locks.get(key);
         }

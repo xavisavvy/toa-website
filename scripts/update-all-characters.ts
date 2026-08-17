@@ -104,7 +104,7 @@ async function main() {
         const data = await fetchCharacterData(id);
         allCharacterData.push(data);
         console.log(`  ✓ ${data.name} - ${data.race} ${data.class} ${data.level}`);
-      } catch (error) {
+      } catch (_error) {
         console.error(`  ✗ Failed to fetch character ${id}`);
       }
       // Small delay to avoid rate limiting

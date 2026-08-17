@@ -1,11 +1,13 @@
 # robots.txt for Tales of Aneria
 # https://talesofaneria.com
 
+# NOTE: /legal/privacy and /legal/tos are intentionally NOT disallowed here.
+# They carry a `noindex` meta tag, and Google must be able to CRAWL a page to
+# see that tag. Blocking them in robots.txt would prevent the noindex from
+# being honored and could leave them indexed URL-only.
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /legal/privacy
-Disallow: /legal/tos
 Disallow: /admin
 Disallow: /admin/
 Disallow: /track-order

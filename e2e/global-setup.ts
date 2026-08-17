@@ -5,7 +5,7 @@
 
 import type { FullConfig } from '@playwright/test';
 
-// eslint-disable-next-line no-unused-vars
+ 
 function globalSetup(_config: FullConfig) {
   // Check if database is available
   const DATABASE_URL = process.env.DATABASE_URL;
