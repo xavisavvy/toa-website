@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Headphones } from "lucide-react";
 import { SiSpotify, SiApplepodcasts, SiYoutubemusic } from "react-icons/si";
+import { Link } from "wouter";
 
+import PodcastSubscribeStrip from "@/components/PodcastSubscribeStrip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { analytics } from "@/lib/analytics";
-import { apiRequest } from "@/lib/queryClient";
 
 interface PodcastEpisode {
   id: string;
@@ -61,13 +61,22 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
   return (
     <section id="podcast" className="py-20 lg:py-32 bg-card">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="font-serif text-4xl md:text-5xl font-semibold mb-3" data-testid="text-podcast-title">
-            Podcast
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Dive deeper into the world of Aneria with exclusive content
-          </p>
+        <div className="flex items-center justify-between mb-12 flex-wrap gap-4">
+          <div>
+            <h2 className="font-serif text-4xl md:text-5xl font-semibold mb-3" data-testid="text-podcast-title">
+              Podcast
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Dive deeper into the world of Aneria with exclusive content
+            </p>
+          </div>
+          <Button
+            asChild
+            variant="outline"
+            data-testid="button-browse-all-podcast"
+          >
+            <Link href="/podcast">Browse all episodes</Link>
+          </Button>
         </div>
 
         {isLoading ? (
@@ -146,54 +155,13 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
                     Audio Player Placeholder
                   </div>
                 )}
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-sm text-muted-foreground">Listen on:</span>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    data-testid="button-spotify"
-                    onClick={() => {
-                      if (spotifyUrl) {
-                        analytics.podcastPlay('Spotify');
-                        window.open(spotifyUrl, '_blank');
-                      }
-                    }}
-                    disabled={!spotifyUrl}
-                  >
-                    <SiSpotify className="h-4 w-4 mr-2" />
-                    Spotify
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    data-testid="button-apple-podcasts"
-                    onClick={() => {
-                      if (applePodcastsUrl) {
-                        analytics.podcastPlay('Apple Podcasts');
-                        window.open(applePodcastsUrl, '_blank');
-                      }
-                    }}
-                    disabled={!applePodcastsUrl}
-                  >
-                    <SiApplepodcasts className="h-4 w-4 mr-2" />
-                    Apple
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    data-testid="button-youtube-music"
-                    onClick={() => {
-                      if (youtubeMusicUrl) {
-                        analytics.podcastPlay('YouTube Music');
-                        window.open(youtubeMusicUrl, '_blank');
-                      }
-                    }}
-                    disabled={!youtubeMusicUrl}
-                  >
-                    <SiYoutubemusic className="h-4 w-4 mr-2" />
-                    YouTube Music
-                  </Button>
-                </div>
+                <PodcastSubscribeStrip
+                  spotifyUrl={spotifyUrl}
+                  applePodcastsUrl={applePodcastsUrl}
+                  youtubeMusicUrl={youtubeMusicUrl}
+                  trackAnalytics
+                />
+
               </CardContent>
             </Card>
 

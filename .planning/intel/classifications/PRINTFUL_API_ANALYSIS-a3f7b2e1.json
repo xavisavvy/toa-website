@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/integration/PRINTFUL_API_ANALYSIS.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Printful API Analysis & Order Creation Methods",
+  "summary": "Analysis of Printful's API documenting two methods for creating orders (sync variant vs catalog variant) with common mistakes and integration guidance.",
+  "scope": ["Printful API", "order creation", "sync variants", "catalog variants", "file uploads"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

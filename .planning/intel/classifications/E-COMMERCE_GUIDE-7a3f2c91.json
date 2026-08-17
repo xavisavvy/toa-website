@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/E-COMMERCE_GUIDE.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "E-Commerce Integration Guide",
+  "summary": "Integration guide covering architecture, setup, testing, and deployment for the Printful and Stripe e-commerce implementation.",
+  "scope": ["Printful", "Stripe", "checkout", "webhooks", "shop page", "order fulfillment"],
+  "cross_refs": ["server/printful.ts", "server/stripe.ts", "server/routes.ts", "client/src/components/PrintfulShop.tsx", "client/src/pages/Shop.tsx", "client/src/pages/CheckoutSuccess.tsx", "client/src/pages/CheckoutCancel.tsx"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

@@ -18,6 +18,7 @@ function formatViewCount(count: number): string {
 }
 
 function formatDuration(isoDuration: string): string {
+  // eslint-disable-next-line security/detect-unsafe-regex -- ISO 8601 PT duration; bounded, no catastrophic backtracking
   const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!match) {return '0:00';}
 

@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/guides/DESIGN_GUIDELINES.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Design Guidelines: Tales of Aneria Landing Page",
+  "summary": "Visual design specification defining color palette, typography, layout system, and component patterns for the Tales of Aneria landing page.",
+  "scope": ["landing page", "color palette", "typography", "layout system", "component library", "navigation", "dark mode", "light mode"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

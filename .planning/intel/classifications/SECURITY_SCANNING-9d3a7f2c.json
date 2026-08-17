@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/security/SECURITY_SCANNING.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Security Scanning Configuration",
+  "summary": "Documents the active multi-layer security scanning configuration in CI/CD including Trivy, Snyk, Gitleaks, and custom OWASP tests, with CodeQL disabled.",
+  "scope": ["security scanning", "CI/CD", "Trivy", "Snyk", "Gitleaks", "npm audit", "CodeQL", "OWASP Top 10"],
+  "cross_refs": [],
+  "locked": true,
+  "precedence": null,
+  "notes": "Classified as ADR per manifest override; document status reads Active which is treated as Accepted/locked."
+}

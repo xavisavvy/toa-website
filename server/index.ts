@@ -122,11 +122,15 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  // Windows does not support reusePort and rejects 0.0.0.0 binds with ENOTSUP
+  // in some Node 22 builds. Default to localhost on win32 so local dev / Playwright works.
+  const isWindows = process.platform === 'win32';
+  const host = process.env.HOST ?? (isWindows ? 'localhost' : '0.0.0.0');
+  const listenOpts: { port: number; host: string; reusePort?: boolean } = { port, host };
+  if (!isWindows) {
+    listenOpts.reusePort = true;
+  }
+  server.listen(listenOpts, () => {
+    log(`serving on ${host}:${port}`);
   });
 })();

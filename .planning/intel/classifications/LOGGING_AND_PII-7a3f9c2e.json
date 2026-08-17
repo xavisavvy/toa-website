@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/LOGGING_AND_PII.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Logging & PII Protection",
+  "summary": "Documents the application's logging architecture with automatic PII sanitization to comply with GDPR, CCPA, and other privacy regulations.",
+  "scope": ["logging", "PII sanitization", "log-sanitizer.ts", "safeLog", "privacy compliance", "GDPR", "CCPA"],
+  "cross_refs": ["log-sanitizer.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Manifest declared this as ADR; heuristic+content signals would suggest DOC (prose-heavy guide with no Decision/Consequences sections or Accepted status). Manifest type honored as authoritative; locked=false because no Accepted status marker present."
+}

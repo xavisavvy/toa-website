@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/INFLUENCER_FEATURES_ANALYSIS.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Social Media Influencer Website - Feature Analysis",
+  "summary": "Comprehensive feature analysis and requirements catalog for social media influencer and entertainment public-figure websites.",
+  "scope": ["community engagement", "fan interaction", "social media aggregation", "live streaming", "user generated content", "gamification"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Type assigned from manifest declaration."
+}

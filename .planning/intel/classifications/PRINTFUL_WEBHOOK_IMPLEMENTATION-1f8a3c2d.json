@@ -1,0 +1,22 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/PRINTFUL_WEBHOOK_IMPLEMENTATION.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Printful Webhook Implementation Summary",
+  "summary": "Implementation summary of the Printful webhook endpoint, covering HMAC signature verification, supported event types, schema updates, and tests.",
+  "scope": ["printful", "webhooks", "server/routes.ts", "shared/schema.ts", "order status", "signature verification"],
+  "cross_refs": [
+    "server/routes.ts",
+    "shared/schema.ts",
+    "docs/PRINTFUL_WEBHOOK_SETUP.md",
+    "docs/ORDER_STATUS_FLOW.md",
+    "docs/security/SECURITY.md",
+    ".env.example",
+    "test/printful-webhook.test.ts",
+    "e2e/printful-webhook.spec.ts"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}
