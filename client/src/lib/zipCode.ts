@@ -21,7 +21,8 @@ const ZIP_CODE_STORAGE_KEY = 'toa_session_zip';
  */
 export function saveZipCode(zipCode: string): void {
   try {
-    // Basic validation
+    // Basic validation — anchored 5-or-9 digit US zip; bounded, no catastrophic backtracking
+    // eslint-disable-next-line security/detect-unsafe-regex
     if (!/^\d{5}(-\d{4})?$/.test(zipCode)) {
       console.warn('Invalid zip code format');
       return;
@@ -64,5 +65,6 @@ export function clearZipCode(): void {
  * @returns true if valid 5 or 9-digit US zip code
  */
 export function isValidZipCode(zipCode: string): boolean {
+  // eslint-disable-next-line security/detect-unsafe-regex -- anchored US zip; bounded
   return /^\d{5}(-\d{4})?$/.test(zipCode);
 }

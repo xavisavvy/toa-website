@@ -1,0 +1,105 @@
+# GSD Ingest Manifest for toa-website
+# Curated subset of docs/ that contain decisions, requirements, architecture,
+# contracts, and forward-looking roadmaps.
+# Excludes: how-tos, dated audit reports, phase-completion summaries,
+# optimization notes, fix-of-the-week notes, and duplicate variants.
+docs:
+  # ── Architecture & Cross-cutting Decisions ────────────────
+  - path: docs/ARCHITECTURE.md
+    type: SPEC
+  - path: docs/CI_DATABASE_STRATEGY.md
+    type: ADR
+  - path: docs/CACHING_RATE_LIMIT_ANALYSIS.md
+    type: ADR
+  - path: docs/LOGGING_AND_PII.md
+    type: ADR
+  - path: docs/ENVIRONMENT_MANAGEMENT.md
+    type: SPEC
+
+  # ── Security policies & decisions ─────────────────────────
+  - path: docs/AUTHENTICATION_SECURITY.md
+    type: SPEC
+  - path: docs/security/SECURITY.md
+    type: SPEC
+  - path: docs/security/SECURITY_SCANNING.md
+    type: ADR
+  - path: docs/security/YOUTUBE_API_SECURITY.md
+    type: ADR
+  - path: docs/security/LICENSE_COMPLIANCE_REVIEW.md
+    type: ADR
+  - path: docs/security/MARKDOWN_SECRET_PREVENTION.md
+    type: ADR
+  - path: docs/SECURITY_AUDIT.md
+    type: DOC
+  - path: docs/audit-compliance.md
+    type: ADR
+
+  # ── Feature specs / system contracts ──────────────────────
+  - path: docs/CART_SYSTEM.md
+    type: SPEC
+  - path: docs/ORDER_STATUS_FLOW.md
+    type: SPEC
+  - path: docs/PAYMENT_FLOW_IMPLEMENTATION.md
+    type: SPEC
+  - path: docs/PRINTFUL_WEBHOOK_IMPLEMENTATION.md
+    type: SPEC
+  - path: docs/ADMIN_DASHBOARD.md
+    type: SPEC
+  - path: docs/ANALYTICS_IMPLEMENTATION.md
+    type: SPEC
+  - path: docs/E-COMMERCE_GUIDE.md
+    type: SPEC
+  - path: docs/api-specs/README.md
+    type: SPEC
+  - path: docs/CONTRACT_TESTING.md
+    type: SPEC
+
+  # ── Integrations ──────────────────────────────────────────
+  - path: docs/integration/PRINTFUL_INTEGRATION_FINAL.md
+    type: SPEC
+  - path: docs/integration/STRIPE_INTEGRATION.md
+    type: SPEC
+  - path: docs/integration/AWS_SES_INTEGRATION_SUMMARY.md
+    type: SPEC
+  - path: docs/integration/SHIPPING_IMPLEMENTATION_SUMMARY.md
+    type: SPEC
+  - path: docs/integration/PRINTFUL_API_ANALYSIS.md
+    type: DOC
+  - path: docs/integration/PRINTFUL_SHIPPING_API.md
+    type: SPEC
+  - path: docs/integration/DUPLICATE_ORDER_PREVENTION.md
+    type: ADR
+
+  # ── PRDs / Roadmaps / forward-looking analysis ────────────
+  - path: docs/ROADMAP.md
+    type: PRD
+  - path: docs/ANALYTICS_METRICS_ROADMAP.md
+    type: PRD
+  - path: docs/INFLUENCER_FEATURES_ANALYSIS.md
+    type: PRD
+  - path: docs/SEO_RECOMMENDATIONS.md
+    type: PRD
+  - path: docs/SHOP_PERFORMANCE_OPTIMIZATION.md
+    type: PRD
+
+  # ── Distinct features ─────────────────────────────────────
+  - path: docs/features/CHAOS_GOBLIN_MODE.md
+    type: SPEC
+  - path: docs/features/YOUTUBE_CHANNEL_VIDEOS.md
+    type: SPEC
+  - path: docs/CHARACTER_IMAGES.md
+    type: SPEC
+  - path: docs/DYNAMIC_SOCIAL_IMAGES.md
+    type: SPEC
+
+  # ── Standards (durable, not how-to) ───────────────────────
+  - path: docs/guides/DESIGN_GUIDELINES.md
+    type: SPEC
+
+  # ── Deployment architecture (kept overview docs only) ─────
+  - path: docs/deployment/DEPLOYMENT.md
+    type: SPEC
+  - path: docs/deployment/DOCKER.md
+    type: SPEC
+  - path: docs/deployment/HEALTH_CHECK_GUIDE.md
+    type: SPEC

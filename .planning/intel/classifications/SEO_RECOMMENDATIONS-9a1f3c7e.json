@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/SEO_RECOMMENDATIONS.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "SEO Recommendations for Tales of Aneria",
+  "summary": "Recommendations and action items for improving SEO across the Tales of Aneria website, including structured data, sitemap, and meta tag enhancements.",
+  "scope": ["SEO", "structured data", "sitemap", "meta tags", "Open Graph", "shop page", "episode pages", "character pages"],
+  "cross_refs": ["client/src/lib/structuredData.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Classified per manifest declaration (PRD); content reads more like a DOC/recommendations guide but manifest type is authoritative."
+}

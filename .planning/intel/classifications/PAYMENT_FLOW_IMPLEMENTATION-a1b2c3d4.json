@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/PAYMENT_FLOW_IMPLEMENTATION.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Payment Flow Implementation - Complete",
+  "summary": "Technical implementation spec for e-commerce payment flow covering order tracking, customer notifications, admin alerts, and failed order storage.",
+  "scope": ["payment flow", "order tracking", "Stripe integration", "Printful integration", "email notifications", "admin alerts", "database schema", "order lifecycle"],
+  "cross_refs": ["server/db.ts", "server/order-service.ts", "shared/schema.ts", "server/notification-service.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

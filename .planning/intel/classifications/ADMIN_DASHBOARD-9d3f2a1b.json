@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/ADMIN_DASHBOARD.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Admin Dashboard & Order Tracking - Implementation Summary",
+  "summary": "Implementation specification for admin dashboard and customer order tracking system, covering authentication, API endpoints, and privacy protections.",
+  "scope": ["admin dashboard", "order tracking", "authentication", "session management", "API endpoints", "privacy protections"],
+  "cross_refs": ["server/auth.ts", "server/auth-middleware.ts", "server/db.ts", "server/routes.ts", "server/index.ts", "client/src/hooks/useAuth.ts", "client/src/pages/AdminLogin.tsx", "client/src/pages/AdminDashboard.tsx", "client/src/pages/AdminOrders.tsx", "client/src/pages/TrackOrder.tsx"],
+  "locked": false,
+  "precedence": null
+}
