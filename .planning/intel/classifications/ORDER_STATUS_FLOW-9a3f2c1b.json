@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/ORDER_STATUS_FLOW.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Order Status Flow & Webhooks",
+  "summary": "Specifies the order status lifecycle and webhook event handling contracts between Stripe, Printful, and the orders database.",
+  "scope": ["orders", "order status lifecycle", "Stripe webhook", "Printful webhook", "shipping notifications", "refund handling"],
+  "cross_refs": ["../shared/schema.ts", "server/notification-service.ts", "server/routes.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

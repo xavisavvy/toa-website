@@ -81,13 +81,15 @@ export default [
       'jsx-a11y': jsxA11y
     },
     rules: {
-      // Disable base rule as it can report incorrect errors with TypeScript
+      // Disable base rules that don't work well with TypeScript — TS handles these natively
       'no-unused-vars': 'off',
+      'no-undef': 'off',
       
       // TypeScript rules
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
       }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -176,6 +178,34 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       'sonarjs/no-duplicate-string': 'off',
       'no-console': 'off'
+    }
+  },
+  {
+    // Build / tooling scripts run under Node — declare Node globals + relaxed rules
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        exports: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        globalThis: 'readonly'
+      }
+    },
+    rules: {
+      'no-console': 'off',
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
     }
   }
 ];

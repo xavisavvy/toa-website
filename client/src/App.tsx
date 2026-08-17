@@ -16,13 +16,17 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminOrderDetail from "@/pages/AdminOrderDetail";
 import AdminOrders from "@/pages/AdminOrders";
+import CampaignDetail from "@/pages/CampaignDetail";
+import Campaigns from "@/pages/Campaigns";
 import CharacterDetail from "@/pages/CharacterDetail";
 import Characters from "@/pages/Characters";
 import Checkout from "@/pages/Checkout";
 import CheckoutCancel from "@/pages/CheckoutCancel";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
+import EpisodeDetail from "@/pages/EpisodeDetail";
 import Home from "@/pages/Home";
 import NotFound from "@/pages/not-found";
+import Podcast from "@/pages/Podcast";
 import PressKit from "@/pages/PressKit";
 import Privacy from "@/pages/Privacy";
 import Shop from "@/pages/Shop";
@@ -30,6 +34,7 @@ import Sponsors from "@/pages/Sponsors";
 import Sponsorship from "@/pages/Sponsorship";
 import TermsOfService from "@/pages/TermsOfService";
 import TrackOrder from "@/pages/TrackOrder";
+import Videos from "@/pages/Videos";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -70,6 +75,11 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/characters" component={Characters} />
         <Route path="/characters/:id" component={CharacterDetail} />
+        <Route path="/campaigns" component={Campaigns} />
+        <Route path="/campaigns/:slug" component={CampaignDetail} />
+        <Route path="/campaigns/:slug/episodes/:episodeNumber" component={EpisodeDetail} />
+        <Route path="/videos" component={Videos} />
+        <Route path="/podcast" component={Podcast} />
         <Route path="/shop" component={Shop} />
         <Route path="/checkout" component={Checkout} />
         <Route path="/sponsorship" component={Sponsorship} />

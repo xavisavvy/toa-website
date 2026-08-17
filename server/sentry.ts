@@ -76,7 +76,7 @@ export function initSentry(): boolean {
       profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
       // Filter sensitive data
-      beforeSend(event) {
+      beforeSend(event: { request?: { headers?: Record<string, unknown> } }) {
         // Remove sensitive headers
         if (event.request?.headers) {
           delete event.request.headers['authorization'];

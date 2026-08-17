@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/ROADMAP.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Tales of Aneria - Feature Roadmap & Checklist",
+  "summary": "Feature roadmap and sprint checklist tracking technical debt cleanup, contract testing, security fixes, and upcoming product priorities.",
+  "scope": ["webhooks", "contract testing", "security vulnerabilities", "YouTube integration", "monitoring", "sprint planning"],
+  "cross_refs": ["test/contract/webhook.contract.test.ts", "package.json", "test/user-engagement.test.ts", "test/routes/youtube-shorts-routes.test.ts", "test/monitoring.test.ts"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Type assigned via MANIFEST_TYPE override; document is a roadmap/checklist."
+}

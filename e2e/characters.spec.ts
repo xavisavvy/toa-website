@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Characters Page', () => {
@@ -171,6 +172,97 @@ test.describe('Character Detail Page', () => {
       const playlistButton = page.getByTestId('button-playlist');
       await expect(playlistButton).toBeVisible();
     }
+  });
+});
+
+test.describe('Phase 2 enhancements', () => {
+  test('character page renders extended-lore sections only when populated', async ({
+    page,
+  }) => {
+    // wayne-archivist has backstory + personality but no motivations/arcSummary in v1
+    await page.goto('/characters/wayne-archivist');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByTestId('card-backstory')).toBeVisible();
+    await expect(page.getByTestId('card-personality')).toBeVisible();
+    await expect(page.getByTestId('card-motivations')).toHaveCount(0);
+    await expect(page.getByTestId('card-arc-summary')).toHaveCount(0);
+  });
+
+  test('AI badge is visible and accessible on AI-generated character art', async ({
+    page,
+  }) => {
+    await page.goto('/characters/winifred-fred-blodbane');
+    await page.waitForLoadState('networkidle');
+
+    // Page-level legend is visible because at least one image is AI-generated
+    await expect(page.getByTestId('text-ai-legend')).toBeVisible();
+
+    // The AI corner badge has the documented aria-label
+    const aiBadge = page.getByLabel('AI-generated image').first();
+    await expect(aiBadge).toBeVisible();
+
+    // Axe pass on this URL
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .disableRules(['svg-img-alt'])
+      .analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
+  });
+
+  test('character page emits parseable Person JSON-LD when playerId resolves', async ({
+    page,
+  }) => {
+    await page.goto('/characters/wayne-archivist');
+    await page.waitForLoadState('networkidle');
+
+    const ldScript = page.locator('script[type="application/ld+json"]').first();
+    const text = (await ldScript.textContent()) ?? '{}';
+    const parsed = JSON.parse(text);
+    expect(Array.isArray(parsed['@graph'])).toBe(true);
+    const graph = parsed['@graph'] as Array<{
+      '@type': string;
+      name?: string;
+      description?: string;
+    }>;
+    const person = graph.find((n) => n['@type'] === 'Person');
+    expect(person).toBeDefined();
+    expect(person!.name).toBe('Preston Farr');
+    expect(person!.description).toContain('Wayne');
+    expect(person!.description).toContain('Tales of Aneria');
+
+    // Orphan playerId path: holiday-special-1 emits the @graph WITHOUT a Person node
+    await page.goto('/characters/holiday-special-1');
+    await page.waitForLoadState('networkidle');
+    const ldScript2 = page
+      .locator('script[type="application/ld+json"]')
+      .first();
+    const text2 = (await ldScript2.textContent()) ?? '{}';
+    const parsed2 = JSON.parse(text2);
+    const graph2 = parsed2['@graph'] as Array<{ '@type': string }>;
+    expect(graph2.find((n) => n['@type'] === 'Person')).toBeUndefined();
+    expect(graph2.find((n) => n['@type'] === 'CreativeWork')).toBeDefined();
+    expect(graph2.find((n) => n['@type'] === 'BreadcrumbList')).toBeDefined();
+  });
+
+  test('og:image meta uses character featuredImage when present, site default when empty', async ({
+    page,
+  }) => {
+    await page.goto('/characters/wayne-archivist');
+    await page.waitForLoadState('networkidle');
+
+    const ogWayne = await page
+      .locator('meta[property="og:image"]')
+      .getAttribute('content');
+    expect(ogWayne).toMatch(/\/characters\/wayne-archivist\.webp$/);
+
+    // eve-faraque has featuredImage: "" — should fall back to site default
+    await page.goto('/characters/eve-faraque');
+    await page.waitForLoadState('networkidle');
+    const ogEve = await page
+      .locator('meta[property="og:image"]')
+      .getAttribute('content');
+    expect(ogEve).toBe('https://talesofaneria.com/og-image.png');
   });
 });
 

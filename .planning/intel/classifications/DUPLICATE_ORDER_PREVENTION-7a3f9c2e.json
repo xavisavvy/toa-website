@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/integration/DUPLICATE_ORDER_PREVENTION.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Duplicate Order Prevention Fix",
+  "summary": "Documents the decision to add in-memory idempotency protection in the Stripe webhook handler to prevent duplicate Printful order creation.",
+  "scope": ["Stripe webhooks", "Printful order creation", "idempotency", "server/routes.ts", "duplicate prevention"],
+  "cross_refs": ["server/routes.ts", "test/routes/stripe-routes.test.ts", "docs/integration/PRINTFUL_ORDER_FIX.md"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Classified as ADR per manifest override. Document lacks formal ADR frontmatter (no Status: Accepted marker), so locked=false. Content describes a problem/solution/consequences pattern consistent with an ADR but without explicit Accepted status."
+}

@@ -22,6 +22,7 @@ export const TestFactory = {
     publishedAt: '2024-01-01T12:00:00Z',
     viewCount: '1000',
     url: 'https://www.youtube.com/watch?v=test-video-1',
+    durationSeconds: 600,
     ...overrides,
   }),
 
@@ -29,9 +30,9 @@ export const TestFactory = {
     id: 'test-short-1',
     title: 'Test Short',
     thumbnail: 'https://i.ytimg.com/vi/test-short-1/maxresdefault.jpg',
-    duration: '0:45',
+    duration: '0:30',
     publishedAt: '2024-01-01T12:00:00Z',
-    durationSeconds: 45,
+    durationSeconds: 30,
     ...overrides,
   }),
 

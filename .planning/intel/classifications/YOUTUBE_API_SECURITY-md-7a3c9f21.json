@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/security/YOUTUBE_API_SECURITY.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Securing Your YouTube API Key",
+  "summary": "Guide for securing the YouTube Data API key by using separate server-side (IP-restricted) and client-side (referrer-restricted) keys.",
+  "scope": ["YouTube Data API", "API key management", "server-side key", "client-side key", "Replit deployment"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Manifest declared ADR; document is structured as a how-to guide rather than a formal ADR with Context/Decision/Consequences, but manifest type is treated as authoritative. No 'Accepted' status marker, so locked=false."
+}

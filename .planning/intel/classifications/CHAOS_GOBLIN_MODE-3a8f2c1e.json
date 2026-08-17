@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/features/CHAOS_GOBLIN_MODE.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Chaos Goblin Mode Easter Egg",
+  "summary": "Technical specification for a Konami-code-activated visual easter egg overlay component with epilepsy-safe rainbow animation.",
+  "scope": ["ChaosGoblinMode component", "useKonamiCode hook", "client/src/App.tsx integration", "chaos-goblin SVG asset", "WCAG 2.1 seizure safety"],
+  "cross_refs": ["client/src/components/ChaosGoblinMode.tsx", "client/public/chaos-goblin.svg", "test/components/chaos-goblin-mode.test.tsx", "client/src/App.tsx"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

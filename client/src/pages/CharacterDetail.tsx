@@ -1,11 +1,14 @@
 import {
   ArrowLeft,
+  BookOpen,
+  Compass,
   ExternalLink,
   User,
   Sword,
   Shield,
   Heart,
   Music,
+  Sparkles,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
@@ -25,7 +28,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import charactersData from "@/data/characters.json";
-import { getCreativeWorkSchema, getBreadcrumbSchema } from "@/lib/structuredData";
+import { getCastMemberById, getCastSocialUrls } from "@/lib/cast";
+import {
+  getCreativeWorkSchema,
+  getBreadcrumbSchema,
+  getPersonSchema,
+} from "@/lib/structuredData";
+import { cn } from "@/lib/utils";
 
 interface CharacterImage {
   id: string;
@@ -37,6 +46,7 @@ interface CharacterImage {
   artistUrl?: string;
   copyright?: string;
   isAiGenerated?: boolean;
+  source?: "official" | "fan";
 }
 
 interface Character {
@@ -57,19 +67,26 @@ interface Character {
   dndbeyondId?: string;
   playlist?: string;
   status: string;
+  motivations?: string;
+  arcSummary?: string;
 }
 
 export default function CharacterDetail() {
   const [, params] = useRoute("/characters/:id");
   const characterId = params?.id;
 
-  const character = charactersData.characters.find(
-    (c: Character) => c.id === characterId
-  ) as Character | undefined;
+  const character = (charactersData.characters as unknown as Character[]).find(
+    (c) => c.id === characterId
+  );
 
   if (!character) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO
+          title="Character Not Found - Tales of Aneria"
+          description="This character could not be found."
+          noindex={true}
+        />
         <Navigation />
         <div className="flex items-center justify-center py-20 pt-24">
           <div className="text-center">
@@ -107,9 +124,23 @@ export default function CharacterDetail() {
     { name: character.name, url: `https://talesofaneria.com/characters/${character.id}` }
   ]);
 
+  const player = getCastMemberById(character.playerId);
+  const socials = player ? getCastSocialUrls(player.socialLinks) : [];
+  const personSchema = player
+    ? getPersonSchema({
+        name: player.name,
+        description: `${player.name} plays ${character.name}, a ${character.race} ${character.class}, in Tales of Aneria.`,
+        ...(socials.length > 0 ? { sameAs: socials } : {}),
+      })
+    : null;
+
   const structuredData = {
     "@context": "https://schema.org",
-    "@graph": [characterSchema, breadcrumbData]
+    "@graph": [
+      characterSchema,
+      breadcrumbData,
+      ...(personSchema ? [personSchema] : []),
+    ],
   };
 
   const metaDescription = `Meet ${character.name}, a ${character.race} ${character.class} from ${character.campaign}. ${character.backstory.substring(0, 120)}...`;
@@ -120,8 +151,8 @@ export default function CharacterDetail() {
         title={`${character.name} - ${character.race} ${character.class} | Tales of Aneria`}
         description={metaDescription}
         canonical={`https://talesofaneria.com/characters/${character.id}`}
-        ogImage={character.featuredImage}
-        ogImageAlt={`${character.name} - ${character.race} ${character.class} character portrait`}
+        ogImage={character.featuredImage || undefined}
+        ogImageAlt={`${character.name} — official character art`}
         ogType="profile"
         keywords={`${character.name}, ${character.race}, ${character.class}, ${character.campaign}, D&D character, TTRPG hero, ${character.player}`}
         jsonLd={structuredData}
@@ -174,9 +205,9 @@ export default function CharacterDetail() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-amber-500 text-white border-amber-600 cursor-help"
+                      <Badge
+                        variant="secondary"
+                        className="bg-amber-700 text-white border-amber-800 cursor-help"
                         data-testid="badge-ai-featured"
                       >
                         AI Art
@@ -218,6 +249,23 @@ export default function CharacterDetail() {
               </CardContent>
             </Card>
 
+            {/* Motivations */}
+            {character.motivations && (
+              <Card data-testid="card-motivations">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Compass className="h-5 w-5" />
+                    Motivations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {character.motivations}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Personality */}
             <Card data-testid="card-personality">
               <CardHeader>
@@ -233,6 +281,23 @@ export default function CharacterDetail() {
               </CardContent>
             </Card>
 
+            {/* Arc Summary */}
+            {character.arcSummary && (
+              <Card data-testid="card-arc-summary">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" />
+                    Arc Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {character.arcSummary}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Image Gallery */}
             {allImages.length > 0 && (
               <Card data-testid="card-gallery">
@@ -240,6 +305,18 @@ export default function CharacterDetail() {
                   <CardTitle>Gallery</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {allImages.some((img) => img.isAiGenerated) && (
+                    <p
+                      className="text-sm text-muted-foreground mb-4 flex items-center gap-2"
+                      data-testid="text-ai-legend"
+                    >
+                      <Sparkles
+                        className="h-4 w-4 text-amber-500"
+                        aria-hidden="true"
+                      />
+                      Images marked AI are AI-generated. We disclose this for transparency; AI-generated images are never used commercially.
+                    </p>
+                  )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {allImages.map((image) => (
                       <div
@@ -258,35 +335,43 @@ export default function CharacterDetail() {
                               loading="lazy"
                               itemProp="image"
                             />
+                            {image.isAiGenerated && (
+                              <Badge
+                                variant="secondary"
+                                role="img"
+                                aria-label="AI-generated image"
+                                className="absolute top-2 right-2 z-10 bg-amber-700 text-white border-amber-800 shadow-md gap-1"
+                                data-testid={`badge-ai-${image.id}`}
+                              >
+                                <Sparkles
+                                  className="h-3 w-3"
+                                  aria-hidden="true"
+                                />
+                                AI
+                              </Badge>
+                            )}
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
                               <p className="text-white text-sm font-medium mb-1">
                                 {image.caption}
                               </p>
                               <div className="flex items-center gap-2 flex-wrap">
-                                {image.artist && (
-                                  <Badge 
-                                    variant="secondary"
-                                    className="text-xs"
-                                    data-testid={`badge-type-${image.id}`}
-                                  >
-                                    Fan Art
-                                  </Badge>
-                                )}
-                                {image.isAiGenerated && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <p className="text-amber-300 text-xs flex items-center gap-1 cursor-help">
-                                          <span className="inline-block w-1.5 h-1.5 bg-amber-300 rounded-full"></span>
-                                          AI Art
-                                        </p>
-                                      </TooltipTrigger>
-                                      <TooltipContent className="max-w-xs">
-                                        <p>This artwork was generated using AI for early character exploration and personal use. AI-generated artwork is not used for commercial purposes or merchandise. We believe in transparency about the use of AI tools in creative work.</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
+                                <Badge
+                                  variant={
+                                    image.source === "fan"
+                                      ? "secondary"
+                                      : "outline"
+                                  }
+                                  className={cn(
+                                    "text-xs",
+                                    image.source !== "fan" &&
+                                      "bg-white/10 text-white border-white/40 backdrop-blur-sm"
+                                  )}
+                                  data-testid={`badge-source-${image.id}`}
+                                >
+                                  {image.source === "fan"
+                                    ? "Fan Art"
+                                    : "Official Art"}
+                                </Badge>
                               </div>
                               {image.copyright && (
                                 <p 

@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/CHARACTER_IMAGES.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Character Image Gallery Guide",
+  "summary": "Specification for character gallery image data structure, field definitions, badge types, and AI-generated artwork disclosure requirements.",
+  "scope": ["character gallery", "image data schema", "official art badges", "fan art badges", "AI-generated artwork disclosure"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

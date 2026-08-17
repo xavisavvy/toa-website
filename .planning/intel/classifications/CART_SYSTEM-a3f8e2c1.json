@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/CART_SYSTEM.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Shopping Cart System",
+  "summary": "Technical specification for the Tales of Aneria shopping cart system covering architecture, data flow, storage, analytics integration, and usage APIs.",
+  "scope": ["shopping cart", "checkout", "localStorage persistence", "useCart hook", "cart analytics", "product variants", "merchandise"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null
+}
