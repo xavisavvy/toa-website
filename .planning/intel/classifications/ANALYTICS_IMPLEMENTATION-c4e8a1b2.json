@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/ANALYTICS_IMPLEMENTATION.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Google Analytics Event Tracking Implementation",
+  "summary": "Specifies GA4 event tracking implementation across video, podcast, character, e-commerce, and external link interactions with event names and tracked parameters.",
+  "scope": ["Google Analytics 4", "event tracking", "video tracking", "podcast tracking", "character page views", "external link clicks", "e-commerce events", "purchase tracking"],
+  "cross_refs": ["LatestEpisodes.tsx", "PodcastSection.tsx", "CharacterDetail.tsx", "Footer.tsx", "PrintfulShop.tsx", "CheckoutSuccess.tsx"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

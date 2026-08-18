@@ -1,0 +1,26 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/integration/AWS_SES_INTEGRATION_SUMMARY.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "AWS SES Integration Summary",
+  "summary": "Summary of the AWS SES integration for transactional email delivery, covering implementation, env configuration, documentation, and testing tools.",
+  "scope": ["AWS SES", "notification-service", "transactional email", "environment configuration", "email testing"],
+  "cross_refs": [
+    "server/notification-service.ts",
+    ".env.example",
+    ".env",
+    ".env.docker",
+    "docs/integration/AWS_SES_SETUP.md",
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PAYMENT_FLOW_IMPLEMENTATION.md",
+    "docs/ROADMAP.md",
+    "docs/deployment/DEPLOYMENT.md",
+    "docs/integration/PRINTFUL_INTEGRATION.md",
+    "scripts/test-ses.ts"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": "Type assigned per MANIFEST_TYPE override; document is integration summary with technical contracts (env vars, service functions)."
+}

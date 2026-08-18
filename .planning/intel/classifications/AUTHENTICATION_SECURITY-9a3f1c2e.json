@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/AUTHENTICATION_SECURITY.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Authentication & Security Implementation",
+  "summary": "Specification of authentication, session management, RBAC, password hashing, and PII-safe logging for the Tales of Aneria admin dashboard.",
+  "scope": ["authentication", "session management", "RBAC", "password hashing", "PII sanitization", "logging", "admin dashboard", "API security"],
+  "cross_refs": ["docs/LOGGING_AND_PII.md", "./LOGGING_AND_PII.md"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

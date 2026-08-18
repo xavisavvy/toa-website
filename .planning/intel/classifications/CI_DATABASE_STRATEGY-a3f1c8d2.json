@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/CI_DATABASE_STRATEGY.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "CI/CD Database Strategy Recommendation",
+  "summary": "Recommends Docker Compose with PostgreSQL and Redis services in CI for running E2E tests requiring a real database.",
+  "scope": ["CI/CD", "E2E testing", "Docker Compose", "PostgreSQL", "Redis", "GitHub Actions"],
+  "cross_refs": ["docker-compose.test.yml", ".github/workflows/ci.yml"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Type assigned via MANIFEST_TYPE override. Document is a recommendation/proposal style doc without explicit 'Accepted' status, so locked=false."
+}

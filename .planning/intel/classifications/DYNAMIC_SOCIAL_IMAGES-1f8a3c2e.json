@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/DYNAMIC_SOCIAL_IMAGES.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Dynamic Social Media Images Implementation",
+  "summary": "Technical implementation spec for dynamic Open Graph and Twitter Card meta tags via the SEO component for character and other pages.",
+  "scope": ["SEO component", "Open Graph meta tags", "Twitter Card meta tags", "character pages", "social media sharing"],
+  "cross_refs": ["client/src/components/SEO.tsx"],
+  "locked": false,
+  "precedence": null
+}

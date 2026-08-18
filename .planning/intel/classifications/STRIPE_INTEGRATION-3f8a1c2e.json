@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/integration/STRIPE_INTEGRATION.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Stripe Integration - Complete Setup Guide",
+  "summary": "Setup guide and technical contract for Stripe Checkout integration including environment variables, webhook endpoints, and event handlers.",
+  "scope": ["Stripe Checkout", "Stripe webhooks", "Printful", "payment processing", "environment configuration"],
+  "cross_refs": ["client/src/pages/Home.tsx", "client/src/components/PrintfulShop"],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

@@ -102,7 +102,7 @@ app.use((req, res, next) => {
 
   // A07: Enhanced error handling - Don't leak sensitive information
   // IMPORTANT: Register error handler AFTER all routes
-  /* eslint-disable-next-line no-unused-vars */
+   
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     

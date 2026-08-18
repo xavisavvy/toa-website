@@ -92,6 +92,92 @@ export const getPersonSchema = (person: {
   }
 });
 
+export const getTVSeriesSchema = (campaign: {
+  name: string;
+  slug: string;
+  description: string;
+  startDate: string;
+  endDate?: string;
+  numberOfEpisodes: number;
+  thumbnailUrl?: string;
+  cast: { name: string }[];
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "TVSeries",
+  "name": campaign.name,
+  "description": campaign.description,
+  "url": `https://talesofaneria.com/campaigns/${campaign.slug}`,
+  ...(campaign.thumbnailUrl ? { "image": campaign.thumbnailUrl } : {}),
+  "startDate": campaign.startDate,
+  ...(campaign.endDate ? { "endDate": campaign.endDate } : {}),
+  "numberOfEpisodes": campaign.numberOfEpisodes,
+  "actor": campaign.cast.map((c) => ({ "@type": "Person", "name": c.name })),
+  "productionCompany": {
+    "@type": "Organization",
+    "name": "Tales of Aneria"
+  },
+  "genre": ["Fantasy", "Tabletop RPG", "Dungeons & Dragons", "Live Play"]
+});
+
+export const getTVEpisodeSchema = (input: {
+  campaignName: string;
+  campaignSlug: string;
+  episodeNumber: number;
+  title: string;
+  summary: string;
+  airDate: string;
+  url: string;
+  youtubeUrl: string;
+  thumbnailUrl?: string;
+  duration?: string;
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "TVEpisode",
+  "name": input.title,
+  "episodeNumber": input.episodeNumber,
+  "datePublished": input.airDate,
+  "description": input.summary,
+  "url": input.url,
+  ...(input.thumbnailUrl ? { "image": input.thumbnailUrl } : {}),
+  "partOfSeries": {
+    "@type": "TVSeries",
+    "name": input.campaignName,
+    "url": `https://talesofaneria.com/campaigns/${input.campaignSlug}`
+  },
+  "video": {
+    "@type": "VideoObject",
+    "name": input.title,
+    "description": input.summary,
+    ...(input.thumbnailUrl ? { "thumbnailUrl": input.thumbnailUrl } : {}),
+    "uploadDate": input.airDate,
+    "contentUrl": input.youtubeUrl,
+    "embedUrl": input.youtubeUrl,
+    ...(input.duration ? { "duration": input.duration } : {})
+  }
+});
+
+export const getPodcastEpisodeSchema = (input: {
+  title: string;
+  summary: string;
+  airDate: string;
+  podcastUrl: string;
+  campaignName: string;
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "PodcastEpisode",
+  "name": input.title,
+  "datePublished": input.airDate,
+  "description": input.summary,
+  "associatedMedia": {
+    "@type": "MediaObject",
+    "contentUrl": input.podcastUrl
+  },
+  "partOfSeries": {
+    "@type": "PodcastSeries",
+    "name": input.campaignName
+  }
+});
+
 export const getCreativeWorkSchema = (character: {
   name: string;
   description: string;

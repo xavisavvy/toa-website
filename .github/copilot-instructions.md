@@ -3,6 +3,41 @@
 ## 🎯 Project Context
 This is a TTRPG live play website showcasing enterprise-grade practices: comprehensive testing, security scanning, CI/CD automation, and WCAG 2.1 AA accessibility compliance.
 
+## 📋 Quick Commands
+
+```bash
+# Development
+npm run dev                    # Start dev server (port 5000)
+npm run build                  # Build for production
+npm run check                  # TypeScript type checking
+npm run lint                   # ESLint (add --fix to auto-fix)
+
+# Testing
+npm run test                   # Unit tests (Vitest watch mode)
+npm run test:coverage          # Unit tests with coverage report
+npm run test:e2e               # E2E tests (Playwright)
+npm run test:e2e:headed        # E2E tests with visible browser
+npm run test:quick             # Fast unit tests without coverage
+vitest run path/to/test.ts     # Run a single test file
+
+# Database
+npm run db:push                # Push schema changes (dev only)
+npm run db:generate            # Generate migration files
+npm run db:migrate             # Apply migrations (production)
+npm run db:studio              # Visual database browser
+npm run db:seed                # Seed database with test data
+
+# Specialized Testing
+npm run test:mutation          # Mutation testing (Stryker)
+npm run test:contract          # Contract tests (Pact)
+npm run test:security          # Security tests
+npm run test:chaos             # Chaos/resilience tests
+
+# Quality Checks
+npm run check:markdown-secrets # Scan markdown for secrets
+npm run check:mistakes         # Check common import errors
+```
+
 ## ⚠️ CRITICAL: Cross-Platform Script Maintenance
 **ALWAYS maintain parity between PowerShell (.ps1) and Shell (.sh) scripts:**
 - When updating `.kubernetes/local/*.ps1` → Update corresponding `.sh` files
@@ -12,12 +47,13 @@ This is a TTRPG live play website showcasing enterprise-grade practices: compreh
 - This applies to ALL script changes in every session
 
 ## 🛠️ Technology Stack
-- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, wouter (routing)
 - **Backend**: Express.js, Node.js, TypeScript
 - **Database**: PostgreSQL, Drizzle ORM
 - **Testing**: Vitest (unit), Playwright (E2E), Stryker (mutation), Axe (accessibility)
 - **CI/CD**: GitHub Actions, Docker, automated versioning
 - **Security**: Trivy, Snyk, GitLeaks, npm audit
+- **Integrations**: YouTube Data API, Printful, Stripe, AWS SES
 
 ## 🚫 Common Mistakes to Avoid
 
@@ -34,33 +70,55 @@ This is a TTRPG live play website showcasing enterprise-grade practices: compreh
 - Any change to `scripts/*.ps1` MUST be reflected in `scripts/*.sh`
 - Both Windows (PowerShell) and Unix (Bash) users must have identical functionality
 
+### API Routes Architecture
+All backend routes are in **single file**: `server/routes.ts`. Every endpoint must have:
+- Zod validation for all inputs
+- Rate limiting (`apiLimiter` or `expensiveLimiter`)
+- try/catch error handling
+- Consistent return format: `{ success: boolean, data/error }`
+
+### Database Workflow
+1. Edit schema in `shared/schema.ts`
+2. Run `npm run db:push` for dev (direct schema push)
+3. Run `npm run db:generate` + `npm run db:migrate` for production (migration files)
+
 ## 📁 Architecture
 
 ### Directory Structure
 ```
 client/src/
-  ├── components/      # React components (PascalCase)
-  │   ├── layout/      # Layout components (Header, Footer, etc.)
+  ├── components/      # React components (PascalCase.tsx)
+  │   ├── layout/      # Header, Footer, etc.
   │   └── ui/          # shadcn/ui components
   ├── pages/           # Page components
   ├── hooks/           # Custom React hooks
   ├── lib/             # Utilities and helpers
-  └── data/            # Static JSON data
+  └── data/            # Static JSON (cast.json, social-links.json)
 
 server/
-  ├── routes/          # Express route handlers
-  ├── db/              # Drizzle ORM schema
-  ├── middleware/      # Express middleware
-  └── utils/           # Server utilities
+  ├── routes.ts        # ALL Express route handlers (single file)
+  ├── auth.ts          # Authentication logic
+  ├── security.ts      # Security utilities, validation, logging
+  ├── db.ts            # Database connection (Drizzle)
+  ├── stripe.ts        # Stripe integration
+  ├── printful.ts      # Printful API integration
+  ├── youtube.ts       # YouTube API integration
+  ├── cache.ts         # Redis caching layer
+  └── [other services] # Feature-specific modules
 
 shared/
+  ├── schema.ts        # Drizzle ORM schema + Zod validation
   └── types/           # Shared TypeScript types
 
 test/                  # Unit & integration tests
 e2e/                   # Playwright E2E tests
-scripts/               # Build & deployment scripts
+.ai/                   # AI context (architecture.md, prompts.md)
 docs/                  # Comprehensive documentation
 ```
+
+### Path Aliases
+- `@/` → `client/src/`
+- `@shared/` → `shared/`
 
 ### Naming Conventions
 - **Components**: `PascalCase.tsx` (e.g., `HeroSection.tsx`)
@@ -106,34 +164,24 @@ test('critical user flow', async ({ page }) => {
 ```
 
 ### 🔒 "secure endpoint"
-**Creates:** API endpoint with validation, rate limiting, error handling, tests
+**Creates:** API endpoint with validation, rate limiting, error handling
 
 ```typescript
-import { Router } from 'express';
-import { z } from 'zod';
-import rateLimit from 'express-rate-limit';
+// All routes go in server/routes.ts
 
-const router = Router();
-
-// Zod validation schema
+// 1. Define Zod validation schema
 const requestSchema = z.object({
   field: z.string().min(1).max(100),
   email: z.string().email(),
 });
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP',
-});
-
-// Route handler
-router.post('/api/endpoint', limiter, async (req, res) => {
+// 2. Add route handler
+app.post('/api/endpoint', apiLimiter, async (req, res) => {
   try {
     const validated = requestSchema.parse(req.body);
     
     // Business logic here
+    const result = await doSomething(validated);
     
     res.json({ success: true, data: result });
   } catch (error) {
@@ -145,6 +193,7 @@ router.post('/api/endpoint', limiter, async (req, res) => {
       });
     }
     
+    logSecurityEvent('API_ERROR', { endpoint: '/api/endpoint', error });
     res.status(500).json({ 
       success: false, 
       error: 'Internal server error' 
@@ -152,10 +201,12 @@ router.post('/api/endpoint', limiter, async (req, res) => {
   }
 });
 
-export default router;
-
-// Required: Add unit tests for validation and error cases
+// 3. Add tests in test/routes/ directory
 ```
+
+**Rate Limiters:**
+- `apiLimiter` - Standard API endpoints (100 req/15min)
+- `expensiveLimiter` - Resource-intensive endpoints (10 req/15min)
 
 ### ♿ "accessible component"
 **Creates:** WCAG 2.1 AA compliant React component
@@ -220,11 +271,13 @@ export function AccessibleComponent({
 **Creates:** Drizzle schema with Zod validation and TypeScript types
 
 ```typescript
+// shared/schema.ts
+
 import { pgTable, serial, text, timestamp, integer } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-// Database schema
+// 1. Define table schema
 export const tableName = pgTable('table_name', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
@@ -232,9 +285,12 @@ export const tableName = pgTable('table_name', {
   age: integer('age'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => ({
+  // Add indexes for frequently queried columns
+  emailIdx: index('table_name_email_idx').on(table.email),
+}));
 
-// Zod validation schemas
+// 2. Create Zod validation schemas
 export const insertTableNameSchema = createInsertSchema(tableName, {
   email: z.string().email(),
   age: z.number().min(0).max(150).optional(),
@@ -242,12 +298,13 @@ export const insertTableNameSchema = createInsertSchema(tableName, {
 
 export const selectTableNameSchema = createSelectSchema(tableName);
 
-// TypeScript types
+// 3. Export TypeScript types
 export type TableName = typeof tableName.$inferSelect;
 export type NewTableName = typeof tableName.$inferInsert;
 
-// After creating schema, run:
-// npm run db:push
+// 4. Apply schema changes
+// Dev: npm run db:push
+// Prod: npm run db:generate && npm run db:migrate
 ```
 
 ### 🚀 "ci pipeline"
@@ -362,18 +419,24 @@ npm run test:quick
 ## ✅ Code Quality Standards
 
 ### Testing Requirements
-- **Coverage Threshold**: 80% minimum (lines, functions, branches, statements)
-- **Mutation Score**: 80% minimum
+- **Coverage Threshold**: 40% global minimum (80% for critical files)
+- **Critical File Thresholds**: 
+  - `server/routes.ts`: 40% lines, 47% functions
+  - `server/security.ts`: 60% lines, 50% functions
+  - `server/env-validator.ts`: 77% lines, 80% functions
+- **Mutation Score**: 80% minimum (run with `npm run test:mutation`)
 - **E2E Coverage**: All critical user flows
-- **Accessibility**: WCAG 2.1 AA compliance (run `await expect(page).toPassAxeCheck()`)
+- **Accessibility**: WCAG 2.1 AA compliance (`await expect(page).toPassAxeCheck()`)
 
 ### Security Requirements
 - **Input Validation**: ALL user inputs validated with Zod
 - **Rate Limiting**: ALL public API endpoints must have rate limiting
-- **SQL Injection**: ONLY use Drizzle ORM prepared statements
-- **XSS Prevention**: Sanitize outputs (React handles this automatically)
+- **SQL Injection**: ONLY use Drizzle ORM prepared statements (no raw SQL)
+- **Webhook Verification**: Stripe and Printful webhooks use HMAC signature verification
+- **Session Security**: Regenerate session ID after login to prevent fixation attacks
+- **Security Logging**: Log security events via `logSecurityEvent()` in `server/security.ts`
 - **Secrets**: NEVER commit secrets; use environment variables
-- **Dependencies**: Run `npm audit` regularly
+- **Pre-commit Hook**: Runs `npm run check:markdown-secrets` automatically
 
 ### TypeScript Standards
 - **Strict Mode**: ALWAYS enabled
@@ -416,34 +479,36 @@ export default function({ name, email, onDelete }) {
 
 ## 🔄 Common Patterns
 
-### API Route Pattern
+### API Route Pattern (server/routes.ts)
 ```typescript
-import { Router } from 'express';
-import { z } from 'zod';
-import rateLimit from 'express-rate-limit';
-
-const router = Router();
-
-const schema = z.object({
-  // Define schema
+// Define schema at top of file
+const resourceSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
 });
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-
-router.post('/api/resource', limiter, async (req, res) => {
+// Add route handler
+app.post('/api/resource', apiLimiter, async (req, res) => {
   try {
-    const data = schema.parse(req.body);
-    // Handle request
+    const data = resourceSchema.parse(req.body);
+    
+    // Business logic
+    const result = await processResource(data);
+    
     res.json({ success: true, data: result });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Validation failed',
+        details: error.errors 
+      });
     }
+    
+    logSecurityEvent('API_ERROR', { endpoint: '/api/resource', error });
     res.status(500).json({ success: false, error: 'Internal error' });
   }
 });
-
-export default router;
 ```
 
 ### Custom Hook Pattern
@@ -524,14 +589,14 @@ export function LoginForm() {
 
 When adding new environment variables:
 
-1. Add to `.env.example` with documentation:
+1. **Add to `.env.example` with documentation:**
 ```bash
 # YouTube API Configuration
-YOUTUBE_API_KEY=your_api_key_here        # YouTube Data API v3 key
-VITE_YOUTUBE_PLAYLIST_ID=your_id         # Public playlist ID
+YOUTUBE_API_KEY=your_api_key_here        # Server-side YouTube Data API v3 key
+VITE_YOUTUBE_PLAYLIST_ID=your_id         # Public playlist ID (client-side)
 ```
 
-2. Update validation in `server/index.ts`:
+2. **Add validation in `server/env-validator.ts`:**
 ```typescript
 const envSchema = z.object({
   YOUTUBE_API_KEY: z.string().min(1),
@@ -539,7 +604,16 @@ const envSchema = z.object({
 });
 ```
 
-3. Document in README.md if user-facing
+3. **Document in README.md** if user-facing
+
+**Key Environment Variables:**
+- `DATABASE_URL` - PostgreSQL connection string
+- `YOUTUBE_API_KEY` - Server-side YouTube API key
+- `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` - Stripe keys
+- `STRIPE_WEBHOOK_SECRET` - Webhook signature verification
+- `PRINTFUL_API_KEY` - Printful integration
+- `SESSION_SECRET` - Session encryption (generate with `openssl rand -base64 32`)
+- `SENTRY_DSN` - (Optional) Sentry APM integration
 
 ## 📝 Documentation Requirements
 
@@ -633,8 +707,12 @@ This automatically:
 
 ## 🧪 Testing Patterns
 
-### Unit Test Structure
+### Unit Test Structure (Vitest)
 ```typescript
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 describe('FeatureName', () => {
   describe('FunctionName', () => {
     it('should handle the happy path', () => {
@@ -653,10 +731,28 @@ describe('FeatureName', () => {
     });
   });
 });
+
+// Component test
+describe('ComponentName', () => {
+  it('should render correctly', () => {
+    render(<ComponentName />);
+    expect(screen.getByRole('heading')).toBeInTheDocument();
+  });
+
+  it('should handle user interactions', async () => {
+    const user = userEvent.setup();
+    render(<ComponentName />);
+    
+    await user.click(screen.getByRole('button'));
+    expect(screen.getByText('Updated')).toBeInTheDocument();
+  });
+});
 ```
 
-### E2E Test Structure
+### E2E Test Structure (Playwright)
 ```typescript
+import { test, expect } from '@playwright/test';
+
 test.describe('Feature', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/feature');
@@ -673,10 +769,22 @@ test.describe('Feature', () => {
     await expect(page.locator('[data-testid="result"]'))
       .toHaveText('Expected');
     
-    // Accessibility
+    // Accessibility check (REQUIRED for all E2E tests)
     await expect(page).toPassAxeCheck();
   });
 });
+```
+
+### Run Specific Tests
+```bash
+# Single file
+vitest run test/specific.test.ts
+
+# Pattern matching
+vitest run --testNamePattern="should handle errors"
+
+# Watch mode for TDD
+npm run test:watch
 ```
 
 ## 📊 Quality Gates (CI Must Pass)
@@ -684,167 +792,65 @@ test.describe('Feature', () => {
 All pull requests must pass:
 - ✅ TypeScript type checking (`npm run check`)
 - ✅ ESLint with no warnings (`npm run lint`)
-- ✅ Unit tests with 80%+ coverage (`npm run test:coverage`)
+- ✅ Unit tests with 40%+ coverage (`npm run test:coverage`)
 - ✅ E2E tests for critical paths (`npm run test:e2e`)
 - ✅ Security scans - no high/critical issues (`npm audit`)
 - ✅ Mutation tests with 80%+ score (`npm run test:mutation`)
-- ✅ Accessibility tests - WCAG 2.1 AA (`npm run test:e2e`)
+- ✅ Accessibility tests - WCAG 2.1 AA (E2E tests include axe checks)
+- ✅ Pre-commit hooks (ESLint + related tests)
+- ✅ Pre-push hooks (full test suite with coverage)
 
 ## 🔍 Code Review Checklist
 
 Before submitting PR:
 - [ ] Tests written and passing
-- [ ] Pre-commit hooks passed (tests run automatically)
+- [ ] Pre-commit hooks passed (automatic)
+- [ ] Pre-push hooks passed (automatic)
 - [ ] TypeScript types defined
 - [ ] No `any` types used
-- [ ] Accessibility attributes added
-- [ ] Responsive design implemented
-
-## 📤 Git Push Status Reporting
-
-**IMPORTANT**: At the end of every summary or response involving code changes:
-- ✅ **Always indicate whether changes have been pushed to remote**
-- Format: `🔄 Status: Pushed to remote` or `⚠️ Status: Not yet pushed to remote`
-- This helps maintain clarity on deployment state
+- [ ] Accessibility attributes added (aria-labels, semantic HTML)
+- [ ] Responsive design implemented (mobile, tablet, desktop)
 - [ ] Error handling included
+- [ ] Security logging for sensitive operations
 - [ ] Documentation updated
-- [ ] Environment variables documented
+- [ ] Environment variables documented in `.env.example`
 - [ ] Conventional commit messages used
+- [ ] Cross-platform script parity maintained (if applicable)
 
-## 🎯 Automated Testing on File Changes
+## 📚 Documentation
 
-### Pre-commit Hook (Already Configured!)
-When you commit files, the following automatically runs:
+- **Main Documentation**: [`docs/README.md`](../docs/README.md) - Documentation index
+- **Architecture**: [`.ai/architecture.md`](../.ai/architecture.md) - System design overview
+- **CI/CD**: [`docs/ci-cd/`](../docs/ci-cd/) - GitHub Actions, workflows
+- **Testing**: [`docs/testing/`](../docs/testing/) - Testing strategies
+- **Security**: [`docs/security/`](../docs/security/) - Security practices
+- **Deployment**: [`docs/deployment/`](../docs/deployment/) - Docker, Kubernetes, deployment guides
+- **Features**: [`docs/features/`](../docs/features/) - Feature implementation guides
+- **Guides**: [`docs/guides/`](../docs/guides/) - Phase documentation and summaries
 
-1. **ESLint** - Fixes formatting and catches issues
-2. **Vitest Related** - Runs tests for changed files and their dependencies
-3. **Blocks Commit** - If tests fail, commit is prevented
+## 🚨 Important Files to Review
 
-### Testing Strategies by Scenario
+### When Working on Authentication
+- `server/auth.ts` - Authentication logic
+- `server/auth-middleware.ts` - Auth middleware (requireAdmin, optionalAuth)
+- `shared/schema.ts` - User schema and validation
 
-**Development (making changes):**
-```bash
-npm run test:watch          # Watch mode - tests rerun on save
-```
+### When Working on API Routes
+- `server/routes.ts` - **ALL routes are in this single file**
+- `server/security.ts` - Security utilities (validation, logging)
+- `server/rate-limiter.ts` - Rate limiting configuration
 
-**Pre-commit (automatic):**
-```bash
-git add .
-git commit -m "feat: add feature"
-# ✅ Automatically runs: eslint --fix, vitest related --run
-```
+### When Working on Database
+- `shared/schema.ts` - Database schema (Drizzle ORM)
+- `server/db.ts` - Database connection
+- `drizzle.config.ts` - Drizzle configuration
 
-**Before push:**
-```bash
-npm run test:changed        # Test only files changed from HEAD~1
-npm run test:all            # Full test suite (coverage + E2E)
-```
-
-**Quick validation:**
-```bash
-npm run test:quick          # Fast run, no coverage report
-```
-
-### How Vitest Detects Related Tests
-
-Vitest `--related` flag intelligently finds affected tests:
-- Tests that import the changed file
-- Tests in the same directory
-- Tests that share dependencies
-- Integration tests using the changed code
-
-**Example:**
-```bash
-# You change: server/routes/users.ts
-# Vitest runs:
-# - test/routes/users.test.ts (direct test)
-# - test/integration/api.test.ts (imports users route)
-# - e2e/user-flow.spec.ts (tests user features)
-```
-
-### Customizing Pre-commit Hooks
-
-To modify what runs on commit, edit `package.json`:
-
-```json
-{
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "vitest related --run",
-      // Add more commands here
-    ]
-  }
-}
-```
-
-### Bypassing Hooks (Emergency Only)
-```bash
-# NOT RECOMMENDED - only for emergencies
-git commit --no-verify -m "hotfix: critical bug"
-```
-
-## 📚 Reference Documentation
-
-- [Documentation Index](../docs/README.md)
-- [Enterprise CI/CD Guide](../docs/ci-cd/ENTERPRISE_CICD_GUIDE.md)
-- [Testing Guide](../docs/testing/TESTING.md)
-- [Security Guide](../docs/security/SECURITY.md)
-- [Deployment Guide](../docs/deployment/DEPLOYMENT.md)
+### When Working on Frontend
+- `client/src/App.tsx` - Main app component with routing
+- `client/src/components/` - React components
+- `client/src/data/` - Static JSON data (cast.json, social-links.json)
+- `.github/copilot-knowledge.md` - Wouter navigation reference
 
 ---
 
 **Remember**: Quality over speed. Follow these standards to maintain enterprise-grade code.
-
----
-
-## 📤 Summary & Git Status Guidelines
-
-At the end of every task summary, **ALWAYS** include a clear Git status section:
-
-### Format:
-```
-## 📤 Git Status
-
-**Status:** [PUSHED | NOT PUSHED | PARTIALLY PUSHED]
-
-**Details:**
-- Commit Hash: abc1234 (if committed)
-- Branch: main
-- Remote: origin/main
-- Pushed to GitHub: [YES | NO]
-
-**Action Required:**
-[If NOT PUSHED: "Run `git push` to deploy changes to remote"]
-[If PUSHED: "All changes are live on GitHub"]
-```
-
-### Examples:
-
-**✅ PUSHED:**
-```
-## 📤 Git Status
-**Status:** PUSHED ✅
-- Commit: fcae57b
-- All changes deployed to GitHub
-- No action required
-```
-
-**❌ NOT PUSHED:**
-```
-## 📤 Git Status
-**Status:** NOT PUSHED ⚠️
-- Changes committed locally only
-- **Action Required:** Run `git push` to deploy to GitHub
-```
-
-**⚠️ PARTIALLY PUSHED:**
-```
-## 📤 Git Status
-**Status:** PARTIALLY PUSHED ⚠️
-- Previous commits pushed (abc1234, def5678)
-- Latest commit (ghi9012) NOT PUSHED
-- **Action Required:** Run `git push` to sync all changes
-```
-
-This ensures clear communication about deployment status at all times.

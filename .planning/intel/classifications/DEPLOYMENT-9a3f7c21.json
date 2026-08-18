@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/Users/Preston/git/toa-website/docs/deployment/DEPLOYMENT.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Deployment Guide",
+  "summary": "Deployment process and platform-specific guides (Replit, Vercel, Netlify, Docker) for the Tales of Aneria website, including automated GitHub Actions workflow.",
+  "scope": ["deployment", "CI/CD", "GitHub Actions", "Replit", "Vercel", "Netlify", "Docker"],
+  "cross_refs": ["./REPLIT_DEPLOYMENT.md", "./DOCKER.md", ".github/workflows/deploy.yml"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Type assigned via MANIFEST_TYPE override."
+}
