@@ -53,7 +53,7 @@ export function registerRoutes(app: Express): Server {
       if (!result.success) {
         logSecurityEvent('INVALID_LOGIN_REQUEST', {
           ip: req.ip,
-          errors: result.error.errors,
+          errors: result.error.issues,
         });
         
         return res.status(400).json({ 
