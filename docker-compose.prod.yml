@@ -1,0 +1,59 @@
+# ============================================
+# Tales of Aneria — production stack (AWS Lightsail)
+# ============================================
+# This file is what actually runs on the shared Lightsail VPS
+# (34.199.135.244) at /opt/toa-website. It deliberately differs from
+# docker-compose.yml (local dev) in three ways:
+#
+#   1. No `db` service. The box already runs a PostgreSQL 17 instance
+#      (container `scrummonsters-postgres-1`) shared by the other
+#      tenants. toa-website gets its own role + database inside that
+#      instance rather than a second postgres container — a 1GB box
+#      cannot afford the duplicate.
+#   2. No `redis` service. server/rate-limiter.ts falls back to an
+#      in-memory store when REDIS_URL is unset; a dedicated Redis is not
+#      worth ~40MB of RAM here.
+#   3. No published host ports. Nginx Proxy Manager owns 80/443 and
+#      reaches this container by name over the shared docker network.
+#
+# Deploys pull a pre-built image from GHCR — never build on the VPS
+# (a local `npm run build` pushes load average past 10 for ~20 minutes).
+
+services:
+  app:
+    # TOA_IMAGE_TAG lets the deploy workflow pin a specific sha tag for
+    # rollbacks. Compose reads it from the shell environment (env_file: does
+    # NOT feed compose interpolation), defaulting to latest for manual use.
+    image: ghcr.io/xavisavvy/toa-website:${TOA_IMAGE_TAG:-latest}
+    container_name: toa-app
+    restart: unless-stopped
+    # Sized against observed sibling usage (~30-60MB RSS for the other
+    # Node tenants). Host has ~260MB available at idle.
+    mem_limit: 256m
+    env_file:
+      - .env.production
+    volumes:
+      # Podcast/YouTube response cache written by server/cache/
+      - toa_cache:/app/server/cache
+      - type: tmpfs
+        target: /tmp/app
+        tmpfs:
+          size: 32M
+    networks:
+      # Shared with Nginx Proxy Manager and scrummonsters-postgres-1.
+      - scrummonsters_default
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  toa_cache:
+    name: toa_cache
+
+networks:
+  scrummonsters_default:
+    external: true

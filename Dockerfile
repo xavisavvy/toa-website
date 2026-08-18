@@ -9,7 +9,7 @@
 FROM node:20-alpine AS deps
 
 # Add metadata labels
-LABEL org.opencontainers.image.source="https://github.com/your-org/toa-website"
+LABEL org.opencontainers.image.source="https://github.com/xavisavvy/toa-website"
 LABEL org.opencontainers.image.description="Tales of Aneria - TTRPG Website"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.vendor="Tales of Aneria"
@@ -58,11 +58,35 @@ COPY tailwind.config.ts ./
 COPY postcss.config.js ./
 COPY components.json ./
 COPY drizzle.config.ts ./
+COPY migrations ./migrations
+
+# Frontend env vars are inlined into the client bundle by Vite at BUILD time
+# (import.meta.env.VITE_*), so they must arrive as build args — setting them in
+# .env.production on the VPS has no effect on the already-compiled bundle.
+ARG VITE_YOUTUBE_PLAYLIST_ID=""
+ARG VITE_YOUTUBE_CHANNEL_ID=""
+ARG VITE_PODCAST_FEED_URL=""
+ARG VITE_PODCAST_SPOTIFY_URL=""
+ARG VITE_PODCAST_APPLE_URL=""
+ARG VITE_PODCAST_YOUTUBE_MUSIC_URL=""
+ARG VITE_STRIPE_DONATION_URL=""
+ARG VITE_GA_MEASUREMENT_ID=""
+ENV VITE_YOUTUBE_PLAYLIST_ID=$VITE_YOUTUBE_PLAYLIST_ID
+ENV VITE_YOUTUBE_CHANNEL_ID=$VITE_YOUTUBE_CHANNEL_ID
+ENV VITE_PODCAST_FEED_URL=$VITE_PODCAST_FEED_URL
+ENV VITE_PODCAST_SPOTIFY_URL=$VITE_PODCAST_SPOTIFY_URL
+ENV VITE_PODCAST_APPLE_URL=$VITE_PODCAST_APPLE_URL
+ENV VITE_PODCAST_YOUTUBE_MUSIC_URL=$VITE_PODCAST_YOUTUBE_MUSIC_URL
+ENV VITE_STRIPE_DONATION_URL=$VITE_STRIPE_DONATION_URL
+ENV VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID
 
 # Build the application with optimizations
 # Frontend (Vite) and Backend (esbuild)
 ENV NODE_ENV=production
 ENV VITE_BUILD_CACHE=true
+# Vite + esbuild peak around 768MB. Explicit cap keeps the build inside the
+# runner's memory budget instead of letting V8 discover the ceiling by OOMing.
+ENV NODE_OPTIONS="--max-old-space-size=768"
 RUN --mount=type=cache,target=/app/.vite \
     npm run build && \
     # Remove source maps from production build
@@ -113,7 +137,7 @@ RUN --mount=type=cache,target=/root/.npm \
 FROM node:20-alpine AS runner
 
 # Add metadata
-LABEL org.opencontainers.image.source="https://github.com/your-org/toa-website"
+LABEL org.opencontainers.image.source="https://github.com/xavisavvy/toa-website"
 LABEL org.opencontainers.image.description="Tales of Aneria - Production Runtime"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.vendor="Tales of Aneria"
@@ -159,6 +183,12 @@ COPY --from=sbom --chown=expressjs:nodejs /app/sbom.xml ./sbom.xml
 # Copy necessary config files
 COPY --from=builder --chown=expressjs:nodejs /app/drizzle.config.ts ./
 
+# Migration inputs. `npx drizzle-kit migrate` runs as a one-shot container
+# during deploy (see .github/workflows/deploy.yml), so the journal in
+# migrations/ and the schema it references must exist inside the image.
+COPY --from=builder --chown=expressjs:nodejs /app/migrations ./migrations
+COPY --from=builder --chown=expressjs:nodejs /app/shared ./shared
+
 # Create cache directory with proper permissions
 RUN mkdir -p /app/server/cache /tmp/app && \
     chown -R expressjs:nodejs /app/server/cache /tmp/app && \
@@ -166,7 +196,7 @@ RUN mkdir -p /app/server/cache /tmp/app && \
     chmod 1777 /tmp/app
 
 # Security: Set file permissions to read-only where possible
-RUN chmod -R 555 /app/node_modules /app/dist && \
+RUN chmod -R 555 /app/node_modules /app/dist /app/migrations /app/shared && \
     chmod 444 /app/package*.json /app/drizzle.config.ts /app/sbom.* && \
     chmod 755 /app
 
@@ -178,7 +208,7 @@ EXPOSE 5000
 
 # Health check with comprehensive monitoring
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:5000/api/health || exit 1
+  CMD curl -f "http://localhost:${PORT}/api/health" || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
