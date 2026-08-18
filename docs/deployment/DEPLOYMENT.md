@@ -1,463 +1,326 @@
 # Deployment Guide
 
-**Last Updated:** 2026-01-01
+**Platform:** AWS Lightsail VPS (shared, multi-tenant)
+**Production URL:** https://talesofaneria.com
+**Last Updated:** 2026-08-18
 
-## Overview
-
-This guide explains the deployment process for Tales of Aneria website.
-
----
-
-## 📚 Platform-Specific Guides
-
-For detailed platform-specific deployment instructions:
-
-- **🔄 [Replit Automatic Deployment](./REPLIT_DEPLOYMENT.md)** - Webhook-based auto-deploy from GitHub
-- **☁️ Vercel** - See below
-- **☁️ Netlify** - See below
-- **🐳 Docker** - See [DOCKER.md](./DOCKER.md)
+This guide describes how Tales of Aneria is actually deployed. It replaced an
+earlier Replit setup; see [Migration from Replit](#migration-from-replit) at the
+bottom for what changed and what to clean up on the Replit side.
 
 ---
 
-## 🚀 Automated Deployment
+## Where it runs
 
-### Current Setup
+Tales of Aneria is one of four sites sharing a single 1GB / 1vCPU AWS Lightsail
+instance:
 
-**Trigger:** Push to `main` branch  
-**Workflow:** `.github/workflows/deploy.yml`  
-**Environment:** Production (manual approval required)
+| Site                  | Directory              | Container          | Internal port |
+| --------------------- | ---------------------- | ------------------ | ------------- |
+| scrummonsters.com     | `/opt/scrummonsters`   | `app-blue/green`   | 5000          |
+| familytokens.app      | `/opt/familytokens`    | `familytokens-app` | 5001          |
+| **talesofaneria.com** | **`/opt/toa-website`** | **`toa-app`**      | **5002**      |
+| prestonfarr.com       | `~/prestonfarr`        | `prestonfarr`      | 3000          |
 
-### Workflow Steps:
-
-1. ✅ Checkout code
-2. ✅ Install dependencies
-3. ✅ Run quick smoke tests
-4. ✅ Build application
-5. ✅ Verify build artifacts
-6. ✅ Trigger Replit webhook (if configured)
-7. 🔧 Deploy (placeholder - configure for your platform)
-8. ✅ Notify deployment success
-
-### How It Works:
-
-```yaml
-# Automatic on push to main
-git push origin main
-
-# Or manual trigger via GitHub Actions UI
-# Actions → Deploy → Run workflow
+```
+                    Internet
+                       |  :80 / :443
+                       v
+        +------------------------------+
+        |  Nginx Proxy Manager         |  TLS termination, Let's Encrypt
+        |  (scrummonsters-nginx-...)   |  routes by Host header
+        +--------------+---------------+
+                       |  docker network: scrummonsters_default
+       +---------------+----------------+------------------+
+       v               v                v                  v
+   toa-app:5002   app-blue:5000   familytokens-app   prestonfarr:3000
+       |
+       +----------> scrummonsters-postgres-1:5432
+                    (PostgreSQL 17, one database per tenant)
 ```
 
----
+Nothing publishes ports to the host except Nginx Proxy Manager. Containers reach
+each other by container name over the shared `scrummonsters_default` network.
 
-## 🔧 Deployment Platforms
+### Constraints worth knowing
 
-### Option 1: Replit (Current Platform)
+The box has **914MB RAM and one vCPU**, with roughly 250MB free at idle.
 
-**Automatic Deployment from GitHub**
-
-See **[REPLIT_DEPLOYMENT.md](./REPLIT_DEPLOYMENT.md)** for complete setup guide.
-
-**Quick Setup:**
-1. Connect GitHub to Replit
-2. Enable Auto-deploy from main branch
-3. Add `REPLIT_DEPLOY_WEBHOOK` to GitHub Secrets
-4. Push to main → Auto-deploy!
-
-**Features:**
-- ✅ Zero-downtime deployments
-- ✅ Automatic restarts
-- ✅ Built-in CI/CD integration
-- ✅ Free tier available
+- **Never build on the VPS.** `npm run build` peaks near 768MB and pins load
+  average above 10 for 15-30 minutes; SSH becomes unusable. Images are built in
+  GitHub Actions and pulled.
+- `toa-app` is capped at `mem_limit: 256m`, in line with the other tenants.
+- There is no dedicated Redis. `server/rate-limiter.ts` falls back to an
+  in-memory store when `REDIS_URL` is unset, which is the right trade at this
+  size.
 
 ---
 
-### Option 2: Vercel (Recommended for Full-Stack)
+## Database
 
-**Setup:**
-```bash
-# Install Vercel CLI
-npm install -g vercel
+toa-website does **not** run its own PostgreSQL container. It uses the
+PostgreSQL 17 instance already on the box (`scrummonsters-postgres-1`), with its
+own role and database so tenant data stays separated:
 
-# Login
-vercel login
+- Database `toa_website`, owned by role `toa`
+- `CONNECT` on the neighbouring `scrummonsters` database is revoked from
+  `PUBLIC`, so the `toa` role cannot reach it
+- `DATABASE_URL` points at `scrummonsters-postgres-1:5432` over the docker
+  network - the port is not exposed to the host or the internet
 
-# Link project
-vercel link
-
-# Deploy
-vercel --prod
-```
-
-**Update workflow:**
-```yaml
-- name: Deploy to Vercel
-  run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
-  env:
-    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-```
-
-**Required Secrets:**
-- `VERCEL_TOKEN` - From Vercel dashboard
-- `VERCEL_ORG_ID` - From project settings
-- `VERCEL_PROJECT_ID` - From project settings
-
----
-
-### Option 2: Railway (Easy Database + App)
-
-**Setup:**
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login
-railway login
-
-# Link project
-railway link
-
-# Deploy
-railway up
-```
-
-**Update workflow:**
-```yaml
-- name: Deploy to Railway
-  run: railway up
-  env:
-    RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-```
-
-**Required Secrets:**
-- `RAILWAY_TOKEN` - From Railway dashboard
-
----
-
-### Option 3: Render (Simple & Free)
-
-**Setup:**
-1. Go to https://render.com
-2. Create new "Web Service"
-3. Connect GitHub repository
-4. Configure:
-   - Build: `npm run build`
-   - Start: `npm start`
-   - Environment: Node 20
-
-**Auto-deploys on every push to main!**
-
----
-
-### Option 4: Docker + AWS/GCP/Azure
-
-**Build Docker image:**
-```bash
-# Build
-DOCKER_BUILDKIT=1 docker build -t toa-website:latest .
-
-# Test locally
-docker run -p 5000:5000 \
-  -e DATABASE_URL=your_db_url \
-  -e SESSION_SECRET=your_secret \
-  toa-website:latest
-```
-
-**Push to registry:**
-```bash
-# AWS ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin YOUR_ECR_URL
-docker tag toa-website:latest YOUR_ECR_URL/toa-website:latest
-docker push YOUR_ECR_URL/toa-website:latest
-
-# Google Container Registry
-gcloud auth configure-docker
-docker tag toa-website:latest gcr.io/PROJECT_ID/toa-website:latest
-docker push gcr.io/PROJECT_ID/toa-website:latest
-
-# Azure Container Registry
-az acr login --name YOUR_REGISTRY
-docker tag toa-website:latest YOUR_REGISTRY.azurecr.io/toa-website:latest
-docker push YOUR_REGISTRY.azurecr.io/toa-website:latest
-```
-
----
-
-### Option 5: Self-Hosted (VPS)
-
-**Requirements:**
-- Ubuntu 22.04+ or similar
-- Node.js 20+
-- PostgreSQL 16+
-- nginx (reverse proxy)
-
-**Setup:**
-```bash
-# On server
-git clone https://github.com/your-org/toa-website.git
-cd toa-website
-
-# Install dependencies
-npm ci --production
-
-# Build
-npm run build
-
-# Setup PM2 for process management
-npm install -g pm2
-pm2 start dist/index.js --name toa-website
-
-# Setup nginx reverse proxy
-sudo nano /etc/nginx/sites-available/toa-website
-
-# Add configuration:
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://localhost:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-
-# Enable site
-sudo ln -s /etc/nginx/sites-available/toa-website /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-
-# Setup SSL with Let's Encrypt
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d your-domain.com
-```
-
----
-
-## 📋 Pre-Deployment Checklist
-
-Before deploying to production:
-
-### Code Quality
-- [ ] All tests passing locally (`npm test`)
-- [ ] Build succeeds (`npm run build`)
-- [ ] TypeScript checks pass (`npm run check`)
-- [ ] No security vulnerabilities (`npm audit`)
-
-### Configuration
-- [ ] Environment variables set correctly
-- [ ] Database migrations applied
-- [ ] Secrets rotated (if needed)
-- [ ] CORS origins configured
-
-### Testing
-- [ ] E2E tests pass (`npm run test:e2e`)
-- [ ] Manual testing on staging
-- [ ] Performance acceptable
-- [ ] Security scan clean
-
-### Documentation
-- [ ] CHANGELOG.md updated
-- [ ] Version bumped (if applicable)
-- [ ] Deployment notes added
-- [ ] Team notified
-
----
-
-## 🔒 Environment Variables
-
-Required for production:
+Verify the isolation at any time (run on the VPS; expect success on the first
+command and "permission denied" on the second):
 
 ```bash
-# Database
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
+PW=$(grep '^DATABASE_URL=' /opt/toa-website/.env.production | sed -E 's#.*://toa:([^@]+)@.*#\1#')
+docker exec -e PGPASSWORD="$PW" scrummonsters-postgres-1 \
+  psql -h 127.0.0.1 -U toa -d toa_website -tAc "select current_database();"
+docker exec -e PGPASSWORD="$PW" scrummonsters-postgres-1 \
+  psql -h 127.0.0.1 -U toa -d scrummonsters -tAc "select 1;"
+```
 
-# Security
-SESSION_SECRET=your_long_random_secret_here
-ALLOWED_ORIGINS=https://your-domain.com
+### Migrations
 
-# APIs
-YOUTUBE_API_KEY=your_youtube_api_key
-ETSY_API_KEY=your_etsy_api_key (optional)
+Migrations are versioned in `migrations/` and applied with `drizzle-kit migrate`.
+`drizzle-kit` is a **runtime** dependency precisely so it can run from the
+production image, and `migrations/` plus `shared/` are baked into that image.
 
-# AWS SES (Email)
-AWS_SES_REGION=us-east-1
-AWS_SES_ACCESS_KEY_ID=your_aws_key
-AWS_SES_SECRET_ACCESS_KEY=your_aws_secret
-AWS_SES_FROM_EMAIL=noreply@your-domain.com
+The deploy workflow applies them in a throwaway container off the *new* image
+**before** the live container is replaced, so a failed migration aborts the
+deploy with the old container still serving traffic:
 
-# Stripe
+```bash
+docker compose -f docker-compose.prod.yml run --rm --no-deps \
+  --entrypoint ./node_modules/.bin/drizzle-kit app migrate
+```
+
+To add a migration, change `shared/schema.ts`, run `npm run db:generate`
+locally, then commit the generated SQL and journal. Do not use `npm run db:push`
+against production - it applies schema diffs without a journal.
+
+---
+
+## Deploy pipeline
+
+```
+push to main
+    |
+    v
+docker-build.yml --> builds image, pushes ghcr.io/xavisavvy/toa-website
+    |                tags: latest + sha-<commit>
+    v  (workflow_run: completed & success)
+deploy.yml
+    |- git reset --hard origin/main      (refresh compose file on the VPS)
+    |- docker compose pull app
+    |- drizzle-kit migrate               (aborts deploy on failure)
+    |- docker compose up -d --force-recreate app
+    |- health check from inside the container
+    +- smoke test against https://talesofaneria.com
+```
+
+### Required GitHub configuration
+
+**Secrets** (Settings -> Secrets and variables -> Actions -> Secrets):
+
+| Secret            | Purpose                                |
+| ----------------- | -------------------------------------- |
+| `SSH_PRIVATE_KEY` | Deploy key for `ubuntu@34.199.135.244` |
+
+**Variables** (same page -> Variables). These are `VITE_*` values that Vite
+inlines into the client bundle **at image build time**. Setting them in
+`.env.production` on the VPS has no effect - the bundle is already compiled.
+They are all public values, which is why they are variables and not secrets:
+
+| Variable                         |
+| -------------------------------- |
+| `VITE_YOUTUBE_PLAYLIST_IDS`      |
+| `VITE_YOUTUBE_CHANNEL_ID`        |
+| `VITE_PODCAST_FEED_URL`          |
+| `VITE_PODCAST_SPOTIFY_URL`       |
+| `VITE_PODCAST_APPLE_URL`         |
+| `VITE_PODCAST_YOUTUBE_MUSIC_URL` |
+| `VITE_STRIPE_DONATION_URL`       |
+| `VITE_GA_MEASUREMENT_ID`         |
+
+### Manual deploy and rollback
+
+Every commit gets an immutable `sha-<full-sha>` image tag. To redeploy or roll
+back, dispatch the Deploy workflow with that tag:
+
+```bash
+gh workflow run deploy.yml -f image_tag=sha-<full-sha>
+# or, for the current latest:
+gh workflow run deploy.yml
+```
+
+The tag flows into `docker-compose.prod.yml` through `TOA_IMAGE_TAG`. Note that
+compose reads it from the **shell environment** - `env_file:` does not feed
+compose's `${...}` interpolation.
+
+Straight from the VPS:
+
+```bash
+cd /opt/toa-website
+TOA_IMAGE_TAG=sha-<full-sha> docker compose -f docker-compose.prod.yml up -d --force-recreate app
+```
+
+Rolling back a schema change needs a forward migration; there is no
+down-migration path.
+
+---
+
+## Server-side environment
+
+Runtime configuration lives in `/opt/toa-website/.env.production` (mode 600,
+never committed). `docker-compose.prod.yml` loads it via `env_file:`.
+
+```bash
+NODE_ENV=production
+PORT=5002
+DATABASE_URL=postgresql://toa:...@scrummonsters-postgres-1:5432/toa_website
+SESSION_SECRET=...
+ALLOWED_ORIGINS=https://talesofaneria.com,https://www.talesofaneria.com
+BASE_URL=https://talesofaneria.com
+
+YOUTUBE_API_KEY=...
+PRINTFUL_API_KEY=...
+PRINTFUL_WEBHOOK_SECRET=...
+
+# server/env-validator.ts requires these three together, or all three empty
 STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_SUCCESS_URL=/checkout/success
+STRIPE_CANCEL_URL=/checkout/cancel
 
-# Printful
-PRINTFUL_API_KEY=your_printful_key
+AWS_SES_REGION=us-east-1
+AWS_SES_ACCESS_KEY_ID=...
+AWS_SES_SECRET_ACCESS_KEY=...
+AWS_SES_FROM_EMAIL=noreply@talesofaneria.com
 
-# Node
-NODE_ENV=production
-PORT=5000
+BUSINESS_NAME=Tales of Aneria
+SUPPORT_EMAIL=TalesOfAneria@gmail.com
+ADMIN_EMAIL=TalesOfAneria@gmail.com
 ```
 
-**Set in your platform:**
-- Vercel: Settings → Environment Variables
-- Railway: Settings → Variables
-- Render: Environment → Add Variable
-- Docker: Pass via `-e` flag or `.env` file
-
----
-
-## 🐛 Troubleshooting
-
-### Deployment fails with "vitest.config.ts not found"
-
-**Solution:** The deploy workflow now uses `test:quick` instead of `test:coverage`. Update and push:
-```yaml
-- name: Run quick tests
-  run: npm run test:quick
-```
-
-### Build succeeds but app crashes
-
-**Check:**
-1. Environment variables set correctly
-2. Database connection working
-3. Node version matches (20+)
-4. All dependencies installed
-5. Check logs: `docker logs` or platform logs
-
-### Database connection fails
-
-**Verify:**
-```bash
-# Test connection
-psql $DATABASE_URL
-
-# Check format
-postgresql://user:password@host:5432/database
-```
-
-### Static files not loading
-
-**Check:**
-1. `dist/public` directory exists
-2. File paths are absolute
-3. CDN/cache cleared
-4. CORS headers correct
-
----
-
-## 📊 Monitoring Deployment
-
-### Health Check
+After editing it, restart the container - env vars are read at process start:
 
 ```bash
-# Check if app is running
-curl https://your-domain.com/api/health
-
-# Expected response
-{
-  "status": "healthy",
-  "timestamp": "2026-01-01T00:00:00.000Z",
-  "uptime": 1234
-}
+cd /opt/toa-website && docker compose -f docker-compose.prod.yml up -d --force-recreate app
 ```
 
-### Logs
+See `.env.example` for the full annotated list.
+
+---
+
+## TLS and routing
+
+Nginx Proxy Manager owns 80/443 and holds the Let's Encrypt certificates for all
+tenants. The proxy host for this site forwards `talesofaneria.com` and
+`www.talesofaneria.com` to `toa-app:5002`, with Force SSL, HTTP/2 and HSTS on.
+
+Certificates renew automatically inside NPM. To inspect or change routing,
+tunnel to the admin UI rather than exposing port 81:
 
 ```bash
-# Vercel
-vercel logs
-
-# Railway
-railway logs
-
-# Docker
-docker logs toa-website
-
-# PM2
-pm2 logs toa-website
+ssh -i ~/.ssh/lightsail_scrummonsters -L 8181:localhost:81 -N ubuntu@34.199.135.244
+# then open http://localhost:8181
 ```
 
-### Rollback
+**Do not edit the other tenants' proxy hosts.** They share this NPM instance.
 
-If deployment fails:
+### Webhook endpoints
+
+Both providers must point at the production domain:
+
+| Provider | Endpoint                                        |
+| -------- | ----------------------------------------------- |
+| Stripe   | `https://talesofaneria.com/api/stripe/webhook`   |
+| Printful | `https://talesofaneria.com/api/printful/webhook` |
+
+Stripe events to subscribe: `checkout.session.completed`,
+`checkout.session.async_payment_succeeded`,
+`checkout.session.async_payment_failed`. The signing secret from the Stripe
+dashboard goes into `STRIPE_WEBHOOK_SECRET`.
+
+---
+
+## Operations
 
 ```bash
-# Vercel - automatic rollback to last working deployment
-vercel rollback
+ssh -i ~/.ssh/lightsail_scrummonsters ubuntu@34.199.135.244
+cd /opt/toa-website
 
-# Railway - redeploy previous version
-railway up --previous
-
-# Docker - use previous image tag
-docker run previous-tag
-
-# Git - revert commit
-git revert HEAD
-git push origin main
+docker compose -f docker-compose.prod.yml ps           # status
+docker compose -f docker-compose.prod.yml logs -f app  # tail logs
+docker exec toa-app curl -sf localhost:5002/api/health # health from inside
+docker stats --no-stream                               # memory across tenants
+free -m                                                # host headroom
 ```
 
----
+Health from outside, which also proves NPM is routing correctly:
 
-## 🔄 CI/CD Pipeline
-
-### Full Pipeline Flow:
-
-```
-1. Push to main
-   ↓
-2. CI Workflow runs (security scans, tests)
-   ↓
-3. Deploy Workflow triggered
-   ↓
-4. Quick smoke tests
-   ↓
-5. Build application
-   ↓
-6. Verify artifacts
-   ↓
-7. Deploy to platform
-   ↓
-8. Health check
-   ↓
-9. Notify team
+```bash
+curl -fsS https://talesofaneria.com/api/health
 ```
 
-### Workflow Files:
-- `.github/workflows/ci.yml` - Full CI pipeline with security
-- `.github/workflows/deploy.yml` - Production deployment
-- `.github/workflows/sbom.yml` - SBOM generation
+### Troubleshooting
+
+**502 from NPM.** The container is down or not on the shared network. Check
+`docker compose ps`, then confirm `docker inspect toa-app` lists
+`scrummonsters_default`.
+
+**Container restart loop.** Usually a bad `DATABASE_URL` or a missing required
+env var. `docker compose logs app` shows the validation output from
+`server/env-validator.ts`.
+
+**`WARN: variable is not set` during compose commands.** Compose interpolation
+reads the shell environment, not `env_file:`. Export `TOA_IMAGE_TAG` or accept
+the `latest` default.
+
+**Deploy times out pulling the image.** The box swaps under memory pressure and
+a large pull can take several minutes; `command_timeout` in `deploy.yml` is set
+to 25m for this reason. Check `free -m` and `df -h /`.
+
+**Host is out of memory.** `docker image prune -f` first - old image layers are
+the usual culprit. The deploy workflow prunes on success.
 
 ---
 
-## 🎯 Next Steps
+## Pre-deployment checklist
 
-1. **Choose a deployment platform** from options above
-2. **Configure secrets** in GitHub repository settings
-3. **Update deploy.yml** with platform-specific commands
-4. **Test deployment** on staging first
-5. **Monitor** first production deployment
-6. **Set up alerts** for errors/downtime
-
----
-
-## 📞 Support
-
-- Deployment issues: Check workflow logs in Actions tab
-- Platform issues: Refer to platform documentation
-- App crashes: Check application logs
-- Database: Verify connection and migrations
+- [ ] `npm test` passes
+- [ ] `npm run check` passes (TypeScript)
+- [ ] `npm run build` succeeds
+- [ ] New schema changes have a generated migration committed in `migrations/`
+- [ ] Any new `VITE_*` var added as a GitHub repo *variable* and to
+      `docker-build.yml` build args - it will not work from `.env.production`
+- [ ] Any new server env var added to `.env.example` and to
+      `/opt/toa-website/.env.production`
+- [ ] `CHANGELOG.md` updated
 
 ---
 
-**Need Help?**
+## Migration from Replit
 
-See documentation:
-- [ENTERPRISE_CICD_GUIDE.md](./ENTERPRISE_CICD_GUIDE.md)
-- [BUILD_PERFORMANCE.md](./BUILD_PERFORMANCE.md)
-- [DOCKER.md](./DOCKER.md)
+The site previously ran on Replit autoscale deployments, triggered by a webhook
+from `deploy.yml`. That path is gone:
+
+- `.replit` removed
+- `REPLIT_DEPLOYMENT.md` and `REPLIT_DEPLOY_CHECKLIST.md` are retained for
+  historical reference only and marked deprecated
+- The `REPLIT_DEPLOY_WEBHOOK` / `STAGING_DEPLOY_WEBHOOK` steps and the
+  staging/production split in `deploy.yml` were replaced by the single Lightsail
+  environment described above
+
+Once traffic is confirmed on the VPS, the `REPLIT_DEPLOY_WEBHOOK`,
+`STAGING_DEPLOY_WEBHOOK`, `STAGING_URL` and `PRODUCTION_URL` GitHub secrets can
+be deleted, and the Replit deployment itself shut down.
+
+---
+
+## Related documentation
+
+- [DOCKER.md](./DOCKER.md) - image internals and local Docker workflow
+- [HEALTH_CHECK_GUIDE.md](./HEALTH_CHECK_GUIDE.md) - what `/api/health` reports
+- `~/.claude/infrastructure.md` - VPS inventory (not in this repo)

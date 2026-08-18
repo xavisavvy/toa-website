@@ -68,6 +68,7 @@ jobs:
           # public values (playlist IDs, feed URLs, a Stripe payment link),
           # which is why they live in repo *variables* rather than secrets.
           build-args: |
+            VITE_YOUTUBE_PLAYLIST_IDS=${{ vars.VITE_YOUTUBE_PLAYLIST_IDS }}
             VITE_YOUTUBE_PLAYLIST_ID=${{ vars.VITE_YOUTUBE_PLAYLIST_ID }}
             VITE_YOUTUBE_CHANNEL_ID=${{ vars.VITE_YOUTUBE_CHANNEL_ID }}
             VITE_PODCAST_FEED_URL=${{ vars.VITE_PODCAST_FEED_URL }}

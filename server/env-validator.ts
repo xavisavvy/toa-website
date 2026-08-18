@@ -19,9 +19,6 @@ const OPTIONAL_API_KEYS: EnvConfig[] = [
   { name: 'YOUTUBE_API_KEY', required: false, description: 'YouTube Data API v3 key (server-side)' },
   { name: 'ETSY_API_KEY', required: false, description: 'Etsy API key' },
   { name: 'ETSY_ACCESS_TOKEN', required: false, description: 'Etsy access token' },
-  { name: 'REPLIT_CONNECTORS_HOSTNAME', required: false, description: 'Replit connectors hostname' },
-  { name: 'REPL_IDENTITY', required: false, description: 'Replit identity token' },
-  { name: 'WEB_REPL_RENEWAL', required: false, description: 'Replit deployment renewal token' },
 ];
 
 const ECOMMERCE_ENV_VARS: EnvConfig[] = [

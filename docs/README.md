@@ -46,8 +46,8 @@ Deployment strategies and infrastructure
 - [Docker Guide](./deployment/DOCKER.md) - Docker containerization
 - [Docker Optimization](./deployment/DOCKER_OPTIMIZATION.md) - Container optimization
 - [Docker Optimization Summary](./deployment/DOCKER_OPTIMIZATION_SUMMARY.md) - Quick reference
-- [Replit Deployment](./deployment/REPLIT_DEPLOYMENT.md) - Deploying to Replit
-- [Replit Deploy Checklist](./deployment/REPLIT_DEPLOY_CHECKLIST.md) - Pre-deployment verification
+- [Replit Deployment](./deployment/REPLIT_DEPLOYMENT.md) - **Deprecated**, historical reference
+- [Replit Deploy Checklist](./deployment/REPLIT_DEPLOY_CHECKLIST.md) - **Deprecated**, historical reference
 - [Health Check Guide](./deployment/HEALTH_CHECK_GUIDE.md) - Application health monitoring
 
 ### 📘 [Implementation Guides](./guides/)
