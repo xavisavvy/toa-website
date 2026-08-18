@@ -14,6 +14,16 @@ on:
       - '**.md'
       - 'docs/**'
       - '.planning/**'
+  # Same-repo PRs build and push too, tagged sha-<commit> only. That keeps
+  # the Dockerfile honest on every PR, and gives deploy.yml a concrete tag to
+  # roll out before a change reaches main. Forks are excluded: they have no
+  # packages:write on this repo.
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.planning/**'
   workflow_dispatch:
 
 permissions:
@@ -29,6 +39,7 @@ jobs:
     name: Build and Push Image
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
 
