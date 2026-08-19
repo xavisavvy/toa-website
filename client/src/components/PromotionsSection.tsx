@@ -1,6 +1,5 @@
 import { Sparkles } from "lucide-react";
 
-import creepyForest from "@/assets/creepy-forest.webp";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,14 +15,6 @@ interface Promotion {
 export default function PromotionsSection() {
   //todo: remove mock functionality - Replace with actual promotions data
   const promotions: Promotion[] = [
-    {
-      id: "1",
-      title: "Journeys Through Taebrin Premiere Event",
-      description:
-        "Join us for a special live premiere event with exclusive behind-the-scenes content and Q&A",
-      badge: "Coming Soon",
-      image: creepyForest,
-    },
     // {
     //   id: "2",
     //   title: "Limited Edition Dice Set",
@@ -32,6 +23,10 @@ export default function PromotionsSection() {
     //   image: "",
     // },
   ];
+
+  if (promotions.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-20 lg:py-32 bg-card">
