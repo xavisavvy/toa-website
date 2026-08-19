@@ -57,7 +57,9 @@ export default function Podcast() {
       const r = await fetch("/api/podcast/feed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feedUrl, limit: 500 }),
+        // Must not exceed the cap in server/routes.ts POST
+        // /api/podcast/feed (200). 500 silently 400'd this whole page.
+        body: JSON.stringify({ feedUrl, limit: 200 }),
       });
       if (!r.ok) {
         throw new Error("Failed to fetch podcast feed");

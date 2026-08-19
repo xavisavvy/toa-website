@@ -1,5 +1,15 @@
 # Replit Automatic Deployment Guide
 
+> **DEPRECATED - historical reference only.**
+>
+> Tales of Aneria no longer deploys to Replit. Production runs on the shared
+> AWS Lightsail VPS behind Nginx Proxy Manager; see
+> [DEPLOYMENT.md](./DEPLOYMENT.md) for the current platform, pipeline and
+> runbook. Nothing in this document is wired up any more - the webhook steps
+> it describes were removed from `.github/workflows/deploy.yml`.
+
+---
+
 This guide explains how to set up automatic deployments from GitHub to Replit using webhooks.
 
 ## 🎯 Overview

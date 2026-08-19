@@ -65,3 +65,5 @@ pids/
 # OS
 .DS_Store
 Thumbs.db
+# TLS material staged on the VPS deploy checkout (/opt/toa-website/certs)
+certs/

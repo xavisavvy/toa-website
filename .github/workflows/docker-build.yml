@@ -1,0 +1,79 @@
+name: Docker Build and Push
+
+# Builds the production image and pushes it to GHCR. The Lightsail box is a
+# 1GB/1vCPU instance — building there pushes load average past 10 for ~20
+# minutes — so images are always built here and pulled on the VPS.
+#
+# Deploy to Lightsail runs as a separate workflow (deploy.yml) triggered by
+# this one completing successfully on main.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.planning/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: docker-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/toa-website
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
+          flavor: latest=false
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runner
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Vite inlines import.meta.env.VITE_* at build time, so these are
+          # baked into the client bundle here — putting them in
+          # .env.production on the VPS would have no effect. They are all
+          # public values (playlist IDs, feed URLs, a Stripe payment link),
+          # which is why they live in repo *variables* rather than secrets.
+          build-args: |
+            VITE_YOUTUBE_PLAYLIST_IDS=${{ vars.VITE_YOUTUBE_PLAYLIST_IDS }}
+            VITE_YOUTUBE_PLAYLIST_ID=${{ vars.VITE_YOUTUBE_PLAYLIST_ID }}
+            VITE_YOUTUBE_CHANNEL_ID=${{ vars.VITE_YOUTUBE_CHANNEL_ID }}
+            VITE_PODCAST_FEED_URL=${{ vars.VITE_PODCAST_FEED_URL }}
+            VITE_PODCAST_SPOTIFY_URL=${{ vars.VITE_PODCAST_SPOTIFY_URL }}
+            VITE_PODCAST_APPLE_URL=${{ vars.VITE_PODCAST_APPLE_URL }}
+            VITE_PODCAST_YOUTUBE_MUSIC_URL=${{ vars.VITE_PODCAST_YOUTUBE_MUSIC_URL }}
+            VITE_STRIPE_DONATION_URL=${{ vars.VITE_STRIPE_DONATION_URL }}
+            VITE_GA_MEASUREMENT_ID=${{ vars.VITE_GA_MEASUREMENT_ID }}

@@ -110,7 +110,11 @@ export function configureSecurity(app: Express) {
         }
 
         // In production, check against allowed origins
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.replit.app') || origin.endsWith('.repl.co')) {
+        // Strictly the configured list. The previous *.replit.app /
+        // *.repl.co suffix match existed to allow Replit preview domains;
+        // with credentials: true it let any Replit-hosted origin make
+        // credentialed requests, and the site no longer runs there.
+        if (allowedOrigins.indexOf(origin) !== -1) {
           callback(null, true);
         } else {
           callback(new Error('Not allowed by CORS'));

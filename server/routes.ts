@@ -695,7 +695,11 @@ export function registerRoutes(app: Express): Server {
       }
 
       // A03: Validate limit parameter
-      const limitValidation = validateNumber(limit || 10, 1, 50);
+      // Upper bound must stay >= the limit client/src/pages/Podcast.tsx
+      // requests for its full-archive list, or that page 400s. The feed
+      // is ~151 episodes today; 200 leaves headroom without letting an
+      // arbitrary caller ask us to parse an unbounded feed.
+      const limitValidation = validateNumber(limit || 10, 1, 200);
       if (!limitValidation.valid) {
         return res.status(400).json({ error: limitValidation.error });
       }

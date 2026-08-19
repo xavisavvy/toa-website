@@ -1,5 +1,21 @@
 # Replit Deployment Checklist
 
+> **DEPRECATED - historical reference only.**
+>
+> **A live YouTube Data API key was committed in this file on 2026-01-01
+> (commit `0c654e3`) and sat in a public repository until 2026-08-18.**
+> It has been redacted here, but redaction does not remove it from git
+> history - the key must be revoked and reissued in the Google Cloud
+> Console.
+>
+> Tales of Aneria no longer deploys to Replit. Production runs on the shared
+> AWS Lightsail VPS behind Nginx Proxy Manager; see
+> [DEPLOYMENT.md](./DEPLOYMENT.md) for the current platform, pipeline and
+> runbook. Nothing in this document is wired up any more - the webhook steps
+> it describes were removed from `.github/workflows/deploy.yml`.
+
+---
+
 ## 🚨 Current Issue: Old Code Still Running
 
 Your Replit is still running **old code** without the trust proxy fix. The logs confirm this.
@@ -44,7 +60,7 @@ NODE_ENV=production
 
 # YouTube Configuration
 VITE_YOUTUBE_CHANNEL_ID=UC7PTdudxJ43HMLJVv2QxVoQ
-YOUTUBE_API_KEY=AIzaSyDqbwNuCxOeiOLXGsBnLli778Kg5vaCpVo
+YOUTUBE_API_KEY=AIza_REDACTED_ROTATE_THIS_KEY
 ```
 
 ⚠️ **CRITICAL:** The `NODE_ENV=production` must be set!
@@ -156,7 +172,7 @@ In Replit Secrets, verify:
 
 - [ ] `NODE_ENV=production` ← **MUST HAVE THIS!**
 - [ ] `VITE_YOUTUBE_CHANNEL_ID=UC7PTdudxJ43HMLJVv2QxVoQ`
-- [ ] `YOUTUBE_API_KEY=AIzaSyDqbwNuCxOeiOLXGsBnLli778Kg5vaCpVo`
+- [ ] `YOUTUBE_API_KEY=AIza_REDACTED_ROTATE_THIS_KEY`
 
 ---
 

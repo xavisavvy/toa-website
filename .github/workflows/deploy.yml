@@ -1,542 +1,156 @@
-name: Deploy
+name: Deploy to Lightsail
+
+# Production deploy for https://talesofaneria.com.
+#
+# Target: the shared AWS Lightsail VPS at 34.199.135.244, which also hosts
+# scrummonsters.com, prestonfarr.com and familytokens.app. Each tenant lives
+# in its own /opt/<site> directory and joins the shared `scrummonsters_default`
+# docker network; Nginx Proxy Manager terminates TLS on 443 and routes to
+# containers by name. See docs/deployment/DEPLOYMENT.md.
+#
+# There is exactly one environment. The previous staging/production split in
+# this file pointed at Replit webhooks that no longer exist.
 
 on:
+  # Auto-deploy once the image for this commit is in GHCR.
   workflow_run:
-    workflows: ["Versioning"]
-    types:
-      - completed
-    branches:
-      - main
+    workflows: ["Docker Build and Push"]
+    types: [completed]
+    branches: [main]
+  # Manual re-deploy (roll the container without a new commit).
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - production
-      rollback_to:
-        description: 'Rollback to specific commit SHA (leave empty for normal deployment)'
+      image_tag:
+        description: 'Image tag to deploy, e.g. sha-<full-sha> for a rollback (default: latest)'
         required: false
+        default: 'latest'
         type: string
-      skip_staging:
-        description: 'Skip staging and deploy directly to production (use with caution)'
-        required: false
-        default: false
-        type: boolean
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 
 permissions:
   contents: read
-  deployments: write
+  # Lets the deploy step mint a short-lived GHCR credential for the VPS
+  # instead of the box holding a long-lived registry PAT.
+  packages: read
+
+env:
+  REMOTE_HOST: '34.199.135.244'
+  REMOTE_USER: 'ubuntu'
+  REMOTE_DIR: '/opt/toa-website'
+  SITE_URL: 'https://talesofaneria.com'
 
 jobs:
-  # ============================================
-  # STAGING DEPLOYMENT
-  # ============================================
-  deploy-staging:
-    name: Deploy to Staging
+  deploy:
+    name: Deploy to talesofaneria.com
     runs-on: ubuntu-latest
-    environment: staging
-    # Deploy to staging on automated runs or when explicitly selected
-    if: |
-      (github.event.workflow_run.conclusion == 'success') ||
-      (github.event_name == 'workflow_dispatch' &&
-       (github.event.inputs.environment == 'staging' ||
-        (github.event.inputs.environment == 'production' && github.event.inputs.skip_staging != 'true')))
-
-    outputs:
-      deployment_sha: ${{ steps.metadata.outputs.sha }}
-      staging_healthy: ${{ steps.post_health.outputs.health_passed }}
+    timeout-minutes: 30
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: production
+      url: https://talesofaneria.com
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Pull image, migrate, and roll the container
+        uses: appleboy/ssh-action@v1
         with:
-          ref: ${{ github.event.inputs.rollback_to || github.sha }}
-          fetch-depth: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Save deployment metadata
-        id: metadata
-        run: |
-          mkdir -p deployment-metadata
-          echo "${{ github.sha }}" > deployment-metadata/current-sha.txt
-          echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "environment=staging" >> deployment-metadata/environment.txt
-          echo "${{ github.event.inputs.rollback_to || 'normal-deployment' }}" > deployment-metadata/rollback-info.txt
-          git log -1 --format="%H %s" > deployment-metadata/commit-info.txt
-          date -u +"%Y-%m-%dT%H:%M:%SZ" > deployment-metadata/deployed-at.txt
-
-      - name: Install dependencies
-        run: npm ci
-        env:
-          HUSKY: 0
-
-      - name: Run quick tests
-        id: tests
-        run: npm run test:quick
-        continue-on-error: true
-
-      - name: Build application
-        id: build
-        run: npm run build
-
-      - name: Verify build artifacts
-        id: verify
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "❌ Build failed - dist directory not found"
-            exit 1
-          fi
-          if [ ! -f "dist/index.js" ]; then
-            echo "❌ Build failed - dist/index.js not found"
-            exit 1
-          fi
-          echo "✅ Build artifacts verified"
-
-      - name: Get package version
-        id: pkg_version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      # GitHub's Deployments API — records a real deployment entry for this
-      # environment so the repo's deployment count/history reflects staging
-      # rollouts, not just production ones.
-      - name: Create GitHub deployment
-        id: create_deployment
-        uses: actions/github-script@v7
-        env:
-          APP_VERSION: ${{ steps.pkg_version.outputs.version }}
-        with:
+          host: ${{ env.REMOTE_HOST }}
+          username: ${{ env.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # The box is RAM-pressured; pulling a ~300MB image while swapping
+          # can take several minutes. The 10m action default is too tight.
+          command_timeout: 25m
+          envs: TOA_IMAGE_TAG,GHCR_TOKEN
           script: |
-            const version = process.env.APP_VERSION || '0.0.0';
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha,
-              environment: 'staging',
-              auto_merge: false,
-              required_contexts: [],
-              description: `Tales of Aneria v${version} (staging)`,
-            });
-            core.setOutput('deployment_id', deployment.data.id);
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: deployment.data.id,
-              state: 'in_progress',
-            });
+            set -euo pipefail
+            cd ${{ env.REMOTE_DIR }}
 
-      - name: Deploy to Staging
-        id: deploy
-        run: |
-          echo "🚀 Deploying to STAGING environment..."
-          # Add your staging deployment commands here
-          # Examples:
-          # - Deploy to staging server
-          # - Deploy to staging Kubernetes namespace
-          # - Deploy to staging cloud environment
-          echo "Staging deployment placeholder - add your staging deployment script"
+            echo "[1/5] Refreshing deploy config from main..."
+            git fetch origin main
+            git reset --hard origin/main
 
-      - name: Trigger Staging Deployment (Replit/Custom)
-        id: staging_deploy
-        if: success()
-        run: |
-          if [ -n "${{ secrets.STAGING_DEPLOY_WEBHOOK }}" ]; then
-            echo "🚀 Triggering staging deployment..."
-            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.STAGING_DEPLOY_WEBHOOK }}" \
-              -H "Content-Type: application/json" \
-              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "environment": "staging", "actor": "${{ github.actor }}"}')
+            echo "[2/5] Pulling image from GHCR..."
+            # Authenticate with this run's ephemeral GITHUB_TOKEN rather than
+            # relying on a registry credential stored on the box. The VPS is
+            # shared with other sites, so it should not need to hold a
+            # long-lived PAT for this one. Logout runs unconditionally below.
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
+            docker compose -f docker-compose.prod.yml pull app
 
-            STATUS_CODE=$(echo "$RESPONSE" | tail -n1)
-            if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
-              echo "✅ Staging deployment triggered successfully!"
-              echo "deployment_triggered=true" >> $GITHUB_OUTPUT
-            else
-              echo "❌ Staging deployment failed with status code: $STATUS_CODE"
-              echo "deployment_triggered=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          else
-            echo "ℹ️ STAGING_DEPLOY_WEBHOOK not configured, skipping webhook trigger"
-            echo "deployment_triggered=skip" >> $GITHUB_OUTPUT
-          fi
+            # Versioned migrations run in a throwaway container off the new
+            # image before the live container is replaced, so a bad migration
+            # aborts the deploy with the old container still serving.
+            # drizzle-kit ships as a runtime dependency for exactly this.
+            echo "[3/5] Applying database migrations..."
+            # The binary is invoked directly rather than via npx: the runtime
+            # user is a --system account with a read-only node_modules, and
+            # npx wants a writable cache directory.
+            #
+            # Deliberately NOT guarded with `if [ -x ... ]`. Skipping the
+            # migration when drizzle-kit is absent would turn a loud failure
+            # into a silent success, and this step exists precisely so a
+            # schema problem aborts the deploy before the container swap.
+            docker compose -f docker-compose.prod.yml run --rm --no-deps \
+              --entrypoint ./node_modules/.bin/drizzle-kit app migrate
 
-      - name: Post-deployment health check (Staging)
-        id: post_health
-        if: success()
-        run: |
-          if [ -n "${{ secrets.STAGING_URL }}" ]; then
-            echo "⏳ Waiting 30s for staging deployment to stabilize..."
-            sleep 30
+            echo "[4/5] Recreating app container..."
+            docker compose -f docker-compose.prod.yml up -d --force-recreate app
 
-            echo "🏥 Checking staging health..."
-            MAX_RETRIES=5
-            RETRY_COUNT=0
-            HEALTH_OK=false
-
-            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-              HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.STAGING_URL }}/api/health" || echo "000")
-              echo "Health check attempt $((RETRY_COUNT+1)): $HEALTH_STATUS"
-
-              if [ "$HEALTH_STATUS" = "200" ]; then
-                HEALTH_BODY=$(curl -s "${{ secrets.STAGING_URL }}/api/health")
-                if echo "$HEALTH_BODY" | grep -q '"status"'; then
-                  HEALTH_OK=true
-                  echo "✅ Staging health check passed!"
-                  break
-                fi
+            echo "[5/5] Waiting for health..."
+            # Port 5002 is not published on the host — the container is only
+            # reachable over the docker network — so probe from inside it.
+            # $PORT comes from .env.production rather than being hardcoded
+            # here, so the workflow follows a port change instead of silently
+            # probing the wrong one. (Copilot Autofix suggestion, kept.)
+            for i in $(seq 1 45); do
+              if docker exec toa-app sh -c 'curl -sf "http://localhost:${PORT:-5002}/api/health"' > /dev/null 2>&1; then
+                echo "Container healthy after ${i} attempts."
+                docker image prune -f > /dev/null 2>&1 || true
+                exit 0
               fi
-
-              RETRY_COUNT=$((RETRY_COUNT+1))
-              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-                echo "⏳ Retrying in 10s..."
-                sleep 10
-              fi
+              sleep 4
             done
 
-            if [ "$HEALTH_OK" = false ]; then
-              echo "❌ Staging health check failed after $MAX_RETRIES attempts"
-              echo "health_passed=false" >> $GITHUB_OUTPUT
-              exit 1
-            else
-              echo "health_passed=true" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "ℹ️ STAGING_URL not configured, skipping health check"
-            echo "health_passed=skip" >> $GITHUB_OUTPUT
-          fi
+            echo "Health check failed. Recent logs:" >&2
+            docker compose -f docker-compose.prod.yml logs --tail 100 app >&2
+            exit 1
+        env:
+          # Consumed by docker-compose.prod.yml's image: interpolation.
+          # Compose reads it from the shell environment, not from env_file.
+          #
+          # Auto-deploys pin the immutable sha tag of the commit whose build
+          # triggered this run, NOT `latest`. Two commits landing close together
+          # would otherwise race: build B can move `latest` before deploy A
+          # pulls, so deploy A would roll out — and migrate — commit B's image
+          # while reporting it deployed commit A.
+          # Manual dispatch still honours image_tag (default `latest`) so
+          # rollbacks to an arbitrary sha keep working.
+          TOA_IMAGE_TAG: ${{ github.event.inputs.image_tag || (github.event.workflow_run.head_sha && format('sha-{0}', github.event.workflow_run.head_sha)) || 'latest' }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run smoke tests (Staging)
-        if: success() && steps.post_health.outputs.health_passed == 'true'
-        run: |
-          if [ -n "${{ secrets.STAGING_URL }}" ]; then
-            echo "🧪 Running smoke tests against staging..."
-            # Homepage loads
-            curl -f -s "${{ secrets.STAGING_URL }}" | grep -q "Tales of Aneria" || exit 1
-            # API responds
-            curl -f "${{ secrets.STAGING_URL }}/api/health" || exit 1
-            echo "✅ Smoke tests passed!"
-          fi
-
-      - name: Report staging deployment success
-        if: success() && steps.create_deployment.outputs.deployment_id
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.deployment_id }},
-              state: 'success',
-              environment_url: '${{ secrets.STAGING_URL }}' || undefined,
-            });
-
-      - name: Report staging deployment failure
-        if: failure() && steps.create_deployment.outputs.deployment_id
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.deployment_id }},
-              state: 'failure',
-              environment_url: '${{ secrets.STAGING_URL }}' || undefined,
-            });
-
-      - name: Upload staging deployment metadata
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: staging-deployment-metadata
-          path: deployment-metadata/
-          retention-days: 30
-
-      - name: Notify staging deployment
-        if: success()
-        run: |
-          echo "✅ Staging deployment successful!"
-          echo "Deployed commit: ${{ github.sha }}"
-          echo "Environment: staging"
-
-  # ============================================
-  # PRODUCTION DEPLOYMENT
-  # ============================================
-  deploy-production:
-    name: Deploy to Production
+  smoke-test:
+    name: Smoke Tests
     runs-on: ubuntu-latest
-    environment: production
-    needs: [deploy-staging]
-    # Only deploy to production after staging succeeds
-    # Or if manual dispatch directly to production with skip_staging
-    if: |
-      always() &&
-      ((needs.deploy-staging.result == 'success') ||
-       (github.event_name == 'workflow_dispatch' &&
-        github.event.inputs.environment == 'production' &&
-        github.event.inputs.skip_staging == 'true'))
-
+    timeout-minutes: 10
+    needs: [deploy]
+    if: needs.deploy.result == 'success'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.rollback_to || github.sha }}
-          fetch-depth: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Save deployment metadata
+      # Hits the public URL, which proves NPM is routing 443 to the new
+      # container — not just that the container itself came up.
+      - name: Public health endpoint
         run: |
-          mkdir -p deployment-metadata
-          echo "${{ github.sha }}" > deployment-metadata/current-sha.txt
-          echo "environment=production" >> deployment-metadata/environment.txt
-          echo "${{ github.event.inputs.rollback_to || 'normal-deployment' }}" > deployment-metadata/rollback-info.txt
-          git log -1 --format="%H %s" > deployment-metadata/commit-info.txt
-          date -u +"%Y-%m-%dT%H:%M:%SZ" > deployment-metadata/deployed-at.txt
-
-      - name: Install dependencies
-        run: npm ci
-        env:
-          HUSKY: 0
-
-      - name: Run quick tests
-        id: tests
-        run: npm run test:quick
-        continue-on-error: true
-
-      - name: Build application
-        id: build
-        run: npm run build
-
-      - name: Verify build artifacts
-        id: verify
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "❌ Build failed - dist directory not found"
-            exit 1
-          fi
-          if [ ! -f "dist/index.js" ]; then
-            echo "❌ Build failed - dist/index.js not found"
-            exit 1
-          fi
-          echo "✅ Build artifacts verified"
-
-      - name: Pre-deployment health check
-        id: pre_health
-        run: |
-          echo "🏥 Checking current production health..."
-          if [ -n "${{ secrets.PRODUCTION_URL }}" ]; then
-            HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
-            echo "health_status=$HEALTH_STATUS" >> $GITHUB_OUTPUT
-            if [ "$HEALTH_STATUS" = "200" ]; then
-              echo "✅ Pre-deployment health check passed"
-            else
-              echo "⚠️ Current production health: $HEALTH_STATUS"
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            if curl -fsS "${{ env.SITE_URL }}/api/health" | grep -q '"status"'; then
+              echo "Health OK."
+              break
             fi
-          else
-            echo "ℹ️ PRODUCTION_URL not configured, skipping health check"
-            echo "health_status=skip" >> $GITHUB_OUTPUT
-          fi
+            [ "$i" = "10" ] && { echo "Health check failed." >&2; exit 1; }
+            sleep 6
+          done
 
-      - name: Get package version
-        id: pkg_version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      # GitHub's Deployments API — records a real deployment entry so the
-      # repo's deployment count/history reflects production rollouts.
-      - name: Create GitHub deployment
-        id: create_deployment
-        uses: actions/github-script@v7
-        env:
-          APP_VERSION: ${{ steps.pkg_version.outputs.version }}
-        with:
-          script: |
-            const version = process.env.APP_VERSION || '0.0.0';
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha,
-              environment: 'production',
-              auto_merge: false,
-              required_contexts: [],
-              description: `Tales of Aneria v${version} (production)`,
-            });
-            core.setOutput('deployment_id', deployment.data.id);
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: deployment.data.id,
-              state: 'in_progress',
-            });
-
-      - name: Deploy to Production
-        id: deploy
-        run: |
-          echo "🚀 Deploying to PRODUCTION environment..."
-          # Add your production deployment commands here
-          echo "Production deployment placeholder - add your production deployment script"
-
-      - name: Trigger Production Deployment (Replit)
-        id: replit_deploy
-        if: success()
-        run: |
-          if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
-            echo "🚀 Triggering production deployment..."
-            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
-              -H "Content-Type: application/json" \
-              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "environment": "production", "actor": "${{ github.actor }}"}')
-
-            STATUS_CODE=$(echo "$RESPONSE" | tail -n1)
-            if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 300 ]; then
-              echo "✅ Production deployment triggered successfully!"
-              echo "deployment_triggered=true" >> $GITHUB_OUTPUT
-            else
-              echo "❌ Production deployment failed with status code: $STATUS_CODE"
-              echo "deployment_triggered=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          else
-            echo "ℹ️ REPLIT_DEPLOY_WEBHOOK not configured, skipping Replit deployment"
-            echo "deployment_triggered=skip" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Post-deployment health check
-        id: post_health
-        if: success()
-        run: |
-          if [ -n "${{ secrets.PRODUCTION_URL }}" ]; then
-            echo "⏳ Waiting 30s for deployment to stabilize..."
-            sleep 30
-
-            echo "🏥 Checking post-deployment health..."
-            MAX_RETRIES=5
-            RETRY_COUNT=0
-            HEALTH_OK=false
-
-            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-              HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
-              echo "Health check attempt $((RETRY_COUNT+1)): $HEALTH_STATUS"
-
-              if [ "$HEALTH_STATUS" = "200" ]; then
-                HEALTH_BODY=$(curl -s "${{ secrets.PRODUCTION_URL }}/api/health")
-                if echo "$HEALTH_BODY" | grep -q '"status"'; then
-                  HEALTH_OK=true
-                  echo "✅ Post-deployment health check passed!"
-                  break
-                fi
-              fi
-
-              RETRY_COUNT=$((RETRY_COUNT+1))
-              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-                echo "⏳ Retrying in 10s..."
-                sleep 10
-              fi
-            done
-
-            if [ "$HEALTH_OK" = false ]; then
-              echo "❌ Post-deployment health check failed after $MAX_RETRIES attempts"
-              echo "health_passed=false" >> $GITHUB_OUTPUT
-              exit 1
-            else
-              echo "health_passed=true" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "ℹ️ PRODUCTION_URL not configured, skipping post-deployment health check"
-            echo "health_passed=skip" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Report production deployment success
-        if: success() && steps.create_deployment.outputs.deployment_id
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.deployment_id }},
-              state: 'success',
-              environment_url: '${{ secrets.PRODUCTION_URL }}' || undefined,
-            });
-
-      - name: Report production deployment failure
-        if: failure() && steps.create_deployment.outputs.deployment_id
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.deployment_id }},
-              state: 'failure',
-              environment_url: '${{ secrets.PRODUCTION_URL }}' || undefined,
-            });
-
-      - name: Automated Rollback
-        if: failure() && steps.post_health.outcome == 'failure'
-        run: |
-          echo "🔄 INITIATING AUTOMATED ROLLBACK"
-          echo "Deployment failed health checks, rolling back to previous version"
-
-          PREVIOUS_SHA=$(git rev-parse HEAD~1)
-          echo "Previous SHA: $PREVIOUS_SHA"
-
-          if [ -n "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" ]; then
-            echo "🚀 Triggering rollback deployment..."
-            curl -X POST "${{ secrets.REPLIT_DEPLOY_WEBHOOK }}" \
-              -H "Content-Type: application/json" \
-              -d "{\"ref\": \"$PREVIOUS_SHA\", \"rollback\": true, \"failed_sha\": \"${{ github.sha }}\"}"
-
-            echo "⏳ Waiting for rollback to complete..."
-            sleep 30
-
-            ROLLBACK_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || echo "000")
-            if [ "$ROLLBACK_HEALTH" = "200" ]; then
-              echo "✅ Rollback successful - application healthy"
-            else
-              echo "❌ Rollback health check failed: $ROLLBACK_HEALTH"
-              echo "⚠️ MANUAL INTERVENTION REQUIRED"
-            fi
-          else
-            echo "❌ Cannot perform automated rollback - REPLIT_DEPLOY_WEBHOOK not configured"
-            echo "⚠️ MANUAL ROLLBACK REQUIRED"
-          fi
-
-      - name: Upload production deployment metadata
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-deployment-metadata
-          path: deployment-metadata/
-          retention-days: 30
-
-      - name: Notify production deployment
-        if: success()
-        run: |
-          echo "✅ Production deployment successful!"
-          echo "Deployed commit: ${{ github.sha }}"
-          echo "Deployed by: ${{ github.actor }}"
-          if [ -n "${{ github.event.inputs.rollback_to }}" ]; then
-            echo "🔄 This was a ROLLBACK to: ${{ github.event.inputs.rollback_to }}"
-          fi
-
-      - name: Notify failure
-        if: failure()
-        run: |
-          echo "❌ Production deployment failed!"
-          echo "Failed commit: ${{ github.sha }}"
-          echo "Check logs above for details"
-          if [ "${{ steps.post_health.outputs.health_passed }}" = "false" ]; then
-            echo "Failure reason: Post-deployment health check failed"
-            echo "Automated rollback should have been triggered"
-          fi
+      - name: Homepage renders
+        run: curl -fsS "${{ env.SITE_URL }}" | grep -q "Tales of Aneria"

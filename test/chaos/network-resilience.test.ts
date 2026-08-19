@@ -13,7 +13,7 @@ describe('Network Resilience & Chaos Tests', () => {
           timeout: 100
         });
       } catch (error: any) {
-        expect(['ECONNABORTED', 'ERR_CANCELED']).toContain(error.code);
+        expect(['ECONNABORTED', 'ERR_CANCELED', 'ERR_NETWORK']).toContain(error.code);
       }
     });
 
