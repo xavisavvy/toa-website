@@ -41,13 +41,37 @@ const RISKY_LICENSES = [
   'EPL-1.0',
 ];
 
-// Known exceptions (packages we've reviewed and approved)
+// Known exceptions (packages we've reviewed and approved).
+//
+// Keyed by package NAME, not name@version. Pinning the version meant every
+// sharp bump silently re-flagged the same libraries and failed CI: the
+// entries below were pinned to @1.2.4 and stopped matching the moment sharp
+// 0.35.x pulled in @img/sharp-libvips-* 1.3.2. The licensing rationale is a
+// property of the package, not of a particular release, so the version was
+// only ever creating maintenance work.
 const EXCEPTIONS = {
-  // LGPL binary libraries - Safe for dynamic linking (not modifying source)
-  '@img/sharp-libvips-linux-x64@1.2.4': 'LGPL-3.0-or-later (binary library, dynamic linking)',
-  '@img/sharp-libvips-linuxmusl-x64@1.2.4': 'LGPL-3.0-or-later (binary library, dynamic linking)',
-  '@img/sharp-win32-x64@0.34.5': 'Apache-2.0 AND LGPL-3.0-or-later (binary library, dual-licensed)',
+  // LGPL binary libraries - safe for dynamic linking (we do not modify or
+  // statically link libvips; sharp loads it as a prebuilt shared library).
+  '@img/sharp-libvips-linux-x64': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-linuxmusl-x64': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-linux-arm64': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-linuxmusl-arm64': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-darwin-x64': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-darwin-arm64': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-win32-x64': 'Apache-2.0 AND LGPL-3.0-or-later (binary library, dual-licensed)',
+  '@img/sharp-win32-arm64': 'Apache-2.0 AND LGPL-3.0-or-later (binary library, dual-licensed)',
 };
+
+/**
+ * license-checker reports packages as "name@version". Match an exception on
+ * the package name so a version bump does not re-trigger a review that has
+ * already been done.
+ */
+function exceptionFor(nameAtVersion) {
+  const at = nameAtVersion.lastIndexOf('@');
+  const bare = at > 0 ? nameAtVersion.slice(0, at) : nameAtVersion;
+  return EXCEPTIONS[bare] || EXCEPTIONS[nameAtVersion];
+}
 
 console.log('🔍 Scanning license compliance...\n');
 
@@ -88,8 +112,8 @@ checker.init(
         licenses = ['UNKNOWN'];
       }
 
-      // Check if exception
-      if (EXCEPTIONS[name]) {
+      // Check if exception (matched by package name, version-agnostic)
+      if (exceptionFor(name)) {
         results.approved++;
         results.packages[name] = {
           license: info.licenses,

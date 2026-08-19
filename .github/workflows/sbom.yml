@@ -37,10 +37,16 @@ jobs:
         run: npm install -g @cyclonedx/cyclonedx-npm
       
       - name: Generate SBOM (JSON)
-        run: cyclonedx-npm --output-file sbom.json
+        # --ignore-npm-errors: `npm ls` exits non-zero here because
+        # package.json deliberately overrides esbuild to ^0.25.12 (a security
+        # pin) which npm reports as "invalid" under tsx and vite, and because
+        # sharp's optional platform binaries show as "extraneous". Both are the
+        # intended state of the tree; cyclonedx treats the non-zero exit as
+        # fatal and the SBOM is complete either way.
+        run: cyclonedx-npm --ignore-npm-errors --output-file sbom.json
       
       - name: Generate SBOM (XML)
-        run: cyclonedx-npm --output-format XML --output-file sbom.xml
+        run: cyclonedx-npm --ignore-npm-errors --output-format XML --output-file sbom.xml
       
       - name: Generate SBOM (SPDX)
         run: |
@@ -93,7 +99,7 @@ jobs:
             type=sha
       
       - name: Build and push with SBOM
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
