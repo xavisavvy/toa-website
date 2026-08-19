@@ -50,22 +50,26 @@ describe('Printful Webhook', () => {
   const mockPrintfulOrderId = '12345678';
   const webhookSecret = 'test_webhook_secret';
 
+  // The app is built ONCE. Importing ../server/routes pulls in the whole
+  // server dependency graph (stripe, printful, youtube, aws-sdk, ...) which
+  // costs ~3.5s on a cold module cache. Doing that in beforeEach charged it to
+  // whichever test ran first and, under full-suite parallel load, blew the
+  // 10s hookTimeout — the suite failed intermittently on
+  // "should update order status to shipped" while passing in isolation.
+  //
+  // Rebuilding per test bought nothing: the handler reads
+  // PRINTFUL_WEBHOOK_SECRET per request (server/routes.ts), not at
+  // registration, so the dev-mode test that unsets it still works against a
+  // shared app. Per-test isolation comes from resetting the db mocks below.
   beforeAll(async () => {
-    // Set up test environment
     process.env.PRINTFUL_WEBHOOK_SECRET = webhookSecret;
-  });
 
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    // Default: return order for most tests
-    mockDbSelect.mockResolvedValue([mockOrder]);
-    
-    // Import app with routes
     const { registerRoutes } = await import('../server/routes');
     const express = await import('express');
     app = express.default();
-    
-    // Setup body parsing with raw body preservation for webhooks (like production)
+
+    // Body parsing with raw body preserved for signature verification,
+    // matching production.
     app.use(express.default.json({
       verify: (req: any, _res, buf) => {
         if (req.url === '/api/webhooks/printful') {
@@ -73,8 +77,14 @@ describe('Printful Webhook', () => {
         }
       }
     }));
-    
+
     registerRoutes(app);
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Default: return order for most tests
+    mockDbSelect.mockResolvedValue([mockOrder]);
   });
 
   afterAll(() => {
