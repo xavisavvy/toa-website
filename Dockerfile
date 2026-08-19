@@ -108,8 +108,14 @@ FROM builder AS sbom
 RUN npm install -g @cyclonedx/cyclonedx-npm
 
 # Generate SBOM in both JSON and XML formats
-RUN cyclonedx-npm --output-file /app/sbom.json && \
-    cyclonedx-npm --output-format XML --output-file /app/sbom.xml
+# --ignore-npm-errors: package.json pins `esbuild: ^0.25.12` as a security
+# override, which npm reports as "invalid" under tsx and vite since both want
+# a newer esbuild. That is the intended state of the tree, but it makes
+# `npm ls` exit non-zero, which cyclonedx-npm treats as fatal. The SBOM itself
+# is complete either way. (Same root cause as the failing SBOM Generation
+# workflow on main.)
+RUN cyclonedx-npm --ignore-npm-errors --output-file /app/sbom.json && \
+    cyclonedx-npm --ignore-npm-errors --output-format XML --output-file /app/sbom.xml
 
 # ============================================
 # Stage 4: Production Dependencies Pruning
