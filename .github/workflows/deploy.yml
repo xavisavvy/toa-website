@@ -85,15 +85,28 @@ jobs:
             # aborts the deploy with the old container still serving.
             # drizzle-kit ships as a runtime dependency for exactly this.
             echo "[3/5] Applying database migrations..."
-            # Use a sh wrapper so rollbacks to older images (without drizzle-kit) don't hard-fail.
+            # The binary is invoked directly rather than via npx: the runtime
+            # user is a --system account with a read-only node_modules, and
+            # npx wants a writable cache directory.
+            #
+            # Deliberately NOT guarded with `if [ -x ... ]`. Skipping the
+            # migration when drizzle-kit is absent would turn a loud failure
+            # into a silent success, and this step exists precisely so a
+            # schema problem aborts the deploy before the container swap.
             docker compose -f docker-compose.prod.yml run --rm --no-deps \
-              --entrypoint sh app -c 'if [ -x ./node_modules/.bin/drizzle-kit ]; then ./node_modules/.bin/drizzle-kit migrate; else echo "drizzle-kit not present in image; skipping migrations."; fi'
+              --entrypoint ./node_modules/.bin/drizzle-kit app migrate
 
             echo "[4/5] Recreating app container..."
             docker compose -f docker-compose.prod.yml up -d --force-recreate app
 
+            echo "[5/5] Waiting for health..."
+            # Port 5002 is not published on the host — the container is only
+            # reachable over the docker network — so probe from inside it.
+            # $PORT comes from .env.production rather than being hardcoded
+            # here, so the workflow follows a port change instead of silently
+            # probing the wrong one. (Copilot Autofix suggestion, kept.)
             for i in $(seq 1 45); do
-              if docker exec toa-app sh -lc 'curl -sf "http://localhost:${PORT:-5002}/api/health"' > /dev/null 2>&1; then
+              if docker exec toa-app sh -c 'curl -sf "http://localhost:${PORT:-5002}/api/health"' > /dev/null 2>&1; then
                 echo "Container healthy after ${i} attempts."
                 docker image prune -f > /dev/null 2>&1 || true
                 exit 0
