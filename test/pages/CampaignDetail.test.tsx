@@ -37,6 +37,10 @@ describe("CampaignDetail page", () => {
     );
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("renders campaign name, description, cast, and episode list for a known slug", () => {
     const { getByTestId, getAllByTestId } = renderAt(
       `/campaigns/${seeded.slug}`,

@@ -57,6 +57,10 @@ describe("useCampaignEpisodes", () => {
     vi.restoreAllMocks();
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("returns the static list untouched when the world has no playlist link", () => {
     const { result } = renderHook(
       () =>

@@ -41,6 +41,10 @@ describe("EpisodeDetail page", () => {
     );
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("renders episode title and airDate when (slug, episodeNumber) matches", () => {
     const { getByTestId } = renderAt(
       `/campaigns/${seededCampaign.slug}/episodes/${epWithPodcast.episodeNumber}`,
