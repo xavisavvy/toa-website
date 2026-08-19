@@ -236,13 +236,6 @@
   </url>
 
   <url>
-    <loc>https://talesofaneria.com/campaigns/forgotten-gods-saga</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2026-06-03</lastmod>
-  </url>
-
-  <url>
     <loc>https://talesofaneria.com/campaigns/journeys-through-taebrin</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -250,21 +243,21 @@
   </url>
 
   <url>
-    <loc>https://talesofaneria.com/campaigns/forgotten-gods-saga/episodes/1</loc>
+    <loc>https://talesofaneria.com/campaigns/journeys-through-taebrin/episodes/1</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <lastmod>2026-06-03</lastmod>
   </url>
 
   <url>
-    <loc>https://talesofaneria.com/campaigns/forgotten-gods-saga/episodes/2</loc>
+    <loc>https://talesofaneria.com/campaigns/journeys-through-taebrin/episodes/2</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <lastmod>2026-06-03</lastmod>
   </url>
 
   <url>
-    <loc>https://talesofaneria.com/campaigns/forgotten-gods-saga/episodes/3</loc>
+    <loc>https://talesofaneria.com/campaigns/journeys-through-taebrin/episodes/3</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <lastmod>2026-06-03</lastmod>

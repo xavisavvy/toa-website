@@ -7,6 +7,7 @@ import { describe, it, expect } from "vitest";
 import campaignsData from "@/data/campaigns.json";
 import castData from "@/data/cast.json";
 import episodesData from "@/data/episodes.json";
+import { worlds } from "@/data/worlds";
 
 /**
  * Build-time integrity guard for client/src/data/campaigns.json + episodes.json.
@@ -52,6 +53,16 @@ describe("campaigns / episodes static data", () => {
       expect(
         slugs.has(ep.campaignSlug),
         `episode ${ep.id} references unknown campaignSlug "${ep.campaignSlug}"`
+      ).toBe(true);
+    }
+  });
+
+  it("every campaign worldId resolves to a known campaign world", () => {
+    const worldIds = new Set(worlds.map((w) => w.id));
+    for (const c of campaignsData.campaigns) {
+      expect(
+        worldIds.has(c.worldId),
+        `campaign "${c.slug}" references unknown worldId "${c.worldId}"`
       ).toBe(true);
     }
   });
