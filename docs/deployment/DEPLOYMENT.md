@@ -236,7 +236,7 @@ Both providers must point at the production domain:
 | Provider | Endpoint                                        |
 | -------- | ----------------------------------------------- |
 | Stripe   | `https://talesofaneria.com/api/stripe/webhook`   |
-| Printful | `https://talesofaneria.com/api/printful/webhook` |
+| Printful | `https://talesofaneria.com/api/webhooks/printful` |
 
 Stripe events to subscribe: `checkout.session.completed`,
 `checkout.session.async_payment_succeeded`,
