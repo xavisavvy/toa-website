@@ -1,3 +1,4 @@
+import type { Campaign as ArchivedCampaign } from "@shared/schema";
 import { Globe, Skull, Sparkles, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import type React from "react";
@@ -9,7 +10,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import campaignsData from "@/data/campaigns.json";
 import charactersData from "@/data/characters.json";
+import { worlds } from "@/data/worlds";
 
 interface Campaign {
   name: string;
@@ -173,61 +176,66 @@ function LazyBackgroundImage({ src, alt, className }: LazyBackgroundImageProps) 
   );
 }
 
+// Preview blurbs for worlds that don't yet have a full entry in campaigns.json
+// (no confirmed dates/cast to build a proper archive page from). Once a world
+// gets a real campaigns.json entry tagged with its worldId, that data takes
+// over automatically below.
+const fallbackCampaignPreviews: Record<string, Campaign[]> = {
+  aneria: [
+    {
+      name: "The Wayward Watch",
+      description: "The primary campaign spanning Seasons 1 & 2",
+    },
+    {
+      name: "Littlest Hopes",
+      description: "Side quest campaign with overlapping storylines",
+    },
+    {
+      name: "Aneria Holiday Specials",
+      description: "Festive one-shots and holiday adventures",
+    },
+  ],
+  pterrordale: [
+    {
+      name: "S.A.S.S",
+      description: "High school students investigating the supernatural",
+    },
+  ],
+};
+
+const worldIcons: Record<string, React.ReactNode> = {
+  aneria: <Globe className="h-8 w-8" />,
+  pterrordale: <Skull className="h-8 w-8" />,
+  taebrin: <Sparkles className="h-8 w-8" />,
+};
+
+const worldBackgrounds: Record<string, string> = {
+  aneria: aneriaBg,
+  pterrordale: pterrordaleBg,
+  taebrin: taebrinBg,
+};
+
 export default function WorldSection() {
   const worldAnvilUrl = "https://www.worldanvil.com/w/aneria-niburu";
 
-  const campaignWorlds: CampaignWorld[] = [
-    {
-      id: "aneria",
-      name: "Aneria",
-      icon: <Globe className="h-8 w-8" />,
-      description:
-        "A realm steeped in magic and mystery, where ancient powers awaken and heroes rise to face unimaginable challenges",
-      campaigns: [
-        {
-          name: "The Wayward Watch",
-          description: "The primary campaign spanning Seasons 1 & 2",
-        },
-        {
-          name: "Littlest Hopes",
-          description: "Side quest campaign with overlapping storylines",
-        },
-        {
-          name: "Aneria Holiday Specials",
-          description: "Festive one-shots and holiday adventures",
-        },
-      ],
-      link: worldAnvilUrl,
-      backgroundImage: aneriaBg,
-    },
-    {
-      id: "pterrordale",
-      name: "Pterrordale",
-      icon: <Skull className="h-8 w-8" />,
-      description:
-        "A modern Halloween special setting filled with magic, intrigue, and horror in the unfortunate town of Pterrordale",
-      campaigns: [
-        {
-          name: "S.A.S.S",
-          description: "High school students investigating the supernatural",
-        },
-      ],
-      comingSoon: false,
-      link: "https://www.youtube.com/watch?v=GzMnW52hmP4",
-      backgroundImage: pterrordaleBg,
-    },
-    {
-      id: "taebrin",
-      name: "Journeys Through Taebrin",
-      icon: <Sparkles className="h-8 w-8" />,
-      description:
-        "A bronze age themed land inhabited by the ancient Saurian people, where dinosaur civilizations thrive",
-      campaigns: [],
-      comingSoon: false,
-      link: "https://www.youtube.com/playlist?list=PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY",
-      backgroundImage: taebrinBg,
-    },
-  ];
+  const campaignWorlds: CampaignWorld[] = worlds.map((world) => {
+    const archivedCampaigns = (campaignsData.campaigns as ArchivedCampaign[])
+      .filter((c) => c.worldId === world.id)
+      .map((c) => ({ name: c.name, description: c.summary }));
+
+    return {
+      id: world.id,
+      name: world.name,
+      icon: worldIcons[world.id],
+      description: world.description,
+      campaigns:
+        archivedCampaigns.length > 0
+          ? archivedCampaigns
+          : (fallbackCampaignPreviews[world.id] ?? []),
+      link: world.link,
+      backgroundImage: worldBackgrounds[world.id],
+    };
+  });
 
   return (
     <section

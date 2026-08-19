@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import campaignsData from "@/data/campaigns.json";
 import episodesData from "@/data/episodes.json";
+import { getWorldById } from "@/data/worlds";
 import { sortCampaignsByStartDateDesc } from "@/lib/campaigns";
 import { getBreadcrumbSchema } from "@/lib/structuredData";
 
@@ -105,52 +106,65 @@ export default function Campaigns() {
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sorted.map((campaign) => (
-                <Link
-                  key={campaign.slug}
-                  href={`/campaigns/${campaign.slug}`}
-                  className="relative z-0 hover:z-10"
-                >
-                  <Card
-                    className="overflow-hidden hover-elevate cursor-pointer transition-all h-full"
-                    data-testid={`card-campaign-${campaign.slug}`}
+              {sorted.map((campaign) => {
+                const world = getWorldById(campaign.worldId);
+                return (
+                  <Link
+                    key={campaign.slug}
+                    href={`/campaigns/${campaign.slug}`}
+                    className="relative z-0 hover:z-10"
                   >
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-3">
-                        <CardTitle
-                          className="text-xl"
-                          data-testid={`text-campaign-name-${campaign.slug}`}
+                    <Card
+                      className="overflow-hidden hover-elevate cursor-pointer transition-all h-full"
+                      data-testid={`card-campaign-${campaign.slug}`}
+                    >
+                      <CardHeader>
+                        <div className="flex items-start justify-between gap-3">
+                          <CardTitle
+                            className="text-xl"
+                            data-testid={`text-campaign-name-${campaign.slug}`}
+                          >
+                            {campaign.name}
+                          </CardTitle>
+                          <Badge
+                            variant={
+                              campaign.status === "active" ? "default" : "secondary"
+                            }
+                            data-testid={`badge-status-${campaign.slug}`}
+                          >
+                            {campaign.status === "active" ? "Active" : "Concluded"}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p
+                          className="text-sm text-muted-foreground mb-4 line-clamp-3"
+                          data-testid={`text-campaign-summary-${campaign.slug}`}
                         >
-                          {campaign.name}
-                        </CardTitle>
-                        <Badge
-                          variant={
-                            campaign.status === "active" ? "default" : "secondary"
-                          }
-                          data-testid={`badge-status-${campaign.slug}`}
-                        >
-                          {campaign.status === "active" ? "Active" : "Concluded"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p
-                        className="text-sm text-muted-foreground mb-4 line-clamp-3"
-                        data-testid={`text-campaign-summary-${campaign.slug}`}
-                      >
-                        {campaign.summary}
-                      </p>
-                      <p
-                        className="text-xs text-muted-foreground"
-                        data-testid={`text-episode-count-${campaign.slug}`}
-                      >
-                        {episodeCount(campaign.slug)} episode
-                        {episodeCount(campaign.slug) === 1 ? "" : "s"}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                          {campaign.summary}
+                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p
+                            className="text-xs text-muted-foreground"
+                            data-testid={`text-episode-count-${campaign.slug}`}
+                          >
+                            {episodeCount(campaign.slug)} episode
+                            {episodeCount(campaign.slug) === 1 ? "" : "s"}
+                          </p>
+                          {world && (
+                            <Badge
+                              variant="outline"
+                              data-testid={`badge-world-${campaign.slug}`}
+                            >
+                              {world.name}
+                            </Badge>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

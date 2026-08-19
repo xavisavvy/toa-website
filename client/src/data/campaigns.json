@@ -1,23 +1,14 @@
 {
   "campaigns": [
     {
-      "slug": "forgotten-gods-saga",
-      "name": "The Forgotten Gods Saga",
-      "summary": "An ongoing saga of forgotten deities returning to claim what is theirs across the lands of Aneria.",
-      "description": "The Forgotten Gods stir beneath the ash of dead pantheons, and the unlikely heroes of Aneria find themselves at the center of a divine reckoning. Across mire and council chamber alike, the party must decide whether to wake old powers — or bury them once and for all.\n\nThis campaign runs in our currently-airing slot. New episodes drop on the Tales of Aneria YouTube channel and podcast feed.",
-      "status": "active",
-      "startDate": "2025-01-15",
-      "cast": ["cory-avis", "preston-farr", "torrey-woolsey", "scott-avis"]
-    },
-    {
       "slug": "journeys-through-taebrin",
       "name": "Journeys Through Taebrin",
-      "summary": "A concluded saga of misfit adventurers traversing the storied roads of Taebrin.",
-      "description": "Across the green hills and shadowed forests of Taebrin, a band of misfits — a wizard who cannot stop lying, an astral-touched sorcerer, a stoic warrior, and more — wove a tale of friendship, betrayal, and impossible odds. The campaign concluded with the resolution of the Taebrin succession crisis.\n\nThis archive preserves the saga in episode order. New listeners are encouraged to start at Episode 1.",
-      "status": "concluded",
+      "worldId": "taebrin",
+      "summary": "The Forgotten Gods Saga: forgotten deities stir across the storied roads of Taebrin, and an unlikely band of misfits is caught at the center of the reckoning.",
+      "description": "The Forgotten Gods stir beneath the ash of dead pantheons, and the unlikely heroes of Taebrin find themselves at the center of a divine reckoning. Across the green hills and shadowed forests of this bronze-age land of Saurian civilizations — through mire and council chamber alike — a wizard who cannot stop lying, an astral-touched sorcerer, a stoic cleric, and more must decide whether to wake old powers or bury them once and for all.\n\nThis is our currently-airing campaign. New episodes drop on the Tales of Aneria YouTube channel and podcast feed.",
+      "status": "active",
       "startDate": "2023-06-01",
-      "endDate": "2024-11-30",
-      "cast": ["cory-avis", "preston-farr", "scott-avis", "dallin-rogers"]
+      "cast": ["cory-avis", "preston-farr", "torrey-woolsey", "scott-avis", "dallin-rogers", "ian", "jake"]
     }
   ]
 }

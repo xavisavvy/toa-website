@@ -2,7 +2,7 @@
   "episodes": [
     {
       "id": "forgotten-gods-saga-1",
-      "campaignSlug": "forgotten-gods-saga",
+      "campaignSlug": "journeys-through-taebrin",
       "episodeNumber": 1,
       "title": "Into the Mire",
       "summary": "The party answers a strange invitation and finds themselves wading into the Mire of Forgotten Names — a place where deities go to die, and where one is stubbornly refusing to.",
@@ -13,7 +13,7 @@
     },
     {
       "id": "forgotten-gods-saga-2",
-      "campaignSlug": "forgotten-gods-saga",
+      "campaignSlug": "journeys-through-taebrin",
       "episodeNumber": 2,
       "title": "The Council of Embers",
       "summary": "An audience with the Council of Embers reveals that the heroes are not the only ones searching for the Forgotten Gods — and that one councilmember already knows more than they should.",
@@ -23,7 +23,7 @@
     },
     {
       "id": "forgotten-gods-saga-3",
-      "campaignSlug": "forgotten-gods-saga",
+      "campaignSlug": "journeys-through-taebrin",
       "episodeNumber": 3,
       "title": "Beneath the Ash",
       "summary": "Beneath the ash-choked ruins of an old temple, the party makes contact with something that should not be awake — and a long-buried bargain comes due.",
