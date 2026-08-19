@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "@playwright/test";
@@ -23,6 +24,8 @@ interface SeedEpisode {
   episodeNumber: number;
   podcastUrl?: string;
 }
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CAMPAIGNS_JSON = path.resolve(
   __dirname,
