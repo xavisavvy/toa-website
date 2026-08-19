@@ -70,7 +70,7 @@ export function useCampaignEpisodes(
       episodeNumber,
       title: authored?.title ?? video.title,
       summary: authored?.summary ?? "",
-      airDate: authored?.airDate ?? video.publishedAt.slice(0, 10),
+      airDate: video.publishedAt ? video.publishedAt.slice(0, 10) : (authored?.airDate ?? ""),
       youtubeUrl: `https://www.youtube.com/watch?v=${video.id}`,
       podcastUrl: authored?.podcastUrl,
       thumbnail: video.thumbnail || authored?.thumbnail,
