@@ -44,9 +44,9 @@ const RISKY_LICENSES = [
 // Known exceptions (packages we've reviewed and approved)
 const EXCEPTIONS = {
   // LGPL binary libraries - Safe for dynamic linking (not modifying source)
-  '@img/sharp-libvips-linux-x64@1.2.4': 'LGPL-3.0-or-later (binary library, dynamic linking)',
-  '@img/sharp-libvips-linuxmusl-x64@1.2.4': 'LGPL-3.0-or-later (binary library, dynamic linking)',
-  '@img/sharp-win32-x64@0.34.5': 'Apache-2.0 AND LGPL-3.0-or-later (binary library, dual-licensed)',
+  '@img/sharp-libvips-linux-x64@1.3.2': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-libvips-linuxmusl-x64@1.3.2': 'LGPL-3.0-or-later (binary library, dynamic linking)',
+  '@img/sharp-win32-x64@0.35.3': 'Apache-2.0 AND LGPL-3.0-or-later (binary library, dual-licensed)',
 };
 
 console.log('🔍 Scanning license compliance...\n');
