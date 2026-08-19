@@ -85,11 +85,9 @@ jobs:
             # aborts the deploy with the old container still serving.
             # drizzle-kit ships as a runtime dependency for exactly this.
             echo "[3/5] Applying database migrations..."
-            # The binary is invoked directly rather than via npx: the runtime
-            # user is a --system account with a read-only node_modules, and
-            # npx wants a writable cache directory.
+            # Use a sh wrapper so rollbacks to older images (without drizzle-kit) don't hard-fail.
             docker compose -f docker-compose.prod.yml run --rm --no-deps \
-              --entrypoint ./node_modules/.bin/drizzle-kit app migrate
+              --entrypoint sh app -c 'if [ -x ./node_modules/.bin/drizzle-kit ]; then ./node_modules/.bin/drizzle-kit migrate; else echo "drizzle-kit not present in image; skipping migrations."; fi'
 
             echo "[4/5] Recreating app container..."
             docker compose -f docker-compose.prod.yml up -d --force-recreate app
