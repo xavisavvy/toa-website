@@ -182,6 +182,7 @@ export const CampaignSchema = z.object({
     .min(1)
     .regex(kebabCaseRegex, "slug must be kebab-case (a-z, 0-9, hyphens only)"),
   name: z.string().min(1),
+  worldId: z.string().min(1),
   summary: z.string().min(1),
   description: z.string().min(1),
   status: z.enum(["active", "concluded"]),

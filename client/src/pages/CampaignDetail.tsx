@@ -19,6 +19,7 @@ import {
 import campaignsData from "@/data/campaigns.json";
 import castData from "@/data/cast.json";
 import episodesData from "@/data/episodes.json";
+import { getWorldById } from "@/data/worlds";
 import {
   getCampaignBySlug,
   getEpisodesByCampaign,
@@ -75,6 +76,8 @@ export default function CampaignDetail() {
     episodesData.episodes as Episode[],
     campaign.slug
   );
+
+  const world = getWorldById(campaign.worldId);
 
   const allCast = castData.cast as CastMember[];
   const resolvedCast: CastMember[] = campaign.cast
@@ -161,6 +164,11 @@ export default function CampaignDetail() {
                 {campaign.startDate}
                 {campaign.endDate ? ` – ${campaign.endDate}` : ""}
               </span>
+              {world && (
+                <Badge variant="outline" data-testid="badge-world">
+                  {world.name}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
