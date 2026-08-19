@@ -1,8 +1,11 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
+
+import { createTestQueryClient } from "../helpers/test-utils";
 
 import campaignsData from "@/data/campaigns.json";
 import episodesData from "@/data/episodes.json";
@@ -10,7 +13,12 @@ import EpisodeDetail from "@/pages/EpisodeDetail";
 
 function renderAt(path: string, ui: ReactElement) {
   const { hook } = memoryLocation({ path });
-  return render(<Router hook={hook}>{ui}</Router>);
+  const queryClient = createTestQueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <Router hook={hook}>{ui}</Router>
+    </QueryClientProvider>
+  );
 }
 
 describe("EpisodeDetail page", () => {
@@ -26,6 +34,15 @@ describe("EpisodeDetail page", () => {
     document
       .querySelectorAll('script[type="application/ld+json"]')
       .forEach((s) => s.remove());
+    // Fail the live playlist fetch so tests exercise the static episodes.json
+    // fallback deterministically, without hitting the network.
+    globalThis.fetch = vi.fn(() =>
+      Promise.resolve({ ok: false } as Response)
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("renders episode title and airDate when (slug, episodeNumber) matches", () => {

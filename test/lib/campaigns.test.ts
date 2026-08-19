@@ -4,6 +4,7 @@ import { describe, it, expect } from "vitest";
 import {
   youtubeIdFromUrl,
   youtubeThumbnail,
+  getPlaylistIdFromUrl,
   getCampaignBySlug,
   getEpisodesByCampaign,
   sortCampaignsByStartDateDesc,
@@ -56,6 +57,42 @@ describe("youtubeThumbnail", () => {
     expect(youtubeThumbnail("https://example.com")).toBeUndefined();
     expect(youtubeThumbnail("")).toBeUndefined();
     expect(youtubeThumbnail(undefined)).toBeUndefined();
+  });
+});
+
+describe("getPlaylistIdFromUrl", () => {
+  it("extracts the playlist id from a playlist URL", () => {
+    expect(
+      getPlaylistIdFromUrl(
+        "https://www.youtube.com/playlist?list=PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY"
+      )
+    ).toBe("PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY");
+  });
+
+  it("extracts the playlist id when list= is one of several query params", () => {
+    expect(
+      getPlaylistIdFromUrl(
+        "https://www.youtube.com/watch?v=abcdefghijk&list=PLxyz123&index=2"
+      )
+    ).toBe("PLxyz123");
+  });
+
+  it("returns null for a single-video URL with no list param", () => {
+    expect(
+      getPlaylistIdFromUrl("https://www.youtube.com/watch?v=GzMnW52hmP4")
+    ).toBeNull();
+  });
+
+  it("returns null for a non-YouTube URL", () => {
+    expect(
+      getPlaylistIdFromUrl("https://www.worldanvil.com/w/aneria-niburu")
+    ).toBeNull();
+  });
+
+  it("returns null for malformed input", () => {
+    expect(getPlaylistIdFromUrl("")).toBeNull();
+    expect(getPlaylistIdFromUrl(undefined)).toBeNull();
+    expect(getPlaylistIdFromUrl(null)).toBeNull();
   });
 });
 
