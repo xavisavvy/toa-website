@@ -94,11 +94,8 @@ jobs:
             echo "[4/5] Recreating app container..."
             docker compose -f docker-compose.prod.yml up -d --force-recreate app
 
-            echo "[5/5] Waiting for health..."
-            # Port 5002 is not published on the host — the container is only
-            # reachable over the docker network — so probe from inside it.
             for i in $(seq 1 45); do
-              if docker exec toa-app curl -sf "http://localhost:5002/api/health" > /dev/null 2>&1; then
+              if docker exec toa-app sh -lc 'curl -sf "http://localhost:${PORT:-5002}/api/health"' > /dev/null 2>&1; then
                 echo "Container healthy after ${i} attempts."
                 docker image prune -f > /dev/null 2>&1 || true
                 exit 0
