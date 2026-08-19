@@ -154,12 +154,31 @@ describe('API Routes', () => {
     });
 
     it('should validate limit parameter', async () => {
+      // 100 used to be over the cap; the bound is now 200 so that the
+      // /podcast full-archive page (which asks for 200) is not rejected.
+      // 201 keeps this asserting the boundary rather than a stale number.
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({ feedUrl: 'https://anchor.fm/test/feed', limit: 100 })
+        .send({ feedUrl: 'https://anchor.fm/test/feed', limit: 201 })
         .expect(400);
 
       expect(response.body).toHaveProperty('error');
+    });
+
+    it('should accept the limit the /podcast page actually requests', async () => {
+      // Regression guard: client/src/pages/Podcast.tsx sends limit 200. When
+      // it sent 500 against a cap of 50, that page 400'd on every load and
+      // rendered an empty episode list for months without anyone noticing.
+      await request(app)
+        .post('/api/podcast/feed')
+        .send({ feedUrl: 'https://anchor.fm/test/feed', limit: 200 })
+        .expect((res) => {
+          if (res.status === 400) {
+            throw new Error(
+              `limit 200 must not be rejected by validation, got: ${JSON.stringify(res.body)}`,
+            );
+          }
+        });
     });
   });
 
