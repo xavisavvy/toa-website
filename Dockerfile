@@ -59,6 +59,9 @@ COPY postcss.config.js ./
 COPY components.json ./
 COPY drizzle.config.ts ./
 COPY migrations ./migrations
+# build:client runs scripts/generate-sitemap.ts before vite build; it reads
+# client/src/data and writes client/public/sitemap.xml.
+COPY scripts ./scripts
 
 # Frontend env vars are inlined into the client bundle by Vite at BUILD time
 # (import.meta.env.VITE_*), so they must arrive as build args — setting them in
