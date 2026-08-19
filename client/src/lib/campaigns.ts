@@ -31,6 +31,18 @@ export function youtubeThumbnail(url: string | undefined | null): string | undef
 }
 
 /**
+ * Extract a YouTube playlist id from a `youtube.com/playlist?list=<id>` URL
+ * (also matches a `list=` param on a `watch` URL). Returns null when the URL
+ * isn't a YouTube playlist link — e.g. a single-video URL or a non-YouTube
+ * world link like WorldAnvil.
+ */
+export function getPlaylistIdFromUrl(url: string | undefined | null): string | null {
+  if (!url || typeof url !== "string") {return null;}
+  const match = url.match(/[?&]list=([\w-]+)/);
+  return match ? match[1] : null;
+}
+
+/**
  * Find a campaign by slug. Returns undefined when no match.
  */
 export function getCampaignBySlug(

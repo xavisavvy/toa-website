@@ -20,6 +20,7 @@ import campaignsData from "@/data/campaigns.json";
 import castData from "@/data/cast.json";
 import episodesData from "@/data/episodes.json";
 import { getWorldById } from "@/data/worlds";
+import { useCampaignEpisodes } from "@/hooks/useCampaignEpisodes";
 import {
   getCampaignBySlug,
   getEpisodesByCampaign,
@@ -43,6 +44,14 @@ export default function CampaignDetail() {
   const campaign = getCampaignBySlug(
     campaignsData.campaigns as Campaign[],
     slug
+  );
+
+  const world = getWorldById(campaign?.worldId ?? "");
+
+  const liveEpisodes = useCampaignEpisodes(
+    campaign?.slug,
+    world,
+    episodesData.episodes as Episode[]
   );
 
   if (!campaign) {
@@ -72,12 +81,7 @@ export default function CampaignDetail() {
     );
   }
 
-  const episodes = getEpisodesByCampaign(
-    episodesData.episodes as Episode[],
-    campaign.slug
-  );
-
-  const world = getWorldById(campaign.worldId);
+  const episodes = getEpisodesByCampaign(liveEpisodes, campaign.slug);
 
   const allCast = castData.cast as CastMember[];
   const resolvedCast: CastMember[] = campaign.cast

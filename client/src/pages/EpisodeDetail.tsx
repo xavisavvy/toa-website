@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/card";
 import campaignsData from "@/data/campaigns.json";
 import episodesData from "@/data/episodes.json";
+import { getWorldById } from "@/data/worlds";
+import { useCampaignEpisodes } from "@/hooks/useCampaignEpisodes";
 import {
   getCampaignBySlug,
   youtubeThumbnail,
@@ -69,8 +71,16 @@ export default function EpisodeDetail() {
     slug
   );
 
+  const world = getWorldById(campaign?.worldId ?? "");
+
+  const liveEpisodes = useCampaignEpisodes(
+    campaign?.slug,
+    world,
+    episodesData.episodes as Episode[]
+  );
+
   // wouter route params are always strings — string-compare against episodeNumber
-  const episode = (episodesData.episodes as Episode[]).find(
+  const episode = liveEpisodes.find(
     (e) =>
       e.campaignSlug === slug &&
       String(e.episodeNumber) === episodeNumberParam

@@ -1,8 +1,11 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
+
+import { createTestQueryClient } from "../helpers/test-utils";
 
 import campaignsData from "@/data/campaigns.json";
 import episodesData from "@/data/episodes.json";
@@ -10,7 +13,12 @@ import CampaignDetail from "@/pages/CampaignDetail";
 
 function renderAt(path: string, ui: ReactElement) {
   const { hook } = memoryLocation({ path });
-  return render(<Router hook={hook}>{ui}</Router>);
+  const queryClient = createTestQueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <Router hook={hook}>{ui}</Router>
+    </QueryClientProvider>
+  );
 }
 
 describe("CampaignDetail page", () => {
@@ -22,6 +30,11 @@ describe("CampaignDetail page", () => {
     document
       .querySelectorAll('script[type="application/ld+json"]')
       .forEach((s) => s.remove());
+    // Fail the live playlist fetch so tests exercise the static episodes.json
+    // fallback deterministically, without hitting the network.
+    globalThis.fetch = vi.fn(() =>
+      Promise.resolve({ ok: false } as Response)
+    );
   });
 
   it("renders campaign name, description, cast, and episode list for a known slug", () => {
