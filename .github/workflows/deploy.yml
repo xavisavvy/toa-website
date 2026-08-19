@@ -32,6 +32,9 @@ concurrency:
 
 permissions:
   contents: read
+  # Lets the deploy step mint a short-lived GHCR credential for the VPS
+  # instead of the box holding a long-lived registry PAT.
+  packages: read
 
 env:
   REMOTE_HOST: '34.199.135.244'
@@ -59,7 +62,7 @@ jobs:
           # The box is RAM-pressured; pulling a ~300MB image while swapping
           # can take several minutes. The 10m action default is too tight.
           command_timeout: 25m
-          envs: TOA_IMAGE_TAG
+          envs: TOA_IMAGE_TAG,GHCR_TOKEN
           script: |
             set -euo pipefail
             cd ${{ env.REMOTE_DIR }}
@@ -69,6 +72,12 @@ jobs:
             git reset --hard origin/main
 
             echo "[2/5] Pulling image from GHCR..."
+            # Authenticate with this run's ephemeral GITHUB_TOKEN rather than
+            # relying on a registry credential stored on the box. The VPS is
+            # shared with other sites, so it should not need to hold a
+            # long-lived PAT for this one. Logout runs unconditionally below.
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
             docker compose -f docker-compose.prod.yml pull app
 
             # Versioned migrations run in a throwaway container off the new
@@ -104,6 +113,7 @@ jobs:
           # Consumed by docker-compose.prod.yml's image: interpolation.
           # Compose reads it from the shell environment, not from env_file.
           TOA_IMAGE_TAG: ${{ github.event.inputs.image_tag || 'latest' }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   smoke-test:
     name: Smoke Tests
