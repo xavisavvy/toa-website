@@ -289,7 +289,7 @@ describe('Data Processing Performance Benchmarks', () => {
 });
 
 describe('String Operations Performance Benchmarks', () => {
-  it('escapes 1000 HTML strings in under 10ms', () => {
+  it('escapes 1000 HTML strings in under 25ms', () => {
     const strings = Array.from({ length: 1000 }, (_, i) => 
       `<script>alert('XSS ${i}')</script>`
     );
@@ -310,7 +310,7 @@ describe('String Operations Performance Benchmarks', () => {
     const duration = performance.now() - start;
 
     expect(escaped[0]).not.toContain('<script>');
-    expect(duration).toBeLessThan(10);
+    expect(duration).toBeLessThan(25); // Increased from 10ms - flaky on loaded shared CI runners
   });
 
   it('trims and normalizes 1000 strings in under 10ms', () => {

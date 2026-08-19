@@ -51,6 +51,7 @@ RUN --mount=type=cache,target=/root/.npm \
 COPY client ./client
 COPY server ./server
 COPY shared ./shared
+COPY scripts ./scripts
 COPY index.ts ./
 COPY vite.config.ts ./
 COPY tsconfig.json ./
