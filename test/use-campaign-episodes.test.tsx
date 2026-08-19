@@ -2,7 +2,7 @@ import type { Episode } from "@shared/schema";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import type { WorldMeta } from "@/data/worlds";
 import { useCampaignEpisodes } from "@/hooks/useCampaignEpisodes";
