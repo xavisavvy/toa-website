@@ -128,7 +128,7 @@ jobs:
           # while reporting it deployed commit A.
           # Manual dispatch still honours image_tag (default `latest`) so
           # rollbacks to an arbitrary sha keep working.
-          TOA_IMAGE_TAG: ${{ github.event.inputs.image_tag || (github.event.workflow_run.head_sha && format('sha-{0}', github.event.workflow_run.head_sha)) || 'latest' }}
+          TOA_IMAGE_TAG: ${{ github.event_name == 'workflow_run' && format('sha-{0}', github.event.workflow_run.head_sha) || github.event.inputs.image_tag || 'latest' }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   smoke-test:
