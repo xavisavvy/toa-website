@@ -120,7 +120,15 @@ jobs:
         env:
           # Consumed by docker-compose.prod.yml's image: interpolation.
           # Compose reads it from the shell environment, not from env_file.
-          TOA_IMAGE_TAG: ${{ github.event.inputs.image_tag || 'latest' }}
+          #
+          # Auto-deploys pin the immutable sha tag of the commit whose build
+          # triggered this run, NOT `latest`. Two commits landing close together
+          # would otherwise race: build B can move `latest` before deploy A
+          # pulls, so deploy A would roll out — and migrate — commit B's image
+          # while reporting it deployed commit A.
+          # Manual dispatch still honours image_tag (default `latest`) so
+          # rollbacks to an arbitrary sha keep working.
+          TOA_IMAGE_TAG: ${{ github.event.inputs.image_tag || (github.event.workflow_run.head_sha && format('sha-{0}', github.event.workflow_run.head_sha)) || 'latest' }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   smoke-test:
