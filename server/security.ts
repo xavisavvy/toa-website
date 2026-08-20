@@ -286,7 +286,7 @@ export async function logSecurityEvent(event: string, details: Record<string, un
       await db.insert(auditLogs).values({
         userId: details.userId as string || null,
         userEmail: details.email as string || null,
-        action: event.toLowerCase().replace(/_/g, '_'),
+        action: event.toLowerCase().replace(/_/g, '-'),
         resource: details.resource as string || 'authentication',
         category: details.category as string || 'security',
         ipAddress: details.ip as string || null,

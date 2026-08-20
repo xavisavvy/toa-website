@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import express, { type Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
 
 import { registerRoutes } from "./server/routes";
 import { configureSecurity } from "./server/security";
@@ -88,7 +89,13 @@ app.use((req, res, next) => {
     
     // SPA fallback - serve index.html for all non-API routes
     // This MUST come after static file serving
-    app.get('*', (req, res) => {
+    const staticLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 200,
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
+    app.get('*', staticLimiter, (req, res) => {
       // Don't serve index.html for asset requests (they should 404 if missing)
       if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
         return res.status(404).send('Not found');

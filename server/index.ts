@@ -1,6 +1,7 @@
 import type { IncomingMessage } from 'http';
 
 import 'dotenv/config';
+import crypto from 'crypto';
 import express, { type Request, Response, NextFunction } from "express";
 import session from 'express-session';
 
@@ -12,6 +13,35 @@ import { setupVite, serveStatic, log } from "./vite";
 
 // Validate environment variables before starting
 validateEnvironment();
+
+// CSRF protection middleware (synchronizer token pattern)
+// Works alongside the sameSite: 'lax' cookie setting for defence-in-depth
+function csrfProtection(req: Request, res: Response, next: NextFunction) {
+  const SESSION_KEY = '_csrf';
+  const stateChanging = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
+  // Exempt webhook endpoints that use signature verification instead
+  const exempted = ['/api/stripe/webhook', '/api/webhooks/printful'];
+  if (exempted.includes(req.path)) {
+    return next();
+  }
+
+  if (stateChanging.includes(req.method)) {
+    // Reject if no token exists in session or if provided token doesn't match
+    const expected = (req.session as any)[SESSION_KEY];
+    const provided = (req.headers['x-csrf-token'] as string) || req.body?._csrf;
+    if (!expected || !provided || provided !== expected) {
+      res.status(403).json({ error: 'Invalid or missing CSRF token' });
+      return;
+    }
+  } else {
+    // For safe methods, ensure a token is available in the session for later use
+    if (!(req.session as any)[SESSION_KEY]) {
+      (req.session as any)[SESSION_KEY] = crypto.randomBytes(24).toString('hex');
+    }
+  }
+  next();
+}
 
 const app = express();
 
@@ -54,6 +84,10 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
+
+// A01: CSRF protection - synchronizer token pattern for state-changing requests
+// Combined with sameSite: 'lax' for defence-in-depth
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
   const start = Date.now();
