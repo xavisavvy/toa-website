@@ -1,4 +1,4 @@
-/* eslint-disable no-undef, @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type Stripe from 'stripe';
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 

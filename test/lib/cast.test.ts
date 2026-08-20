@@ -30,6 +30,7 @@ describe("getCastSocialUrls", () => {
   it("returns 5 populated social URLs for Preston (full set)", () => {
     const preston = getCastMemberById("preston-farr");
     expect(preston).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeDefined() above
     const urls = getCastSocialUrls(preston!.socialLinks);
     expect(urls).toHaveLength(5);
     expect(urls).toContain("https://prestonfarr.com");
@@ -39,6 +40,7 @@ describe("getCastSocialUrls", () => {
   it("returns 0 social URLs for Cory (all empty)", () => {
     const cory = getCastMemberById("cory-avis");
     expect(cory).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeDefined() above
     const urls = getCastSocialUrls(cory!.socialLinks);
     expect(urls).toEqual([]);
   });

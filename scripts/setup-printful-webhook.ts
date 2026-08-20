@@ -13,8 +13,8 @@ async function setupPrintfulWebhook() {
     process.exit(1);
   }
 
-  console.log('🔧 Setting up Printful webhook...');
-  console.log(`📍 Webhook URL: ${WEBHOOK_URL}`);
+  console.info('🔧 Setting up Printful webhook...');
+  console.info(`📍 Webhook URL: ${WEBHOOK_URL}`);
 
   try {
     const response = await fetch('https://api.printful.com/webhooks', {
@@ -45,8 +45,8 @@ async function setupPrintfulWebhook() {
     }
 
     const data = await response.json();
-    console.log('✅ Webhook configured successfully!');
-    console.log(data);
+    console.info('✅ Webhook configured successfully!');
+    console.info(data);
     
     // Also get current webhooks to verify
     const listResponse = await fetch('https://api.printful.com/webhooks', {
@@ -58,8 +58,8 @@ async function setupPrintfulWebhook() {
 
     if (listResponse.ok) {
       const webhooks = await listResponse.json();
-      console.log('\n📋 Current webhooks:');
-      console.log(JSON.stringify(webhooks, null, 2));
+      console.info('\n📋 Current webhooks:');
+      console.info(JSON.stringify(webhooks, null, 2));
     }
 
   } catch (error) {

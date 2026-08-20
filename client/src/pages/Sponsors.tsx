@@ -144,7 +144,7 @@ export default function Sponsors() {
                   <Heart className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="font-serif text-2xl font-semibold mb-3">Become Our First Sponsor!</h3>
                   <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                    We're currently looking for partners who share our passion for storytelling and the TTRPG community. 
+                    We&apos;re currently looking for partners who share our passion for storytelling and the TTRPG community.
                     Be among the first to support our journey and gain exclusive benefits.
                   </p>
                   <Button 

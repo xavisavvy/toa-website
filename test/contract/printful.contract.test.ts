@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -48,7 +47,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: [
               {
@@ -66,7 +65,7 @@ describe('Printful API Contract Tests', () => {
         // Product details fetch
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: {
               sync_product: {
@@ -128,7 +127,7 @@ describe('Printful API Contract Tests', () => {
     it('should handle empty product list', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: []
         }),
@@ -145,7 +144,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
-        text: async () => 'Internal Server Error',
+        text: () => 'Internal Server Error',
       } as Response);
 
       const products = await getPrintfulSyncProducts();
@@ -159,7 +158,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: Array(50).fill(null).map((_, i) => ({
               id: i,
@@ -177,7 +176,7 @@ describe('Printful API Contract Tests', () => {
       for (let i = 0; i < 50; i++) {
         (global.fetch as any).mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: {
               sync_product: { id: i, name: `Product ${i}` },
@@ -203,7 +202,7 @@ describe('Printful API Contract Tests', () => {
     it('should return product with variants', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: {
             sync_product: {
@@ -286,7 +285,7 @@ describe('Printful API Contract Tests', () => {
     it('should filter out ignored variants', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: {
             sync_product: {
@@ -338,7 +337,7 @@ describe('Printful API Contract Tests', () => {
     it('should resolve sync variant to catalog variant', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: {
             id: 5130270457,
@@ -363,7 +362,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 404,
-        text: async () => JSON.stringify({
+        text: () => JSON.stringify({
           code: 404,
           result: 'Variant not found',
           error: { reason: 'NotFound' }
@@ -378,7 +377,7 @@ describe('Printful API Contract Tests', () => {
     it('should handle missing variant_id in response', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: {
             sync_variant: {
@@ -398,7 +397,7 @@ describe('Printful API Contract Tests', () => {
     it('should use product.variant_id as fallback', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: {
             id: 5130270457,
@@ -422,7 +421,7 @@ describe('Printful API Contract Tests', () => {
     it('should follow Printful API response format', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200, // Always present
           result: [], // Data payload
           // Optional: error, paging
@@ -438,7 +437,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 429,
-        json: async () => ({
+        json: () => ({
           code: 429,
           result: 'Too Many Requests',
           error: {
@@ -458,7 +457,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 401,
-        json: async () => ({
+        json: () => ({
           code: 401,
           result: 'Unauthorized',
           error: {
@@ -479,7 +478,7 @@ describe('Printful API Contract Tests', () => {
       global.fetch = vi.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: [{
               id: 123,
@@ -493,7 +492,7 @@ describe('Printful API Contract Tests', () => {
         } as Response)
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: {
               sync_product: { id: 123, name: 'Test' },

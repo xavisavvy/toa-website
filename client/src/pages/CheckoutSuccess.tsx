@@ -10,9 +10,19 @@ import { analytics } from "@/lib/analytics";
 import { getCheckoutSession } from "@/lib/stripe";
 import { clearZipCode } from "@/lib/zipCode";
 
+interface CheckoutSessionLineItem {
+  description?: string;
+}
+
+interface CheckoutSessionSummary {
+  customer_email?: string;
+  amount_total?: number;
+  line_items?: CheckoutSessionLineItem[];
+}
+
 export default function CheckoutSuccess() {
   const [, setLocation] = useLocation();
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<CheckoutSessionSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,7 +48,7 @@ export default function CheckoutSuccess() {
           analytics.purchase(
             sessionId,
             totalAmount,
-            data.line_items?.map((item: any) => item.description) || []
+            data.line_items?.map((item: CheckoutSessionLineItem) => item.description) || []
           );
         }
       })
@@ -84,7 +94,7 @@ export default function CheckoutSuccess() {
 
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    We'll send you an email with tracking information once your order ships.
+                    We&apos;ll send you an email with tracking information once your order ships.
                   </p>
                   
                   <p className="text-sm text-muted-foreground">

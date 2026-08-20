@@ -134,7 +134,7 @@ describe('Stripe Contract Tests', () => {
   });
 
   describe('Checkout Session Retrieval Contract', () => {
-    it('should retrieve session with shipping details', async () => {
+    it('should retrieve session with shipping details', () => {
       // Skip if Stripe is not configured
       if (!process.env.STRIPE_SECRET_KEY) {
         console.log('ℹ️  Skipping Stripe contract test - no secret key configured');

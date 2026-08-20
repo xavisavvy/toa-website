@@ -44,7 +44,7 @@ async function fetchCharacterData(characterId: string) {
 
     const primaryClass = character.classes[0];
     const className = primaryClass?.definition?.name || 'Unknown';
-    const totalLevel = character.classes.reduce((sum: number, c: any) => sum + c.level, 0);
+    const totalLevel = character.classes.reduce((sum: number, c: { level: number }) => sum + c.level, 0);
     const alignment = character.alignmentId 
       ? alignmentMap[character.alignmentId] || 'Unknown'
       : 'Unknown';
@@ -78,7 +78,7 @@ function findCustomImage(slug: string): string | null {
 }
 
 async function main() {
-  console.log('Updating Journeys Through Taebrin character images...\n');
+  console.info('Updating Journeys Through Taebrin character images...\n');
 
   const charactersPath = join(process.cwd(), 'client/src/data/characters.json');
   const charactersFile = readFileSync(charactersPath, 'utf-8');
@@ -89,7 +89,7 @@ async function main() {
   let ddbImageCount = 0;
 
   for (const config of CHARACTER_CONFIG) {
-    console.log(`\nProcessing ${config.name}...`);
+    console.info(`\nProcessing ${config.name}...`);
     
     // Check for custom image first
     const customImagePath = findCustomImage(config.slug);
@@ -101,23 +101,27 @@ async function main() {
       imageUrl = customImagePath;
       imageSource = 'Custom Local Image';
       customImageCount++;
-      console.log(`  ✓ Found custom image: ${customImagePath}`);
+      console.info(`  ✓ Found custom image: ${customImagePath}`);
     } else {
       // Fetch from D&D Beyond
-      console.log(`  ⚠ No custom image found, fetching from D&D Beyond...`);
+      console.info(`  ⚠ No custom image found, fetching from D&D Beyond...`);
       const freshData = await fetchCharacterData(config.id);
       imageUrl = freshData.avatarUrl;
       imageSource = 'D&D Beyond';
       ddbImageCount++;
-      console.log(`  ✓ Using D&D Beyond avatar`);
+      console.info(`  ✓ Using D&D Beyond avatar`);
       
       // Update other fields with fresh data
       const charIndex = charactersJson.characters.findIndex(
-        (c: any) => c.dndbeyondId === config.id
+        (c: { dndbeyondId?: string }) => c.dndbeyondId === config.id
       );
-      
+
       if (charIndex !== -1) {
+        // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+        // eslint-disable-next-line security/detect-object-injection
         const existingChar = charactersJson.characters[charIndex];
+        // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+        // eslint-disable-next-line security/detect-object-injection
         charactersJson.characters[charIndex] = {
           ...existingChar,
           race: freshData.race,
@@ -133,12 +137,16 @@ async function main() {
     
     // Update the character's image
     const charIndex = charactersJson.characters.findIndex(
-      (c: any) => c.dndbeyondId === config.id
+      (c: { dndbeyondId?: string }) => c.dndbeyondId === config.id
     );
-    
+
     if (charIndex !== -1) {
+      // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+      // eslint-disable-next-line security/detect-object-injection
       const existingChar = charactersJson.characters[charIndex];
-      
+
+      // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+      // eslint-disable-next-line security/detect-object-injection
       charactersJson.characters[charIndex] = {
         ...existingChar,
         featuredImage: imageUrl,
@@ -154,24 +162,24 @@ async function main() {
       };
       
       updatedCount++;
-      console.log(`  ✓ Updated character data (Source: ${imageSource})`);
+      console.info(`  ✓ Updated character data (Source: ${imageSource})`);
     }
   }
 
   // Write back to characters.json
   writeFileSync(charactersPath, JSON.stringify(charactersJson, null, 2));
   
-  console.log(`\n${  '='.repeat(50)}`);
-  console.log(`✓ Successfully updated ${updatedCount} characters`);
-  console.log(`  • Custom images: ${customImageCount}`);
-  console.log(`  • D&D Beyond images: ${ddbImageCount}`);
-  console.log('='.repeat(50));
-  console.log('\nTo add custom images, place them in:');
-  console.log('  client/public/characters/');
-  console.log('\nSupported formats: .jpg, .jpeg, .png, .webp');
-  console.log('Filenames:');
+  console.info(`\n${  '='.repeat(50)}`);
+  console.info(`✓ Successfully updated ${updatedCount} characters`);
+  console.info(`  • Custom images: ${customImageCount}`);
+  console.info(`  • D&D Beyond images: ${ddbImageCount}`);
+  console.info('='.repeat(50));
+  console.info('\nTo add custom images, place them in:');
+  console.info('  client/public/characters/');
+  console.info('\nSupported formats: .jpg, .jpeg, .png, .webp');
+  console.info('Filenames:');
   CHARACTER_CONFIG.forEach(c => {
-    console.log(`  • ${c.slug}.jpg (or .png, .webp)`);
+    console.info(`  • ${c.slug}.jpg (or .png, .webp)`);
   });
 }
 

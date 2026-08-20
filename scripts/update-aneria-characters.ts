@@ -48,7 +48,7 @@ async function fetchCharacterData(characterId: string) {
     // Extract class and level information
     const primaryClass = character.classes[0];
     const className = primaryClass?.definition?.name || 'Unknown';
-    const totalLevel = character.classes.reduce((sum: number, c: any) => sum + c.level, 0);
+    const totalLevel = character.classes.reduce((sum: number, c: { level: number }) => sum + c.level, 0);
 
     // Get alignment
     const alignment = character.alignmentId 
@@ -71,20 +71,20 @@ async function fetchCharacterData(characterId: string) {
 }
 
 async function main() {
-  console.log('Fetching D&D Beyond character data for Aneria - Wayward Watch...\n');
+  console.info('Fetching D&D Beyond character data for Aneria - Wayward Watch...\n');
 
   // Fetch all character data
   const characterData = [];
   for (const id of CHARACTER_IDS) {
-    console.log(`Fetching character ${id}...`);
+    console.info(`Fetching character ${id}...`);
     const data = await fetchCharacterData(id);
     characterData.push(data);
-    console.log(`  ${data.name} - ${data.race} ${data.class} ${data.level}`);
+    console.info(`  ${data.name} - ${data.race} ${data.class} ${data.level}`);
     // Small delay to avoid rate limiting
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
-  console.log('\n✓ All character data fetched successfully!\n');
+  console.info('\n✓ All character data fetched successfully!\n');
 
   // Read existing characters.json
   const charactersPath = join(process.cwd(), 'client/src/data/characters.json');
@@ -95,13 +95,17 @@ async function main() {
   let updatedCount = 0;
   for (const freshData of characterData) {
     const charIndex = charactersJson.characters.findIndex(
-      (c: any) => c.dndbeyondId === freshData.dndbeyondId
+      (c: { dndbeyondId?: string }) => c.dndbeyondId === freshData.dndbeyondId
     );
 
     if (charIndex !== -1) {
+      // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+      // eslint-disable-next-line security/detect-object-injection
       const existingChar = charactersJson.characters[charIndex];
-      
+
       // Update only the D&D Beyond-derived fields
+      // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+      // eslint-disable-next-line security/detect-object-injection
       charactersJson.characters[charIndex] = {
         ...existingChar,
         race: freshData.race,
@@ -109,8 +113,8 @@ async function main() {
         level: freshData.level,
         alignment: freshData.alignment,
         featuredImage: freshData.avatarUrl,
-        images: existingChar.images.length > 0 
-          ? existingChar.images.map((img: any, idx: number) => 
+        images: existingChar.images.length > 0
+          ? existingChar.images.map((img: Record<string, unknown>, idx: number) =>
               idx === 0 ? { ...img, url: freshData.avatarUrl } : img
             )
           : [{
@@ -125,13 +129,13 @@ async function main() {
       };
       
       updatedCount++;
-      console.log(`✓ Updated ${freshData.name}`);
+      console.info(`✓ Updated ${freshData.name}`);
     }
   }
 
   // Write back to characters.json
   writeFileSync(charactersPath, JSON.stringify(charactersJson, null, 2));
-  console.log(`\n✓ Successfully updated ${updatedCount} characters in characters.json`);
+  console.info(`\n✓ Successfully updated ${updatedCount} characters in characters.json`);
 }
 
 main().catch(console.error);

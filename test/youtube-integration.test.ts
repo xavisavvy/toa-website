@@ -30,13 +30,13 @@ describe('YouTube API Integration Tests', () => {
         ok: false,
         status: 429,
         statusText: 'Too Many Requests',
-        json: async () => ({
+        json: () => ({
           error: {
             code: 429,
             message: 'Rate limit exceeded',
           },
         }),
-        text: async () => 'Rate limit exceeded',
+        text: () => 'Rate limit exceeded',
       };
 
       vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
@@ -57,7 +57,7 @@ describe('YouTube API Integration Tests', () => {
         ok: false,
         status: 403,
         statusText: 'Forbidden',
-        json: async () => ({
+        json: () => ({
           error: {
             code: 403,
             message: 'API key not valid',
@@ -77,7 +77,7 @@ describe('YouTube API Integration Tests', () => {
         ok: false,
         status: 404,
         statusText: 'Not Found',
-        json: async () => ({
+        json: () => ({
           error: {
             code: 404,
             message: 'Playlist not found',
@@ -104,9 +104,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => {
-          throw new SyntaxError('Unexpected token in JSON');
-        },
+        json: () => Promise.reject(new SyntaxError('Unexpected token in JSON')),
       };
 
       vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
@@ -119,7 +117,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => ({}),
+        json: () => ({}),
       };
 
       vi.mocked(globalThis.fetch).mockResolvedValueOnce(mockResponse as any);
@@ -133,7 +131,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           kind: 'youtube#playlistItemListResponse',
           etag: 'test',
           pageInfo: { totalResults: 0, resultsPerPage: 0 },
@@ -154,7 +152,7 @@ describe('YouTube API Integration Tests', () => {
       const page1Response = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [
             { contentDetails: { videoId: 'video1' } },
             { contentDetails: { videoId: 'video2' } },
@@ -167,7 +165,7 @@ describe('YouTube API Integration Tests', () => {
       const page2Response = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [
             { contentDetails: { videoId: 'video3' } },
             { contentDetails: { videoId: 'video4' } },
@@ -194,7 +192,7 @@ describe('YouTube API Integration Tests', () => {
       const response = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{ contentDetails: { videoId: 'video1' } }],
           // No nextPageToken
         }),
@@ -212,7 +210,7 @@ describe('YouTube API Integration Tests', () => {
       const pageResponses = Array.from({ length: 20 }, (_, i) => ({
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: Array.from({ length: 50 }, (_, j) => ({
             contentDetails: { videoId: `video${i * 50 + j}` },
           })),
@@ -246,7 +244,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{
             id: 'video1',
             snippet: {
@@ -278,7 +276,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{
             id: 'video1',
             snippet: {
@@ -306,7 +304,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{
             id: 'video1',
             snippet: {
@@ -387,7 +385,7 @@ describe('YouTube API Integration Tests', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{ contentDetails: { videoId: 'video1' } }],
         }),
       };
@@ -413,7 +411,7 @@ describe('YouTube API Integration Tests', () => {
       const playlist1Response = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{ contentDetails: { videoId: 'video1' } }],
         }),
       };
@@ -421,7 +419,7 @@ describe('YouTube API Integration Tests', () => {
       const playlist2Response = {
         ok: true,
         status: 200,
-        json: async () => ({
+        json: () => ({
           items: [{ contentDetails: { videoId: 'video2' } }],
         }),
       };

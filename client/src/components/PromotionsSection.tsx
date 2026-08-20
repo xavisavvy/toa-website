@@ -39,7 +39,7 @@ export default function PromotionsSection() {
             Special Offers
           </h2>
           <p className="text-muted-foreground text-lg">
-            Don't miss out on exclusive events and limited-time deals
+            Don&apos;t miss out on exclusive events and limited-time deals
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function PromotionsSection() {
               key={promo.id}
               className="overflow-hidden hover-elevate cursor-pointer transition-all"
               data-testid={`card-promotion-${promo.id}`}
-              onClick={() => console.log(`Promotion ${promo.id} clicked`)}
+              onClick={() => console.info(`Promotion ${promo.id} clicked`)}
             >
               <div className="relative aspect-[16/9] overflow-hidden">
                 <img

@@ -27,6 +27,7 @@ describe("Campaigns index page", () => {
       container.querySelectorAll('[data-testid^="card-campaign-"]')
     );
     const renderedSlugs = cards.map((el) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- element was matched by its data-testid attribute selector, so it's guaranteed present
       el.getAttribute("data-testid")!.replace("card-campaign-", "")
     );
 
@@ -102,7 +103,9 @@ describe("Campaigns index page", () => {
     expect(anchor).toBeTruthy();
     // wouter <Router base="/"> prepends a leading base segment. We only care that
     // the href ends with /campaigns/<slug> regardless of the test base.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
     expect(anchor!.getAttribute("href")).toMatch(
+      // eslint-disable-next-line security/detect-non-literal-regexp -- firstSlug comes from local test fixture data, not external input
       new RegExp(`/campaigns/${firstSlug}$`)
     );
   });
@@ -114,6 +117,7 @@ describe("Campaigns index page", () => {
 
     const ldScript = document.querySelector('script[type="application/ld+json"]');
     expect(ldScript).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
     const parsed = JSON.parse(ldScript!.textContent ?? "{}");
     expect(parsed["@type"]).toBe("BreadcrumbList");
     expect(parsed.itemListElement.length).toBeGreaterThanOrEqual(2);

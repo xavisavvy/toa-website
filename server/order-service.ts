@@ -30,7 +30,7 @@ export interface CreateOrderParams {
     price: string;
     imageUrl?: string;
   }>;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export async function createOrder(params: CreateOrderParams): Promise<Order> {
@@ -70,7 +70,7 @@ export async function createOrder(params: CreateOrderParams): Promise<Order> {
       eventType: 'order_created',
       status: 'success',
       message: 'Order created successfully',
-      metadata: { stripeSessionId: params.stripeSessionId } as any,
+      metadata: { stripeSessionId: params.stripeSessionId },
     });
 
     return order;
@@ -83,7 +83,7 @@ export async function createOrder(params: CreateOrderParams): Promise<Order> {
 export async function updateOrderStatus(
   orderId: string,
   status: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<void> {
   try {
     await db.update(orders)
@@ -99,7 +99,7 @@ export async function updateOrderStatus(
       eventType: 'status_changed',
       status: 'success',
       message: `Order status changed to ${status}`,
-      metadata: { newStatus: status, ...metadata } as any,
+      metadata: { newStatus: status, ...metadata },
     });
   } catch (error) {
     console.error('Error updating order status:', error);
@@ -125,7 +125,7 @@ export async function updateOrderWithPrintfulId(
       eventType: 'printful_created',
       status: 'success',
       message: 'Printful order created successfully',
-      metadata: { printfulOrderId } as any,
+      metadata: { printfulOrderId },
     });
   } catch (error) {
     console.error('Error updating order with Printful ID:', error);
@@ -160,7 +160,7 @@ export async function logFailedOrder(
   stripeSessionId: string,
   eventType: string,
   errorMessage: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<void> {
   try {
     const order = await getOrderByStripeSessionId(stripeSessionId);

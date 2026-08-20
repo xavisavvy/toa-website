@@ -26,5 +26,11 @@ if (DATABASE_URL) {
   }
 }
 
-// Export db - will be null if DATABASE_URL not configured or connection failed
+// Export db - will be null if DATABASE_URL not configured or connection failed.
+// Typed loosely (not `... | null`) on purpose: every consumer across the
+// codebase (server/routes.ts, order-service.ts, etc.) calls db.<method>()
+// directly without a null check, so giving this the precise nullable type
+// would require touching all of those call sites. Narrowing it properly is
+// tracked as follow-up work, not a lint-only change.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- see comment above
 export const db = queryClient ? drizzle(queryClient, { schema }) : null as any;

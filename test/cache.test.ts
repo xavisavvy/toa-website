@@ -282,6 +282,7 @@ describe('Generic Cache Behavior', () => {
       const getCachedData = (key: string) => {
         if (fs.existsSync(testCacheFile)) {
           const cache = JSON.parse(fs.readFileSync(testCacheFile, 'utf-8'));
+          // eslint-disable-next-line security/detect-object-injection -- test fixture data, key is test-controlled
           if (cache[key]) {return cache[key];}
         }
         
@@ -292,7 +293,8 @@ describe('Generic Cache Behavior', () => {
         const cache = fs.existsSync(testCacheFile) 
           ? JSON.parse(fs.readFileSync(testCacheFile, 'utf-8'))
           : {};
-        
+
+        // eslint-disable-next-line security/detect-object-injection -- test fixture data, key is test-controlled
         cache[key] = freshData;
         
         if (!fs.existsSync(testCacheDir)) {
@@ -323,7 +325,8 @@ describe('Generic Cache Behavior', () => {
         const cache = fs.existsSync(testCacheFile) 
           ? JSON.parse(fs.readFileSync(testCacheFile, 'utf-8'))
           : {};
-        
+
+        // eslint-disable-next-line security/detect-object-injection -- test fixture data, key is test-controlled
         cache[key] = data;
         
         if (!fs.existsSync(testCacheDir)) {

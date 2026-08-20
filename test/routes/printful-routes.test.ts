@@ -49,7 +49,7 @@ describe('Printful Routes', () => {
       fetchMock
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: [
               {
@@ -67,7 +67,7 @@ describe('Printful Routes', () => {
         // Mock variant fetch for the product
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: () => ({
             code: 200,
             result: {
               sync_product: {
@@ -117,7 +117,7 @@ describe('Printful Routes', () => {
       fetchMock.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        text: async () => 'Internal Server Error',
+        text: () => 'Internal Server Error',
       });
 
       const response = await request(app)
@@ -133,7 +133,7 @@ describe('Printful Routes', () => {
     it('should return product details', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
+        json: () => ({
           code: 200,
           result: {
             sync_product: {

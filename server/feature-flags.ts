@@ -1,9 +1,23 @@
 /**
  * Feature Flag System
- * 
+ *
  * Enables safe rollout of new features with runtime toggles.
  * Supports environment-based, percentage-based, and user-based flags.
  */
+import type { Request, Response, NextFunction } from 'express';
+
+// Extend Express Request with the feature-flag context this middleware attaches.
+declare global {
+  namespace Express {
+    interface Request {
+      id?: string;
+      featureFlags?: {
+        isEnabled: (flagName: string) => boolean;
+        getAll: () => FeatureFlagConfig;
+      };
+    }
+  }
+}
 
 export interface FeatureFlag {
   name: string;
@@ -104,10 +118,13 @@ export class FeatureFlagManager {
     this.flags = { ...defaultFlags };
 
     // Apply environment overrides
+    // eslint-disable-next-line security/detect-object-injection -- environment is a developer-supplied value (NODE_ENV or a literal passed by the constructor caller), not end-user input
     const overrides = environmentOverrides[environment];
     if (overrides) {
       Object.entries(overrides).forEach(([key, override]) => {
+        // eslint-disable-next-line security/detect-object-injection -- key comes from Object.entries() of a fixed, developer-defined config object
         if (this.flags[key]) {
+          // eslint-disable-next-line security/detect-object-injection -- key comes from Object.entries() of a fixed, developer-defined config object
           this.flags[key] = { ...this.flags[key], ...override };
         }
       });
@@ -118,6 +135,7 @@ export class FeatureFlagManager {
    * Check if a feature is enabled
    */
   isEnabled(flagName: string, context?: { userId?: string; requestId?: string }): boolean {
+    // eslint-disable-next-line security/detect-object-injection -- flagName is a developer-supplied literal at call sites (e.g. requireFeature('flag-name')), not raw request input
     const flag = this.flags[flagName];
     
     if (!flag) {
@@ -161,6 +179,7 @@ export class FeatureFlagManager {
    * Get a specific flag configuration
    */
   getFlag(flagName: string): FeatureFlag | undefined {
+    // eslint-disable-next-line security/detect-object-injection -- flagName is a developer-supplied literal at call sites, not raw request input
     return this.flags[flagName];
   }
 
@@ -168,7 +187,9 @@ export class FeatureFlagManager {
    * Override a flag (useful for testing)
    */
   override(flagName: string, enabled: boolean): void {
+    // eslint-disable-next-line security/detect-object-injection -- flagName is a developer-supplied literal at call sites, not raw request input
     if (this.flags[flagName]) {
+      // eslint-disable-next-line security/detect-object-injection -- flagName is a developer-supplied literal at call sites, not raw request input
       this.flags[flagName].enabled = enabled;
     }
   }
@@ -181,7 +202,9 @@ export class FeatureFlagManager {
     const overrides = environmentOverrides[this.environment];
     if (overrides) {
       Object.entries(overrides).forEach(([key, override]) => {
+        // eslint-disable-next-line security/detect-object-injection -- key comes from Object.entries() of a fixed, developer-defined config object
         if (this.flags[key]) {
+          // eslint-disable-next-line security/detect-object-injection -- key comes from Object.entries() of a fixed, developer-defined config object
           this.flags[key] = { ...this.flags[key], ...override };
         }
       });
@@ -208,11 +231,11 @@ export const featureFlags = new FeatureFlagManager();
 /**
  * Express middleware to add feature flag context to requests
  */
-export function featureFlagMiddleware(req: any, res: any, next: any) {
+export function featureFlagMiddleware(req: Request, res: Response, next: NextFunction) {
   req.featureFlags = {
     isEnabled: (flagName: string) => featureFlags.isEnabled(flagName, {
       userId: req.user?.id,
-      requestId: req.id || req.headers['x-request-id'],
+      requestId: req.id || (req.headers['x-request-id'] as string | undefined),
     }),
     getAll: () => featureFlags.getAllFlags(),
   };
@@ -223,8 +246,8 @@ export function featureFlagMiddleware(req: any, res: any, next: any) {
  * Helper function for checking flags in route handlers
  */
 export function requireFeature(flagName: string) {
-  return (req: any, res: any, next: any) => {
-    if (!req.featureFlags.isEnabled(flagName)) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.featureFlags?.isEnabled(flagName)) {
       return res.status(404).json({
         error: 'Feature not available',
         message: `The feature "${flagName}" is not enabled in this environment`,

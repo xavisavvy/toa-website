@@ -18,16 +18,19 @@ export class MemStorage implements IStorage {
     this.users = new Map();
   }
 
+  // eslint-disable-next-line require-await -- must stay async to satisfy the IStorage interface (callers `await` it; a future DB-backed implementation will need the await)
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
+  // eslint-disable-next-line require-await -- must stay async to satisfy the IStorage interface (callers `await` it; a future DB-backed implementation will need the await)
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
       (user) => user.email === email,
     );
   }
 
+  // eslint-disable-next-line require-await -- must stay async to satisfy the IStorage interface (callers `await` it; a future DB-backed implementation will need the await)
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const now = new Date();

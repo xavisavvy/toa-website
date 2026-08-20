@@ -18,6 +18,7 @@ import castData from "@/data/cast.json";
 
 // YouTube channel ID for Tales of Aneria
 const YOUTUBE_CHANNEL_ID = "UC7PTdudxJ43HMLJVv2QxVoQ";
+const NOOPENER_NOREFERRER = "noopener,noreferrer";
 
 interface ChannelStats {
   subscriberCount: string;
@@ -109,7 +110,7 @@ export default function AboutSection() {
             window.open(
               member.socialLinks.youtube,
               "_blank",
-              "noopener,noreferrer",
+              NOOPENER_NOREFERRER,
             );
           }}
           data-testid={`button-social-youtube-${member.id}`}
@@ -131,7 +132,7 @@ export default function AboutSection() {
             window.open(
               member.socialLinks.twitter,
               "_blank",
-              "noopener,noreferrer",
+              NOOPENER_NOREFERRER,
             );
           }}
           data-testid={`button-social-twitter-${member.id}`}
@@ -153,7 +154,7 @@ export default function AboutSection() {
             window.open(
               member.socialLinks.instagram,
               "_blank",
-              "noopener,noreferrer",
+              NOOPENER_NOREFERRER,
             );
           }}
           data-testid={`button-social-instagram-${member.id}`}
@@ -175,7 +176,7 @@ export default function AboutSection() {
             window.open(
               member.socialLinks.twitch,
               "_blank",
-              "noopener,noreferrer",
+              NOOPENER_NOREFERRER,
             );
           }}
           data-testid={`button-social-twitch-${member.id}`}
@@ -197,7 +198,7 @@ export default function AboutSection() {
             window.open(
               member.socialLinks.website,
               "_blank",
-              "noopener,noreferrer",
+              NOOPENER_NOREFERRER,
             );
           }}
           data-testid={`button-social-website-${member.id}`}

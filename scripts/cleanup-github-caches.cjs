@@ -65,7 +65,7 @@ try {
   execSync('gh --version', { stdio: 'ignore' });
   useGhCli = true;
   console.log('✅ Using GitHub CLI (gh)\n');
-} catch (error) {
+} catch {
   if (!process.env.GITHUB_TOKEN) {
     console.error('❌ Error: GitHub CLI not found and GITHUB_TOKEN not set');
     console.error('');
@@ -95,7 +95,7 @@ try {
   } else {
     throw new Error('Could not parse repository info');
   }
-} catch (error) {
+} catch {
   console.error('❌ Error: Could not determine repository info');
   console.error('Make sure you are in a git repository with GitHub remote');
   exit(1);
@@ -198,7 +198,7 @@ function deleteCacheWithCLI(cacheId) {
       { stdio: 'ignore' }
     );
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -219,9 +219,9 @@ async function deleteCacheWithAPI(cacheId) {
         },
       }
     );
-    
+
     return response.ok;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -284,13 +284,13 @@ async function cleanupCaches() {
     });
     
     // Sort each branch's caches by creation date (newest first)
-    cachesByBranch.forEach((branchCaches, branch) => {
+    cachesByBranch.forEach((branchCaches, _branch) => {
       branchCaches.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     });
-    
+
     // Identify caches to keep
     const cachesToKeep = new Set();
-    cachesByBranch.forEach((branchCaches, branch) => {
+    cachesByBranch.forEach((branchCaches, _branch) => {
       branchCaches.slice(0, options.keepLatest).forEach(cache => {
         cachesToKeep.add(cache.id);
       });

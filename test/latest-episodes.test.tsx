@@ -19,6 +19,7 @@ describe("LatestEpisodes — DISC-03 deep-link", () => {
     const anchor = button.closest("a") || button.querySelector("a");
     expect(anchor).not.toBeNull();
     // wouter renders with the Router's base prefix; suffix matters.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by not.toBeNull() above
     expect(anchor!.getAttribute("href")).toMatch(/\/videos$/);
   });
 

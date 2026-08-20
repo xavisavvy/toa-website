@@ -98,7 +98,7 @@ async function fetchPrintfulOrder(orderId: string): Promise<PrintfulOrder | null
 }
 
 async function syncStripePayments(days: number, dryRun: boolean, stats: SyncStats): Promise<void> {
-  console.log(`\n🔍 Syncing Stripe payments from last ${days} days...`);
+  console.info(`\n🔍 Syncing Stripe payments from last ${days} days...`);
   
   const startDate = Math.floor(Date.now() / 1000) - (days * 24 * 60 * 60);
   
@@ -122,7 +122,7 @@ async function syncStripePayments(days: number, dryRun: boolean, stats: SyncStat
       .limit(1);
 
     if (existingOrder.length > 0) {
-      console.log(`⏭️  Skipping existing order: ${session.id}`);
+      console.info(`⏭️  Skipping existing order: ${session.id}`);
       stats.stripeSessionsSkipped++;
       continue;
     }
@@ -131,7 +131,7 @@ async function syncStripePayments(days: number, dryRun: boolean, stats: SyncStat
     const shippingDetails = session.shipping_details;
 
     if (dryRun) {
-      console.log(`[DRY RUN] Would add order: ${session.id}`);
+      console.info(`[DRY RUN] Would add order: ${session.id}`);
       stats.stripeSessionsAdded++;
       continue;
     }
@@ -158,7 +158,7 @@ async function syncStripePayments(days: number, dryRun: boolean, stats: SyncStat
         metadata: metadata,
       });
 
-      console.log(`✅ Added order from Stripe: ${session.id}`);
+      console.info(`✅ Added order from Stripe: ${session.id}`);
       stats.stripeSessionsAdded++;
     } catch (error) {
       const errorMsg = `Failed to insert order ${session.id}: ${error}`;
@@ -169,7 +169,7 @@ async function syncStripePayments(days: number, dryRun: boolean, stats: SyncStat
 }
 
 async function syncPrintfulOrders(dryRun: boolean, stats: SyncStats): Promise<void> {
-  console.log(`\n🔍 Syncing Printful orders...`);
+  console.info(`\n🔍 Syncing Printful orders...`);
 
   // Get all orders that have a Printful order ID
   const ordersWithPrintful = await db.select()
@@ -205,7 +205,7 @@ async function syncPrintfulOrders(dryRun: boolean, stats: SyncStats): Promise<vo
     const newStatus = statusMap[printfulOrder.status] || 'processing';
 
     if (dryRun) {
-      console.log(`[DRY RUN] Would update order ${order.id} status to ${newStatus}`);
+      console.info(`[DRY RUN] Would update order ${order.id} status to ${newStatus}`);
       stats.printfulOrdersUpdated++;
       continue;
     }
@@ -218,7 +218,7 @@ async function syncPrintfulOrders(dryRun: boolean, stats: SyncStats): Promise<vo
       })
       .where(eq(orders.id, order.id));
 
-    console.log(`✅ Updated order ${order.id} status: ${newStatus}`);
+    console.info(`✅ Updated order ${order.id} status: ${newStatus}`);
     stats.printfulOrdersUpdated++;
 
     // Check if order items exist
@@ -227,14 +227,14 @@ async function syncPrintfulOrders(dryRun: boolean, stats: SyncStats): Promise<vo
       .where(eq(orderItems.orderId, order.id));
 
     if (existingItems.length > 0) {
-      console.log(`⏭️  Order items already exist for ${order.id}`);
+      console.info(`⏭️  Order items already exist for ${order.id}`);
       continue;
     }
 
     // Add order items
     for (const item of printfulOrder.items) {
       if (dryRun) {
-        console.log(`[DRY RUN] Would add item: ${item.name}`);
+        console.info(`[DRY RUN] Would add item: ${item.name}`);
         stats.printfulItemsAdded++;
         continue;
       }
@@ -252,7 +252,7 @@ async function syncPrintfulOrders(dryRun: boolean, stats: SyncStats): Promise<vo
       stats.printfulItemsAdded++;
     }
 
-    console.log(`✅ Added ${printfulOrder.items.length} items for order ${order.id}`);
+    console.info(`✅ Added ${printfulOrder.items.length} items for order ${order.id}`);
   }
 }
 
@@ -263,12 +263,12 @@ async function main() {
   
   const days = daysArg ? parseInt(daysArg.split('=')[1]) : 30;
 
-  console.log('🔄 Order Synchronization Script');
-  console.log(`📅 Syncing orders from last ${days} days`);
+  console.info('🔄 Order Synchronization Script');
+  console.info(`📅 Syncing orders from last ${days} days`);
   if (dryRun) {
-    console.log('🔍 DRY RUN MODE - No changes will be made');
+    console.info('🔍 DRY RUN MODE - No changes will be made');
   }
-  console.log('');
+  console.info('');
 
   const stats: SyncStats = {
     stripeSessionsChecked: 0,
@@ -284,24 +284,24 @@ async function main() {
     await syncStripePayments(days, dryRun, stats);
     await syncPrintfulOrders(dryRun, stats);
 
-    console.log('\n📊 Synchronization Summary:');
-    console.log('━'.repeat(50));
-    console.log(`Stripe Sessions Checked: ${stats.stripeSessionsChecked}`);
-    console.log(`Stripe Sessions Added: ${stats.stripeSessionsAdded}`);
-    console.log(`Stripe Sessions Skipped: ${stats.stripeSessionsSkipped}`);
-    console.log(`Printful Orders Checked: ${stats.printfulOrdersChecked}`);
-    console.log(`Printful Orders Updated: ${stats.printfulOrdersUpdated}`);
-    console.log(`Printful Items Added: ${stats.printfulItemsAdded}`);
-    console.log(`Errors: ${stats.errors.length}`);
+    console.info('\n📊 Synchronization Summary:');
+    console.info('━'.repeat(50));
+    console.info(`Stripe Sessions Checked: ${stats.stripeSessionsChecked}`);
+    console.info(`Stripe Sessions Added: ${stats.stripeSessionsAdded}`);
+    console.info(`Stripe Sessions Skipped: ${stats.stripeSessionsSkipped}`);
+    console.info(`Printful Orders Checked: ${stats.printfulOrdersChecked}`);
+    console.info(`Printful Orders Updated: ${stats.printfulOrdersUpdated}`);
+    console.info(`Printful Items Added: ${stats.printfulItemsAdded}`);
+    console.info(`Errors: ${stats.errors.length}`);
 
     if (stats.errors.length > 0) {
-      console.log('\n❌ Errors encountered:');
-      stats.errors.forEach(error => console.log(`  - ${error}`));
+      console.error('\n❌ Errors encountered:');
+      stats.errors.forEach(error => console.error(`  - ${error}`));
     }
 
     if (dryRun) {
-      console.log('\n🔍 This was a dry run. No changes were made.');
-      console.log('   Run without --dry-run to apply changes.');
+      console.info('\n🔍 This was a dry run. No changes were made.');
+      console.info('   Run without --dry-run to apply changes.');
     }
 
     process.exit(stats.errors.length > 0 ? 1 : 0);

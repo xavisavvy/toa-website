@@ -33,6 +33,7 @@ const InputOTPSlot = React.forwardRef<
   React.ComponentPropsWithoutRef<"div"> & { index: number }
 >(({ index, className, ...props }, ref) => {
   const inputOTPContext = React.useContext(OTPInputContext)
+  // eslint-disable-next-line security/detect-object-injection -- index is a numeric slot position within the fixed-length OTP slots array
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
 
   return (

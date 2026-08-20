@@ -42,6 +42,7 @@ describe("campaigns / episodes static data", () => {
     );
     expect(activeCampaign).toBeDefined();
     const eps = episodesData.episodes.filter(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeDefined() above
       (e) => e.campaignSlug === activeCampaign!.slug
     );
     expect(eps.length).toBeGreaterThanOrEqual(2);

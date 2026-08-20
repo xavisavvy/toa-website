@@ -10,6 +10,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Separator } from '../components/ui/separator';
 import { useAuth } from '../hooks/useAuth';
 
+interface DisplayAddress {
+  name?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state_code?: string;
+  zip?: string;
+  country_code?: string;
+  phone?: string;
+}
+
 export default function AdminOrderDetail() {
   const { user, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
@@ -92,7 +103,7 @@ export default function AdminOrderDetail() {
     }
   };
 
-  const formatAddressForMaps = (address: any): string => {
+  const formatAddressForMaps = (address: DisplayAddress): string => {
     const parts = [
       address.address1,
       address.address2,
@@ -104,7 +115,7 @@ export default function AdminOrderDetail() {
     return encodeURIComponent(parts.join(', '));
   };
 
-  const formatAddressForClipboard = (address: any): string => {
+  const formatAddressForClipboard = (address: DisplayAddress): string => {
     const parts = [];
     if (address.name) {parts.push(address.name);}
     if (address.address1) {parts.push(address.address1);}

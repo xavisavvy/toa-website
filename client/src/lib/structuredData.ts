@@ -1,9 +1,12 @@
 // Structured Data (JSON-LD) generators for SEO
 
+const SCHEMA_ORG_CONTEXT = "https://schema.org";
+const SITE_NAME = "Tales of Aneria";
+
 export const getOrganizationSchema = () => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "Organization",
-  "name": "Tales of Aneria",
+  "name": SITE_NAME,
   "url": "https://talesofaneria.com",
   "logo": "https://talesofaneria.com/favicon.png",
   "description": "Epic TTRPG live play series exploring the mystical world of Aneria through Dungeons & Dragons gameplay",
@@ -20,14 +23,14 @@ export const getOrganizationSchema = () => ({
 });
 
 export const getWebSiteSchema = () => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "WebSite",
-  "name": "Tales of Aneria",
+  "name": SITE_NAME,
   "url": "https://talesofaneria.com",
   "description": "Join us on an epic journey through the mystical world of Aneria. Watch our TTRPG live play series, explore rich lore, and discover exclusive merchandise from our adventures.",
   "publisher": {
     "@type": "Organization",
-    "name": "Tales of Aneria"
+    "name": SITE_NAME
   },
   "potentialAction": {
     "@type": "SearchAction",
@@ -37,7 +40,7 @@ export const getWebSiteSchema = () => ({
 });
 
 export const getBreadcrumbSchema = (items: { name: string; url: string }[]) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "BreadcrumbList",
   "itemListElement": items.map((item, index) => ({
     "@type": "ListItem",
@@ -55,7 +58,7 @@ export const getVideoSchema = (video: {
   duration?: string;
   contentUrl?: string;
 }) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "VideoObject",
   "name": video.name,
   "description": video.description,
@@ -66,7 +69,7 @@ export const getVideoSchema = (video: {
   "embedUrl": video.contentUrl,
   "publisher": {
     "@type": "Organization",
-    "name": "Tales of Aneria",
+    "name": SITE_NAME,
     "logo": {
       "@type": "ImageObject",
       "url": "https://talesofaneria.com/favicon.png"
@@ -80,7 +83,7 @@ export const getPersonSchema = (person: {
   image?: string;
   sameAs?: string[];
 }) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "Person",
   "name": person.name,
   "description": person.description,
@@ -88,7 +91,7 @@ export const getPersonSchema = (person: {
   "sameAs": person.sameAs,
   "memberOf": {
     "@type": "Organization",
-    "name": "Tales of Aneria"
+    "name": SITE_NAME
   }
 });
 
@@ -102,7 +105,7 @@ export const getTVSeriesSchema = (campaign: {
   thumbnailUrl?: string;
   cast: { name: string }[];
 }) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "TVSeries",
   "name": campaign.name,
   "description": campaign.description,
@@ -114,7 +117,7 @@ export const getTVSeriesSchema = (campaign: {
   "actor": campaign.cast.map((c) => ({ "@type": "Person", "name": c.name })),
   "productionCompany": {
     "@type": "Organization",
-    "name": "Tales of Aneria"
+    "name": SITE_NAME
   },
   "genre": ["Fantasy", "Tabletop RPG", "Dungeons & Dragons", "Live Play"]
 });
@@ -131,7 +134,7 @@ export const getTVEpisodeSchema = (input: {
   thumbnailUrl?: string;
   duration?: string;
 }) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "TVEpisode",
   "name": input.title,
   "episodeNumber": input.episodeNumber,
@@ -163,7 +166,7 @@ export const getPodcastEpisodeSchema = (input: {
   podcastUrl: string;
   campaignName: string;
 }) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "PodcastEpisode",
   "name": input.title,
   "datePublished": input.airDate,
@@ -184,7 +187,7 @@ export const getCreativeWorkSchema = (character: {
   creator: string;
   image?: string;
 }) => ({
-  "@context": "https://schema.org",
+  "@context": SCHEMA_ORG_CONTEXT,
   "@type": "CreativeWork",
   "name": character.name,
   "description": character.description,
@@ -195,7 +198,7 @@ export const getCreativeWorkSchema = (character: {
   "image": character.image,
   "isPartOf": {
     "@type": "CreativeWorkSeries",
-    "name": "Tales of Aneria"
+    "name": SITE_NAME
   },
   "genre": ["Fantasy", "Tabletop RPG", "Dungeons & Dragons"]
 });

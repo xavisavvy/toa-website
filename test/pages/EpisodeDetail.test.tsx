@@ -26,6 +26,7 @@ describe("EpisodeDetail page", () => {
   const seededEpisodes = episodesData.episodes.filter(
     (e) => e.campaignSlug === seededCampaign.slug
   );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- seeded test fixture is guaranteed to include an episode with a podcastUrl
   const epWithPodcast = seededEpisodes.find((e) => "podcastUrl" in e)!;
   const epWithoutPodcast = seededEpisodes.find((e) => !("podcastUrl" in e));
 
@@ -98,6 +99,7 @@ describe("EpisodeDetail page", () => {
     );
 
     const link = getByTestId("link-podcast");
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- epWithPodcast was selected for having a podcastUrl
     expect(link.getAttribute("href")).toBe(epWithPodcast.podcastUrl!);
     expect(link.getAttribute("target")).toBe("_blank");
     const rel = link.getAttribute("rel") ?? "";
@@ -127,6 +129,7 @@ describe("EpisodeDetail page", () => {
 
     const ldScript = document.querySelector('script[type="application/ld+json"]');
     expect(ldScript).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
     const parsed = JSON.parse(ldScript!.textContent ?? "{}");
     const graph = parsed["@graph"] as Array<Record<string, unknown>>;
     expect(Array.isArray(graph)).toBe(true);
@@ -136,6 +139,7 @@ describe("EpisodeDetail page", () => {
     expect(types).toContain("VideoObject");
     expect(types).toContain("BreadcrumbList");
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by types.toContain("VideoObject") above
     const video = graph.find((n) => n["@type"] === "VideoObject")!;
     expect(video.name).toBeTruthy();
     expect(video.thumbnailUrl).toBeTruthy(); // CAMP-04 required
@@ -149,6 +153,7 @@ describe("EpisodeDetail page", () => {
     );
 
     const ldScript = document.querySelector('script[type="application/ld+json"]');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- SEO effect always injects this script on render, as covered by the preceding test
     const parsed = JSON.parse(ldScript!.textContent ?? "{}");
     const types = (parsed["@graph"] as Array<Record<string, string>>).map(
       (n) => n["@type"]

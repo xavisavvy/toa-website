@@ -12,19 +12,20 @@ async function main() {
   const password = 'X8w79LuizWuXj2DP8AX!';
   const role = 'admin';
 
-  console.log('🔐 Creating Admin User...\n');
+  console.info('🔐 Creating Admin User...\n');
 
   try {
     const user = await createUser(email, password, role);
 
-    console.log('✅ Admin user created successfully!\n');
-    console.log(`   Email: ${user.email}`);
-    console.log(`   Role: ${user.role}`);
-    console.log(`   ID: ${user.id}\n`);
+    console.info('✅ Admin user created successfully!\n');
+    console.info(`   Email: ${user.email}`);
+    console.info(`   Role: ${user.role}`);
+    console.info(`   ID: ${user.id}\n`);
 
     process.exit(0);
-  } catch (error: any) {
-    console.error('❌ Error creating admin user:', error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error creating admin user:', message);
     process.exit(1);
   }
 }

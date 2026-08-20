@@ -1,3 +1,4 @@
+import type { Request, Response, NextFunction } from 'express';
 import pino from 'pino';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -48,7 +49,7 @@ export const logger = pino({
 
 // Request logger middleware for Express
 export function expressLogger() {
-  return (req: any, res: any, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     
     res.on('finish', () => {
@@ -76,7 +77,7 @@ export function expressLogger() {
 }
 
 // Helper for logging errors with context
-export function logError(error: Error, context?: Record<string, any>) {
+export function logError(error: Error, context?: Record<string, unknown>) {
   logger.error(
     {
       err: {
@@ -91,7 +92,7 @@ export function logError(error: Error, context?: Record<string, any>) {
 }
 
 // Helper for logging performance metrics
-export function logPerformance(operation: string, duration: number, context?: Record<string, any>) {
+export function logPerformance(operation: string, duration: number, context?: Record<string, unknown>) {
   logger.info(
     {
       operation,

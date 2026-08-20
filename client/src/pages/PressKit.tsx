@@ -329,7 +329,7 @@ export default function PressKit() {
                 <h2 className="font-serif text-3xl font-semibold mb-4">Need Something Else?</h2>
                 <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
                   Looking for high-resolution files, additional formats, custom assets, or have questions about usage? 
-                  We're happy to help!
+                  We&apos;re happy to help!
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <Button 

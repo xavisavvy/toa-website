@@ -71,6 +71,7 @@ describe('YouTube API Contract Tests', () => {
                     },
                   },
                   channelTitle: 'Tales of Aneria',
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
                   playlistId: playlistId!,
                   position: 0,
                   resourceId: {
@@ -327,8 +328,9 @@ describe('YouTube API Contract Tests', () => {
           const ids = url.searchParams.get('id')?.split(',');
           
           expect(ids).toBeInstanceOf(Array);
+          /* eslint-disable @typescript-eslint/no-non-null-assertion -- presence verified by toBeInstanceOf(Array) above */
           expect(ids!.length).toBeGreaterThan(1);
-          
+
           return HttpResponse.json({
             kind: 'youtube#videoListResponse',
             items: ids!.map((id, index) => ({
@@ -339,6 +341,7 @@ describe('YouTube API Contract Tests', () => {
               statistics: { viewCount: '1000' },
             })),
           });
+          /* eslint-enable @typescript-eslint/no-non-null-assertion */
         })
       );
 

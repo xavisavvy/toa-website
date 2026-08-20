@@ -10,7 +10,7 @@
  */
 
 import { execSync } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { resolve } from 'path';
 
 const ENV_EXAMPLE_FILE = resolve(process.cwd(), '.env.example');
@@ -26,25 +26,6 @@ const colors = {
   gray: '\x1b[90m',
 };
 
-function parseEnvFile(content) {
-  const vars = {};
-  const lines = content.split('\n');
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    // Skip comments and empty lines
-    if (trimmed.startsWith('#') || trimmed === '') continue;
-    
-    // Match KEY=value format
-    const match = trimmed.match(/^([A-Z_][A-Z0-9_]*)=/);
-    if (match) {
-      vars[match[1]] = true;
-    }
-  }
-  
-  return vars;
-}
-
 function getGitDiff() {
   try {
     // Check if file is staged
@@ -58,7 +39,7 @@ function getGitDiff() {
     // Get the diff
     const diff = execSync('git diff HEAD .env.example', { encoding: 'utf-8' });
     return diff;
-  } catch (error) {
+  } catch {
     // File might be new or git not initialized
     return null;
   }

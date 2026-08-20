@@ -8,9 +8,9 @@ import { setupServer } from '../helpers/test-server';
  */
 
 async function runLoadTest(url: string, name: string, duration: number = 10) {
-  console.log(`\n🚀 Running load test: ${name}`);
-  console.log(`   URL: ${url}`);
-  console.log(`   Duration: ${duration}s\n`);
+  console.info(`\n🚀 Running load test: ${name}`);
+  console.info(`   URL: ${url}`);
+  console.info(`   Duration: ${duration}s\n`);
 
   const result = await autocannon({
     url,
@@ -20,19 +20,19 @@ async function runLoadTest(url: string, name: string, duration: number = 10) {
     workers: 2,
   });
 
-  console.log(`\n📊 Results for ${name}:`);
-  console.log(`   Requests: ${result.requests.total}`);
-  console.log(`   Throughput: ${Math.round(result.throughput.mean / 1024)} KB/s`);
-  console.log(`   Latency (avg): ${result.latency.mean.toFixed(2)}ms`);
-  console.log(`   Latency (p99): ${result.latency.p99.toFixed(2)}ms`);
-  console.log(`   Errors: ${result.errors}`);
-  console.log(`   Timeouts: ${result.timeouts}`);
+  console.info(`\n📊 Results for ${name}:`);
+  console.info(`   Requests: ${result.requests.total}`);
+  console.info(`   Throughput: ${Math.round(result.throughput.mean / 1024)} KB/s`);
+  console.info(`   Latency (avg): ${result.latency.mean.toFixed(2)}ms`);
+  console.info(`   Latency (p99): ${result.latency.p99.toFixed(2)}ms`);
+  console.info(`   Errors: ${result.errors}`);
+  console.info(`   Timeouts: ${result.timeouts}`);
 
   return result;
 }
 
 async function main() {
-  console.log('🎯 Starting Load Tests...\n');
+  console.info('🎯 Starting Load Tests...\n');
 
   const { server } = await setupServer();
   const baseUrl = 'http://localhost:5000';
@@ -60,7 +60,7 @@ async function main() {
     );
 
     // Test 4: Stress test - High concurrency
-    console.log(`\n🔥 Running stress test (high concurrency)...`);
+    console.info(`\n🔥 Running stress test (high concurrency)...`);
     const stressResult = await autocannon({
       url: `${baseUrl}/api/youtube`,
       duration: 10,
@@ -69,20 +69,24 @@ async function main() {
       workers: 4,
     });
 
-    console.log(`\n📊 Stress Test Results:`);
-    console.log(`   Requests: ${stressResult.requests.total}`);
-    console.log(`   Throughput: ${Math.round(stressResult.throughput.mean / 1024)} KB/s`);
-    console.log(`   Latency (avg): ${stressResult.latency.mean.toFixed(2)}ms`);
-    console.log(`   Latency (p99): ${stressResult.latency.p99.toFixed(2)}ms`);
-    console.log(`   Errors: ${stressResult.errors}`);
-    console.log(`   Timeouts: ${stressResult.timeouts}`);
+    console.info(`\n📊 Stress Test Results:`);
+    console.info(`   Requests: ${stressResult.requests.total}`);
+    console.info(`   Throughput: ${Math.round(stressResult.throughput.mean / 1024)} KB/s`);
+    console.info(`   Latency (avg): ${stressResult.latency.mean.toFixed(2)}ms`);
+    console.info(`   Latency (p99): ${stressResult.latency.p99.toFixed(2)}ms`);
+    console.info(`   Errors: ${stressResult.errors}`);
+    console.info(`   Timeouts: ${stressResult.timeouts}`);
 
     // Validate performance SLAs
-    console.log(`\n✅ Performance SLA Validation:`);
+    console.info(`\n✅ Performance SLA Validation:`);
     
-    const validateSLA = (name: string, result: any, maxLatencyP99: number) => {
+    const validateSLA = (
+      name: string,
+      result: { latency: { p99: number }; errors: number },
+      maxLatencyP99: number
+    ) => {
       const passed = result.latency.p99 < maxLatencyP99 && result.errors === 0;
-      console.log(`   ${name}: ${passed ? '✅ PASS' : '❌ FAIL'} (p99: ${result.latency.p99.toFixed(2)}ms, max: ${maxLatencyP99}ms)`);
+      console.info(`   ${name}: ${passed ? '✅ PASS' : '❌ FAIL'} (p99: ${result.latency.p99.toFixed(2)}ms, max: ${maxLatencyP99}ms)`);
       return passed;
     };
 
@@ -93,7 +97,7 @@ async function main() {
 
     const allPassed = youtubeSLA && eventsSLA && homepageSLA && stressSLA;
     
-    console.log(`\n${allPassed ? '✅ All SLAs passed!' : '❌ Some SLAs failed!'}`);
+    console.info(`\n${allPassed ? '✅ All SLAs passed!' : '❌ Some SLAs failed!'}`);
     
     process.exit(allPassed ? 0 : 1);
   } catch (error) {
