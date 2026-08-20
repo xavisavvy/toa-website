@@ -329,8 +329,10 @@ test.describe('Checkout Flow E2E Tests', () => {
       let cartBadge = page.locator('[aria-label*="Shopping cart"]').locator('text=1');
       await expect(cartBadge).toBeVisible();
 
-      // Simulate successful payment by navigating to success page
-      await page.goto('/checkout/success');
+      // Simulate successful payment by navigating to success page. Needs a
+      // session_id or CheckoutSuccess redirects straight to '/' before this
+      // test's assertions below even run.
+      await page.goto('/checkout/success?session_id=test_session_123');
 
       // Navigate back to shop
       await page.goto('/shop');
