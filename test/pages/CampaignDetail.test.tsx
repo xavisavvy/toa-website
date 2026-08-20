@@ -67,6 +67,7 @@ describe("CampaignDetail page", () => {
 
     const links = getAllByTestId(/^link-episode-/);
     const numbers = links.map((el) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- element was matched by its data-testid, so the attribute is guaranteed present
       Number(el.getAttribute("data-testid")!.replace("link-episode-", ""))
     );
     const sorted = [...numbers].sort((a, b) => a - b);
@@ -89,6 +90,7 @@ describe("CampaignDetail page", () => {
 
     const ldScript = document.querySelector('script[type="application/ld+json"]');
     expect(ldScript).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
     const parsed = JSON.parse(ldScript!.textContent ?? "{}");
     expect(parsed["@graph"]).toBeDefined();
     const types = (parsed["@graph"] as Array<{ "@type": string }>).map(

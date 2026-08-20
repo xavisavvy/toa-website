@@ -19,16 +19,18 @@ export const AUTH_RATE_LIMIT = {
   max: 5, // 5 attempts per window
 };
 
+const DB_NOT_INITIALIZED_ERROR = 'Database not initialized';
+
 /**
  * Hash a password securely using bcrypt
  * @param password Plain text password
  * @returns Hashed password
  */
-export async function hashPassword(password: string): Promise<string> {
+export function hashPassword(password: string): Promise<string> {
   if (!password || password.length < 8) {
     throw new Error('Password must be at least 8 characters');
   }
-  
+
   return bcrypt.hash(password, SALT_ROUNDS);
 }
 
@@ -38,7 +40,7 @@ export async function hashPassword(password: string): Promise<string> {
  * @param hash Stored password hash
  * @returns True if password matches
  */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+export function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
@@ -56,7 +58,7 @@ export async function createUser(
   role: 'admin' | 'customer' = 'customer'
 ): Promise<User> {
   if (!db) {
-    throw new Error('Database not initialized');
+    throw new Error(DB_NOT_INITIALIZED_ERROR);
   }
 
   // Security: Validate email format
@@ -96,6 +98,22 @@ export async function createUser(
 }
 
 /**
+ * Audit-log a failed login attempt, if a request is available.
+ * Pulled out of authenticateUser to keep its cognitive complexity in check.
+ */
+async function auditLoginFailure(
+  req: Request | undefined,
+  email: string,
+  userId: string | undefined,
+  reason: string
+): Promise<void> {
+  if (!req) {
+    return;
+  }
+  await AuditService.logAuth(AuditAction.LOGIN_FAILED, "failure", req, email, userId, reason);
+}
+
+/**
  * Authenticate user with email and password
  * Security: Returns null on failure (don't reveal if email exists)
  * @param credentials Login credentials
@@ -107,7 +125,7 @@ export async function authenticateUser(
   req?: Request
 ): Promise<User | null> {
   if (!db) {
-    throw new Error('Database not initialized');
+    throw new Error(DB_NOT_INITIALIZED_ERROR);
   }
 
   try {
@@ -122,38 +140,18 @@ export async function authenticateUser(
       // Security: Don't reveal if email exists
       // Still run bcrypt to prevent timing attacks
       await bcrypt.compare(credentials.password, '$2a$12$invalidhashtopreventtimingattack');
-      
-      // Audit: Log failed login attempt
-      if (req) {
-        await AuditService.logAuth(
-          AuditAction.LOGIN_FAILED,
-          "failure",
-          req,
-          credentials.email,
-          undefined,
-          "Invalid credentials"
-        );
-      }
-      
+
+      await auditLoginFailure(req, credentials.email, undefined, "Invalid credentials");
+
       return null;
     }
 
     // Security: Check if account is active
     if (user.isActive !== 1) {
       safeLog.warn(`Inactive account login attempt: ${maskEmail(user.email)}`);
-      
-      // Audit: Log inactive account attempt
-      if (req) {
-        await AuditService.logAuth(
-          AuditAction.LOGIN_FAILED,
-          "failure",
-          req,
-          user.email,
-          user.id,
-          "Account is inactive"
-        );
-      }
-      
+
+      await auditLoginFailure(req, user.email, user.id, "Account is inactive");
+
       return null;
     }
 
@@ -161,19 +159,9 @@ export async function authenticateUser(
     const isValid = await verifyPassword(credentials.password, user.passwordHash);
     if (!isValid) {
       safeLog.warn(`Failed login attempt for: ${maskEmail(user.email)}`);
-      
-      // Audit: Log failed password attempt
-      if (req) {
-        await AuditService.logAuth(
-          AuditAction.LOGIN_FAILED,
-          "failure",
-          req,
-          user.email,
-          user.id,
-          "Invalid password"
-        );
-      }
-      
+
+      await auditLoginFailure(req, user.email, user.id, "Invalid password");
+
       return null;
     }
 
@@ -200,19 +188,14 @@ export async function authenticateUser(
     return sanitizeUser(user);
   } catch (error) {
     console.error('Authentication error:', error);
-    
-    // Audit: Log system error
-    if (req) {
-      await AuditService.logAuth(
-        AuditAction.LOGIN_FAILED,
-        "failure",
-        req,
-        credentials.email,
-        undefined,
-        error instanceof Error ? error.message : "System error"
-      );
-    }
-    
+
+    await auditLoginFailure(
+      req,
+      credentials.email,
+      undefined,
+      error instanceof Error ? error.message : "System error"
+    );
+
     return null;
   }
 }
@@ -262,7 +245,7 @@ export async function getUserById(id: string): Promise<User | null> {
  */
 export async function updatePassword(userId: string, newPassword: string): Promise<void> {
   if (!db) {
-    throw new Error('Database not initialized');
+    throw new Error(DB_NOT_INITIALIZED_ERROR);
   }
 
   if (newPassword.length < 8) {
@@ -289,7 +272,7 @@ export async function updatePassword(userId: string, newPassword: string): Promi
  */
 export async function deactivateUser(userId: string): Promise<void> {
   if (!db) {
-    throw new Error('Database not initialized');
+    throw new Error(DB_NOT_INITIALIZED_ERROR);
   }
 
   await db
@@ -309,7 +292,7 @@ export async function deactivateUser(userId: string): Promise<void> {
  */
 export async function reactivateUser(userId: string): Promise<void> {
   if (!db) {
-    throw new Error('Database not initialized');
+    throw new Error(DB_NOT_INITIALIZED_ERROR);
   }
 
   await db

@@ -45,11 +45,11 @@ function readCache(feedUrl: string): PodcastEpisode[] | null {
 
     if (isCacheValid(cachedData, feedUrl)) {
       const ageMinutes = Math.floor((Date.now() - cachedData.timestamp) / (1000 * 60));
-      console.log(`Using cached podcast data (age: ${ageMinutes}m)`);
+      console.info(`Using cached podcast data (age: ${ageMinutes}m)`);
       return cachedData.episodes;
     }
 
-    console.log('Podcast cache expired, fetching fresh data');
+    console.info('Podcast cache expired, fetching fresh data');
     return null;
   } catch (error) {
     console.error('Error reading podcast cache:', error);
@@ -70,7 +70,7 @@ function writeCache(feedUrl: string, episodes: PodcastEpisode[]): void {
     };
 
     fs.writeFileSync(CACHE_FILE, JSON.stringify(cacheData, null, 2), 'utf-8');
-    console.log('Podcast data cached successfully');
+    console.info('Podcast data cached successfully');
   } catch (error) {
     console.error('Error writing podcast cache:', error);
   }
@@ -111,7 +111,7 @@ export async function getPodcastFeed(feedUrl: string, limit: number = 10): Promi
         const cacheContent = fs.readFileSync(CACHE_FILE, 'utf-8');
         const cachedData: CachedPodcastData = JSON.parse(cacheContent);
         if (cachedData.feedUrl === feedUrl) {
-          console.log('Podcast API failed, serving stale cache as fallback');
+          console.info('Podcast API failed, serving stale cache as fallback');
           return cachedData.episodes.slice(0, limit);
         }
       }

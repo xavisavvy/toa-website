@@ -25,14 +25,14 @@ export default function LatestShorts({ channelId }: LatestShortsProps) {
     queryKey: ['/api/youtube/channel/shorts', channelId],
     enabled: !!channelId,
     queryFn: async () => {
-      console.log('Fetching YouTube Shorts:', channelId);
+      console.info('Fetching YouTube Shorts:', channelId);
       const response = await fetch(`/api/youtube/channel/${channelId}/shorts?maxResults=50`);
       if (!response.ok) {
         console.error('Error fetching shorts:', response.statusText);
         return [];
       }
       const videos = await response.json();
-      console.log('Shorts response:', videos.length, 'shorts');
+      console.info('Shorts response:', videos.length, 'shorts');
       return videos;
     },
   });

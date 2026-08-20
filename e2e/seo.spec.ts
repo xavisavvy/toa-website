@@ -11,8 +11,10 @@ test.describe('SEO and Meta Tags', () => {
     // Check meta description
     const description = await page.locator('meta[name="description"]').getAttribute('content');
     expect(description).toBeTruthy();
+    /* eslint-disable @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above */
     expect(description!.length).toBeGreaterThan(50);
     expect(description!.length).toBeLessThan(160);
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
     
     // Check Open Graph tags
     const ogTitle = await page.locator('meta[property="og:title"]').getAttribute('content');
@@ -53,6 +55,7 @@ test.describe('SEO and Meta Tags', () => {
     
     // Title should include character name
     const title = await page.title();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- character name is guaranteed present on this page by test setup
     expect(title).toContain(characterName!);
     
     // Description should mention the character

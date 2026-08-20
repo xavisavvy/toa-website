@@ -87,6 +87,7 @@ export function validateEnvironment(): void {
 
   // Check required variables
   SERVER_ENV_VARS.forEach(({ name, required, description }) => {
+    // eslint-disable-next-line security/detect-object-injection -- name comes from the fixed, hardcoded SERVER_ENV_VARS list above, not external input
     const value = process.env[name];
     if (required && !value) {
       missing.push(`${name}: ${description}`);
@@ -95,6 +96,7 @@ export function validateEnvironment(): void {
 
   // Warn about missing optional API keys
   OPTIONAL_API_KEYS.forEach(({ name, description }) => {
+    // eslint-disable-next-line security/detect-object-injection -- name comes from the fixed, hardcoded OPTIONAL_API_KEYS list above, not external input
     const value = process.env[name];
     if (!value) {
       warnings.push(`${name}: ${description}`);
@@ -103,6 +105,7 @@ export function validateEnvironment(): void {
 
   // Warn about missing e-commerce keys
   ECOMMERCE_ENV_VARS.forEach(({ name, description }) => {
+    // eslint-disable-next-line security/detect-object-injection -- name comes from the fixed, hardcoded ECOMMERCE_ENV_VARS list above, not external input
     const value = process.env[name];
     if (!value) {
       warnings.push(`${name}: ${description}`);

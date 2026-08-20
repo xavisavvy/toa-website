@@ -100,6 +100,7 @@ describe("CharacterDetail — og:image safety + Person JSON-LD (CHAR-03 + CHAR-0
 
     const ld = document.querySelector('script[type="application/ld+json"]');
     expect(ld).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
     const parsed = JSON.parse(ld!.textContent ?? "{}");
     expect(parsed["@graph"]).toBeDefined();
     const graph = parsed["@graph"] as Array<{ "@type": string; name?: string }>;
@@ -117,6 +118,7 @@ describe("CharacterDetail — og:image safety + Person JSON-LD (CHAR-03 + CHAR-0
 
     const ld = document.querySelector('script[type="application/ld+json"]');
     expect(ld).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by toBeTruthy() above
     const parsed = JSON.parse(ld!.textContent ?? "{}");
     const graph = parsed["@graph"] as Array<{ "@type": string }>;
     const types = graph.map((n) => n["@type"]);

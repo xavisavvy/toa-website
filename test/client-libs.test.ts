@@ -25,14 +25,14 @@ describe('YouTube Client Library', () => {
     (globalThis.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
+        json: () => ({
           items: [{ contentDetails: { videoId: 'test123' } }],
           nextPageToken: null,
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
+        json: () => ({
           items: [
             {
               id: 'test123',

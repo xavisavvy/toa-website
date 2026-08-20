@@ -169,7 +169,7 @@ Thank you!`;
             </p>
             <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
               <li>Review your information above</li>
-              <li>Click "Open Email Client" to create a pre-filled email</li>
+              <li>Click &quot;Open Email Client&quot; to create a pre-filled email</li>
               <li>Your default email app will open with all details included</li>
               <li>Review, make any edits, and send when ready</li>
             </ol>

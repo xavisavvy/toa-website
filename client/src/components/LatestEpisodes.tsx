@@ -34,20 +34,20 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
     queryFn: async () => {
       if (useChannel) {
         // Fetch all videos from channel
-        console.log('Fetching YouTube channel videos:', channelId);
+        console.info('Fetching YouTube channel videos:', channelId);
         const response = await fetch(`/api/youtube/channel/${channelId}?maxResults=50`);
         if (!response.ok) {
           console.error('Error fetching channel videos:', response.statusText);
           return [];
         }
         const videos = await response.json();
-        console.log('Channel response:', videos.length, 'videos');
+        console.info('Channel response:', videos.length, 'videos');
         return videos;
       } else {
         // Fetch from playlists (existing logic)
-        console.log('Fetching YouTube playlists from server:', playlistIds);
-        
-        const allVideosPromises = playlistIds!.map(async (playlistId) => {
+        console.info('Fetching YouTube playlists from server:', playlistIds);
+
+        const allVideosPromises = (playlistIds ?? []).map(async (playlistId) => {
           try {
             const response = await fetch(`/api/youtube/playlist/${playlistId}?maxResults=10000`);
             if (!response.ok) {
@@ -81,7 +81,7 @@ export default function LatestEpisodes({ playlistIds, channelId }: LatestEpisode
           return dateB - dateA;
         });
         
-        console.log('Server-side response:', allVideos.length, 'videos from', playlistIds?.length, 'playlists');
+        console.info('Server-side response:', allVideos.length, 'videos from', playlistIds?.length, 'playlists');
         return allVideos;
       }
     },

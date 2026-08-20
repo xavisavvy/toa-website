@@ -15,7 +15,7 @@ vi.mock('../../server/printful', async () => {
   const actual = await vi.importActual('../../server/printful');
   return {
     ...actual,
-    getPrintfulShippingEstimate: vi.fn(async (params: {recipient: {zip: string}}) => {
+    getPrintfulShippingEstimate: vi.fn((params: {recipient: {zip: string}}) => {
       // Mock successful response
       if (params.recipient.zip === '84015') {
         return {
@@ -58,7 +58,7 @@ vi.mock('../../server/stripe', async () => {
   const actual = await vi.importActual('../../server/stripe');
   return {
     ...actual,
-    createCheckoutSession: vi.fn(async () => {
+    createCheckoutSession: vi.fn(() => {
       return {
         id: 'cs_test_with_shipping_123',
         url: 'https://checkout.stripe.com/test-with-shipping',

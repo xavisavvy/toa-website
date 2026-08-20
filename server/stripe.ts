@@ -9,7 +9,10 @@ if (!stripeSecretKey) {
 
 export const stripe = stripeSecretKey 
   ? new Stripe(stripeSecretKey, {
-      apiVersion: '2024-12-18.acacia' as any, // Using older API version for compatibility
+      // Pinned to an older API version for compatibility; the installed SDK's
+      // types only describe its own latest version (see Stripe.StripeConfig
+      // docstring), so a precise cast is required here.
+      apiVersion: '2024-12-18.acacia' as unknown as Stripe.LatestApiVersion,
       typescript: true,
     })
   : null;
@@ -253,11 +256,9 @@ export function createPrintfulOrderFromSession(
 /**
  * Submit order to Printful
  */
-export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise<{
-  success: boolean;
-  orderId?: number;
-  error?: string;
-}> {
+export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise<
+  { success: true; orderId: number } | { success: false; error: string }
+> {
   const apiKey = process.env.PRINTFUL_API_KEY;
 
   if (!apiKey) {

@@ -5,9 +5,9 @@
  * Works with local PostgreSQL (not Neon serverless)
  */
 
+import bcrypt from 'bcryptjs';
 import pkg from 'pg';
 const { Client } = pkg;
-import bcrypt from 'bcryptjs';
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/toa_website';
 
@@ -16,22 +16,22 @@ async function main() {
   const password = 'X8w79LuizWuXj2DP8AX!';
   const role = 'admin';
 
-  console.log('🔐 Creating Admin User...\n');
-  console.log(`   Database: ${DATABASE_URL.split('@')[1]}\n`);
+  console.info('🔐 Creating Admin User...\n');
+  console.info(`   Database: ${DATABASE_URL.split('@')[1]}\n`);
 
   const client = new Client({ connectionString: DATABASE_URL });
 
   try {
     // Connect to database
     await client.connect();
-    console.log('✅ Connected to database');
+    console.info('✅ Connected to database');
 
     // Hash password
-    console.log('🔒 Hashing password...');
+    console.info('🔒 Hashing password...');
     const passwordHash = await bcrypt.hash(password, 12);
 
     // Insert user
-    console.log('💾 Creating admin user...');
+    console.info('💾 Creating admin user...');
     const result = await client.query(
       `INSERT INTO users (email, password_hash, role, is_active, created_at, updated_at)
        VALUES ($1, $2, $3, 1, NOW(), NOW())
@@ -41,11 +41,11 @@ async function main() {
 
     const user = result.rows[0];
 
-    console.log('\n✅ Admin user created successfully!\n');
-    console.log(`   Email: ${user.email}`);
-    console.log(`   Role: ${user.role}`);
-    console.log(`   ID: ${user.id}`);
-    console.log(`   Created: ${user.created_at}\n`);
+    console.info('\n✅ Admin user created successfully!\n');
+    console.info(`   Email: ${user.email}`);
+    console.info(`   Role: ${user.role}`);
+    console.info(`   ID: ${user.id}`);
+    console.info(`   Created: ${user.created_at}\n`);
 
     await client.end();
     process.exit(0);

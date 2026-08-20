@@ -125,7 +125,7 @@ export default function Shop() {
             {/* Thank You Message */}
             <div className="text-center max-w-3xl mx-auto">
               <p className="text-lg text-muted-foreground mb-6">
-                We're incredibly grateful for your support! Whether you purchase merchandise, join our Patreon, make a donation, or become a sponsor, you're helping us continue our adventures in Aneria and beyond.
+                We&apos;re incredibly grateful for your support! Whether you purchase merchandise, join our Patreon, make a donation, or become a sponsor, you&apos;re helping us continue our adventures in Aneria and beyond.
               </p>
               <a href="/#about" className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover-elevate active-elevate-2 border [border-color:var(--button-outline)] shadow-xs active:shadow-none min-h-10 rounded-md px-8">
                 Learn More About Tales of Aneria

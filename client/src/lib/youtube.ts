@@ -8,6 +8,31 @@ export interface VideoItem {
   description?: string;
 }
 
+interface YouTubePlaylistItem {
+  contentDetails?: {
+    videoId?: string;
+  };
+}
+
+interface YouTubeVideoItem {
+  id?: string;
+  snippet?: {
+    title?: string;
+    description?: string;
+    publishedAt?: string;
+    thumbnails?: {
+      high?: { url?: string };
+      default?: { url?: string };
+    };
+  };
+  statistics?: {
+    viewCount?: string;
+  };
+  contentDetails?: {
+    duration?: string;
+  };
+}
+
 function formatViewCount(count: number): string {
   if (count >= 1000000) {
     return `${(count / 1000000).toFixed(1)  }M`;
@@ -93,7 +118,7 @@ export async function getPlaylistVideosClient(playlistId: string, apiKey: string
     }
 
     const videoIds = data.items
-      .map((item: any) => item.contentDetails?.videoId)
+      .map((item: YouTubePlaylistItem) => item.contentDetails?.videoId)
       .filter(Boolean) as string[];
     
     allVideoIds.push(...videoIds);
@@ -124,7 +149,7 @@ export async function getPlaylistVideosClient(playlistId: string, apiKey: string
     
     const data = await response.json();
 
-    const videos: VideoItem[] = (data.items || []).map((video: any) => {
+    const videos: VideoItem[] = (data.items || []).map((video: YouTubeVideoItem) => {
       const snippet = video.snippet;
       const statistics = video.statistics;
       const contentDetails = video.contentDetails;

@@ -81,8 +81,8 @@ function questionHidden(query: string): Promise<string> {
 }
 
 async function main() {
-  console.log('🔐 Create Admin User');
-  console.log('===================\n');
+  console.info('🔐 Create Admin User');
+  console.info('===================\n');
 
   try {
     // Get email
@@ -103,21 +103,25 @@ async function main() {
 
     // Confirm password
     const confirmPassword = await questionHidden('Confirm password: ');
-    
+
+    // Not a secret-guessing comparison (both values are typed locally by the
+    // same operator in this CLI session), so a constant-time check has no
+    // security benefit here — plain equality is intentional.
+    // eslint-disable-next-line security/detect-possible-timing-attacks
     if (password !== confirmPassword) {
       console.error('\n❌ Passwords do not match');
       process.exit(1);
     }
 
-    console.log('\n⏳ Creating admin user...');
+    console.info('\n⏳ Creating admin user...');
 
     // Create admin user
     const user = await createUser(email, password, 'admin');
 
-    console.log('\n✅ Admin user created successfully!');
-    console.log(`   Email: ${user.email}`);
-    console.log(`   Role: ${user.role}`);
-    console.log(`   ID: ${user.id}\n`);
+    console.info('\n✅ Admin user created successfully!');
+    console.info(`   Email: ${user.email}`);
+    console.info(`   Role: ${user.role}`);
+    console.info(`   ID: ${user.id}\n`);
 
     rl.close();
     process.exit(0);

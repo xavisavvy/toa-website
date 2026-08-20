@@ -9,7 +9,7 @@ export interface CacheEntry<T> {
   expires: number;
 }
 
-export class MetricsCache<T = any> {
+export class MetricsCache<T = unknown> {
   private cache: Map<string, CacheEntry<T>> = new Map();
   private defaultTTL: number;
 

@@ -35,7 +35,7 @@ export default function TermsOfService() {
               </CardHeader>
               <CardContent className="space-y-4 text-muted-foreground">
                 <p>
-                  Welcome to Tales of Aneria. These Terms of Service ("Terms") govern your access to and use of our website, 
+                  Welcome to Tales of Aneria. These Terms of Service (&quot;Terms&quot;) govern your access to and use of our website,
                   content, and services. By accessing or using our website, you agree to be bound by these Terms.
                 </p>
                 <p>
@@ -56,7 +56,7 @@ export default function TermsOfService() {
                   <h3 className="font-semibold text-foreground mb-2">Content Ownership</h3>
                   <p>
                     All content on this website, including but not limited to text, graphics, logos, images, audio clips, 
-                    video clips, character descriptions, stories, and other materials ("Content"), is the property of Tales of Aneria 
+                    video clips, character descriptions, stories, and other materials (&quot;Content&quot;), is the property of Tales of Aneria
                     or its content creators and is protected by United States and international copyright, trademark, and other 
                     intellectual property laws.
                   </p>
@@ -111,7 +111,7 @@ export default function TermsOfService() {
                   <li>Use our content for commercial purposes without authorization</li>
                   <li>Remove or alter any copyright, trademark, or other proprietary notices</li>
                   <li>Use automated systems (bots, scrapers) to access the website without permission</li>
-                  <li>Attempt to interfere with or disrupt the website's functionality or security</li>
+                  <li>Attempt to interfere with or disrupt the website&apos;s functionality or security</li>
                   <li>Engage in any unlawful, harmful, or fraudulent activity</li>
                   <li>Impersonate any person or entity or misrepresent your affiliation</li>
                   <li>Upload or transmit viruses, malware, or other harmful code</li>
@@ -197,7 +197,7 @@ export default function TermsOfService() {
                   <li>Payments and subscriptions are processed through third-party platforms (Patreon, etc.)</li>
                   <li>Benefits and rewards are subject to change based on our content schedule and availability</li>
                   <li>We reserve the right to modify, suspend, or cancel support tiers at any time</li>
-                  <li>Refund policies are governed by the payment platform's terms (Patreon, etc.)</li>
+                  <li>Refund policies are governed by the payment platform&apos;s terms (Patreon, etc.)</li>
                   <li>Supporters must follow our community guidelines and code of conduct</li>
                 </ul>
                 <p className="mt-4">
@@ -217,7 +217,7 @@ export default function TermsOfService() {
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
                   <li>Transactions are processed through the third-party platform (Etsy, etc.)</li>
-                  <li>Returns, refunds, and customer service are subject to the platform's policies</li>
+                  <li>Returns, refunds, and customer service are subject to the platform&apos;s policies</li>
                   <li>Product availability, pricing, and descriptions may change without notice</li>
                   <li>Shipping times and costs are estimates and may vary</li>
                   <li>We are not responsible for issues arising from third-party payment processing or shipping</li>
@@ -234,7 +234,7 @@ export default function TermsOfService() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">No Warranties</h3>
                   <p>
-                    OUR WEBSITE AND CONTENT ARE PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+                    OUR WEBSITE AND CONTENT ARE PROVIDED &quot;AS IS&quot; WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                     WE DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, 
                     AND NON-INFRINGEMENT.
                   </p>
@@ -344,7 +344,7 @@ export default function TermsOfService() {
               <CardContent className="space-y-4 text-muted-foreground">
                 <p>
                   We reserve the right to modify these Terms of Service at any time. When we make changes, we will update 
-                  the "Last Updated" date at the top of this page. Significant changes will be communicated through our 
+                  the &quot;Last Updated&quot; date at the top of this page. Significant changes will be communicated through our
                   website or social media channels.
                 </p>
                 <p>

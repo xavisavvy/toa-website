@@ -67,11 +67,11 @@ function readCache(shopId: string): Product[] | null {
 
     if (isCacheValid(cachedData, shopId)) {
       const ageMinutes = Math.floor((Date.now() - cachedData.timestamp) / (1000 * 60));
-      console.log(`Using cached Etsy data (age: ${ageMinutes}m)`);
+      console.info(`Using cached Etsy data (age: ${ageMinutes}m)`);
       return cachedData.products;
     }
 
-    console.log('Etsy cache expired, fetching fresh data');
+    console.info('Etsy cache expired, fetching fresh data');
     return null;
   } catch (error) {
     console.error('Error reading Etsy cache:', error);
@@ -92,7 +92,7 @@ function writeCache(shopId: string, products: Product[]): void {
     };
 
     fs.writeFileSync(CACHE_FILE, JSON.stringify(cacheData, null, 2), 'utf-8');
-    console.log('Etsy data cached successfully');
+    console.info('Etsy data cached successfully');
   } catch (error) {
     console.error('Error writing Etsy cache:', error);
   }
@@ -110,7 +110,7 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
   const accessToken = process.env.ETSY_ACCESS_TOKEN;
 
   if (!apiKey || !accessToken) {
-    console.log('Etsy API credentials not configured - returning empty product list');
+    console.warn('Etsy API credentials not configured - returning empty product list');
     return [];
   }
 
@@ -133,11 +133,11 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
     if (!response.ok) {
       if (process.env.NODE_ENV === 'development') {
         const errorText = await response.text();
-        console.log('⚠️  Etsy API error (expected in local dev):', response.status, errorText);
+        console.warn('⚠️  Etsy API error (expected in local dev):', response.status, errorText);
       } else {
         console.error('Etsy API error:', response.status);
       }
-      console.log('Returning empty product list due to API error');
+      console.warn('Returning empty product list due to API error');
       return [];
     }
 
@@ -178,7 +178,7 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
         const cacheContent = fs.readFileSync(CACHE_FILE, 'utf-8');
         const cachedData: CachedEtsyData = JSON.parse(cacheContent);
         if (cachedData.shopId === shopId) {
-          console.log('Etsy API failed, serving stale cache as fallback');
+          console.info('Etsy API failed, serving stale cache as fallback');
           return cachedData.products.slice(0, limit);
         }
       }
@@ -186,7 +186,7 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
       console.error('Failed to read stale Etsy cache:', cacheError);
     }
     
-    console.log('Returning empty product list due to error');
+    console.warn('Returning empty product list due to error');
     return [];
   }
 }

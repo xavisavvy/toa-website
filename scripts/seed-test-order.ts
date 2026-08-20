@@ -12,7 +12,7 @@ const pool = new Pool({
 const db = drizzle(pool);
 
 async function seedTestOrder() {
-  console.log('🌱 Seeding test order...');
+  console.info('🌱 Seeding test order...');
 
   const testOrderId = 'test-order-12345678';
   const testEmail = 'test@talesofaneria.com';
@@ -44,7 +44,7 @@ async function seedTestOrder() {
       },
     }).returning();
 
-    console.log('✅ Created test order:', order.id);
+    console.info('✅ Created test order:', order.id);
 
     // Create test order items
     const items = await db.insert(orderItems).values([
@@ -87,20 +87,20 @@ async function seedTestOrder() {
       },
     ]).returning();
 
-    console.log(`✅ Created ${items.length} test order items`);
+    console.info(`✅ Created ${items.length} test order items`);
 
-    console.log('\n📦 Test Order Details:');
-    console.log('━'.repeat(50));
-    console.log(`Order ID: ${testOrderId}`);
-    console.log(`Email: ${testEmail}`);
-    console.log(`Status: ${order.status}`);
-    console.log(`Total: $${order.totalAmount} ${order.currency.toUpperCase()}`);
-    console.log('━'.repeat(50));
-    console.log('\n🧪 To test the order tracking page:');
-    console.log(`1. Go to: http://localhost:5000/track-order`);
-    console.log(`2. Enter email: ${testEmail}`);
-    console.log(`3. Enter order ID: ${testOrderId}`);
-    console.log('\n✨ Done!\n');
+    console.info('\n📦 Test Order Details:');
+    console.info('━'.repeat(50));
+    console.info(`Order ID: ${testOrderId}`);
+    console.info(`Email: ${testEmail}`);
+    console.info(`Status: ${order.status}`);
+    console.info(`Total: $${order.totalAmount} ${order.currency.toUpperCase()}`);
+    console.info('━'.repeat(50));
+    console.info('\n🧪 To test the order tracking page:');
+    console.info(`1. Go to: http://localhost:5000/track-order`);
+    console.info(`2. Enter email: ${testEmail}`);
+    console.info(`3. Enter order ID: ${testOrderId}`);
+    console.info('\n✨ Done!\n');
 
   } catch (error) {
     console.error('❌ Error seeding test order:', error);

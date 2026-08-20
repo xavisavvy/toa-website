@@ -25,6 +25,7 @@ describe("PodcastSection — DISC-03 deep-link + subscribe strip", () => {
     expect(anchor).not.toBeNull();
     // wouter renders the Link with the Router's base prefix; the suffix is
     // what matters for the deep-link behavior.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- presence verified by not.toBeNull() above
     expect(anchor!.getAttribute("href")).toMatch(/\/podcast$/);
   });
 

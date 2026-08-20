@@ -11,6 +11,8 @@ export interface EmailParams {
   html?: string;
 }
 
+const DEFAULT_BUSINESS_NAME = 'Tales of Aneria';
+
 // Initialize AWS SES client
 const sesClient = process.env.AWS_SES_ACCESS_KEY_ID 
   ? new SESClient({
@@ -98,7 +100,7 @@ You will receive another email with tracking information once your order ships.
 If you have any questions, please contact us at ${process.env.SUPPORT_EMAIL || 'support@talesofaneria.com'}.
 
 Best regards,
-${process.env.BUSINESS_NAME || 'Tales of Aneria'}
+${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}
   `.trim();
 
   const CUSTOMER_NAME = order.customerName || 'Customer';
@@ -132,14 +134,14 @@ ${process.env.BUSINESS_NAME || 'Tales of Aneria'}
       
       <p>If you have any questions, please contact us at ${process.env.SUPPORT_EMAIL || 'support@talesofaneria.com'}.</p>
       
-      <p>Best regards,<br>${process.env.BUSINESS_NAME || 'Tales of Aneria'}</p>
+      <p>Best regards,<br>${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}</p>
     </div>
   `;
 
   try {
     await sendEmail({
       to: order.customerEmail,
-      subject: `Order Confirmation - ${process.env.BUSINESS_NAME || 'Tales of Aneria'}`,
+      subject: `Order Confirmation - ${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}`,
       body: emailBody,
       html: htmlBody,
     });
@@ -169,13 +171,13 @@ Please try again or contact your bank for more information.
 If you continue to have issues, please contact us at ${process.env.SUPPORT_EMAIL || 'support@talesofaneria.com'}.
 
 Best regards,
-${process.env.BUSINESS_NAME || 'Tales of Aneria'}
+${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}
   `.trim();
 
   try {
     await sendEmail({
       to: customerEmail,
-      subject: `Payment Failed - ${process.env.BUSINESS_NAME || 'Tales of Aneria'}`,
+      subject: `Payment Failed - ${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}`,
       body: emailBody,
     });
     safeLog.info(`✅ Payment failure notification sent to ${maskEmail(customerEmail)}`);
@@ -199,7 +201,7 @@ Metadata:
 ${JSON.stringify(metadata, null, 2)}
 ` : ''}
 
-This is an automated alert from ${process.env.BUSINESS_NAME || 'Tales of Aneria'}.
+This is an automated alert from ${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}.
   `.trim();
 
   try {

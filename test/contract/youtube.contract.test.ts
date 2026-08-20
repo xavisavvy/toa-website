@@ -110,6 +110,7 @@ describe('YouTube Service Contract', () => {
         
         requiredProps.forEach(prop => {
           expect(video).toHaveProperty(prop);
+          // eslint-disable-next-line security/detect-object-injection -- prop comes from a fixed literal list above, not external input
           expect(video[prop]).toBeDefined();
         });
       });

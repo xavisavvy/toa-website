@@ -187,6 +187,7 @@ test.describe("Campaign Archive — Episode", () => {
       .textContent();
 
     expect(ldText).toBeTruthy();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- truthiness verified by the assertion above
     const parsed = JSON.parse(ldText!);
     const graph = parsed["@graph"];
     expect(Array.isArray(graph)).toBe(true);

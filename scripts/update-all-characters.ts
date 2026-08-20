@@ -65,7 +65,7 @@ async function fetchCharacterData(characterId: string) {
     // Extract class and level information
     const primaryClass = character.classes[0];
     const className = primaryClass?.definition?.name || 'Unknown';
-    const totalLevel = character.classes.reduce((sum: number, c: any) => sum + c.level, 0);
+    const totalLevel = character.classes.reduce((sum: number, c: { level: number }) => sum + c.level, 0);
 
     // Get alignment
     const alignment = character.alignmentId 
@@ -88,22 +88,22 @@ async function fetchCharacterData(characterId: string) {
 }
 
 async function main() {
-  console.log('Fetching D&D Beyond character data for ALL campaigns...\n');
+  console.info('Fetching D&D Beyond character data for ALL campaigns...\n');
 
   const allCharacterData = [];
 
   // Fetch data for each campaign
   for (const [campaignName, characterIds] of Object.entries(CAMPAIGN_CHARACTER_IDS)) {
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`CAMPAIGN: ${campaignName}`);
-    console.log(`${'='.repeat(60)}\n`);
+    console.info(`\n${'='.repeat(60)}`);
+    console.info(`CAMPAIGN: ${campaignName}`);
+    console.info(`${'='.repeat(60)}\n`);
 
     for (const id of characterIds) {
-      console.log(`Fetching character ${id}...`);
+      console.info(`Fetching character ${id}...`);
       try {
         const data = await fetchCharacterData(id);
         allCharacterData.push(data);
-        console.log(`  ✓ ${data.name} - ${data.race} ${data.class} ${data.level}`);
+        console.info(`  ✓ ${data.name} - ${data.race} ${data.class} ${data.level}`);
       } catch (_error) {
         console.error(`  ✗ Failed to fetch character ${id}`);
       }
@@ -112,9 +112,9 @@ async function main() {
     }
   }
 
-  console.log(`\n${  '='.repeat(60)}`);
-  console.log(`✓ Fetched ${allCharacterData.length} characters successfully!`);
-  console.log(`${'='.repeat(60)  }\n`);
+  console.info(`\n${  '='.repeat(60)}`);
+  console.info(`✓ Fetched ${allCharacterData.length} characters successfully!`);
+  console.info(`${'='.repeat(60)  }\n`);
 
   // Read existing characters.json
   const charactersPath = join(process.cwd(), 'client/src/data/characters.json');
@@ -125,13 +125,17 @@ async function main() {
   let updatedCount = 0;
   for (const freshData of allCharacterData) {
     const charIndex = charactersJson.characters.findIndex(
-      (c: any) => c.dndbeyondId === freshData.dndbeyondId
+      (c: { dndbeyondId?: string }) => c.dndbeyondId === freshData.dndbeyondId
     );
 
     if (charIndex !== -1) {
+      // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+      // eslint-disable-next-line security/detect-object-injection
       const existingChar = charactersJson.characters[charIndex];
-      
+
       // Update only the D&D Beyond-derived fields
+      // safe: charIndex comes from findIndex() on this same array, so it is a bounded index
+      // eslint-disable-next-line security/detect-object-injection
       charactersJson.characters[charIndex] = {
         ...existingChar,
         race: freshData.race,
@@ -139,8 +143,8 @@ async function main() {
         level: freshData.level,
         alignment: freshData.alignment,
         featuredImage: freshData.avatarUrl,
-        images: existingChar.images.length > 0 
-          ? existingChar.images.map((img: any, idx: number) => 
+        images: existingChar.images.length > 0
+          ? existingChar.images.map((img: Record<string, unknown>, idx: number) =>
               idx === 0 ? { ...img, url: freshData.avatarUrl } : img
             )
           : [{
@@ -155,15 +159,15 @@ async function main() {
       };
       
       updatedCount++;
-      console.log(`✓ Updated ${freshData.name}`);
+      console.info(`✓ Updated ${freshData.name}`);
     }
   }
 
   // Write back to characters.json
   writeFileSync(charactersPath, JSON.stringify(charactersJson, null, 2));
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`✓ Successfully updated ${updatedCount} characters in characters.json`);
-  console.log('='.repeat(60));
+  console.info(`\n${'='.repeat(60)}`);
+  console.info(`✓ Successfully updated ${updatedCount} characters in characters.json`);
+  console.info('='.repeat(60));
 }
 
 main().catch(console.error);

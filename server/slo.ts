@@ -74,6 +74,7 @@ const startTime = Date.now();
  * Record a request metric
  */
 function recordMetric(metric: RequestMetric): void {
+  // eslint-disable-next-line security/detect-object-injection -- metricsIndex is an internal counter, always an integer in [0, MAX_METRICS) via the modulo below, never external input
   metrics[metricsIndex] = metric;
   metricsIndex = (metricsIndex + 1) % MAX_METRICS;
 }

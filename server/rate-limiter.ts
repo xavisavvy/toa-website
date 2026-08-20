@@ -21,7 +21,7 @@ try {
     });
 
     redis.on('connect', () => {
-      console.log('✅ Redis connected for rate limiting');
+      console.info('✅ Redis connected for rate limiting');
     });
   }
 } catch {
@@ -33,13 +33,23 @@ try {
 // E2E_DISABLE_RATE_LIMIT leaks into a prod-like environment by mistake.
 const isProductionLike = process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT;
 
+// Builds a RedisStore bound to a non-null local so callers don't need a
+// non-null assertion on the module-level `redis` inside the sendCommand closure.
+function createRedisStore(prefix: string): RedisStore | undefined {
+  if (!redis) {
+    return undefined;
+  }
+  const client = redis;
+  return new RedisStore({
+    // @ts-expect-error - ioredis is compatible
+    sendCommand: (...args: string[]) => client.call(...args),
+    prefix,
+  });
+}
+
 // General API rate limiter (300 requests per 15 minutes)
 export const apiLimiter = rateLimit({
-  store: redis ? new RedisStore({
-    // @ts-expect-error - ioredis is compatible
-    sendCommand: (...args: string[]) => redis!.call(...args),
-    prefix: 'rl:api:',
-  }) : undefined,
+  store: createRedisStore('rl:api:'),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 300,
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
@@ -83,11 +93,7 @@ export const apiLimiter = rateLimit({
 
 // Stricter rate limiter for authentication endpoints (5 requests per 15 minutes)
 export const authLimiter = rateLimit({
-  store: redis ? new RedisStore({
-    // @ts-expect-error - ioredis is compatible
-    sendCommand: (...args: string[]) => redis!.call(...args),
-    prefix: 'rl:auth:',
-  }) : undefined,
+  store: createRedisStore('rl:auth:'),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5,
   standardHeaders: true,
@@ -106,11 +112,7 @@ export const authLimiter = rateLimit({
 
 // Aggressive rate limiter for expensive operations (10 requests per hour)
 export const expensiveLimiter = rateLimit({
-  store: redis ? new RedisStore({
-    // @ts-expect-error - ioredis is compatible
-    sendCommand: (...args: string[]) => redis!.call(...args),
-    prefix: 'rl:expensive:',
-  }) : undefined,
+  store: createRedisStore('rl:expensive:'),
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10,
   standardHeaders: true,

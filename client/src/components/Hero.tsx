@@ -40,6 +40,7 @@ export default function Hero() {
     imagesToLoad.forEach((index) => {
       if (!loadedImages.has(index)) {
         const img = new Image();
+        // eslint-disable-next-line security/detect-object-injection -- index is bounded by heroImages.length via modulo above
         img.src = heroImages[index];
         img.onload = () => {
           setLoadedImages((prev) => new Set(Array.from(prev).concat(index)));

@@ -1,3 +1,5 @@
+import type { IncomingMessage } from 'http';
+
 import 'dotenv/config';
 import crypto from 'crypto';
 import express, { type Request, Response, NextFunction } from "express";
@@ -72,9 +74,9 @@ app.use(metricsMiddleware);
 
 // Body parsing middleware (with size limits)
 // Use verify callback to preserve raw body for webhook routes
-app.use(express.json({ 
+app.use(express.json({
   limit: '1mb',
-  verify: (req: any, _res, buf) => {
+  verify: (req: IncomingMessage & { rawBody?: Buffer }, _res, buf) => {
     // Store raw body for webhook signature verification
     if (req.url === '/api/stripe/webhook' || req.url === '/api/webhooks/printful') {
       req.rawBody = buf;
@@ -90,7 +92,7 @@ app.use(csrfProtection);
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -121,23 +123,24 @@ app.use((req, res, next) => {
   const server = await registerRoutes(app);
 
   // A07: Enhanced error handling - Don't leak sensitive information
-  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    
+  app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+    const error = err as { status?: number; statusCode?: number; message?: string; stack?: string };
+    const status = error.status || error.statusCode || 500;
+
     // A09: Security Logging - Log errors for monitoring
     console.error('[ERROR]', {
       timestamp: new Date().toISOString(),
       method: req.method,
       path: req.path,
       status,
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
 
     // A07: Don't expose internal error details in production
     const message = status === 500 && process.env.NODE_ENV === 'production'
       ? 'Internal Server Error'
-      : err.message || 'Internal Server Error';
+      : error.message || 'Internal Server Error';
 
     res.status(status).json({ error: message });
   });

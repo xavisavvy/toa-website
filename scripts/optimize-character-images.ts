@@ -24,8 +24,8 @@ async function optimizeImage(inputPath: string, outputPath: string, maxWidth: nu
   const outputStats = fs.statSync(outputPath);
   const savings = ((1 - outputStats.size / inputStats.size) * 100).toFixed(1);
   
-  console.log(`${path.basename(inputPath)} -> ${path.basename(outputPath)}`);
-  console.log(`  ${(inputStats.size / 1024 / 1024).toFixed(2)} MB -> ${(outputStats.size / 1024).toFixed(0)} KB (${savings}% smaller)`);
+  console.info(`${path.basename(inputPath)} -> ${path.basename(outputPath)}`);
+  console.info(`  ${(inputStats.size / 1024 / 1024).toFixed(2)} MB -> ${(outputStats.size / 1024).toFixed(0)} KB (${savings}% smaller)`);
   
   return { inputSize: inputStats.size, outputSize: outputStats.size };
 }
@@ -33,7 +33,7 @@ async function optimizeImage(inputPath: string, outputPath: string, maxWidth: nu
 async function main() {
   const files = fs.readdirSync(CHARACTERS_DIR).filter(f => f.endsWith('.png'));
   
-  console.log(`\nOptimizing ${files.length} character images...\n`);
+  console.info(`\nOptimizing ${files.length} character images...\n`);
   
   let totalInputSize = 0;
   let totalOutputSize = 0;
@@ -52,11 +52,11 @@ async function main() {
     }
   }
   
-  console.log(`\n=== Summary ===`);
-  console.log(`Total before: ${(totalInputSize / 1024 / 1024).toFixed(2)} MB`);
-  console.log(`Total after: ${(totalOutputSize / 1024 / 1024).toFixed(2)} MB`);
-  console.log(`Total savings: ${((1 - totalOutputSize / totalInputSize) * 100).toFixed(1)}%`);
-  console.log(`\nDon't forget to update characters.json to use .webp extensions!`);
+  console.info(`\n=== Summary ===`);
+  console.info(`Total before: ${(totalInputSize / 1024 / 1024).toFixed(2)} MB`);
+  console.info(`Total after: ${(totalOutputSize / 1024 / 1024).toFixed(2)} MB`);
+  console.info(`Total savings: ${((1 - totalOutputSize / totalInputSize) * 100).toFixed(1)}%`);
+  console.info(`\nDon't forget to update characters.json to use .webp extensions!`);
 }
 
 main().catch(console.error);

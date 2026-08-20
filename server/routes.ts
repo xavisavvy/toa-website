@@ -33,6 +33,8 @@ declare module 'express-session' {
   }
 }
 
+const DATABASE_NOT_AVAILABLE_ERROR = 'Database not available';
+
 export function registerRoutes(app: Express): Server {
   // Apply API rate limiting to all /api routes
   app.use("/api", apiLimiter);
@@ -185,7 +187,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/admin/stats", async (req, res) => {
     try {
       if (!db) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
       // Get order statistics
@@ -213,7 +215,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/admin/orders", async (req, res) => {
     try {
       if (!db) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
       const { status, limit = '50', offset = '0' } = req.query;
@@ -245,7 +247,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/admin/orders/:id", async (req, res) => {
     try {
       if (!db) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
       const { id } = req.params;
@@ -282,7 +284,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/admin/audit-logs", async (req, res) => {
     try {
       if (!db) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
       const { 
@@ -331,13 +333,8 @@ export function registerRoutes(app: Express): Server {
       if (startDate) {conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string)));}
       if (endDate) {conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string)));}
 
-      let query = db.select().from(auditLogs);
-      
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as any;
-      }
-
-      const logs = await query
+      const logs = await db.select().from(auditLogs)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(desc(auditLogs.createdAt))
         .limit(limitNum)
         .offset(offset);
@@ -360,7 +357,7 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
     try {
       if (!db) {
-        return res.status(503).json({ error: 'Database not available' });
+        return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
       const { range = '30d' } = req.query;
@@ -378,17 +375,18 @@ export function registerRoutes(app: Express): Server {
         .orderBy(desc(orders.createdAt));
 
       // Calculate daily revenue
-      const dailyRevenueMap: Record<string, { date: string; revenue: number; orders: number }> = {};
-      
+      // Map (not a plain object) so keying by app-derived strings never risks
+      // prototype-pollution-style property injection.
+      const dailyRevenueMap = new Map<string, { date: string; revenue: number; orders: number }>();
+
       recentOrders.forEach((order: typeof recentOrders[0]) => {
         const date = new Date(order.createdAt).toISOString().split('T')[0];
-        if (!dailyRevenueMap[date]) {
-          dailyRevenueMap[date] = { date, revenue: 0, orders: 0 };
-        }
+        const entry = dailyRevenueMap.get(date) ?? { date, revenue: 0, orders: 0 };
         if (order.status === 'completed' || order.status === 'processing') {
-          dailyRevenueMap[date].revenue += parseFloat(order.totalAmount);
+          entry.revenue += parseFloat(order.totalAmount);
         }
-        dailyRevenueMap[date].orders += 1;
+        entry.orders += 1;
+        dailyRevenueMap.set(date, entry);
       });
 
       // Get top products
@@ -398,20 +396,19 @@ export function registerRoutes(app: Express): Server {
         .innerJoin(orders, eq(orderItems.orderId, orders.id))
         .where(gte(orders.createdAt, startDate));
 
-      const productStats: Record<string, { name: string; quantity: number; revenue: number }> = {};
-      
+      const productStats = new Map<string, { name: string; quantity: number; revenue: number }>();
+
       allOrderItems.forEach(({ order_items: item, orders: order }: typeof allOrderItems[0]) => {
         if (order.status === 'completed' || order.status === 'processing') {
           const productName = item.name;
-          if (!productStats[productName]) {
-            productStats[productName] = { name: productName, quantity: 0, revenue: 0 };
-          }
-          productStats[productName].quantity += item.quantity;
-          productStats[productName].revenue += parseFloat(item.price) * item.quantity;
+          const stats = productStats.get(productName) ?? { name: productName, quantity: 0, revenue: 0 };
+          stats.quantity += item.quantity;
+          stats.revenue += parseFloat(item.price) * item.quantity;
+          productStats.set(productName, stats);
         }
       });
 
-      const topProducts = Object.values(productStats)
+      const topProducts = Array.from(productStats.values())
         .sort((a, b) => b.revenue - a.revenue)
         .slice(0, 10);
 
@@ -467,7 +464,7 @@ export function registerRoutes(app: Express): Server {
       };
 
       res.json({
-        dailyRevenue: Object.values(dailyRevenueMap).sort((a, b) => a.date.localeCompare(b.date)),
+        dailyRevenue: Array.from(dailyRevenueMap.values()).sort((a, b) => a.date.localeCompare(b.date)),
         topProducts,
         ordersByStatus,
         metrics: {
@@ -587,7 +584,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: validation.error });
       }
 
-      const videos = await getPlaylistVideos(playlistId, validation.value!);
+      const videos = await getPlaylistVideos(playlistId, validation.value);
       res.json(videos);
     } catch (error) {
       console.error('Error fetching playlist:', error);
@@ -614,7 +611,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: validation.error });
       }
 
-      const videos = await getChannelVideos(channelId, validation.value!);
+      const videos = await getChannelVideos(channelId, validation.value);
       res.json(videos);
     } catch (error) {
       console.error('Error fetching channel videos:', error);
@@ -641,7 +638,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: validation.error });
       }
 
-      const shorts = await getChannelShorts(channelId, validation.value!);
+      const shorts = await getChannelShorts(channelId, validation.value);
       res.json(shorts);
     } catch (error) {
       console.error('Error fetching YouTube Shorts:', error);
@@ -704,13 +701,43 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: limitValidation.error });
       }
       
-      const episodes = await getPodcastFeed(feedUrl, limitValidation.value!);
+      const episodes = await getPodcastFeed(feedUrl, limitValidation.value);
       res.json(episodes);
     } catch (error) {
       console.error('Error fetching podcast feed:', error);
       res.status(500).json({ error: 'Failed to fetch podcast feed' });
     }
   });
+
+  // Shared by the three redirect-hop checks below (original/final/fallback URL).
+  function isAllowedAudioDomain(hostname: string, allowedDomains: string[]): boolean {
+    return allowedDomains.some(domain => hostname.endsWith(domain) || hostname === domain);
+  }
+
+  // Runs the SSRF + domain-allowlist check shared by all three redirect hops
+  // in the audio proxy below (original URL, post-redirect final URL, and the
+  // no-redirect fallback), logging the same security events each hop used to
+  // log inline.
+  function checkAudioUrlSafety(
+    urlStr: string,
+    allowedDomains: string[],
+    eventNames: { invalidUrl: string; unauthorizedDomain: string },
+    context: Record<string, unknown>
+  ): { ok: true } | { ok: false; status: number; error: string } {
+    const validation = validateUrl(urlStr);
+    if (!validation.valid) {
+      logSecurityEvent(eventNames.invalidUrl, { ...context, error: validation.error });
+      return { ok: false, status: 400, error: validation.error || 'Invalid URL' };
+    }
+
+    const hostname = new URL(urlStr).hostname;
+    if (!isAllowedAudioDomain(hostname, allowedDomains)) {
+      logSecurityEvent(eventNames.unauthorizedDomain, context);
+      return { ok: false, status: 403, error: 'Audio URL from unauthorized domain' };
+    }
+
+    return { ok: true };
+  }
 
   // Audio proxy endpoint to bypass CORS restrictions
   // Uses redirect approach for better production reliability
@@ -733,27 +760,18 @@ export function registerRoutes(app: Express): Server {
         // If decoding fails, use original
       }
 
-      // Validate URL to prevent SSRF attacks
-      const urlValidation = validateUrl(decodedUrl);
-      if (!urlValidation.valid) {
-        logSecurityEvent('SSRF_ATTEMPT', { 
-          url: decodedUrl, 
-          ip: req.ip,
-          error: urlValidation.error 
-        });
-        return res.status(400).json({ error: urlValidation.error });
-      }
-
       // Only allow audio from known podcast hosting domains
       const allowedDomains = ['anchor.fm', 'cloudfront.net', 'spotify.com', 'apple.com', 'spreaker.com', 'buzzsprout.com', 'libsyn.com', 'podbean.com', 'simplecast.com', 'transistor.fm', 'captivate.fm', 'megaphone.fm', 'omny.fm', 'acast.com'];
-      const urlObj = new URL(decodedUrl);
-      const isAllowed = allowedDomains.some(domain => 
-        urlObj.hostname.endsWith(domain) || urlObj.hostname === domain
-      );
 
-      if (!isAllowed) {
-        logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN', { url: decodedUrl, ip: req.ip });
-        return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
+      // Validate URL (SSRF) and confirm it's on an allowed audio domain
+      const urlCheck = checkAudioUrlSafety(
+        decodedUrl,
+        allowedDomains,
+        { invalidUrl: 'SSRF_ATTEMPT', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN' },
+        { url: decodedUrl, ip: req.ip }
+      );
+      if (!urlCheck.ok) {
+        return res.status(urlCheck.status).json({ error: urlCheck.error });
       }
 
       // Follow redirects to get the final audio URL
@@ -780,32 +798,17 @@ export function registerRoutes(app: Express): Server {
           return res.status(500).json({ error: 'Failed to resolve audio URL' });
         }
 
-        // Validate final URL to prevent SSRF via redirects
-        const finalUrlValidation = validateUrl(finalUrl);
-        if (!finalUrlValidation.valid) {
-          logSecurityEvent('SSRF_ATTEMPT_FINAL_URL', {
-            originalUrl: decodedUrl,
-            finalUrl,
-            ip: req.ip,
-            error: finalUrlValidation.error,
-          });
-          return res.status(400).json({ error: finalUrlValidation.error });
-        }
-
-        const finalUrlObj = new URL(finalUrl);
-        const isFinalAllowed = allowedDomains.some(domain =>
-          finalUrlObj.hostname.endsWith(domain) || finalUrlObj.hostname === domain
+        // Validate the post-redirect URL (SSRF) and confirm its domain too
+        const finalUrlCheck = checkAudioUrlSafety(
+          finalUrl,
+          allowedDomains,
+          { invalidUrl: 'SSRF_ATTEMPT_FINAL_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FINAL' },
+          { originalUrl: decodedUrl, finalUrl, ip: req.ip }
         );
-
-        if (!isFinalAllowed) {
-          logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN_FINAL', {
-            originalUrl: decodedUrl,
-            finalUrl,
-            ip: req.ip,
-          });
-          return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
+        if (!finalUrlCheck.ok) {
+          return res.status(finalUrlCheck.status).json({ error: finalUrlCheck.error });
         }
-        
+
         // Redirect client to the actual audio source
         res.redirect(302, finalUrl);
       } catch {
@@ -813,34 +816,21 @@ export function registerRoutes(app: Express): Server {
 
         // As a fallback, only redirect to the original decodedUrl
         // if it still passes validation and domain checks
-        const fallbackValidation = validateUrl(decodedUrl);
-        if (!fallbackValidation.valid) {
-          logSecurityEvent('SSRF_ATTEMPT_FALLBACK_URL', {
-            url: decodedUrl,
-            ip: req.ip,
-            error: fallbackValidation.error,
-          });
-          return res.status(400).json({ error: fallbackValidation.error });
-        }
-
-        const fallbackUrlObj = new URL(decodedUrl);
-        const isFallbackAllowed = allowedDomains.some(domain =>
-          fallbackUrlObj.hostname.endsWith(domain) || fallbackUrlObj.hostname === domain
+        const fallbackCheck = checkAudioUrlSafety(
+          decodedUrl,
+          allowedDomains,
+          { invalidUrl: 'SSRF_ATTEMPT_FALLBACK_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FALLBACK' },
+          { url: decodedUrl, ip: req.ip }
         );
-
-        if (!isFallbackAllowed) {
-          logSecurityEvent('UNAUTHORIZED_AUDIO_DOMAIN_FALLBACK', {
-            url: decodedUrl,
-            ip: req.ip,
-          });
-          return res.status(403).json({ error: 'Audio URL from unauthorized domain' });
+        if (!fallbackCheck.ok) {
+          return res.status(fallbackCheck.status).json({ error: fallbackCheck.error });
         }
 
         // If all checks pass, redirect directly to the original URL
         res.redirect(302, decodedUrl);
       }
-    } catch (error: any) {
-      console.error('Error proxying audio:', error?.message || error);
+    } catch (error) {
+      console.error('Error proxying audio:', error instanceof Error ? error.message : error);
       if (!res.headersSent) {
         res.status(500).json({ error: 'Failed to proxy audio file' });
       }
@@ -866,7 +856,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: validation.error });
       }
       
-      const products = await getShopListings(shopId, validation.value!);
+      const products = await getShopListings(shopId, validation.value);
       res.json(products);
     } catch (error) {
       console.error('Error fetching Etsy listings:', error);
@@ -885,7 +875,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: validation.error });
       }
       
-      const products = await getPrintfulSyncProducts(validation.value!);
+      const products = await getPrintfulSyncProducts(validation.value);
       res.json(products);
     } catch (error) {
       console.error('Error fetching Printful products:', error);
@@ -1246,7 +1236,7 @@ export function registerRoutes(app: Express): Server {
               stripePaymentIntentId: fullSession.payment_intent as string,
               customerEmail: fullSession.customer_details?.email || '',
               customerName: fullSession.customer_details?.name || undefined,
-              totalAmount: (fullSession.amount_total! / 100).toFixed(2),
+              totalAmount: ((fullSession.amount_total ?? 0) / 100).toFixed(2),
               currency: fullSession.currency || 'usd',
               shippingAddress: (fullSession as any).shipping_details?.address ? {
                 name: (fullSession as any).shipping_details.name || '',
@@ -1363,7 +1353,7 @@ export function registerRoutes(app: Express): Server {
               try {
                 const order = await getOrderByStripeSessionId(sessionId);
                 if (order) {
-                  await updateOrderWithPrintfulId(order.id, String(result.orderId!));
+                  await updateOrderWithPrintfulId(order.id, String(result.orderId));
                   
                   // Send confirmation email to customer
                   const items = [{
@@ -1440,7 +1430,7 @@ export function registerRoutes(app: Express): Server {
             if (asyncOrderData) {
               const result = await createPrintfulOrder(asyncOrderData);
               
-              if (result.success && result.orderId) {
+              if (result.success) {
                 const order = await getOrderByStripeSessionId(asyncEventSession.id);
                 if (order) {
                   await updateOrderWithPrintfulId(order.id, String(result.orderId));
@@ -1826,7 +1816,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Sponsorship contact form endpoint
-  app.post("/api/contact/sponsor", async (req, res) => {
+  app.post("/api/contact/sponsor", (req, res) => {
     try {
       const { name, email, company, interest, message } = req.body;
 

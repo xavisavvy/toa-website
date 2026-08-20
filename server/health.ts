@@ -12,7 +12,14 @@ export interface ComponentHealth {
   status: HealthStatus;
   message?: string;
   responseTime?: number;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
+}
+
+const UNKNOWN_ERROR_MESSAGE = "Unknown error";
+
+/** Extracts a human-readable message from a caught value, falling back to a generic message. */
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
 }
 
 export interface HealthCheckResponse {
@@ -56,12 +63,12 @@ async function checkStorage(): Promise<ComponentHealth> {
       status: "unhealthy",
       message: "Storage unavailable",
       responseTime: Date.now() - start,
-      details: { error: error instanceof Error ? error.message : "Unknown error" }
+      details: { error: getErrorMessage(error) }
     };
   }
 }
 
-async function checkCache(): Promise<ComponentHealth> {
+function checkCache(): ComponentHealth {
   const start = Date.now();
   try {
     const cacheMetrics = metrics.getMetrics().cache;
@@ -101,7 +108,7 @@ async function checkCache(): Promise<ComponentHealth> {
       message: "Cache unavailable, using fallback",
       responseTime: Date.now() - start,
       details: { 
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: getErrorMessage(error),
         mode: "fallback"
       }
     };
@@ -165,7 +172,7 @@ function checkMemory(): ComponentHealth {
       status: "unhealthy",
       message: "Memory check failed",
       responseTime: Date.now() - start,
-      details: { error: error instanceof Error ? error.message : "Unknown error" }
+      details: { error: getErrorMessage(error) }
     };
   }
 }
@@ -202,7 +209,7 @@ async function checkDisk(): Promise<ComponentHealth> {
       status: "unhealthy",
       message: "Disk I/O failed",
       responseTime: Date.now() - start,
-      details: { error: error instanceof Error ? error.message : "Unknown error" }
+      details: { error: getErrorMessage(error) }
     };
   }
 }
@@ -266,7 +273,7 @@ function checkCPU(): ComponentHealth {
       status: "unhealthy",
       message: "CPU check failed",
       responseTime: Date.now() - start,
-      details: { error: error instanceof Error ? error.message : "Unknown error" }
+      details: { error: getErrorMessage(error) }
     };
   }
 }
@@ -295,7 +302,7 @@ function determineOverallStatus(checks: HealthCheckResponse["checks"]): HealthSt
 export async function getHealthStatus(): Promise<HealthCheckResponse> {
   const checks = {
     storage: await checkStorage(),
-    cache: await checkCache(),
+    cache: checkCache(),
     memory: checkMemory(),
     disk: await checkDisk(),
     cpu: checkCPU()

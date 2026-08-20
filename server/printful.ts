@@ -463,6 +463,27 @@ export async function getCatalogVariantId(syncVariantId: string): Promise<number
  * Get exact shipping rates and tax from Printful for a specific order
  * This gives us ACTUAL costs before creating the Stripe checkout
  */
+interface PrintfulApiShippingRate {
+  id: string;
+  name: string;
+  rate: string;
+  currency: string;
+  vat?: string;
+  minDeliveryDays?: number;
+  maxDeliveryDays?: number;
+  min_delivery_days?: number;
+  max_delivery_days?: number;
+  costs?: {
+    subtotal?: string;
+    discount?: string;
+    digitization?: string;
+    additional_fee?: string;
+    fulfillment_fee?: string;
+    tax?: string;
+    total?: string;
+  };
+}
+
 export async function getPrintfulShippingEstimate(params: {
   recipient: {
     address1: string;
@@ -532,9 +553,9 @@ export async function getPrintfulShippingEstimate(params: {
       return null;
     }
 
-    const data = await response.json();
+    const data = await response.json() as { result?: PrintfulApiShippingRate[] };
     console.log('✅ Printful shipping response received');
-    console.log('📦 First rate object:', JSON.stringify(data.result[0], null, 2));
+    console.log('📦 First rate object:', JSON.stringify(data.result?.[0], null, 2));
 
     if (!data.result || !data.result.length) {
       console.error('No shipping rates returned from Printful');
@@ -571,7 +592,7 @@ export async function getPrintfulShippingEstimate(params: {
         vat: cheapestRate.vat || '0',
         total: cheapestRate.costs?.total || '0',
       },
-      rates: data.result.map((rate: any) => ({
+      rates: data.result.map((rate: PrintfulApiShippingRate) => ({
         id: rate.id,
         name: rate.name,
         rate: rate.rate,

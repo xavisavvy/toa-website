@@ -226,7 +226,7 @@ test.describe('Order Tracking E2E', () => {
 });
 
 test.describe('Order Tracking - Database Integration', () => {
-  test('database schema should support order tracking', async () => {
+  test('database schema should support order tracking', () => {
     // This is a meta-test to ensure schema exists
     // In production, this would verify database tables exist
     
@@ -241,7 +241,7 @@ test.describe('Order Tracking - Database Integration', () => {
 });
 
 test.describe('Order Tracking - Email Notifications', () => {
-  test('email templates should be well-formed', async () => {
+  test('email templates should be well-formed', () => {
     // This would test email template generation
     // For now, we verify the notification service exists
     

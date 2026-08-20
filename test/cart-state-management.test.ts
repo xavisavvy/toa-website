@@ -12,7 +12,6 @@ import {
 } from '@/lib/cart';
 import type { Cart, CartItem } from '@/types/cart';
 
-/* eslint-disable no-undef */
 describe('Cart State Management Edge Cases', () => {
   beforeEach(() => {
     // Clear localStorage before each test
@@ -461,4 +460,3 @@ describe('Cart State Management Edge Cases', () => {
     });
   });
 });
-/* eslint-enable no-undef */

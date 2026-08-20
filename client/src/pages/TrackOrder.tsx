@@ -55,8 +55,8 @@ export default function TrackOrder() {
 
       const data = await response.json();
       setOrderDetails(data);
-    } catch (err: any) {
-      setError(err.message || 'Unable to find order. Please check your email and order ID.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to find order. Please check your email and order ID.');
     } finally {
       setLoading(false);
     }

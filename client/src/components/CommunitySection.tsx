@@ -142,11 +142,11 @@ export default function CommunitySection() {
                     className="text-muted-foreground mb-2 italic"
                     data-testid="text-testimonial-1"
                   >
-                    "This brought a tear to my eye. Love to see a campaign come
+                    &quot;This brought a tear to my eye. Love to see a campaign come
                     to fruition. The roleplay was fantastic, the story was
                     brimming with life and creativity. It was a joy to listen
                     to. Thank you all so much. I will be waiting with
-                    anticipation for the next adventure."
+                    anticipation for the next adventure.&quot;
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -160,13 +160,13 @@ export default function CommunitySection() {
                     className="text-muted-foreground mb-2 italic"
                     data-testid="text-testimonial-2"
                   >
-                    "I do wanna say you guys are amazing. I have learned so much
-                    as a DM and a player watching you guys. Y'all aren't overly
-                    polished and I love y'all for it. Every episode has felt
-                    like we are just chilling in the room with y'all as you
-                    play. Thank you so much for this campaign and the Time y'all
-                    put into it. Can't wait to see what y'all have in store for
-                    us later!"
+                    &quot;I do wanna say you guys are amazing. I have learned so much
+                    as a DM and a player watching you guys. Y&apos;all aren&apos;t overly
+                    polished and I love y&apos;all for it. Every episode has felt
+                    like we are just chilling in the room with y&apos;all as you
+                    play. Thank you so much for this campaign and the Time y&apos;all
+                    put into it. Can&apos;t wait to see what y&apos;all have in store for
+                    us later!&quot;
                   </p>
                   <p
                     className="text-sm font-medium"
@@ -180,8 +180,8 @@ export default function CommunitySection() {
                     className="text-muted-foreground mb-2 italic"
                     data-testid="text-testimonial-2"
                   >
-                    "☠ This world is amazing. Love exploring it with you
-                    guys."... "Shenanigans abound!"
+                    &quot;☠ This world is amazing. Love exploring it with you
+                    guys.&quot;... &quot;Shenanigans abound!&quot;
                   </p>
                   <p
                     className="text-sm font-medium"

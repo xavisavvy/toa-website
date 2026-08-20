@@ -141,9 +141,9 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
                     preload="metadata"
                     onError={(e) => {
                       console.error('Audio playback error:', e);
-                      console.log('Audio URL:', featuredEpisode.audioUrl);
+                      console.info('Audio URL:', featuredEpisode.audioUrl);
                     }}
-                    onLoadedMetadata={() => console.log('Audio loaded successfully')}
+                    onLoadedMetadata={() => console.info('Audio loaded successfully')}
                   >
                     <source src={`/api/podcast/audio-proxy?url=${encodeURIComponent(featuredEpisode.audioUrl)}`} type="audio/mpeg" />
                     <source src={`/api/podcast/audio-proxy?url=${encodeURIComponent(featuredEpisode.audioUrl)}`} type="audio/mp4" />

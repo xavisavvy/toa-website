@@ -233,17 +233,21 @@ export function validateString(input: string, maxLength: number = 1000): { valid
 /**
  * A03: Injection - Validate numeric input
  */
-export function validateNumber(input: unknown, min: number = 1, max: number = 1000): { valid: boolean; error?: string; value?: number } {
+export type NumberValidationResult =
+  | { valid: true; value: number }
+  | { valid: false; error: string };
+
+export function validateNumber(input: unknown, min: number = 1, max: number = 1000): NumberValidationResult {
   // Strict validation: must be a valid integer string with no extra characters
   const stringInput = String(input).trim();
-  
+
   // Reject if contains non-numeric characters (except leading minus)
   if (!/^-?\d+$/.test(stringInput)) {
     return { valid: false, error: 'Input must be a valid number' };
   }
-  
+
   const num = parseInt(stringInput, 10);
-  
+
   if (isNaN(num)) {
     return { valid: false, error: 'Input must be a valid number' };
   }

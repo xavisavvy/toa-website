@@ -2,31 +2,31 @@ import 'dotenv/config';
 import { sendEmail } from '../server/notification-service';
 
 async function testSESEmail() {
-  console.log('🧪 Testing AWS SES Email Service...\n');
+  console.info('🧪 Testing AWS SES Email Service...\n');
 
   // Check if SES is configured
   if (!process.env.AWS_SES_ACCESS_KEY_ID) {
     console.error('❌ AWS SES not configured!');
-    console.log('\nPlease set the following environment variables:');
-    console.log('  - AWS_SES_REGION');
-    console.log('  - AWS_SES_ACCESS_KEY_ID');
-    console.log('  - AWS_SES_SECRET_ACCESS_KEY');
-    console.log('  - AWS_SES_FROM_EMAIL\n');
-    console.log('See docs/integration/AWS_SES_SETUP.md for setup instructions.');
+    console.info('\nPlease set the following environment variables:');
+    console.info('  - AWS_SES_REGION');
+    console.info('  - AWS_SES_ACCESS_KEY_ID');
+    console.info('  - AWS_SES_SECRET_ACCESS_KEY');
+    console.info('  - AWS_SES_FROM_EMAIL\n');
+    console.info('See docs/integration/AWS_SES_SETUP.md for setup instructions.');
     process.exit(1);
   }
 
-  console.log('Configuration:');
-  console.log(`  Region: ${process.env.AWS_SES_REGION}`);
-  console.log(`  From Email: ${process.env.AWS_SES_FROM_EMAIL}`);
-  console.log(`  Access Key: ${process.env.AWS_SES_ACCESS_KEY_ID?.substring(0, 10)}...`);
-  console.log('');
+  console.info('Configuration:');
+  console.info(`  Region: ${process.env.AWS_SES_REGION}`);
+  console.info(`  From Email: ${process.env.AWS_SES_FROM_EMAIL}`);
+  console.info(`  Access Key: ${process.env.AWS_SES_ACCESS_KEY_ID?.substring(0, 10)}...`);
+  console.info('');
 
   // Get test recipient email from command line or use default
   const testEmail = process.argv[2] || process.env.SUPPORT_EMAIL || 'test@example.com';
   
-  console.log(`📧 Sending test email to: ${testEmail}`);
-  console.log('⚠️  Note: If in SES Sandbox mode, this email must be verified!\n');
+  console.info(`📧 Sending test email to: ${testEmail}`);
+  console.info('⚠️  Note: If in SES Sandbox mode, this email must be verified!\n');
 
   try {
     const result = await sendEmail({
@@ -75,9 +75,9 @@ For more information, see: docs/integration/AWS_SES_SETUP.md`,
       `,
     });
 
-    console.log('\n✅ Test email sent successfully!');
-    console.log(`   Result: ${result ? 'Delivered to SES' : 'Logged (SES not configured)'}`);
-    console.log('\nCheck the recipient\'s inbox (and spam folder) for the test email.');
+    console.info('\n✅ Test email sent successfully!');
+    console.info(`   Result: ${result ? 'Delivered to SES' : 'Logged (SES not configured)'}`);
+    console.info('\nCheck the recipient\'s inbox (and spam folder) for the test email.');
     
   } catch (error) {
     console.error('\n❌ Failed to send test email:');
@@ -87,19 +87,19 @@ For more information, see: docs/integration/AWS_SES_SETUP.md`,
       
       // Provide helpful troubleshooting tips
       if (error.message.includes('not verified')) {
-        console.log('\n💡 Troubleshooting:');
-        console.log('   - Verify the FROM email address in AWS SES Console');
-        console.log('   - If in Sandbox mode, verify the TO email address as well');
-        console.log('   - See: docs/integration/AWS_SES_SETUP.md');
+        console.info('\n💡 Troubleshooting:');
+        console.info('   - Verify the FROM email address in AWS SES Console');
+        console.info('   - If in Sandbox mode, verify the TO email address as well');
+        console.info('   - See: docs/integration/AWS_SES_SETUP.md');
       } else if (error.message.includes('credentials')) {
-        console.log('\n💡 Troubleshooting:');
-        console.log('   - Check AWS_SES_ACCESS_KEY_ID and AWS_SES_SECRET_ACCESS_KEY');
-        console.log('   - Ensure IAM user has SES permissions');
-        console.log('   - Verify credentials are not expired');
+        console.info('\n💡 Troubleshooting:');
+        console.info('   - Check AWS_SES_ACCESS_KEY_ID and AWS_SES_SECRET_ACCESS_KEY');
+        console.info('   - Ensure IAM user has SES permissions');
+        console.info('   - Verify credentials are not expired');
       } else if (error.message.includes('region')) {
-        console.log('\n💡 Troubleshooting:');
-        console.log('   - Check AWS_SES_REGION is set correctly');
-        console.log('   - Ensure SES is available in your region');
+        console.info('\n💡 Troubleshooting:');
+        console.info('   - Check AWS_SES_REGION is set correctly');
+        console.info('   - Ensure SES is available in your region');
       }
     } else {
       console.error(error);

@@ -38,8 +38,8 @@ async function optimizeImage(inputPath: string, outputPath: string, maxWidth: nu
   const outputStats = fs.statSync(outputPath);
   const savings = ((1 - outputStats.size / inputStats.size) * 100).toFixed(1);
   
-  console.log(`${path.basename(inputPath)} -> ${path.basename(outputPath)}`);
-  console.log(`  ${(inputStats.size / 1024 / 1024).toFixed(2)} MB -> ${(outputStats.size / 1024).toFixed(0)} KB (${savings}% smaller)`);
+  console.info(`${path.basename(inputPath)} -> ${path.basename(outputPath)}`);
+  console.info(`  ${(inputStats.size / 1024 / 1024).toFixed(2)} MB -> ${(outputStats.size / 1024).toFixed(0)} KB (${savings}% smaller)`);
 }
 
 async function main() {
@@ -51,7 +51,7 @@ async function main() {
     f.endsWith('.png') || f.endsWith('.jpg')
   );
   
-  console.log(`\nOptimizing ${files.length} images...\n`);
+  console.info(`\nOptimizing ${files.length} images...\n`);
   
   let totalInputSize = 0;
   let totalOutputSize = 0;
@@ -72,10 +72,10 @@ async function main() {
     }
   }
   
-  console.log(`\n=== Summary ===`);
-  console.log(`Total before: ${(totalInputSize / 1024 / 1024).toFixed(2)} MB`);
-  console.log(`Total after: ${(totalOutputSize / 1024 / 1024).toFixed(2)} MB`);
-  console.log(`Total savings: ${((1 - totalOutputSize / totalInputSize) * 100).toFixed(1)}%`);
+  console.info(`\n=== Summary ===`);
+  console.info(`Total before: ${(totalInputSize / 1024 / 1024).toFixed(2)} MB`);
+  console.info(`Total after: ${(totalOutputSize / 1024 / 1024).toFixed(2)} MB`);
+  console.info(`Total savings: ${((1 - totalOutputSize / totalInputSize) * 100).toFixed(1)}%`);
 }
 
 main().catch(console.error);

@@ -28,7 +28,7 @@ export default function CheckoutCancel() {
               </p>
 
               <p className="text-sm text-muted-foreground mb-8">
-                If you experienced any issues during checkout, please contact us and we'll be happy to help.
+                If you experienced any issues during checkout, please contact us and we&apos;ll be happy to help.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

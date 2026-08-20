@@ -38,7 +38,7 @@ app.get('/health', (req, res) => {
 app.use((req, res, next) => {
   const start = Date.now();
   const requestPath = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -58,7 +58,7 @@ app.use((req, res, next) => {
         logLine = `${logLine.slice(0, 79)  }…`;
       }
 
-      console.log(logLine);
+      console.info(logLine);
     }
   });
 
@@ -104,29 +104,30 @@ app.use((req, res, next) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
     
-    console.log(`Serving static files from: ${distPath}`);
+    console.info(`Serving static files from: ${distPath}`);
   }
 
   // A07: Enhanced error handling - Don't leak sensitive information
   // IMPORTANT: Register error handler AFTER all routes
-   
-  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    
+
+  app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+    const error = err as { status?: number; statusCode?: number; message?: string; stack?: string };
+    const status = error.status || error.statusCode || 500;
+
     // A09: Security Logging - Log errors for monitoring
     console.error('[ERROR]', {
       timestamp: new Date().toISOString(),
       method: req.method,
       path: req.path,
       status,
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
 
     // A07: Don't expose internal error details in production
     const message = status === 500 && process.env.NODE_ENV === 'production'
       ? 'Internal Server Error'
-      : err.message || 'Internal Server Error';
+      : error.message || 'Internal Server Error';
 
     res.status(status).json({ error: message });
   });
@@ -144,22 +145,22 @@ app.use((req, res, next) => {
   
   // Start the server and keep it running
   server.listen(port, '0.0.0.0', () => {
-    console.log(`Server running on port ${port} (${process.env.NODE_ENV || 'production'} mode)`);
+    console.info(`Server running on port ${port} (${process.env.NODE_ENV || 'production'} mode)`);
   });
 
   // Handle graceful shutdown
   process.on('SIGTERM', () => {
-    console.log('SIGTERM received, closing server gracefully...');
+    console.info('SIGTERM received, closing server gracefully...');
     server.close(() => {
-      console.log('Server closed');
+      console.info('Server closed');
       process.exit(0);
     });
   });
 
   process.on('SIGINT', () => {
-    console.log('SIGINT received, closing server gracefully...');
+    console.info('SIGINT received, closing server gracefully...');
     server.close(() => {
-      console.log('Server closed');
+      console.info('Server closed');
       process.exit(0);
     });
   });

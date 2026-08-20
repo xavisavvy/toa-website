@@ -1,5 +1,7 @@
 import { performance } from 'perf_hooks';
 
+import type { Request, Response, NextFunction } from 'express';
+
 export interface ApiMetrics {
   endpoint: string;
   duration: number;
@@ -31,11 +33,11 @@ class MetricsCollector {
   private startTime = Date.now();
 
   trackApiCall(endpoint: string, duration: number, status: 'success' | 'error' = 'success') {
-    if (!this.apiLatency.has(endpoint)) {
-      this.apiLatency.set(endpoint, []);
+    let latencies = this.apiLatency.get(endpoint);
+    if (!latencies) {
+      latencies = [];
+      this.apiLatency.set(endpoint, latencies);
     }
-    
-    const latencies = this.apiLatency.get(endpoint)!;
     latencies.push(duration);
     
     // Keep only last 1000 measurements per endpoint
@@ -90,6 +92,7 @@ class MetricsCollector {
     const latencyStats: Record<string, unknown> = {};
     for (const [endpoint, values] of this.apiLatency.entries()) {
       if (values.length > 0) {
+        // eslint-disable-next-line security/detect-object-injection -- endpoint is always "<HTTP method> <path>" (set in trackApiCall/metricsMiddleware below), so it can never equal a reserved property name like "__proto__"
         latencyStats[endpoint] = {
           count: values.length,
           p50: this.percentile(values, 50),
@@ -138,7 +141,7 @@ class MetricsCollector {
 export const metrics = new MetricsCollector();
 
 // Middleware to track API calls
-export function metricsMiddleware(req: any, res: any, next: any) {
+export function metricsMiddleware(req: Request, res: Response, next: NextFunction) {
   const start = performance.now();
   
   res.on('finish', () => {

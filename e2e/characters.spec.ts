@@ -223,9 +223,11 @@ test.describe('Phase 2 enhancements', () => {
     }>;
     const person = graph.find((n) => n['@type'] === 'Person');
     expect(person).toBeDefined();
+    /* eslint-disable @typescript-eslint/no-non-null-assertion -- presence verified by toBeDefined() above */
     expect(person!.name).toBe('Preston Farr');
     expect(person!.description).toContain('Wayne');
     expect(person!.description).toContain('Tales of Aneria');
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
     // Orphan playerId path: holiday-special-1 emits the @graph WITHOUT a Person node
     await page.goto('/characters/holiday-special-1');
