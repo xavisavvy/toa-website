@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { WorldMeta } from "@/data/worlds";
 import { getPlaylistIdFromUrl } from "@/lib/campaigns";
+import { TALES_OF_ANERIA_CHANNEL_ID } from "@/lib/youtube";
 
 interface PlaylistVideo {
   id: string;
@@ -23,7 +24,13 @@ interface PlaylistVideo {
  * Authored fields in episodes.json (title, summary, podcastUrl) are kept as
  * overrides where present — only youtubeUrl/thumbnail/duration/airDate come
  * from the live playlist. Falls back to the static list untouched when the
- * world has no playlist link, or the playlist fetch fails/returns nothing.
+ * world has no playlist link.
+ *
+ * The curated playlist a world links to can lag behind the channel — new
+ * episodes get uploaded but not always added to that specific playlist. When
+ * the playlist comes back empty, fall back to the full channel catalog
+ * filtered to titles mentioning the world/campaign name, so a stale playlist
+ * doesn't silently mask real, current episodes behind the static list.
  */
 export function useCampaignEpisodes(
   campaignSlug: string | undefined,
@@ -32,7 +39,7 @@ export function useCampaignEpisodes(
 ): Episode[] {
   const playlistId = getPlaylistIdFromUrl(world?.link);
 
-  const { data: playlistVideos } = useQuery<PlaylistVideo[]>({
+  const { data: playlistVideos, isFetched: playlistFetched } = useQuery<PlaylistVideo[]>({
     queryKey: ["/api/youtube/playlist", playlistId],
     enabled: !!playlistId,
     queryFn: async () => {
@@ -45,11 +52,34 @@ export function useCampaignEpisodes(
     staleTime: 5 * 60 * 1000,
   });
 
-  if (!playlistId || !playlistVideos || playlistVideos.length === 0) {
+  const playlistEmpty =
+    !!playlistId && playlistFetched && (!playlistVideos || playlistVideos.length === 0);
+
+  const worldName = world?.name;
+
+  const { data: channelFallbackVideos } = useQuery<PlaylistVideo[]>({
+    queryKey: ["/api/youtube/channel", TALES_OF_ANERIA_CHANNEL_ID, "campaign-fallback", worldName],
+    enabled: playlistEmpty && !!worldName,
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/youtube/channel/${TALES_OF_ANERIA_CHANNEL_ID}?maxResults=500`
+      );
+      if (!response.ok) {return [];}
+      const videos: PlaylistVideo[] = await response.json();
+      const needle = (worldName ?? "").toLowerCase();
+      return videos.filter((video) => video.title.toLowerCase().includes(needle));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const liveVideos =
+    playlistVideos && playlistVideos.length > 0 ? playlistVideos : channelFallbackVideos;
+
+  if (!playlistId || !liveVideos || liveVideos.length === 0) {
     return staticEpisodes;
   }
 
-  const orderedVideos = [...playlistVideos].sort(
+  const orderedVideos = [...liveVideos].sort(
     (a, b) =>
       new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
   );
