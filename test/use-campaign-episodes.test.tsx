@@ -213,4 +213,72 @@ describe("useCampaignEpisodes", () => {
 
     expect(result.current).toEqual(staticEpisodes);
   });
+
+  it("falls back to the channel catalog, filtered by campaign name, when the playlist comes back empty", async () => {
+    const channelVideos = [
+      {
+        id: "taebrinVid1",
+        title: "Ep 1 raw - Journeys Through Taebrin - D&D Live Play",
+        thumbnail: "https://i.ytimg.com/vi/taebrinVid1/hqdefault.jpg",
+        duration: "2:15:00",
+        publishedAt: "2025-01-15T00:00:00Z",
+      },
+      {
+        id: "unrelatedVid",
+        title: "Some Other Campaign - Session 1",
+        thumbnail: "https://i.ytimg.com/vi/unrelatedVid/hqdefault.jpg",
+        duration: "1:30:00",
+        publishedAt: "2025-01-10T00:00:00Z",
+      },
+      {
+        id: "taebrinVid2",
+        title: "Ep 2 raw - Journeys Through Taebrin - D&D Live Play",
+        thumbnail: "https://i.ytimg.com/vi/taebrinVid2/hqdefault.jpg",
+        duration: "2:10:00",
+        publishedAt: "2025-01-29T00:00:00Z",
+      },
+    ];
+
+    globalThis.fetch = vi.fn((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url.includes("/api/youtube/playlist/")) {
+        return Promise.resolve({ ok: true, json: () => [] } as unknown as Response);
+      }
+      if (url.includes("/api/youtube/channel/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => channelVideos,
+        } as unknown as Response);
+      }
+      return Promise.resolve({ ok: false } as Response);
+    });
+
+    const { result } = renderHook(
+      () =>
+        useCampaignEpisodes(
+          "journeys-through-taebrin",
+          playlistWorld,
+          staticEpisodes
+        ),
+      { wrapper }
+    );
+
+    await waitFor(() => {
+      expect(result.current[0].youtubeUrl).not.toContain("PLACEHOLDER");
+    });
+
+    // The unrelated video is filtered out; only the two Taebrin uploads remain,
+    // oldest-first, matched to episodeNumber with authored titles preserved.
+    expect(result.current).toHaveLength(2);
+    expect(result.current[0]).toMatchObject({
+      episodeNumber: 1,
+      title: "Into the Mire",
+      youtubeUrl: "https://www.youtube.com/watch?v=taebrinVid1",
+    });
+    expect(result.current[1]).toMatchObject({
+      episodeNumber: 2,
+      title: "The Council of Embers",
+      youtubeUrl: "https://www.youtube.com/watch?v=taebrinVid2",
+    });
+  });
 });

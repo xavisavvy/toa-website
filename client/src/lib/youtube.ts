@@ -59,15 +59,15 @@ function formatDuration(isoDuration: string): string {
 
 export async function getMultiplePlaylistVideosClient(playlistIds: string[], apiKey: string, maxResults: number = 50): Promise<VideoItem[]> {
   // Fetch videos from all playlists in parallel
-  const allPlaylistPromises = playlistIds.map(playlistId => 
+  const allPlaylistPromises = playlistIds.map(playlistId =>
     getPlaylistVideosClient(playlistId, apiKey, 100).catch(error => {
       console.error(`Error fetching playlist ${playlistId}:`, error);
       return [] as VideoItem[];
     })
   );
-  
+
   const playlistResults = await Promise.all(allPlaylistPromises);
-  
+
   // Flatten and dedupe by video ID
   const videoMap = new Map<string, VideoItem>();
   for (const videos of playlistResults) {
@@ -77,7 +77,7 @@ export async function getMultiplePlaylistVideosClient(playlistIds: string[], api
       }
     }
   }
-  
+
   // Sort by publishedAt date (most recent first)
   const allVideos = Array.from(videoMap.values());
   allVideos.sort((a, b) => {
@@ -85,14 +85,14 @@ export async function getMultiplePlaylistVideosClient(playlistIds: string[], api
     const dateB = new Date(b.publishedAt).getTime();
     return dateB - dateA; // Most recent first
   });
-  
+
   return allVideos.slice(0, maxResults);
 }
 
 export async function getPlaylistVideosClient(playlistId: string, apiKey: string, maxResults: number = 50): Promise<VideoItem[]> {
   const allVideoIds: string[] = [];
   let nextPageToken: string | undefined = undefined;
-  
+
   // Fetch all pages of playlist items
   do {
     const url = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
@@ -103,16 +103,16 @@ export async function getPlaylistVideosClient(playlistId: string, apiKey: string
     if (nextPageToken) {
       url.searchParams.set('pageToken', nextPageToken);
     }
-    
+
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       const error = await response.json();
       throw new Error(`YouTube API error: ${JSON.stringify(error)}`);
     }
-    
+
     const data = await response.json();
-    
+
     if (!data.items || data.items.length === 0) {
       break;
     }
@@ -120,10 +120,10 @@ export async function getPlaylistVideosClient(playlistId: string, apiKey: string
     const videoIds = data.items
       .map((item: YouTubePlaylistItem) => item.contentDetails?.videoId)
       .filter(Boolean) as string[];
-    
+
     allVideoIds.push(...videoIds);
     nextPageToken = data.nextPageToken;
-    
+
   } while (nextPageToken);
 
   if (allVideoIds.length === 0) {
@@ -134,31 +134,31 @@ export async function getPlaylistVideosClient(playlistId: string, apiKey: string
   const allVideos: VideoItem[] = [];
   for (let i = 0; i < allVideoIds.length; i += 50) {
     const batchIds = allVideoIds.slice(i, i + 50);
-    
+
     const url = new URL('https://www.googleapis.com/youtube/v3/videos');
     url.searchParams.set('part', 'snippet,contentDetails,statistics');
     url.searchParams.set('id', batchIds.join(','));
     url.searchParams.set('key', apiKey);
-    
+
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       const error = await response.json();
       throw new Error(`YouTube API error: ${JSON.stringify(error)}`);
     }
-    
+
     const data = await response.json();
 
     const videos: VideoItem[] = (data.items || []).map((video: YouTubeVideoItem) => {
       const snippet = video.snippet;
       const statistics = video.statistics;
       const contentDetails = video.contentDetails;
-      
-      const viewCount = statistics?.viewCount 
+
+      const viewCount = statistics?.viewCount
         ? formatViewCount(parseInt(statistics.viewCount))
         : undefined;
 
-      const duration = contentDetails?.duration 
+      const duration = contentDetails?.duration
         ? formatDuration(contentDetails.duration)
         : '0:00';
 
@@ -172,9 +172,16 @@ export async function getPlaylistVideosClient(playlistId: string, apiKey: string
         description: snippet?.description || undefined,
       };
     });
-    
+
     allVideos.push(...videos);
   }
 
   return allVideos.slice(0, maxResults);
 }
+
+/**
+ * YouTube channel ID for Tales of Aneria. Shared constant so callers don't
+ * hand-copy the raw ID (see docs/deployment/REPLIT_DEPLOY_CHECKLIST.md,
+ * which documents this as the VITE_YOUTUBE_CHANNEL_ID deploy value).
+ */
+export const TALES_OF_ANERIA_CHANNEL_ID = "UC7PTdudxJ43HMLJVv2QxVoQ";
