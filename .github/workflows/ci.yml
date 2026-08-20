@@ -97,9 +97,11 @@ jobs:
         run: npm run test:e2e
         # Non-blocking for now: most failures are missing visual-regression
         # baseline screenshots (never committed) plus some flaky SEO/
-        # audit-system/load-stress specs — pre-existing test debt, unmasked
-        # once #42 fixed the __dirname crash that made this suite fail
-        # instantly before. Tracked as follow-up work; see PR #42 discussion.
+        # audit-system/load-stress specs — pre-existing test debt that was
+        # masked for a long time by an unrelated crash earlier in this suite
+        # (a __dirname reference broke under ESM and failed collection before
+        # any test ran). Tracked as follow-up: commit baseline screenshots
+        # and triage the remaining flaky specs, then remove this.
         continue-on-error: true
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
