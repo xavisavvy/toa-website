@@ -111,12 +111,14 @@ jobs:
           cache-to: type=gha,mode=max
       
       - name: Install Trivy
+        shell: bash
         run: |
-          # Install latest Trivy
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install -y trivy
+          # Install pinned Trivy version for deterministic builds
+          TRIVY_VERSION="0.61.0"
+          mkdir -p ~/.local/bin
+          curl -sfL "https://raw.githubusercontent.com/aquasecurity/trivy/v${TRIVY_VERSION}/contrib/install.sh" | sh -s -- -b ~/.local/bin "v${TRIVY_VERSION}"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          ~/.local/bin/trivy --version
       
       - name: Generate vulnerability report from SBOM
         run: |
