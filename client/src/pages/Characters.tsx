@@ -183,7 +183,7 @@ export default function Characters() {
         jsonLd={breadcrumbData}
       />
       <Navigation />
-      <div className="py-20 lg:py-32">
+      <main className="py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-6">
@@ -264,7 +264,7 @@ export default function Characters() {
           </div>
         )}
       </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

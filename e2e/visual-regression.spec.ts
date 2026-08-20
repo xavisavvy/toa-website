@@ -67,7 +67,7 @@ test.describe('Visual Regression Tests', () => {
       await page.waitForLoadState('networkidle');
       
       // Wait for character cards to load
-      await page.waitForSelector('[data-testid="character-card"]', { 
+      await page.waitForSelector('[data-testid^="card-character-"]', {
         state: 'visible',
         timeout: 10000 
       });
@@ -82,7 +82,7 @@ test.describe('Visual Regression Tests', () => {
       await page.goto('/characters');
       await page.waitForLoadState('networkidle');
       
-      const firstCard = page.locator('[data-testid="character-card"]').first();
+      const firstCard = page.locator('[data-testid^="card-character-"]').first();
       await firstCard.waitFor({ state: 'visible' });
       
       // Hover over card
@@ -115,7 +115,7 @@ test.describe('Visual Regression Tests', () => {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
       
-      const header = page.locator('header').first();
+      const header = page.locator('nav').first();
       await expect(header).toBeVisible();
       
       await expect(header).toHaveScreenshot('header-nav.png', {

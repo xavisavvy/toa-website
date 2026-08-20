@@ -70,12 +70,15 @@ test.describe('Load and Stress Tests', () => {
     });
 
     test('handles concurrent character page requests', async ({ request }) => {
-      const characterIds = [1, 2, 3, 4, 5];
+      // Characters are static content (client/src/data/characters.json) with
+      // no backing /api/characters route — load-test the real SPA pages
+      // that actually serve them instead.
+      const characterIds = ['wayne-archivist', 'carine-sol', 'erys-leandorian', 'freya-fenrir', 'porphan-valaritas'];
       const requestsPerChar = 10;
-      
+
       const allRequests = characterIds.flatMap(id =>
         Array(requestsPerChar).fill(null).map(() =>
-          request.get(`/api/characters/${id}`)
+          request.get(`/characters/${id}`)
         )
       );
       
@@ -97,12 +100,18 @@ test.describe('Load and Stress Tests', () => {
 
   test.describe('Database Query Load Tests', () => {
     test('handles multiple concurrent database queries', async ({ request }) => {
+      // /api/characters never existed — characters are static JSON, not
+      // DB-backed. Use the real playlist endpoint (Journeys Through Taebrin,
+      // client/src/data/worlds.ts), which does hit server-side data
+      // fetching + file caching and works without a YOUTUBE_API_KEY (falls
+      // back to an empty, still-200 result).
+      const playlistId = 'PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY';
       const queries = [
-        '/api/characters',
-        '/api/characters/1',
-        '/api/characters/2',
-        '/api/characters',
-        '/api/characters/3',
+        `/api/youtube/playlist/${playlistId}`,
+        `/api/youtube/playlist/${playlistId}?maxResults=10`,
+        `/api/youtube/playlist/${playlistId}?maxResults=25`,
+        `/api/youtube/playlist/${playlistId}`,
+        `/api/youtube/playlist/${playlistId}?maxResults=50`,
       ];
       
       const iterations = 10;
@@ -129,8 +138,10 @@ test.describe('Load and Stress Tests', () => {
 
   test.describe('Cache Performance Tests', () => {
     test('validates cache effectiveness', async ({ request }) => {
-      const endpoint = '/api/characters';
-      
+      // Real cache-backed endpoint (24h file cache in server/youtube.ts) —
+      // /api/characters was never a real route.
+      const endpoint = '/api/youtube/playlist/PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY';
+
       // First request (cold cache)
       const coldStart = Date.now();
       const firstResponse = await request.get(endpoint);
@@ -156,8 +167,8 @@ test.describe('Load and Stress Tests', () => {
     });
 
     test('handles cache under concurrent load', async ({ request }) => {
-      const endpoint = '/api/characters';
-      
+      const endpoint = '/api/youtube/playlist/PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY';
+
       // Warm up cache
       await request.get(endpoint);
       
@@ -189,7 +200,7 @@ test.describe('Load and Stress Tests', () => {
       
       await new Promise<void>(resolve => setTimeout(resolve, 500));
       
-      const burst2 = Array(30).fill(null).map(() => request.get('/api/characters'));
+      const burst2 = Array(30).fill(null).map(() => request.get('/api/youtube/playlist/PLPwB6km-TpoAQiDKQnXQW-JUUXBwvkFQY'));
       const responses2 = await Promise.all(burst2);
       
       await new Promise<void>(resolve => setTimeout(resolve, 500));
@@ -238,8 +249,11 @@ test.describe('Load and Stress Tests', () => {
 
   test.describe('Error Handling Under Load', () => {
     test('handles 404 requests gracefully under load', async ({ request }) => {
+      // Client-side routes always 200 (the SPA fallback serves index.html
+      // for any unmatched path); hit the API instead, where an unmatched
+      // route is a genuine 404.
       const invalidUrls = Array(50).fill(null).map((_, i) =>
-        request.get(`/this-does-not-exist-${i}`)
+        request.get(`/api/this-does-not-exist-${i}`)
       );
       
       const startTime = Date.now();
@@ -261,7 +275,7 @@ test.describe('Load and Stress Tests', () => {
     test('recovers from mixed success/failure requests', async ({ request }) => {
       const mixedRequests = [
         ...Array(25).fill(null).map(() => request.get('/')),
-        ...Array(25).fill(null).map((_, i) => request.get(`/invalid-${i}`)),
+        ...Array(25).fill(null).map((_, i) => request.get(`/api/invalid-${i}`)),
       ];
       
       // Shuffle array

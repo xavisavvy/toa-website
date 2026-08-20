@@ -35,12 +35,8 @@ test.describe('Characters Page', () => {
     // Check for character name
     const name = firstCard.locator('[data-testid^="text-character-name-"]');
     await expect(name).toBeVisible();
-    
-    // Check for race
-    const race = firstCard.locator('[data-testid^="text-character-race-"]');
-    await expect(race).toBeVisible();
-    
-    // Check for class
+
+    // Check for class (race + class, e.g. "Changeling Wizard")
     const charClass = firstCard.locator('[data-testid^="text-character-class-"]');
     await expect(charClass).toBeVisible();
   });

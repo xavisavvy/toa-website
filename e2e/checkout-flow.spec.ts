@@ -300,10 +300,17 @@ test.describe('Checkout Flow E2E Tests', () => {
 
   test.describe('Payment Success Flow', () => {
     test('should display success page when navigating to /checkout/success', async ({ page }) => {
-      await page.goto('/checkout/success');
+      // A session_id is required — without one the page immediately
+      // redirects to "/" (it's a guard against viewing order confirmation
+      // without a completed checkout).
+      await page.goto('/checkout/success?session_id=test_session_123');
 
-      // Should see success message
-      await expect(page.getByText(/thank you|order confirmed|payment successful/i)).toBeVisible();
+      // Should see success message. .first() because the heading
+      // ("Order Confirmed!") and body text ("Thank you for your
+      // purchase!") both independently match the alternation.
+      await expect(
+        page.getByText(/thank you|order confirmed|payment successful/i).first()
+      ).toBeVisible();
     });
 
     test('should clear cart after successful payment', async ({ page }) => {
@@ -322,8 +329,10 @@ test.describe('Checkout Flow E2E Tests', () => {
       let cartBadge = page.locator('[aria-label*="Shopping cart"]').locator('text=1');
       await expect(cartBadge).toBeVisible();
 
-      // Simulate successful payment by navigating to success page
-      await page.goto('/checkout/success');
+      // Simulate successful payment by navigating to success page. Needs a
+      // session_id or CheckoutSuccess redirects straight to '/' before this
+      // test's assertions below even run.
+      await page.goto('/checkout/success?session_id=test_session_123');
 
       // Navigate back to shop
       await page.goto('/shop');
@@ -334,9 +343,10 @@ test.describe('Checkout Flow E2E Tests', () => {
     });
 
     test('should have link to continue shopping from success page', async ({ page }) => {
-      await page.goto('/checkout/success');
+      await page.goto('/checkout/success?session_id=test_session_123');
 
-      const continueButton = page.getByRole('link', { name: /continue shopping|back to shop|browse shop/i });
+      // Rendered as a <button onClick> (client-side navigation), not an <a>.
+      const continueButton = page.getByRole('button', { name: /continue shopping|back to shop|browse shop/i });
       await expect(continueButton).toBeVisible();
     });
   });

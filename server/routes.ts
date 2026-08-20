@@ -1886,5 +1886,11 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Any /api request that didn't match a route above is a genuine 404 —
+  // respond with JSON instead of falling through to the SPA's index.html.
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'Not found' });
+  });
+
   return createServer(app);
 }

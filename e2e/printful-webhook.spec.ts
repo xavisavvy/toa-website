@@ -34,7 +34,7 @@ test.describe('Printful Webhook E2E', () => {
     const payloadStr = JSON.stringify(payload);
     const signature = createSignature(payloadStr);
 
-    const response = await request.post(`${baseURL}/api/printful/webhook`, {
+    const response = await request.post(`${baseURL}/api/webhooks/printful`, {
       headers: {
         'X-Printful-Signature': signature,
         'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ test.describe('Printful Webhook E2E', () => {
       },
     };
 
-    const response = await request.post(`${baseURL}/api/printful/webhook`, {
+    const response = await request.post(`${baseURL}/api/webhooks/printful`, {
       headers: {
         'X-Printful-Signature': 'invalid_signature',
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ test.describe('Printful Webhook E2E', () => {
     const payloadStr = JSON.stringify(payload);
     const signature = createSignature(payloadStr);
 
-    const response = await request.post(`${baseURL}/api/printful/webhook`, {
+    const response = await request.post(`${baseURL}/api/webhooks/printful`, {
       headers: {
         'X-Printful-Signature': signature,
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ test.describe('Printful Webhook E2E', () => {
     const payloadStr = JSON.stringify(payload);
     const signature = createSignature(payloadStr);
 
-    const response = await request.post(`${baseURL}/api/printful/webhook`, {
+    const response = await request.post(`${baseURL}/api/webhooks/printful`, {
       headers: {
         'X-Printful-Signature': signature,
         'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ test.describe('Printful Webhook E2E', () => {
     const payloadStr = JSON.stringify(payload);
     const signature = createSignature(payloadStr);
 
-    const response = await request.post(`${baseURL}/api/printful/webhook`, {
+    const response = await request.post(`${baseURL}/api/webhooks/printful`, {
       headers: {
         'X-Printful-Signature': signature,
         'Content-Type': 'application/json',

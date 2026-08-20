@@ -40,12 +40,13 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <SEO
         title="Tales of Aneria - Epic TTRPG Live Play Series"
-        description="Join us on an epic journey through the mystical world of Aneria. Watch our TTRPG live play series, explore rich lore, meet unforgettable characters, and discover exclusive merchandise from our adventures."
+        description="Join us on an epic journey through the mystical world of Aneria. Watch our TTRPG live play series, explore rich lore, and meet unforgettable characters."
         canonical="https://talesofaneria.com/"
         keywords="TTRPG, Dungeons and Dragons, D&D, live play, actual play, tabletop RPG, fantasy, Aneria, podcast, YouTube, character stories, epic adventures"
         jsonLd={structuredData}
       />
       <Navigation />
+      <main>
       <Hero />
       <LatestEpisodes channelId={YOUTUBE_CHANNEL_ID} playlistIds={YOUTUBE_PLAYLIST_IDS} />
       <LatestShorts channelId={YOUTUBE_CHANNEL_ID} />
@@ -73,6 +74,7 @@ export default function Home() {
       </section>
       <AboutSection />
       <CommunitySection />
+      </main>
       <Footer />
     </div>
   );
