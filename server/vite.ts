@@ -3,6 +3,7 @@ import { type Server } from "http";
 import path from "path";
 
 import express, { type Express } from "express";
+import rateLimit from "express-rate-limit";
 import { nanoid } from "nanoid";
 
 export function log(message: string, source = "express") {
@@ -80,7 +81,8 @@ export async function setupVite(app: Express, server: Server) {
   log("Vite dev server ready", "vite");
   
   app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  const devLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false });
+  app.use("*", devLimiter, async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
@@ -118,7 +120,8 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  const staticLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false });
+  app.use("*", staticLimiter, (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

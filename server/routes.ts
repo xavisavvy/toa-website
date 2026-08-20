@@ -1835,8 +1835,8 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Name, email, and message are required' });
       }
 
-      // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // Email validation (linear-time regex: one @ required, no consecutive dots, proper TLD)
+      const emailRegex = /^[^\s@]+@[^\s@.][^\s@]*\.[^\s@.]+$/;
       if (!emailRegex.test(email)) {
         return res.status(400).json({ error: 'Invalid email format' });
       }
