@@ -8,8 +8,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should audit successful admin login', async ({ page }) => {
     // Login as admin
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
 
     // Wait for dashboard
@@ -25,16 +25,16 @@ test.describe('Audit & Compliance System', () => {
 
   test('should audit failed login attempts', async ({ page }) => {
     // Attempt login with wrong password
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'WrongPassword123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'WrongPassword123!');
     await page.click('button[type="submit"]');
 
     // Should see error
     await expect(page.locator('text=Invalid email or password')).toBeVisible();
     
     // Login with correct credentials to check audit logs
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     
     await page.waitForURL('/admin/dashboard');
@@ -46,8 +46,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should audit order access (PII)', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 
@@ -67,8 +67,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should filter audit logs by category', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 
@@ -93,8 +93,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should filter audit logs by severity', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 
@@ -113,8 +113,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should paginate audit logs', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 
@@ -132,8 +132,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should audit logout', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 
@@ -144,8 +144,8 @@ test.describe('Audit & Compliance System', () => {
     await page.waitForURL('/admin/login');
     
     // Login again to check audit logs
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
     
@@ -157,8 +157,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should mask PII in audit logs', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 
@@ -177,8 +177,8 @@ test.describe('Audit & Compliance System', () => {
 
   test('should show GDPR-relevant indicator', async ({ page }) => {
     // Login
-    await page.fill('input[name="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[name="password"]', 'ChangeMe123!');
+    await page.fill('input[type="email"]', 'admin@talesofaneria.com');
+    await page.fill('input[type="password"]', 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
 

@@ -238,8 +238,11 @@ test.describe('Load and Stress Tests', () => {
 
   test.describe('Error Handling Under Load', () => {
     test('handles 404 requests gracefully under load', async ({ request }) => {
+      // Client-side routes always 200 (the SPA fallback serves index.html
+      // for any unmatched path); hit the API instead, where an unmatched
+      // route is a genuine 404.
       const invalidUrls = Array(50).fill(null).map((_, i) =>
-        request.get(`/this-does-not-exist-${i}`)
+        request.get(`/api/this-does-not-exist-${i}`)
       );
       
       const startTime = Date.now();
@@ -261,7 +264,7 @@ test.describe('Load and Stress Tests', () => {
     test('recovers from mixed success/failure requests', async ({ request }) => {
       const mixedRequests = [
         ...Array(25).fill(null).map(() => request.get('/')),
-        ...Array(25).fill(null).map((_, i) => request.get(`/invalid-${i}`)),
+        ...Array(25).fill(null).map((_, i) => request.get(`/api/invalid-${i}`)),
       ];
       
       // Shuffle array

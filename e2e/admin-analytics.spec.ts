@@ -5,7 +5,7 @@ test.describe('Admin Analytics Dashboard', () => {
     // Login as admin
     await page.goto('/admin/login');
     await page.fill('input[type="email"]', 'admin@talesofaneria.com');
-    await page.fill('input[type="password"]', process.env.TEST_ADMIN_PASSWORD || 'testpassword');
+    await page.fill('input[type="password"]', process.env.ADMIN_PASSWORD || 'ChangeMe123!');
     await page.click('button[type="submit"]');
     await page.waitForURL('/admin/dashboard');
   });
@@ -68,9 +68,12 @@ test.describe('Admin Analytics Dashboard', () => {
   test('should display security events', async ({ page }) => {
     await page.goto('/admin/analytics');
     
-    await expect(page.locator('text=Security Events')).toBeVisible();
-    await expect(page.locator('text=Failed Login Attempts')).toBeVisible();
-    await expect(page.locator('text=Suspicious Activities')).toBeVisible();
+    // Exact matches — the page has both a summary card labeled e.g.
+    // "Failed Login Attempts" and a details heading "Recent Failed Login
+    // Attempts", which a substring match ambiguously matches too.
+    await expect(page.getByText('Security Events', { exact: true })).toBeVisible();
+    await expect(page.getByText('Failed Login Attempts', { exact: true })).toBeVisible();
+    await expect(page.getByText('Suspicious Activities', { exact: true })).toBeVisible();
   });
 
   test('should handle API errors gracefully', async ({ page }) => {
@@ -90,13 +93,18 @@ test.describe('Admin Analytics Dashboard', () => {
   });
 
   test('should redirect to login if not authenticated', async ({ page }) => {
-    // Logout first
-    await page.goto('/admin/dashboard');
+    // Extra headroom: this test does three full page loads in sequence
+    // (beforeEach's login, then two more below), each a fresh dev-server
+    // module graph fetch.
+    test.setTimeout(60000);
+
+    // Logout first — beforeEach already landed on /admin/dashboard, so no
+    // need to navigate there again before clicking Logout.
     await page.click('button:has-text("Logout")');
-    
+
     // Try to access analytics
     await page.goto('/admin/analytics');
-    
+
     // Should redirect to login
     await expect(page).toHaveURL('/admin/login');
   });
@@ -116,12 +124,14 @@ test.describe('Admin Analytics Dashboard', () => {
   test('should display correct metrics format', async ({ page }) => {
     await page.goto('/admin/analytics');
     
-    // Revenue should have $ sign
-    const revenueCard = page.locator('text=Total Revenue').locator('..');
+    // Revenue should have $ sign. Two levels up: the title text is in
+    // CardTitle > CardHeader, while the value is in a sibling CardContent —
+    // both children of the same Card.
+    const revenueCard = page.locator('text=Total Revenue').locator('..').locator('..');
     await expect(revenueCard.locator('text=/\\$\\d+\\.\\d{2}/')).toBeVisible();
-    
+
     // Conversion rate should have % sign
-    const conversionCard = page.locator('text=Conversion Rate').locator('..');
+    const conversionCard = page.locator('text=Conversion Rate').locator('..').locator('..');
     await expect(conversionCard.locator('text=/\\d+\\.\\d{2}%/')).toBeVisible();
   });
 });

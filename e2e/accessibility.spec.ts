@@ -107,13 +107,14 @@ test.describe('Characters Page Accessibility', () => {
     await page.goto('/characters');
     await page.waitForLoadState('networkidle');
     
-    // Get first character card
-    const firstCard = page.locator('[data-testid^="card-character-"]').first();
-    
+    // The focusable element is the <a> link wrapping the card, not the
+    // data-testid'd Card div itself — target that for the focus check.
+    const firstCard = page.locator('a:has([data-testid^="card-character-"])').first();
+
     // Should be focusable
     await firstCard.focus();
-    const isFocused = await firstCard.evaluate(el => el === document.activeElement || el.contains(document.activeElement));
-    
+    const isFocused = await firstCard.evaluate(el => el === document.activeElement);
+
     expect(isFocused).toBe(true);
   });
 
@@ -188,7 +189,6 @@ test.describe('Keyboard Navigation', () => {
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a'])
       .disableRules(['svg-img-alt'])
-      .withRules(['focusable-no-name'])
       .analyze();
 
     expect(accessibilityScanResults.violations).toHaveLength(0);

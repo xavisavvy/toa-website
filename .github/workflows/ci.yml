@@ -99,7 +99,11 @@ jobs:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
-        
+          # Matches printful-webhook.spec.ts's own fallback default — lets
+          # that suite actually exercise HMAC signature verification instead
+          # of silently running in the server's "no secret configured" mode.
+          PRINTFUL_WEBHOOK_SECRET: test_secret
+
       - name: Skip E2E tests
         if: steps.check_e2e.outputs.skip == 'true'
         run: echo "⚠️  E2E tests skipped - DATABASE_URL not configured"

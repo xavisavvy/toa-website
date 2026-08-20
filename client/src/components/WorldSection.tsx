@@ -72,9 +72,12 @@ function CharacterCarousel({ worldId }: CharacterCarouselProps) {
 
   return (
     <div className="pt-4 border-t border-border/50">
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 mb-3">
+      {/* h3, not h4: CardTitle (the world name) renders a <div>, not a
+          heading, so this is the first heading inside the card — h4 here
+          would skip a level after the section's h2. */}
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70 mb-3">
         Characters
-      </h4>
+      </h3>
       <div className="relative overflow-hidden">
         <div
           className={`flex gap-2 ${shouldScroll ? "animate-scroll" : "flex-wrap"}`}
@@ -307,9 +310,10 @@ export default function WorldSection() {
 
                 {world.campaigns.length > 0 && (
                   <div className="space-y-3 pt-2">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+                    {/* h3, not h4 — see the "Characters" heading above. */}
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
                       Campaigns
-                    </h4>
+                    </h3>
                     {world.campaigns.map((campaign, idx) => (
                       <div
                         key={idx}
