@@ -148,10 +148,12 @@ test.describe('Performance', () => {
       !err.includes('YouTube') && // YouTube API errors are expected in test
       !err.includes('favicon') && // Favicon errors are non-critical
       // Optional third-party integrations (YouTube, Printful, Stripe, etc.)
-      // return 503s when their API keys aren't configured, which is expected
+      // return 503 when their API keys aren't configured, which is expected
       // in CI/local dev without secrets — the browser logs this generic
-      // resource-load message rather than an app-level error.
-      !err.includes('Failed to load resource')
+      // resource-load message rather than an app-level error. Scoped to just
+      // the 503 status so a genuinely broken internal asset (a bad image src,
+      // a real 404/500) still fails this test.
+      !(err.includes('Failed to load resource') && err.includes('503'))
     );
     
     expect(criticalErrors).toHaveLength(0);
