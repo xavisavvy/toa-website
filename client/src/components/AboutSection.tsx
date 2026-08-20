@@ -15,9 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import castData from "@/data/cast.json";
+import { TALES_OF_ANERIA_CHANNEL_ID as YOUTUBE_CHANNEL_ID } from "@/lib/youtube";
 
-// YouTube channel ID for Tales of Aneria
-const YOUTUBE_CHANNEL_ID = "UC7PTdudxJ43HMLJVv2QxVoQ";
 const NOOPENER_NOREFERRER = "noopener,noreferrer";
 
 interface ChannelStats {
