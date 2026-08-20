@@ -109,18 +109,14 @@ jobs:
       - name: Skip E2E tests
         if: steps.check_e2e.outputs.skip == 'true'
         run: echo "⚠️  E2E tests skipped - DATABASE_URL not configured"
-        
-      - name: Run contract tests
-        if: steps.check_e2e.outputs.skip == 'false'
-        run: npm run test:contract
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
-          REDIS_URL: redis://localhost:6379
-        
-      - name: Skip contract tests
-        if: steps.check_e2e.outputs.skip == 'true'
-        run: echo "⚠️  Contract tests skipped - DATABASE_URL not configured"
-        
+
+      # No separate "Run contract tests" step: test/contract/** isn't excluded
+      # in vitest.config.ts, so `npm run test:coverage` above already runs it.
+      # Re-running it here via `npm run test:contract` was a full duplicate
+      # execution that, coming after the E2E run, hit the real Redis-backed
+      # apiLimiter (300 req/15min) already elevated by every earlier test in
+      # this job — every request in the second pass got a spurious 429.
+
       - name: Run visual regression tests
         if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:visual
