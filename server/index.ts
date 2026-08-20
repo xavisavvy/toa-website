@@ -25,13 +25,10 @@ function csrfProtection(req: Request, res: Response, next: NextFunction) {
   }
 
   if (stateChanging.includes(req.method)) {
-    // Lazily generate a CSRF token for this session
-    if (!(req.session as any)[SESSION_KEY]) {
-      (req.session as any)[SESSION_KEY] = crypto.randomBytes(24).toString('hex');
-    }
+    // Reject if no token exists in session or if provided token doesn't match
     const expected = (req.session as any)[SESSION_KEY];
     const provided = (req.headers['x-csrf-token'] as string) || req.body?._csrf;
-    if (!provided || provided !== expected) {
+    if (!expected || !provided || provided !== expected) {
       res.status(403).json({ error: 'Invalid or missing CSRF token' });
       return;
     }
