@@ -95,13 +95,13 @@ jobs:
       - name: Run E2E tests
         if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:e2e
-        # Non-blocking for now: most failures are missing visual-regression
-        # baseline screenshots (never committed) plus some flaky SEO/
-        # audit-system/load-stress specs — pre-existing test debt that was
-        # masked for a long time by an unrelated crash earlier in this suite
-        # (a __dirname reference broke under ESM and failed collection before
-        # any test ran). Tracked as follow-up: commit baseline screenshots
-        # and triage the remaining flaky specs, then remove this.
+        # Non-blocking for now: the two remaining known gaps are a missing
+        # PRINTFUL_API_KEY CI secret (blocks cart.spec.ts and most of
+        # checkout-flow.spec.ts) and audit-system.spec.ts targeting
+        # /admin/audit-logs, a page that doesn't exist in the app yet.
+        # Everything else that was previously failing (visual-regression
+        # baselines, SEO/load-stress/printful-webhook/etc.) has been fixed —
+        # see PR #41. Remove this once the two gaps above are resolved.
         continue-on-error: true
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
@@ -130,8 +130,11 @@ jobs:
       - name: Run visual regression tests
         if: steps.check_e2e.outputs.skip == 'false'
         run: npm run test:visual
-        # Non-blocking: no baseline screenshots are committed yet, so every
-        # toHaveScreenshot() assertion fails on first run. See note above.
+        # Non-blocking for now — see note on the E2E step above. Linux
+        # baselines are committed (e2e/visual-regression.spec.ts-snapshots/),
+        # verified 18/18 passing locally; kept non-blocking here only because
+        # the self-hosted runner can't yet get past the Playwright browser
+        # install step (separate, unrelated runner-config issue).
         continue-on-error: true
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
