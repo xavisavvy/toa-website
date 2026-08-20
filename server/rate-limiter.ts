@@ -52,6 +52,16 @@ export const apiLimiter = rateLimit({
     if (req.path === '/api/auth/me') {
       return true;
     }
+    // The full Playwright E2E suite runs ~20 spec files against one
+    // long-lived dev server backed by this same Redis instance, so the
+    // 300/15min budget (sized for real traffic) is exhausted well before
+    // later spec files run, causing unrelated collateral 429s. Opt-in via
+    // a dedicated flag (set only by the E2E CI step) rather than
+    // NODE_ENV === 'test', since test/integration/rate-limiter.test.ts
+    // exercises this same limiter's enforcement under plain `vitest`.
+    if (process.env.E2E_DISABLE_RATE_LIMIT === 'true') {
+      return true;
+    }
     return false;
   },
   handler: (req: Request, res: Response) => {

@@ -103,6 +103,10 @@ jobs:
           # that suite actually exercise HMAC signature verification instead
           # of silently running in the server's "no secret configured" mode.
           PRINTFUL_WEBHOOK_SECRET: test_secret
+          # The full E2E suite (~20 spec files, one shared Redis-backed dev
+          # server) easily exceeds apiLimiter's 300-req/15min budget, causing
+          # unrelated collateral 429s in later spec files. See rate-limiter.ts.
+          E2E_DISABLE_RATE_LIMIT: 'true'
 
       - name: Skip E2E tests
         if: steps.check_e2e.outputs.skip == 'true'
@@ -114,7 +118,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
           REDIS_URL: redis://localhost:6379
-        
+          E2E_DISABLE_RATE_LIMIT: 'true'
+
       - name: Skip contract tests
         if: steps.check_e2e.outputs.skip == 'true'
         run: echo "⚠️  Contract tests skipped - DATABASE_URL not configured"
@@ -125,7 +130,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
           REDIS_URL: redis://localhost:6379
-        
+          E2E_DISABLE_RATE_LIMIT: 'true'
+
       - name: Skip visual tests
         if: steps.check_e2e.outputs.skip == 'true'
         run: echo "⚠️  Visual tests skipped - DATABASE_URL not configured"
