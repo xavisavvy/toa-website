@@ -192,6 +192,11 @@ async function fetchCachesWithAPI() {
  * Delete a cache by ID
  */
 function deleteCacheWithCLI(cacheId) {
+  // Validate cacheId is a safe integer to prevent command injection
+  if (!/^\d+$/.test(String(cacheId))) {
+    console.error(`❌ Invalid cache ID: ${cacheId}`);
+    return false;
+  }
   try {
     execSync(
       `gh api --method DELETE repos/${owner}/${repo}/actions/caches/${cacheId}`,
