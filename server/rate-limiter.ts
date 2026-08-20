@@ -28,6 +28,11 @@ try {
   console.warn('⚠️  Failed to initialize Redis for rate limiting, using in-memory store');
 }
 
+// Same "are we production" check used below for trustProxy — reused so the
+// E2E bypass can never be live at the same time as this is true, even if
+// E2E_DISABLE_RATE_LIMIT leaks into a prod-like environment by mistake.
+const isProductionLike = process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT;
+
 // General API rate limiter (300 requests per 15 minutes)
 export const apiLimiter = rateLimit({
   store: redis ? new RedisStore({
@@ -41,7 +46,7 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
   message: 'Too many requests from this IP, please try again later.',
   // Trust proxy for Replit and cloud environments
-  validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
+  validate: { trustProxy: isProductionLike },
   skip: (req: Request) => {
     // Skip rate limiting for health check endpoints (used by K8s probes)
     const healthPaths = ['/api/health', '/api/ready', '/api/alive', '/api/startup'];
@@ -59,7 +64,10 @@ export const apiLimiter = rateLimit({
     // a dedicated flag (set only by the E2E CI step) rather than
     // NODE_ENV === 'test', since test/integration/rate-limiter.test.ts
     // exercises this same limiter's enforcement under plain `vitest`.
-    if (process.env.E2E_DISABLE_RATE_LIMIT === 'true') {
+    // Also hard-gated off `isProductionLike` so an accidental
+    // E2E_DISABLE_RATE_LIMIT leak into a prod-like environment can never
+    // silently disable this control.
+    if (process.env.E2E_DISABLE_RATE_LIMIT === 'true' && !isProductionLike) {
       return true;
     }
     return false;
