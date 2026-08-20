@@ -45,7 +45,7 @@ env:
 jobs:
   deploy:
     name: Deploy to talesofaneria.com
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 30
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     environment:
@@ -133,7 +133,7 @@ jobs:
 
   smoke-test:
     name: Smoke Tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     timeout-minutes: 10
     needs: [deploy]
     if: needs.deploy.result == 'success'

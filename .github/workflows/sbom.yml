@@ -16,7 +16,7 @@ permissions:
 jobs:
   generate-sbom:
     name: Generate Software Bill of Materials
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     
     steps:
       - name: Checkout code

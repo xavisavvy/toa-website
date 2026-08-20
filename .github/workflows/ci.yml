@@ -14,7 +14,7 @@ permissions:
 jobs:
   test:
     name: Tests & Coverage
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip CI for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -160,7 +160,7 @@ jobs:
   # 1. Container Security Scanning with Trivy
   container-security:
     name: Container Security Scan
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -264,7 +264,7 @@ jobs:
   # 2. Dependency Scanning with multiple tools
   dependency-scan:
     name: Dependency Security Scan
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -317,7 +317,7 @@ jobs:
   # 3. Secret Scanning with Gitleaks
   secret-scan:
     name: Secret Scanning
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -335,7 +335,7 @@ jobs:
 
   security:
     name: Security Audit
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -364,7 +364,7 @@ jobs:
   # 9. License Compliance Scanning
   license-compliance:
     name: License Compliance
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -396,7 +396,7 @@ jobs:
   # 8. Performance Testing in CI
   performance:
     name: Performance Testing
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     needs: [test]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
@@ -439,7 +439,7 @@ jobs:
 
   mutation:
     name: Mutation Testing
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Only run on PRs and skip version commits
     if: "github.event_name == 'pull_request' && !contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -473,7 +473,7 @@ jobs:
           
   lint:
     name: Code Quality
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
