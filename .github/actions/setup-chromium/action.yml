@@ -20,11 +20,35 @@ runs:
 
     - name: Install Playwright Chromium
       shell: bash
-      # Deliberately no --with-deps: that flag shells out to `sudo apt-get
-      # install`, and the self-hosted runners have no passwordless sudo, so it
-      # fails with "sudo: a password is required". The next step covers the
-      # system libraries instead.
-      run: npx playwright install chromium
+      run: |
+        set -euo pipefail
+
+        # Deliberately no --with-deps: that flag shells out to `sudo apt-get
+        # install`, and the self-hosted runners have no passwordless sudo, so it
+        # fails with "sudo: a password is required". The next step covers the
+        # system libraries instead.
+        if npx playwright install chromium; then
+          exit 0
+        fi
+
+        # Playwright ships a browser build per host platform and refuses
+        # outright on a distro it has no build for:
+        #   ERROR: Playwright does not support chromium on ubuntu26.04-x64
+        # Runner hosts do not all track the same Ubuntu release, so pin the
+        # download to the newest LTS build, which runs fine on a newer distro
+        # once its system libraries are present (verified on Ubuntu 26.04).
+        case "$(uname -m)" in
+          aarch64|arm64) OVERRIDE="ubuntu24.04-arm64" ;;
+          *)             OVERRIDE="ubuntu24.04-x64"   ;;
+        esac
+
+        echo "Host platform unsupported by this Playwright version;"              "retrying with PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=$OVERRIDE"
+        export PLAYWRIGHT_HOST_PLATFORM_OVERRIDE="$OVERRIDE"
+        npx playwright install chromium
+
+        # Persist for the rest of the job so `playwright test` resolves the same
+        # build rather than re-deciding from the real host platform.
+        echo "PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=$OVERRIDE" >> "$GITHUB_ENV"
 
     - name: Ensure Chromium can launch
       shell: bash

@@ -23,7 +23,9 @@ action, which handles each case without ever needing root.
 ## What the composite action does
 
 1. Restores the `~/.cache/ms-playwright` and `~/.local/chrome-deps` caches.
-2. `npx playwright install chromium` — download only, no `--with-deps`.
+2. `npx playwright install chromium` — download only, no `--with-deps`. If
+   Playwright has no build for the host's distro, retries pinned to the newest
+   LTS build (see [Distro skew](#distro-skew-across-runner-hosts) below).
 3. Tries to actually launch the browser (`chrome --version`):
    - **Starts** → the host is properly provisioned. Does nothing;
      `LD_LIBRARY_PATH` is left untouched.
@@ -102,12 +104,44 @@ ldd "$(node -e "console.log(require('playwright').chromium.executablePath())")" 
 "$(node -e "console.log(require('playwright').chromium.executablePath())")" --version
 ```
 
+## Distro skew across runner hosts
+
+The runner hosts do **not** track the same Ubuntu release, and Playwright ships
+a separate browser build per host platform. On a release it has no build for it
+refuses outright, before system libraries ever enter the picture:
+
+```
+Error: ERROR: Playwright does not support chromium on ubuntu26.04-x64
+```
+
+The composite action retries with `PLAYWRIGHT_HOST_PLATFORM_OVERRIDE` pinned to
+the newest LTS build (`ubuntu24.04-x64`, or `-arm64` by `uname -m`), which
+downloads a build that runs correctly on the newer distro once its system
+libraries are present. Playwright prints its own warning when this happens:
+
+```
+BEWARE: your OS is not officially supported by Playwright;
+downloading fallback build for ubuntu24.04-x64.
+```
+
+The override is written to `$GITHUB_ENV` so the rest of the job — `playwright
+test` in particular — resolves the same build rather than re-deciding from the
+real host platform.
+
+Verified on Alienwarerig (Ubuntu 26.04): plain install refuses, the override
+installs, and the resulting binary launches and renders once `LD_LIBRARY_PATH`
+carries the user-level libraries.
+
 ## Runner hosts
 
-| Host | Distro | Runner names |
-| --- | --- | --- |
-| Shadowsong | WSL2 Ubuntu 24.04 | `shadowsong-wsl-local`, `-2`, `-3` |
-| Alienwarerig | WSL2 Ubuntu 24.04 | `Alienwarerig` |
+| Host | Distro | Runner names | Path taken |
+| --- | --- | --- | --- |
+| Shadowsong | WSL2 Ubuntu 24.04 (noble) | `shadowsong-wsl-local`, `-2`, `-3` | native build; user-level libs |
+| Alienwarerig | WSL2 Ubuntu 26.04 (resolute) | `Alienwarerig` | LTS fallback build; user-level libs |
+
+Neither host currently has the libraries installed system-wide, so both
+exercise the unprivileged fallback. Installing them (above) is still the tidier
+end state.
 
 ## Known limitation
 
