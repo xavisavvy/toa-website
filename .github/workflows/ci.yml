@@ -449,6 +449,9 @@ jobs:
   mutation:
     name: Mutation Testing
     runs-on: [self-hosted, Linux, X64]
+    # Backstop: without this the job inherits GitHub's 360-minute default and
+    # monopolises a self-hosted runner for 6h before being cancelled.
+    timeout-minutes: 30
     # Only run on PRs and skip version commits
     if: "github.event_name == 'pull_request' && !contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -471,6 +474,9 @@ jobs:
           
       - name: Run incremental mutation testing
         run: npm run test:mutation:incremental
+        # Step-level timeout so continue-on-error still applies -- a job-level
+        # cancellation ignores continue-on-error and marks the check failed.
+        timeout-minutes: 25
         continue-on-error: true
           
       - name: Upload mutation report
