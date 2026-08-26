@@ -34,6 +34,29 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium for Lighthouse
+        # The self-hosted runners have no system Chrome. Reuse the Playwright
+        # chromium (same cache the test job uses) rather than adding a second
+        # browser install. No --with-deps - see docs/ci-cd/RUNNER_CHROME_DEPS.md.
+        run: npx playwright install chromium
+
+      - name: Resolve Chromium path
+        # Pin CHROME_PATH so chrome-launcher does not go hunting for a
+        # system Chrome that is not there. Resolved at runtime so a Playwright
+        # version bump (which changes the chromium-<rev> directory) cannot
+        # silently stale this out.
+        run: |
+          CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")"
+          echo "Using Chromium at: $CHROME_PATH"
+          "$CHROME_PATH" --version
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+
       - name: Run Lighthouse CI
         run: |
           npm install -g @lhci/cli
