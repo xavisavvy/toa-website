@@ -1,0 +1,104 @@
+name: Set up Chromium
+description: >
+  Install Playwright's Chromium build and guarantee it can actually launch,
+  without requiring sudo. Exports CHROME_PATH for consumers such as Lighthouse.
+
+runs:
+  using: composite
+  steps:
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+    - name: Cache user-level Chromium system libraries
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/chrome-deps
+        key: chrome-deps-${{ runner.os }}-libnspr4-libnss3-libasound2
+
+    - name: Install Playwright Chromium
+      shell: bash
+      # Deliberately no --with-deps: that flag shells out to `sudo apt-get
+      # install`, and the self-hosted runners have no passwordless sudo, so it
+      # fails with "sudo: a password is required". The next step covers the
+      # system libraries instead.
+      run: npx playwright install chromium
+
+    - name: Ensure Chromium can launch
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        CHROME="$(node -e "console.log(require('playwright').chromium.executablePath())")"
+        DEPS_ROOT="$HOME/.local/chrome-deps"
+        LIBDIR="$DEPS_ROOT/root/usr/lib/x86_64-linux-gnu"
+
+        # The predicate is "does the browser start", NOT "does `ldd` print
+        # 'not found'". `ldd` exits with an error and prints no such line when
+        # a library on the path is itself malformed, so grepping its output
+        # reports a clean bill of health for a broken install.
+        chrome_ok() { "$CHROME" --version >/dev/null 2>&1; }
+
+        diagnose() {
+          "$CHROME" --version 2>&1 | head -5 || true
+          ldd "$CHROME" 2>&1 | grep 'not found' || true
+        }
+
+        fetch_libs() {
+          echo "::group::Fetching Chromium system libraries (user-level, no sudo)"
+          # `apt-get install` needs root. `apt-get download` and `dpkg -x` do
+          # not - they never write outside the directory we hand them.
+          rm -rf "$DEPS_ROOT"
+          mkdir -p "$DEPS_ROOT/debs" "$DEPS_ROOT/root"
+          (
+            cd "$DEPS_ROOT/debs"
+            # libasound2t64 is the noble (24.04) name; libasound2 on <= 22.04.
+            # Note libnssutil3/libsmime3 are NOT packages - libnss3 provides them.
+            apt-get download libnspr4 libnss3 libasound2t64 libasound2-data \
+              || apt-get download libnspr4 libnss3 libasound2
+          )
+          for f in "$DEPS_ROOT"/debs/*.deb; do
+            dpkg -x "$f" "$DEPS_ROOT/root"
+          done
+          echo "::endgroup::"
+        }
+
+        if chrome_ok; then
+          # Preferred state: the host has libnspr4/libnss3/libasound2 installed
+          # system-wide (see docs/ci-cd/RUNNER_CHROME_DEPS.md). Nothing to do,
+          # and LD_LIBRARY_PATH is left alone.
+          echo "Host system libraries already satisfy Chromium."
+        else
+          echo "Chromium will not start against the host libraries:"
+          diagnose
+
+          export LD_LIBRARY_PATH="$LIBDIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+          # chrome_ok doubles as the cache-validity probe: a restored-but-broken
+          # or partial ~/.local/chrome-deps re-downloads instead of poisoning
+          # the run. Checking for a file's mere existence would not catch that.
+          if chrome_ok; then
+            echo "Reusing cached libraries at $LIBDIR"
+          else
+            fetch_libs
+          fi
+
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+        fi
+
+        if ! chrome_ok; then
+          echo "::error::Chromium still cannot launch after dependency setup."
+          diagnose
+          echo "Add the providing package to this action's apt-get download list,"
+          echo "or install it on the runner host - see docs/ci-cd/RUNNER_CHROME_DEPS.md"
+          exit 1
+        fi
+
+        "$CHROME" --version
+
+        # Lighthouse's chrome-launcher has no system Chrome to auto-detect on
+        # these hosts. Resolved at runtime so a Playwright version bump - which
+        # changes the chromium-<rev> directory - cannot stale this out.
+        echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"

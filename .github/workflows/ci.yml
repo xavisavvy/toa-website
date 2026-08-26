@@ -61,18 +61,8 @@ jobs:
           ADMIN_PASSWORD: ChangeMe123!
           TEST_ADMIN_PASSWORD: testpassword
           
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-        
-      - name: Install Playwright browsers
-        # No --with-deps: the self-hosted runners have no passwordless sudo, so
-        # Playwright's apt-get step fails with "sudo: a password is required".
-        # The system libs (libnspr4, libnss3, libasound2t64) are pre-installed on
-        # each runner host instead - see docs/ci-cd/RUNNER_CHROME_DEPS.md.
-        run: npx playwright install chromium
+      - name: Set up Chromium
+        uses: ./.github/actions/setup-chromium
         
       - name: TypeScript type checking
         run: npm run check
