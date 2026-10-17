@@ -330,6 +330,16 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: Clear stale gitleaks download
+        # gitleaks-action downloads its binary to a fixed /tmp/gitleaks.tmp
+        # path. These runners reuse the same $HOME/tmp across jobs (they are
+        # not ephemeral), so a prior interrupted download - or another job's
+        # concurrent download of the same path - leaves that file behind and
+        # every subsequent run fails with "Destination file path
+        # /tmp/gitleaks.tmp already exists" before gitleaks ever executes.
+        shell: bash
+        run: rm -f /tmp/gitleaks.tmp
+
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
