@@ -16,7 +16,10 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.local/chrome-deps
-        key: chrome-deps-${{ runner.os }}-${{ runner.arch }}-libnspr4-libnss3-libasound2
+        # Scoped by runner.name too: different hosts on the same os/arch (e.g.
+        # noble vs. resolute WSL distros) download different .debs, and a
+        # shared key would let one host's cache poison another's.
+        key: chrome-deps-${{ runner.os }}-${{ runner.arch }}-${{ runner.name }}-libnspr4-libnss3-libasound2
 
     - name: Install Playwright Chromium
       shell: bash

@@ -60,7 +60,10 @@ never write outside the current directory:
 ```bash
 apt-get download libnspr4 libnss3 libasound2t64 libasound2-data
 for f in *.deb; do dpkg -x "$f" "$HOME/.local/chrome-deps/root"; done
-export LD_LIBRARY_PATH="$HOME/.local/chrome-deps/root/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+# dpkg's multiarch dir name matches dpkg's architecture, not uname's:
+# x86_64-linux-gnu on x86_64 hosts, aarch64-linux-gnu on arm64 ones (see the
+# DEB_ARCH case statement in action.yml).
+export LD_LIBRARY_PATH="$HOME/.local/chrome-deps/root/usr/lib/$(dpkg --print-architecture | sed 's/amd64/x86_64-linux-gnu/;s/arm64/aarch64-linux-gnu/'):$LD_LIBRARY_PATH"
 ```
 
 About 2 MB, and cached between runs. This exists so that **a new runner host
