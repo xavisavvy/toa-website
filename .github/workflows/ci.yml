@@ -61,15 +61,9 @@ jobs:
           ADMIN_PASSWORD: ChangeMe123!
           TEST_ADMIN_PASSWORD: testpassword
           
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-        
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-        
+      - name: Set up Chromium
+        uses: ./.github/actions/setup-chromium
+
       - name: TypeScript type checking
         run: npm run check
         
@@ -336,6 +330,16 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: Clear stale gitleaks download
+        # gitleaks-action downloads its binary to a fixed /tmp/gitleaks.tmp
+        # path. These runners reuse the same $HOME/tmp across jobs (they are
+        # not ephemeral), so a prior interrupted download - or another job's
+        # concurrent download of the same path - leaves that file behind and
+        # every subsequent run fails with "Destination file path
+        # /tmp/gitleaks.tmp already exists" before gitleaks ever executes.
+        shell: bash
+        run: rm -f /tmp/gitleaks.tmp
+
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -449,6 +453,9 @@ jobs:
   mutation:
     name: Mutation Testing
     runs-on: [self-hosted, Linux, X64]
+    # Backstop: without this the job inherits GitHub's 360-minute default and
+    # monopolises a self-hosted runner for 6h before being cancelled.
+    timeout-minutes: 30
     # Only run on PRs and skip version commits
     if: "github.event_name == 'pull_request' && !contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -471,6 +478,9 @@ jobs:
           
       - name: Run incremental mutation testing
         run: npm run test:mutation:incremental
+        # Step-level timeout so continue-on-error still applies -- a job-level
+        # cancellation ignores continue-on-error and marks the check failed.
+        timeout-minutes: 25
         continue-on-error: true
           
       - name: Upload mutation report

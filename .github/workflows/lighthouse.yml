@@ -34,6 +34,11 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Set up Chromium
+        # Exports CHROME_PATH: there is no system Chrome on the self-hosted
+        # runners for chrome-launcher to auto-detect.
+        uses: ./.github/actions/setup-chromium
+
       - name: Run Lighthouse CI
         run: |
           npm install -g @lhci/cli
