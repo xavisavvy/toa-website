@@ -1,7 +1,7 @@
+import crypto from 'crypto';
 import type { IncomingMessage } from 'http';
 
 import 'dotenv/config';
-import crypto from 'crypto';
 import express, { type Request, Response, NextFunction } from "express";
 import session from 'express-session';
 
@@ -11,13 +11,20 @@ import { registerRoutes } from "./routes";
 import { configureSecurity } from "./security";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Extend Express Session to include the CSRF token (merges with the
+// `user` augmentation declared in ./routes.ts).
+declare module 'express-session' {
+  interface SessionData {
+    _csrf?: string;
+  }
+}
+
 // Validate environment variables before starting
 validateEnvironment();
 
 // CSRF protection middleware (synchronizer token pattern)
 // Works alongside the sameSite: 'lax' cookie setting for defence-in-depth
 function csrfProtection(req: Request, res: Response, next: NextFunction) {
-  const SESSION_KEY = '_csrf';
   const stateChanging = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
   // Exempt webhook endpoints that use signature verification instead
@@ -28,7 +35,7 @@ function csrfProtection(req: Request, res: Response, next: NextFunction) {
 
   if (stateChanging.includes(req.method)) {
     // Reject if no token exists in session or if provided token doesn't match
-    const expected = (req.session as any)[SESSION_KEY];
+    const expected = req.session._csrf;
     const provided = (req.headers['x-csrf-token'] as string) || req.body?._csrf;
     if (!expected || !provided || provided !== expected) {
       res.status(403).json({ error: 'Invalid or missing CSRF token' });
@@ -36,8 +43,8 @@ function csrfProtection(req: Request, res: Response, next: NextFunction) {
     }
   } else {
     // For safe methods, ensure a token is available in the session for later use
-    if (!(req.session as any)[SESSION_KEY]) {
-      (req.session as any)[SESSION_KEY] = crypto.randomBytes(24).toString('hex');
+    if (!req.session._csrf) {
+      req.session._csrf = crypto.randomBytes(24).toString('hex');
     }
   }
   next();
