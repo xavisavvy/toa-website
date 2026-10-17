@@ -2,6 +2,101 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/xavisavvy/toa-website/compare/v2.2.3...v2.3.0) (2026-10-17)
+
+
+### Features
+
+* **01-01:** add campaigns helper lib (youtube id/thumb, lookups, sort) ([0cba89a](https://github.com/xavisavvy/toa-website/commit/0cba89a06ef57138ac7177ec160d06748227b797))
+* **01-01:** add TVSeries / TVEpisode / PodcastEpisode JSON-LD factories ([864537a](https://github.com/xavisavvy/toa-website/commit/864537a3a4d50dd6bfc67a60d672a23258a4ca8e))
+* **01-01:** add Zod schemas for campaigns & episodes ([2815954](https://github.com/xavisavvy/toa-website/commit/28159544a4b45ad45d3ea857b5aa214bd90a1ee8))
+* **01-01:** implement /campaigns index page with status filter ([ddc0655](https://github.com/xavisavvy/toa-website/commit/ddc0655023e83c235d7a605610a48ded90daa8fe))
+* **01-01:** implement /campaigns/:slug detail page with TVSeries JSON-LD ([acbbe2b](https://github.com/xavisavvy/toa-website/commit/acbbe2b64749d5bc148fd7e41eed9a5b6756b0ee))
+* **01-01:** implement /campaigns/:slug/episodes/:n page with VideoObject JSON-LD ([d246760](https://github.com/xavisavvy/toa-website/commit/d2467605e230836c8a6150c67faa589b29488eff))
+* **01-01:** seed campaigns/episodes JSON + lock with integrity test ([33c74b3](https://github.com/xavisavvy/toa-website/commit/33c74b3540620bde800d2728099a806e8f481a19))
+* **01-01:** wire campaign routes in App.tsx + add Campaigns nav entry ([96a4fc0](https://github.com/xavisavvy/toa-website/commit/96a4fc09c8f8939e6f76f9206c4978140d713984)), closes [#4](https://github.com/xavisavvy/toa-website/issues/4)
+* **02-01:** add cast helpers (getCastMemberById, getCastSocialUrls) ([6f1aee4](https://github.com/xavisavvy/toa-website/commit/6f1aee43b1dcaaf43fde2942b51071df8bf1ea39))
+* **02-01:** add Phase 2 Zod schemas for character lore + image source taxonomy ([1a5e50e](https://github.com/xavisavvy/toa-website/commit/1a5e50ed641934a25cb96c42a6719ca73563c943))
+* **02-01:** extend CharacterDetail — lore cards + gallery badges + Person JSON-LD ([b95533f](https://github.com/xavisavvy/toa-website/commit/b95533f66ee221b2e9084c21e1b62d4f7d0138c6)), closes [#1](https://github.com/xavisavvy/toa-website/issues/1) [#4](https://github.com/xavisavvy/toa-website/issues/4)
+* **02-01:** migrate characters.json + lock with integrity test ([7d036a9](https://github.com/xavisavvy/toa-website/commit/7d036a9a595ab5420f30e923e23b63069b5ff04c))
+* **03-01:** add /podcast page with vertical episode list + subscribe strip ([e96aac4](https://github.com/xavisavvy/toa-website/commit/e96aac4849f4a7c7e58c21e7349b9a8be07e8741))
+* **03-01:** add /videos page with paginated grid + filter chips ([9278e05](https://github.com/xavisavvy/toa-website/commit/9278e05597a76614205a142a56362b3abaac3bc1))
+* **03-01:** retarget home CTAs to internal /videos and /podcast routes ([52badb3](https://github.com/xavisavvy/toa-website/commit/52badb376e0076f0719882ce23a4972fdbe3b4c5))
+* **03-01:** wire /videos and /podcast routes; update Navigation ([cbfc06d](https://github.com/xavisavvy/toa-website/commit/cbfc06d1de6b465596e5bd83773607043836ad04))
+* add enterprise CI/CD enhancements ([3c8f75b](https://github.com/xavisavvy/toa-website/commit/3c8f75bb97a41373fd6b16e099bf925cfa5266b3))
+* add npm run up/down for local docker dev workflow ([4d23aa9](https://github.com/xavisavvy/toa-website/commit/4d23aa9d7205d47df0e23d8631df39967e8b610b))
+* **deploy:** target AWS Lightsail VPS instead of Replit ([8866a6b](https://github.com/xavisavvy/toa-website/commit/8866a6bdab8997e6245fc27f856d492318c8c32a))
+* enhance webhook handling and update dependencies ([a898778](https://github.com/xavisavvy/toa-website/commit/a898778bdc4e8152877de3ca5d1d927cfed7de87))
+* record GitHub Deployments for staging/production rollouts ([a413997](https://github.com/xavisavvy/toa-website/commit/a41399742dea6a359b7152cf33f103111635cd4a))
+* record GitHub Deployments for staging/production rollouts ([#37](https://github.com/xavisavvy/toa-website/issues/37)) ([382585a](https://github.com/xavisavvy/toa-website/commit/382585a3b2098e3b4c7ef7b71121070afeb97583)), closes [#123](https://github.com/xavisavvy/toa-website/issues/123) [#456](https://github.com/xavisavvy/toa-website/issues/456)
+* unify campaign world data source and merge Taebrin/Forgotten Gods ([9c0c9e3](https://github.com/xavisavvy/toa-website/commit/9c0c9e3db621f7fcdcb412af554b0fed97e07e2f))
+* unify campaign world data source and merge Taebrin/Forgotten Gods ([#36](https://github.com/xavisavvy/toa-website/issues/36)) ([23cae39](https://github.com/xavisavvy/toa-website/commit/23cae39fe50f6923134b3b22ae484352edae9000)), closes [#123](https://github.com/xavisavvy/toa-website/issues/123) [#456](https://github.com/xavisavvy/toa-website/issues/456)
+* updated character descriptions ([ef92428](https://github.com/xavisavvy/toa-website/commit/ef92428853dd406084498f7b050a080bf7073ec6))
+
+
+### Bug Fixes
+
+* add missing preview script for Lighthouse CI ([665c5ef](https://github.com/xavisavvy/toa-website/commit/665c5ef2e6eee3c21fff142cd3ed6094d1b8f8f3))
+* address CodeQL security alerts [#3](https://github.com/xavisavvy/toa-website/issues/3)-[#21](https://github.com/xavisavvy/toa-website/issues/21) ([f20eeab](https://github.com/xavisavvy/toa-website/commit/f20eeab2b4b202d8100a0bcfb77a131511f7a523)), closes [#4](https://github.com/xavisavvy/toa-website/issues/4) [#5](https://github.com/xavisavvy/toa-website/issues/5) [#7](https://github.com/xavisavvy/toa-website/issues/7) [#8](https://github.com/xavisavvy/toa-website/issues/8) [#14](https://github.com/xavisavvy/toa-website/issues/14) [#9](https://github.com/xavisavvy/toa-website/issues/9) [#10](https://github.com/xavisavvy/toa-website/issues/10) [#15](https://github.com/xavisavvy/toa-website/issues/15) [#6](https://github.com/xavisavvy/toa-website/issues/6) [#11](https://github.com/xavisavvy/toa-website/issues/11)
+* **ci:** pin trivy-action to v0.35.0 SHA (CVE-2026-33634) ([ef2b78b](https://github.com/xavisavvy/toa-website/commit/ef2b78b3bee7290c5bb6c463aa9edc6e639f0322)), closes [#64](https://github.com/xavisavvy/toa-website/issues/64)
+* **ci:** remove redundant Run contract tests step ([88c6a2f](https://github.com/xavisavvy/toa-website/commit/88c6a2ff1b15f024f71da1c72833c8e7e5ea2389))
+* **ci:** unbreak the scan build, license check, and SBOM generation ([324e384](https://github.com/xavisavvy/toa-website/commit/324e38444776a4b6da982eeecba598d931a00023))
+* **ci:** unbreak the scan build, license check, and SBOM generation ([#39](https://github.com/xavisavvy/toa-website/issues/39)) ([f1ff690](https://github.com/xavisavvy/toa-website/commit/f1ff690372b68a1ab989b9d74b279a58186d7e24))
+* clear eslint warnings in server/index.ts's CSRF middleware ([3cff7da](https://github.com/xavisavvy/toa-website/commit/3cff7da81db05a08b781b7f244d8fc0be94d1613))
+* **deploy:** authenticate to GHCR with the run's ephemeral token ([277fe14](https://github.com/xavisavvy/toa-website/commit/277fe1435dc7117107a20bbe501667c1546b723b))
+* **deploy:** pin auto-deploys to the triggering commit's image, not latest ([3419954](https://github.com/xavisavvy/toa-website/commit/341995473575798c39dde02b60a6bdf94540f63c)), closes [#34](https://github.com/xavisavvy/toa-website/issues/34)
+* **deps:** bump zod-validation-error to 5.0.0 for zod v4 compatibility ([3fba0a1](https://github.com/xavisavvy/toa-website/commit/3fba0a180e1b16504f1fc3e2c7a8185d6761c2b8))
+* **deps:** override uuid to 11.1.1 to resolve @lhci/cli's vulnerable direct dependency ([a88bff5](https://github.com/xavisavvy/toa-website/commit/a88bff57ab93e155ee24134b785ce76e2702598c)), closes [#123](https://github.com/xavisavvy/toa-website/issues/123)
+* **deps:** resolve all 51 npm audit vulnerabilities ([2e2588a](https://github.com/xavisavvy/toa-website/commit/2e2588abe027474de29b16d1337402022ac295d3))
+* **deps:** resolve npm audit vulnerabilities (52 → 7) ([cf19689](https://github.com/xavisavvy/toa-website/commit/cf19689c203d79afb92d47a61d429588043b3e34))
+* **deps:** scope ajv override to stryker; bump brace-expansion to ^5.0.5 ([e4fd24d](https://github.com/xavisavvy/toa-website/commit/e4fd24d99a00cea66a91ed49d845f6ee1acb0684))
+* **deps:** security upgrade @aws-sdk/client-ses from 3.962.0 to 3.974.0 ([0d7c3be](https://github.com/xavisavvy/toa-website/commit/0d7c3be5416fbbfeff5525c35876710d58b15f31))
+* **docker:** copy scripts/ into the builder stage ([cb6d7d7](https://github.com/xavisavvy/toa-website/commit/cb6d7d73c6e735dc5b4b1902697eb7ba6e48974e)), closes [#34](https://github.com/xavisavvy/toa-website/issues/34)
+* **docker:** let SBOM generation tolerate the deliberate esbuild override ([81d73e5](https://github.com/xavisavvy/toa-website/commit/81d73e5e750419cdf01f97beffc02a08c78be022))
+* **e2e:** __dirname undefined in ESM breaks campaigns.spec.ts ([#42](https://github.com/xavisavvy/toa-website/issues/42)) ([8fdad01](https://github.com/xavisavvy/toa-website/commit/8fdad01b0a8a9cdc8163eca542fde3b99fc08bb5)), closes [#30](https://github.com/xavisavvy/toa-website/issues/30) [#39](https://github.com/xavisavvy/toa-website/issues/39)
+* e2e/campaigns.spec.ts uses __dirname, undefined in ESM ([a32b856](https://github.com/xavisavvy/toa-website/commit/a32b856e800372e899c6a39b87f96795852dd97e)), closes [#30](https://github.com/xavisavvy/toa-website/issues/30)
+* **e2e:** add missing session_id to checkout-flow cart-clearing test ([f495ff3](https://github.com/xavisavvy/toa-website/commit/f495ff36b8973908abf4c91f16638f611974dab1))
+* **e2e:** fix ~55 pre-existing E2E test failures and 4 real app bugs ([ee9fac4](https://github.com/xavisavvy/toa-website/commit/ee9fac48a6bb4d31b275acd736b07335d49372e8))
+* **e2e:** regenerate visual-regression baselines for Linux CI, fix stale selectors ([0811c6b](https://github.com/xavisavvy/toa-website/commit/0811c6b89eb5c2160cf66ce8e4965b006d77c490))
+* **e2e:** stop apiLimiter exhaustion from failing unrelated E2E specs, fix stale /api/characters load-stress tests ([99bc7e6](https://github.com/xavisavvy/toa-website/commit/99bc7e6a435493b6eda5b94bd88b50a03b2ab2ca))
+* **e2e:** unblock and stabilize the full Playwright E2E suite ([#41](https://github.com/xavisavvy/toa-website/issues/41)) ([57ce830](https://github.com/xavisavvy/toa-website/commit/57ce83037517846ad7c691fb8d33d0e890ae956b))
+* **e2e:** use fileURLToPath for __dirname under ESM in campaigns.spec.ts ([55eef83](https://github.com/xavisavvy/toa-website/commit/55eef8393089ef7e30aed99c13420736dfca765e))
+* fall back to channel-wide YouTube search when a campaign's playl… ([#46](https://github.com/xavisavvy/toa-website/issues/46)) ([15dc309](https://github.com/xavisavvy/toa-website/commit/15dc309fd5725ee98bc93ea18006c5277bd318f2)), closes [#40](https://github.com/xavisavvy/toa-website/issues/40) [#123](https://github.com/xavisavvy/toa-website/issues/123) [#456](https://github.com/xavisavvy/toa-website/issues/456)
+* fall back to channel-wide YouTube search when a campaign's playlist is stale ([6ef9741](https://github.com/xavisavvy/toa-website/commit/6ef974150fb52d7244056a57638db7d4e757513a)), closes [#40](https://github.com/xavisavvy/toa-website/issues/40)
+* hide Special Offers section when no active promotions ([fc12517](https://github.com/xavisavvy/toa-website/commit/fc125176eb89c8adbbb1dce3b2de207995dcb03b))
+* hide Special Offers section when no active promotions ([#35](https://github.com/xavisavvy/toa-website/issues/35)) ([3dbdde7](https://github.com/xavisavvy/toa-website/commit/3dbdde705c3e07929c622c296927f137e7b4003e)), closes [#123](https://github.com/xavisavvy/toa-website/issues/123) [#456](https://github.com/xavisavvy/toa-website/issues/456)
+* **lint:** clear all 363 ESLint errors (0 errors, 522 warnings remain) ([74167b7](https://github.com/xavisavvy/toa-website/commit/74167b78af34438c5914810904a4fe535c992ab2))
+* pin Trivy to specific version for deterministic builds ([291933d](https://github.com/xavisavvy/toa-website/commit/291933dce7f6b902e88ca15de67ceee033c761a6))
+* pin Trivy to specific version for deterministic builds ([58a42a9](https://github.com/xavisavvy/toa-website/commit/58a42a9e4396ad7985267a58a9a390db78b0733b))
+* **podcast:** stop the /podcast page 400ing on every load ([c942f36](https://github.com/xavisavvy/toa-website/commit/c942f36758d5db44dc9e005184fc081cf4da565f))
+* remove duplicate __dirname declaration left by merge, refresh stale CI comments ([78f9ad4](https://github.com/xavisavvy/toa-website/commit/78f9ad42a267fc4de1e085ffcb5f5ffb7166170f)), closes [#42](https://github.com/xavisavvy/toa-website/issues/42) [#42](https://github.com/xavisavvy/toa-website/issues/42)
+* replace sudo-based Trivy install with user-level installer in SBOM workflow ([f34f147](https://github.com/xavisavvy/toa-website/commit/f34f1475320e76b435fee07fbaf6b7428b6cd76f))
+* replace sudo-based Trivy install with user-level installer in SBOM workflow ([#45](https://github.com/xavisavvy/toa-website/issues/45)) ([172b524](https://github.com/xavisavvy/toa-website/commit/172b5245980bcc16c671abdeb9e66719f7edc8da))
+* resolve 14 CodeQL security alerts (CSRF, rate limiting, ReDoS, command injection, cookie flags, workflow permissions) ([#43](https://github.com/xavisavvy/toa-website/issues/43)) ([3211cd6](https://github.com/xavisavvy/toa-website/commit/3211cd60e976d87de36758e4770b6b321f1eec4e)), closes [#6](https://github.com/xavisavvy/toa-website/issues/6) [#11](https://github.com/xavisavvy/toa-website/issues/11) [#9](https://github.com/xavisavvy/toa-website/issues/9) [#10](https://github.com/xavisavvy/toa-website/issues/10) [#15](https://github.com/xavisavvy/toa-website/issues/15) [#3](https://github.com/xavisavvy/toa-website/issues/3) [#4](https://github.com/xavisavvy/toa-website/issues/4) [#5](https://github.com/xavisavvy/toa-website/issues/5) [#7](https://github.com/xavisavvy/toa-website/issues/7) [#8](https://github.com/xavisavvy/toa-website/issues/8) [#14](https://github.com/xavisavvy/toa-website/issues/14) [#12](https://github.com/xavisavvy/toa-website/issues/12) [#17](https://github.com/xavisavvy/toa-website/issues/17) [#21](https://github.com/xavisavvy/toa-website/issues/21) [#6](https://github.com/xavisavvy/toa-website/issues/6) [#11](https://github.com/xavisavvy/toa-website/issues/11)
+* resolve all ESLint warnings across the codebase ([741cae3](https://github.com/xavisavvy/toa-website/commit/741cae3971644ad81ad9ad402a58aff0d64d4fbc))
+* resolve all ESLint warnings across the codebase ([#44](https://github.com/xavisavvy/toa-website/issues/44)) ([6e110ab](https://github.com/xavisavvy/toa-website/commit/6e110ab4dc3d3dcad8d6dc4648bec3fcf08ef0f6)), closes [#123](https://github.com/xavisavvy/toa-website/issues/123) [#456](https://github.com/xavisavvy/toa-website/issues/456)
+* resolve merge conflicts with origin/main ([6501357](https://github.com/xavisavvy/toa-website/commit/65013573700cf3d715c0da1e1661aeef80876515))
+* restore mocked fetch after each test (unbreak unused-import lint error) ([df241ab](https://github.com/xavisavvy/toa-website/commit/df241abf59988d534c2772418f189d9d6dc7ade8))
+* **security:** hard-gate E2E_DISABLE_RATE_LIMIT off production ([75650f6](https://github.com/xavisavvy/toa-website/commit/75650f62373e56d4979e55132152e2c5b211e56d)), closes [#41](https://github.com/xavisavvy/toa-website/issues/41)
+* **seo:** regenerate sitemap from real data and resolve indexing conflicts ([5e2b228](https://github.com/xavisavvy/toa-website/commit/5e2b228ef12c796b5452de2a2e69cbb730500343))
+* **server:** unblock tsc and Windows local dev server bind ([3b93e19](https://github.com/xavisavvy/toa-website/commit/3b93e192605d5b63c8b2a36770b20247fbc59787))
+* sync campaign episode links from the world's real YouTube playlist ([8ea729f](https://github.com/xavisavvy/toa-website/commit/8ea729f9a449f627ad7b3183ac254d3689ca8893))
+* sync campaign episode links from the world's real YouTube playlist ([#40](https://github.com/xavisavvy/toa-website/issues/40)) ([8035ae0](https://github.com/xavisavvy/toa-website/commit/8035ae06a396c75faec82db75617e12fdd502670)), closes [#123](https://github.com/xavisavvy/toa-website/issues/123) [#456](https://github.com/xavisavvy/toa-website/issues/456)
+* **test:** stop rebuilding the Express app before every webhook test ([345130a](https://github.com/xavisavvy/toa-website/commit/345130a3f67fee17ef87da324cd10868cf515827))
+* tighten CSRF token validation — reject state-changing requests with no session token ([acec864](https://github.com/xavisavvy/toa-website/commit/acec864374eae973f68173ec8d9b1ec83af100e3))
+* update Trivy to use latest version ([b5d8f08](https://github.com/xavisavvy/toa-website/commit/b5d8f08acf8ac3ebbd193c904551f847c1f4231e))
+* use bash pipefail and verify Trivy binary after install in sbom.yml ([0c091ed](https://github.com/xavisavvy/toa-website/commit/0c091ed672dee6fd41f88cdd31befeb5aa5bbd44))
+
+
+### Performance Improvements
+
+* fix Lighthouse CI issues - add image dimensions, enable source maps, improve touch targets ([75ffea5](https://github.com/xavisavvy/toa-website/commit/75ffea5188f554e15cf79922a8a60feb5ef7b921))
+
+
+### Code Refactoring
+
+* **03-01:** extract PodcastSubscribeStrip from PodcastSection ([083c407](https://github.com/xavisavvy/toa-website/commit/083c407ecccad0a642ad39bcdb744b09e2ada434))
+
 ### [2.2.3](https://github.com/xavisavvy/toa-website/compare/v2.2.2...v2.2.3) (2026-01-05)
 
 
