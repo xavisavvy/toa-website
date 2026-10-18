@@ -1,5 +1,6 @@
 import type { Campaign, Episode } from "@shared/schema";
-import { ArrowLeft, ExternalLink, Calendar, Mic, Youtube } from "lucide-react";
+import { ArrowLeft, ExternalLink, Calendar, Mic } from "lucide-react";
+import { SiYoutube } from "react-icons/si";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
@@ -8,6 +9,7 @@ import { useRoute, Link } from "wouter";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import SEO from "@/components/SEO";
+import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -256,7 +258,7 @@ export default function EpisodeDetail() {
                     rel="noopener noreferrer"
                     data-testid="link-youtube"
                   >
-                    <Youtube className="mr-2 h-4 w-4" />
+                    <AccessibleIcon icon={SiYoutube} className="mr-2 h-4 w-4" />
                     Watch on YouTube
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </a>

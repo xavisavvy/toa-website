@@ -1,5 +1,6 @@
-import { Youtube, Twitter, Instagram, Twitch, Globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useEffect, useState } from "react";
+import { SiYoutube, SiX, SiInstagram, SiTwitch } from "react-icons/si";
 
 import brigetteAvatar from "@/assets/cast-brigette.webp";
 import colbyAvatar from "@/assets/cast-colby.webp";
@@ -10,6 +11,7 @@ import jakeAvatar from "@/assets/cast-jake.webp";
 import prestonAvatar from "@/assets/cast-preston.webp";
 import scottAvatar from "@/assets/cast-scott.webp";
 import torreyAvatar from "@/assets/cast-torrey.webp";
+import { AccessibleIcon } from "@/components/ui/accessible-icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -115,7 +117,7 @@ export default function AboutSection() {
           data-testid={`button-social-youtube-${member.id}`}
           aria-label={`${member.name}'s YouTube channel`}
         >
-          <Youtube className="h-4 w-4" />
+          <AccessibleIcon icon={SiYoutube} className="h-4 w-4" />
         </Button>,
       );
     }
@@ -137,7 +139,7 @@ export default function AboutSection() {
           data-testid={`button-social-twitter-${member.id}`}
           aria-label={`${member.name}'s Twitter profile`}
         >
-          <Twitter className="h-4 w-4" />
+          <AccessibleIcon icon={SiX} className="h-4 w-4" />
         </Button>,
       );
     }
@@ -159,7 +161,7 @@ export default function AboutSection() {
           data-testid={`button-social-instagram-${member.id}`}
           aria-label={`${member.name}'s Instagram profile`}
         >
-          <Instagram className="h-4 w-4" />
+          <AccessibleIcon icon={SiInstagram} className="h-4 w-4" />
         </Button>,
       );
     }
@@ -181,7 +183,7 @@ export default function AboutSection() {
           data-testid={`button-social-twitch-${member.id}`}
           aria-label={`${member.name}'s Twitch channel`}
         >
-          <Twitch className="h-4 w-4" />
+          <AccessibleIcon icon={SiTwitch} className="h-4 w-4" />
         </Button>,
       );
     }
