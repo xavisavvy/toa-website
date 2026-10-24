@@ -46,7 +46,17 @@ updates:
           - "eslint*"
           - "@eslint/*"
           - "prettier"
-    
+      # Catch-all: bundles every other direct dependency (anything not matched
+      # above) into one weekly PR instead of each getting its own. Must stay
+      # last — groups are matched in file order, first match wins. Scoped to
+      # minor/patch only; majors are already blocked by the ignore rule below.
+      all-other:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
     ignore:
       # Ignore esbuild vulnerability in drizzle-kit dev dependency
       # GHSA-67mh-4wv8-2f99: Only affects dev servers, not production
