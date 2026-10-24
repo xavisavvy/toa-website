@@ -1,8 +1,9 @@
-import { Sparkles } from "lucide-react";
+import { ExternalLink, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import socialLinks from "@/data/social-links.json";
 
 interface Promotion {
   id: string;
@@ -10,18 +11,22 @@ interface Promotion {
   description: string;
   badge: string;
   image: string;
+  link: string;
+  ctaLabel: string;
 }
 
 export default function PromotionsSection() {
-  //todo: remove mock functionality - Replace with actual promotions data
   const promotions: Promotion[] = [
-    // {
-    //   id: "2",
-    //   title: "Limited Edition Dice Set",
-    //   description: "Coming Soon!",
-    //   badge: "Coming Soon",
-    //   image: "",
-    // },
+    {
+      id: "pterrordale-2026",
+      title: "Pterrordale: Don't Look at the Screen!",
+      description:
+        "Our Halloween one-shot returns to the unfortunate town of Pterrordale. Six new heroes, one very bad broadcast. Subscribe so you don't miss it.",
+      badge: "Halloween One Shot",
+      image: "/promotions/pterrordale-2026.webp",
+      link: socialLinks.youtube,
+      ctaLabel: "Watch on YouTube",
+    },
   ];
 
   if (promotions.length === 0) {
@@ -36,20 +41,25 @@ export default function PromotionsSection() {
             className="font-serif text-4xl md:text-5xl font-semibold mb-4"
             data-testid="text-promotions-title"
           >
-            Special Offers
+            Events &amp; Specials
           </h2>
           <p className="text-muted-foreground text-lg">
             Don&apos;t miss out on exclusive events and limited-time deals
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div
+          className={
+            promotions.length === 1
+              ? "max-w-3xl mx-auto"
+              : "grid grid-cols-1 md:grid-cols-2 gap-8"
+          }
+        >
           {promotions.map((promo) => (
             <Card
               key={promo.id}
-              className="overflow-hidden hover-elevate cursor-pointer transition-all"
+              className="overflow-hidden hover-elevate transition-all"
               data-testid={`card-promotion-${promo.id}`}
-              onClick={() => console.info(`Promotion ${promo.id} clicked`)}
             >
               <div className="relative aspect-[16/9] overflow-hidden">
                 <img
@@ -82,8 +92,11 @@ export default function PromotionsSection() {
                 >
                   {promo.description}
                 </p>
-                <Button data-testid={`button-learn-more-${promo.id}`}>
-                  Learn More
+                <Button asChild data-testid={`button-learn-more-${promo.id}`}>
+                  <a href={promo.link} target="_blank" rel="noopener noreferrer">
+                    {promo.ctaLabel}
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
                 </Button>
               </CardContent>
             </Card>
