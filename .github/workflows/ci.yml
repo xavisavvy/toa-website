@@ -176,7 +176,7 @@ jobs:
       
       - name: Build Docker image for scanning
         # v6: v5 pins Node 20, which GitHub deprecated on Actions runners.
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
