@@ -162,7 +162,7 @@
     "web-vitals": "^5.1.0",
     "wouter": "^3.3.5",
     "ws": "^8.18.0",
-    "zod": "^4.3.5",
+    "zod": "^4.6.6",
     "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
