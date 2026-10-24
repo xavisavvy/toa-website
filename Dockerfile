@@ -6,7 +6,7 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
-FROM node:20-alpine AS deps
+FROM node:25-alpine AS deps
 
 # Add metadata labels
 LABEL org.opencontainers.image.source="https://github.com/xavisavvy/toa-website"
@@ -31,7 +31,7 @@ RUN npm ci --omit=dev --ignore-scripts && \
 # ============================================
 # Stage 2: Builder
 # ============================================
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 # Enable BuildKit caching
 ENV BUILDKIT_INLINE_CACHE=1
@@ -120,7 +120,7 @@ RUN cyclonedx-npm --ignore-npm-errors --output-file /app/sbom.json && \
 # ============================================
 # Stage 4: Production Dependencies Pruning
 # ============================================
-FROM node:20-alpine AS prod-deps
+FROM node:25-alpine AS prod-deps
 
 WORKDIR /app
 
@@ -145,7 +145,7 @@ RUN --mount=type=cache,target=/root/.npm \
 # ============================================
 # Stage 5: Runner (Production) - Distroless-inspired minimal image
 # ============================================
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
 
 # Add metadata
 LABEL org.opencontainers.image.source="https://github.com/xavisavvy/toa-website"
