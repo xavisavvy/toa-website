@@ -21,7 +21,7 @@ export default function PromotionsSection() {
       id: "pterrordale-2026",
       title: "Pterrordale: Don't Look at the Screen!",
       description:
-        "Our Halloween one-shot returns to the unfortunate town of Pterrordale. Six new heroes, one very bad broadcast. Premieres Halloween week at 10 AM MT, so subscribe and don't miss it.",
+        "Our Halloween one-shot returns to the unfortunate town of Pterrordale. Six new heroes, one very bad broadcast. Premieres Wednesday, October 28 at 10 AM MT, so subscribe and don't miss it.",
       badge: "Halloween One Shot",
       image: "/promotions/pterrordale-2026.webp",
       link: socialLinks.youtube,
