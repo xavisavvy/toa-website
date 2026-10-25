@@ -11,10 +11,22 @@ permissions:
   # security-events: write  # Only needed for CodeQL/Advanced Security (paid feature)
   pull-requests: write
 
+# A newer push to the same PR supersedes its older CI run. Pushes to
+# main/develop are never cancelled.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     name: Tests & Coverage
     runs-on: [self-hosted, Linux, X64]
+    # The self-hosted runners share one Docker host, and docker-compose.test.yml
+    # binds fixed host ports (5432, 6379) and container names. Overlapping test
+    # jobs fail with "address already in use", so run them one at a time.
+    concurrency:
+      group: test-services
+      cancel-in-progress: false
     # Skip CI for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
