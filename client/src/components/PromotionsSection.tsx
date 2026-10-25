@@ -71,13 +71,16 @@ export default function PromotionsSection() {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-                <Badge
-                  className="absolute top-4 right-4 bg-primary"
-                  data-testid={`badge-promotion-${promo.id}`}
-                >
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  {promo.badge}
-                </Badge>
+                {/* Badge's hover-elevate forces position:relative, so position the wrapper */}
+                <div className="absolute top-4 left-4">
+                  <Badge
+                    className="bg-primary"
+                    data-testid={`badge-promotion-${promo.id}`}
+                  >
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {promo.badge}
+                  </Badge>
+                </div>
               </div>
               <CardContent className="p-6">
                 <h3
