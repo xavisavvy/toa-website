@@ -156,7 +156,7 @@ jobs:
         run: docker compose -p toa-website-test -f docker-compose.test.yml down -v
         
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         if: always()
         with:
           files: ./coverage/coverage-final.json
