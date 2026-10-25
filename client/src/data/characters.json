@@ -701,7 +701,8 @@
           "type": "portrait",
           "isFeatured": true,
           "source": "official",
-          "url": "/characters/jax-xerowraith.webp"
+          "url": "/characters/jax-xerowraith.webp",
+          "isAiGenerated": true
         }
       ],
       "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Jax Xerowraith is about to find out what happens when you look at the screen.",
@@ -781,7 +782,8 @@
           "type": "portrait",
           "isFeatured": true,
           "source": "official",
-          "url": "/characters/nastia-skorbina.webp"
+          "url": "/characters/nastia-skorbina.webp",
+          "isAiGenerated": true
         }
       ],
       "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Nastia Skorbina is about to find out what happens when you look at the screen.",
@@ -804,11 +806,48 @@
       "images": [
         {
           "id": "1",
-          "caption": "Trevor Calderón de las Vegas - Character Portrait",
+          "url": "/characters/trevor-calderon-de-las-vegas.webp",
+          "caption": "Trevor Calderón de las Vegas - HeroForge 3D model",
           "type": "portrait",
           "isFeatured": true,
-          "source": "official",
-          "url": "/characters/trevor-calderon-de-las-vegas.webp"
+          "isAiGenerated": false,
+          "source": "official"
+        },
+        {
+          "id": "2",
+          "url": "/characters/trevor-calderon-de-las-vegas-pterror-high.webp",
+          "caption": "Trevor outside Pterror High",
+          "type": "portrait",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        },
+        {
+          "id": "3",
+          "url": "/characters/trevor-calderon-de-las-vegas-selfie.webp",
+          "caption": "Trevor with Nastia and Jax at Pterror High",
+          "type": "portrait",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        },
+        {
+          "id": "4",
+          "url": "/characters/trevor-calderon-de-las-vegas-rapier.webp",
+          "caption": "The Calderón family rapier",
+          "type": "item",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        },
+        {
+          "id": "5",
+          "url": "/characters/trevor-calderon-de-las-vegas-whip.webp",
+          "caption": "The fiend-bound whip Damián entrusted to Trevor",
+          "type": "item",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
         }
       ],
       "backstory": "Trevor, 17, grew up in Toledo, Spain, in a close family that investigates supernatural threats. His father Rafael trained him with the rapier, while his grandmother Serafina's side of the family kept records and translations. His older brother Damián infiltrated a suspected Compact front and was later assigned to guard a fiend-bound whip. Believing its power was being misused, Damián stole it, entrusted it to Trevor, and disappeared. The captive fiend later offered Trevor a pact to help protect Damián; Trevor accepted without knowing its price and hides it from his family. A binding mark matching one from a stolen object Serafina had sworn to guard led the family to Pterrordale, where Trevor now attends Pterror High as an exchange student and searches for his brother.",
