@@ -197,8 +197,8 @@
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.51.0",
     "@vitejs/plugin-react": "^4.7.0",
-    "@vitest/coverage-v8": "^4.0.16",
-    "@vitest/ui": "^4.0.16",
+    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/ui": "^4.1.12",
     "autocannon": "^8.0.0",
     "autoprefixer": "^10.4.20",
     "axe-core": "^4.11.0",
@@ -229,7 +229,7 @@
     "tsx": "^4.20.5",
     "typescript": "5.6.3",
     "vite": "^7.3.7",
-    "vitest": "^4.0.16",
+    "vitest": "^4.1.12",
     "vitest-sonar-reporter": "^3.0.0"
   },
   "optionalDependencies": {
@@ -245,7 +245,10 @@
     "esbuild": "^0.25.12",
     "typed-rest-client": "^3.1.2",
     "hyperid": "^4.0.0",
-    "uuid": "^11.1.1"
+    "uuid": "^11.1.1",
+    "postcss-selector-parser": "^6.1.5",
+    "fflate": "^0.8.3",
+    "basic-ftp": "^6.2.3"
   },
   "lint-staged": {
     ".env.example": [
