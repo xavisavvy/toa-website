@@ -4,7 +4,7 @@
       "id": "cory-avis",
       "name": "Cory Avis",
       "role": "Game Master",
-      "characters": ["The Storyteller"],
+      "characters": ["The Storyteller", "Kevin Kambridge"],
       "isCurrent": true,
       "avatar": "cast-cory.webp",
       "socialLinks": {
@@ -26,7 +26,8 @@
         "Zeff the Bastard",
         "Tazer Face",
         "Hu Mungus",
-        "Ahri Flowers"
+        "Ahri Flowers",
+        "Trevor Calderón de las Vegas"
       ],
       "isCurrent": true,
       "avatar": "cast-preston.webp",
@@ -46,7 +47,8 @@
         "Freya Fenrir",
         "Winnifred \"Fred\" Blodbane",
         "Maggie Bramblecheeks",
-        "Maybel Crosscore"
+        "Mabel Crosscore",
+        "Nastia Skorbina"
       ],
       "isCurrent": true,
       "avatar": "cast-torrey.webp",
@@ -62,7 +64,7 @@
       "id": "scott-avis",
       "name": "Scott Avis",
       "role": "Player",
-      "characters": ["Carine Sol", "Bolt", "Cilin Meekmarrow"],
+      "characters": ["Carine Sol", "Bolt", "Cilin Meekmarrow", "Alan McMichaelson"],
       "isCurrent": true,
       "avatar": "cast-scott.webp",
       "socialLinks": {
@@ -77,7 +79,13 @@
       "id": "dallin-rogers",
       "name": "Dallin Rogers",
       "role": "Player",
-      "characters": ["Erys Leandorian", "Aramis", "Ezra"],
+      "characters": [
+        "Erys Leandorian",
+        "Aramis",
+        "Ezra",
+        "Buck Calhoun",
+        "Jax Xerowraith"
+      ],
       "isCurrent": true,
       "avatar": "cast-dallin.webp",
       "socialLinks": {
@@ -107,7 +115,7 @@
       "id": "ian",
       "name": "Ian",
       "role": "Player",
-      "characters": ["Titheus Cillbrost"],
+      "characters": ["Titheus Cillbrost", "Derek \"Gizmo\" Grimes"],
       "isCurrent": true,
       "avatar": "cast-ian.webp",
       "socialLinks": {
@@ -122,7 +130,7 @@
       "id": "jake",
       "name": "Jake",
       "role": "Player",
-      "characters": ["Porphan Valaritas"],
+      "characters": ["Porphan Valaritas", "Jessica M."],
       "isCurrent": true,
       "avatar": "cast-jake.webp",
       "socialLinks": {
