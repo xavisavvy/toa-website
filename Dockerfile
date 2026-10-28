@@ -180,6 +180,13 @@ ENV NODE_ENV=production \
     # Disable DNS caching issues
     UV_USE_IO_URING=0
 
+# POST /api/podcast/feed only fetches the feed URL the server is configured
+# with (server/routes.ts). Carry the same build arg the client bundle was
+# built with into the runtime env so the two can't drift. A PODCAST_FEED_URL
+# in the container's env_file still overrides this.
+ARG VITE_PODCAST_FEED_URL=""
+ENV PODCAST_FEED_URL=$VITE_PODCAST_FEED_URL
+
 # Copy pruned production dependencies
 COPY --from=prod-deps --chown=expressjs:nodejs /app/node_modules ./node_modules
 
