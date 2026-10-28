@@ -19,8 +19,8 @@ docker-compose -f docker-compose.test.yml ps
 cp .env.test.example .env.test
 
 # Load environment variables (or use dotenv)
-export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/toa_test
-export REDIS_URL=redis://localhost:6379
+export DATABASE_URL=postgresql://test_user:test_password@localhost:55432/toa_test
+export REDIS_URL=redis://localhost:56379
 export NODE_ENV=test
 ```
 
@@ -71,11 +71,11 @@ The CI workflow automatically:
 
 **Connection:**
 - Host: `localhost`
-- Port: `5432`
+- Port: `55432` (container port 5432)
 - Database: `toa_test`
 - User: `test_user`
 - Password: `test_password`
-- URL: `postgresql://test_user:test_password@localhost:5432/toa_test`
+- URL: `postgresql://test_user:test_password@localhost:55432/toa_test`
 
 **Features:**
 - ✅ PostgreSQL 16 (Alpine - minimal size)
@@ -89,8 +89,8 @@ The CI workflow automatically:
 
 **Connection:**
 - Host: `localhost`
-- Port: `6379`
-- URL: `redis://localhost:6379`
+- Port: `56379` (container port 6379)
+- URL: `redis://localhost:56379`
 
 **Features:**
 - ✅ Redis 7 (Alpine)
@@ -105,8 +105,8 @@ The CI workflow automatically:
 
 ```bash
 # Check if ports are already in use
-lsof -i :5432  # PostgreSQL
-lsof -i :6379  # Redis
+lsof -i :55432  # PostgreSQL
+lsof -i :56379  # Redis
 
 # Stop conflicting services
 docker-compose -f docker-compose.test.yml down -v
@@ -245,8 +245,8 @@ The CI workflow sets these automatically:
 
 ```yaml
 env:
-  DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
-  REDIS_URL: redis://localhost:6379
+  DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
+  REDIS_URL: redis://localhost:56379
   NODE_ENV: test
 ```
 
