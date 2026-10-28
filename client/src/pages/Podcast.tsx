@@ -59,7 +59,8 @@ export default function Podcast() {
         headers: { "Content-Type": "application/json" },
         // Must not exceed the cap in server/routes.ts POST
         // /api/podcast/feed (200). 500 silently 400'd this whole page.
-        body: JSON.stringify({ feedUrl, limit: 200 }),
+        // The feed URL itself is pinned server-side and not sent.
+        body: JSON.stringify({ limit: 200 }),
       });
       if (!r.ok) {
         throw new Error("Failed to fetch podcast feed");

@@ -33,7 +33,9 @@ export default function PodcastSection({ feedUrl, spotifyUrl, applePodcastsUrl, 
       const response = await fetch('/api/podcast/feed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedUrl, limit: 5 }),
+        // The server pins the feed URL; feedUrl here only gates whether a
+        // feed is configured for this build.
+        body: JSON.stringify({ limit: 5 }),
       });
       if (!response.ok) {
         throw new Error('Failed to fetch podcast feed');

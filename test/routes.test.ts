@@ -1,6 +1,6 @@
 import express, { Express } from 'express';
 import request from 'supertest';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { registerRoutes } from '../server/routes';
 
@@ -30,6 +30,17 @@ vi.mock('../server/podcast', () => ({
     },
   ]),
 }));
+
+// expensiveLimiter allows 10 requests/hour per IP with a module-level store,
+// so this file's podcast tests would trip it. Rate limiting itself is covered
+// in test/integration/rate-limiter.test.ts.
+vi.mock('../server/rate-limiter', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../server/rate-limiter')>();
+  return {
+    ...actual,
+    expensiveLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
+  };
+});
 
 vi.mock('../server/etsy', () => ({
   getShopListings: vi.fn().mockResolvedValue([
@@ -116,41 +127,103 @@ describe('API Routes', () => {
   });
 
   describe('POST /api/podcast/feed', () => {
-    it('should return podcast episodes with valid feed URL', async () => {
+    const PINNED_FEED_URL = 'https://anchor.fm/s/pinned/podcast/rss';
+
+    beforeEach(async () => {
+      vi.stubEnv('PODCAST_FEED_URL', PINNED_FEED_URL);
+      vi.stubEnv('VITE_PODCAST_FEED_URL', '');
+      const { getPodcastFeed } = await import('../server/podcast');
+      vi.mocked(getPodcastFeed).mockClear();
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('should fetch the server-configured feed when no feedUrl is sent', async () => {
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({ feedUrl: 'https://anchor.fm/test/feed', limit: 10 })
+        .send({ limit: 10 })
         .expect(200);
 
       expect(response.body).toBeInstanceOf(Array);
       expect(response.body[0]).toHaveProperty('title');
+
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).toHaveBeenCalledWith(PINNED_FEED_URL, 10);
     });
 
-    it('should reject missing feedUrl', async () => {
+    it('should default limit to 10', async () => {
+      await request(app).post('/api/podcast/feed').send({}).expect(200);
+
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).toHaveBeenCalledWith(PINNED_FEED_URL, 10);
+    });
+
+    it('should accept a feedUrl that matches the configured feed', async () => {
+      await request(app)
+        .post('/api/podcast/feed')
+        .send({ feedUrl: PINNED_FEED_URL, limit: 5 })
+        .expect(200);
+
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).toHaveBeenCalledWith(PINNED_FEED_URL, 5);
+    });
+
+    it('should reject a feedUrl that differs from the configured feed (cache poisoning)', async () => {
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({ limit: 10 })
+        .send({ feedUrl: 'https://attacker.example.com/rss', limit: 10 })
         .expect(400);
 
-      expect(response.body.error).toBe('feedUrl is required');
+      expect(response.body.error).toBe('feedUrl does not match the configured podcast feed');
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).not.toHaveBeenCalled();
     });
 
-    it('should reject localhost URLs (SSRF protection)', async () => {
-      const response = await request(app)
+    it('should reject localhost URLs without fetching them', async () => {
+      await request(app)
         .post('/api/podcast/feed')
         .send({ feedUrl: 'http://localhost:3000/feed', limit: 10 })
         .expect(400);
 
-      expect(response.body.error).toBe('Invalid URL format');
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).not.toHaveBeenCalled();
     });
 
-    it('should reject private IP addresses (SSRF protection)', async () => {
+    it('should fall back to VITE_PODCAST_FEED_URL when PODCAST_FEED_URL is unset', async () => {
+      vi.stubEnv('PODCAST_FEED_URL', '');
+      vi.stubEnv('VITE_PODCAST_FEED_URL', 'https://anchor.fm/s/vite/podcast/rss');
+
+      await request(app).post('/api/podcast/feed').send({ limit: 3 }).expect(200);
+
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).toHaveBeenCalledWith('https://anchor.fm/s/vite/podcast/rss', 3);
+    });
+
+    it('should return 503 when no feed URL is configured', async () => {
+      vi.stubEnv('PODCAST_FEED_URL', '');
+      vi.stubEnv('VITE_PODCAST_FEED_URL', '');
+
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({ feedUrl: 'http://192.168.1.1/feed', limit: 10 })
-        .expect(400);
+        .send({ limit: 10 })
+        .expect(503);
 
-      expect(response.body.error).toBe('Access to private IP addresses is not allowed');
+      expect(response.body.error).toBe('Podcast feed not configured');
+    });
+
+    it('should return 503 when the configured feed URL fails the SSRF check', async () => {
+      vi.stubEnv('PODCAST_FEED_URL', 'http://192.168.1.1/feed');
+
+      const response = await request(app)
+        .post('/api/podcast/feed')
+        .send({ limit: 10 })
+        .expect(503);
+
+      expect(response.body.error).toBe('Podcast feed not configured');
+      const { getPodcastFeed } = await import('../server/podcast');
+      expect(getPodcastFeed).not.toHaveBeenCalled();
     });
 
     it('should validate limit parameter', async () => {
@@ -159,10 +232,17 @@ describe('API Routes', () => {
       // 201 keeps this asserting the boundary rather than a stale number.
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({ feedUrl: 'https://anchor.fm/test/feed', limit: 201 })
+        .send({ limit: 201 })
         .expect(400);
 
       expect(response.body).toHaveProperty('error');
+    });
+
+    it('should reject a non-numeric limit', async () => {
+      await request(app)
+        .post('/api/podcast/feed')
+        .send({ limit: 'lots' })
+        .expect(400);
     });
 
     it('should accept the limit the /podcast page actually requests', async () => {
@@ -171,7 +251,7 @@ describe('API Routes', () => {
       // rendered an empty episode list for months without anyone noticing.
       await request(app)
         .post('/api/podcast/feed')
-        .send({ feedUrl: 'https://anchor.fm/test/feed', limit: 200 })
+        .send({ limit: 200 })
         .expect((res) => {
           if (res.status === 400) {
             throw new Error(
@@ -304,11 +384,17 @@ describe('API Routes', () => {
       const { getPodcastFeed } = await import('../server/podcast');
       const sensitiveError = new Error('Internal database connection failed at 192.168.1.100:5432');
       vi.mocked(getPodcastFeed).mockRejectedValueOnce(sensitiveError);
+      vi.stubEnv('PODCAST_FEED_URL', 'https://example.com/feed.xml');
 
-      const response = await request(app)
-        .post('/api/podcast/feed')
-        .send({ feedUrl: 'https://example.com/feed.xml' })
-        .expect(500);
+      let response;
+      try {
+        response = await request(app)
+          .post('/api/podcast/feed')
+          .send({})
+          .expect(500);
+      } finally {
+        vi.unstubAllEnvs();
+      }
 
       // Should get generic error, not the detailed internal error
       expect(response.body.error).toBeDefined();
@@ -348,24 +434,35 @@ describe('API Routes', () => {
       expect(response.body || response.text).toBeDefined();
     });
 
-    it('should handle missing required fields in POST requests', async () => {
+    it('should reject wrongly-typed fields in POST requests', async () => {
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({})
+        .send({ feedUrl: 12345 })
         .expect(400);
 
       expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toContain('feedUrl');
+      expect(response.body.error).toBe('Invalid request');
     });
 
-    it('should validate content-type for POST requests', async () => {
-      const response = await request(app)
-        .post('/api/podcast/feed')
-        .set('Content-Type', 'text/plain')
-        .send('not json')
-        .expect(400);
+    it('should not let a non-JSON body choose the podcast feed', async () => {
+      // express.json() leaves text/plain unparsed, so the body is ignored and
+      // the server-pinned feed is the only one that can be fetched.
+      vi.stubEnv('PODCAST_FEED_URL', 'https://anchor.fm/s/pinned/podcast/rss');
+      const { getPodcastFeed } = await import('../server/podcast');
+      vi.mocked(getPodcastFeed).mockClear();
 
-      expect(response.status).toBe(400);
+      try {
+        await request(app)
+          .post('/api/podcast/feed')
+          .set('Content-Type', 'text/plain')
+          .send('feedUrl=https://attacker.example.com/rss');
+
+        for (const call of vi.mocked(getPodcastFeed).mock.calls) {
+          expect(call[0]).toBe('https://anchor.fm/s/pinned/podcast/rss');
+        }
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
 
     it('should handle very long URLs gracefully', async () => {
