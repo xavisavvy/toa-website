@@ -28,7 +28,7 @@ const { Client } = pkg;
 import { logger } from '../server/logger.js';
 import { users, orders, orderItems, auditLogs } from '../shared/schema.ts';
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test_user:test_password@localhost:5432/toa_test';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test_user:test_password@localhost:55432/toa_test';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@talesofaneria.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
 const TEST_ADMIN_PASSWORD = process.env.TEST_ADMIN_PASSWORD || 'testpassword';

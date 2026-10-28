@@ -56,7 +56,7 @@ npm run test:security
 
 **Connection String:**
 ```
-postgresql://test_user:test_password@localhost:5432/toa_test
+postgresql://test_user:test_password@localhost:55432/toa_test
 ```
 
 **Features:**
@@ -159,7 +159,7 @@ npm run test:e2e:setup
 
 ```bash
 # Run migrations manually
-export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/toa_test
+export DATABASE_URL=postgresql://test_user:test_password@localhost:55432/toa_test
 npm run db:push
 ```
 
