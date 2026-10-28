@@ -3,7 +3,6 @@ import { ExternalLink, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import socialLinks from "@/data/social-links.json";
 
 interface Promotion {
   id: string;
@@ -24,8 +23,8 @@ export default function PromotionsSection() {
         "Our Halloween one-shot returns to the unfortunate town of Pterrordale. Six new heroes, one very bad broadcast. Premieres Wednesday, October 28 at 10 AM MT, so subscribe and don't miss it.",
       badge: "Halloween One Shot",
       image: "/promotions/pterrordale-2026.webp",
-      link: socialLinks.youtube,
-      ctaLabel: "Watch on YouTube",
+      link: "https://www.youtube.com/watch?v=3IURs0HrT8s",
+      ctaLabel: "Watch the Premiere",
     },
   ];
 
