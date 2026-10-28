@@ -4,7 +4,7 @@
       "id": "cory-avis",
       "name": "Cory Avis",
       "role": "Game Master",
-      "characters": ["The Storyteller", "Kevin Kambridge"],
+      "characters": ["Kevin Kambridge", "The Storyteller"],
       "isCurrent": true,
       "avatar": "cast-cory.webp",
       "socialLinks": {
@@ -20,14 +20,14 @@
       "name": "Preston Farr",
       "role": "Player",
       "characters": [
+        "Trevor Calderón de las Vegas",
+        "Ahri Flowers",
         "Wayne the Archivist of Lies",
         "Victor Udonta",
         "Locke Lirian",
         "Zeff the Bastard",
         "Tazer Face",
-        "Hu Mungus",
-        "Ahri Flowers",
-        "Trevor Calderón de las Vegas"
+        "Hu Mungus"
       ],
       "isCurrent": true,
       "avatar": "cast-preston.webp",
@@ -44,11 +44,11 @@
       "name": "Torrey Woolsey",
       "role": "Player",
       "characters": [
+        "Nastia Skorbina",
+        "Mabel Crosscore",
         "Freya Fenrir",
         "Winnifred \"Fred\" Blodbane",
-        "Maggie Bramblecheeks",
-        "Mabel Crosscore",
-        "Nastia Skorbina"
+        "Maggie Bramblecheeks"
       ],
       "isCurrent": true,
       "avatar": "cast-torrey.webp",
@@ -64,7 +64,7 @@
       "id": "scott-avis",
       "name": "Scott Avis",
       "role": "Player",
-      "characters": ["Carine Sol", "Bolt", "Cilin Meekmarrow", "Alan McMichaelson"],
+      "characters": ["Alan McMichaelson", "Carine Sol", "Bolt", "Cilin Meekmarrow"],
       "isCurrent": true,
       "avatar": "cast-scott.webp",
       "socialLinks": {
@@ -80,11 +80,11 @@
       "name": "Dallin Rogers",
       "role": "Player",
       "characters": [
+        "Jax Xerowraith",
+        "Buck Calhoun",
         "Erys Leandorian",
         "Aramis",
-        "Ezra",
-        "Buck Calhoun",
-        "Jax Xerowraith"
+        "Ezra"
       ],
       "isCurrent": true,
       "avatar": "cast-dallin.webp",
@@ -115,7 +115,7 @@
       "id": "ian",
       "name": "Ian",
       "role": "Player",
-      "characters": ["Titheus Cillbrost", "Derek \"Gizmo\" Grimes"],
+      "characters": ["Derek \"Gizmo\" Grimes", "Titheus Cillbrost"],
       "isCurrent": true,
       "avatar": "cast-ian.webp",
       "socialLinks": {
@@ -130,7 +130,7 @@
       "id": "jake",
       "name": "Jake",
       "role": "Player",
-      "characters": ["Porphan Valaritas", "Jessica M."],
+      "characters": ["Jessica M.", "Porphan Valaritas"],
       "isCurrent": true,
       "avatar": "cast-jake.webp",
       "socialLinks": {
