@@ -16,7 +16,7 @@ describe('Routes Coverage', () => {
         secret: 'test-secret',
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: false, httpOnly: true },
+        cookie: { secure: true, httpOnly: true },
       })
     );
     // CSRF protection: skip token validation in test environment but keep

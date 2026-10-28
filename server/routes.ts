@@ -709,15 +709,16 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Shared by the three redirect-hop checks below (original/final/fallback URL).
+  // Shared by the redirect-hop checks in the audio proxy below.
   function isAllowedAudioDomain(hostname: string, allowedDomains: string[]): boolean {
-    return allowedDomains.some(domain => hostname.endsWith(domain) || hostname === domain);
+    // Match the domain itself or a true subdomain of it. A bare endsWith()
+    // would also accept look-alikes such as "evilapple.com" for "apple.com".
+    const host = hostname.toLowerCase();
+    return allowedDomains.some(domain => host === domain || host.endsWith(`.${domain}`));
   }
 
-  // Runs the SSRF + domain-allowlist check shared by all three redirect hops
-  // in the audio proxy below (original URL, post-redirect final URL, and the
-  // no-redirect fallback), logging the same security events each hop used to
-  // log inline.
+  // Runs the SSRF + domain-allowlist check shared by the audio proxy below
+  // for the original URL and every redirect hop it follows.
   function checkAudioUrlSafety(
     urlStr: string,
     allowedDomains: string[],
@@ -774,61 +775,53 @@ export function registerRoutes(app: Express): Server {
         return res.status(urlCheck.status).json({ error: urlCheck.error });
       }
 
-      // Follow redirects to get the final audio URL
+      // Follow redirects to get the final audio URL. Redirects are followed
+      // manually so every hop is validated *before* the server requests it;
+      // `redirect: 'follow'` would let an allowed host bounce the server to
+      // an internal address before we ever saw the final URL.
+      const MAX_REDIRECTS = 5;
       const controller = new globalThis.AbortController();
       const timeout = globalThis.setTimeout(() => controller.abort(), 15000);
+      let currentUrl = decodedUrl;
 
       try {
-        const response = await fetch(decodedUrl, {
-          method: 'HEAD',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          },
-          redirect: 'follow',
-          signal: controller.signal,
-        });
+        for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+          const response = await fetch(currentUrl, {
+            method: 'HEAD',
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            },
+            redirect: 'manual',
+            signal: controller.signal,
+          });
 
-        globalThis.clearTimeout(timeout);
+          const location = response.headers.get('location');
+          if (response.status < 300 || response.status >= 400 || !location) {
+            break;
+          }
 
-        // Get the final URL after redirects
-        const finalUrl = response.url;
-
-        if (!finalUrl) {
-          logSecurityEvent('AUDIO_PROXY_INVALID_FINAL_URL', { originalUrl: decodedUrl, ip: req.ip });
-          return res.status(500).json({ error: 'Failed to resolve audio URL' });
+          const nextUrl = new URL(location, currentUrl).toString();
+          const hopCheck = checkAudioUrlSafety(
+            nextUrl,
+            allowedDomains,
+            { invalidUrl: 'SSRF_ATTEMPT_FINAL_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FINAL' },
+            { originalUrl: decodedUrl, finalUrl: nextUrl, ip: req.ip }
+          );
+          if (!hopCheck.ok) {
+            globalThis.clearTimeout(timeout);
+            return res.status(hopCheck.status).json({ error: hopCheck.error });
+          }
+          currentUrl = nextUrl;
         }
-
-        // Validate the post-redirect URL (SSRF) and confirm its domain too
-        const finalUrlCheck = checkAudioUrlSafety(
-          finalUrl,
-          allowedDomains,
-          { invalidUrl: 'SSRF_ATTEMPT_FINAL_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FINAL' },
-          { originalUrl: decodedUrl, finalUrl, ip: req.ip }
-        );
-        if (!finalUrlCheck.ok) {
-          return res.status(finalUrlCheck.status).json({ error: finalUrlCheck.error });
-        }
-
-        // Redirect client to the actual audio source
-        res.redirect(302, finalUrl);
       } catch {
-        globalThis.clearTimeout(timeout);
-
-        // As a fallback, only redirect to the original decodedUrl
-        // if it still passes validation and domain checks
-        const fallbackCheck = checkAudioUrlSafety(
-          decodedUrl,
-          allowedDomains,
-          { invalidUrl: 'SSRF_ATTEMPT_FALLBACK_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FALLBACK' },
-          { url: decodedUrl, ip: req.ip }
-        );
-        if (!fallbackCheck.ok) {
-          return res.status(fallbackCheck.status).json({ error: fallbackCheck.error });
-        }
-
-        // If all checks pass, redirect directly to the original URL
-        res.redirect(302, decodedUrl);
+        // Network failure or timeout: fall back to the last validated URL
+        // and let the browser follow any remaining redirects itself.
       }
+      globalThis.clearTimeout(timeout);
+
+      // currentUrl is either the validated original URL or a hop that passed
+      // the same SSRF + allowlist check above.
+      res.redirect(302, currentUrl);
     } catch (error) {
       console.error('Error proxying audio:', error instanceof Error ? error.message : error);
       if (!res.headersSent) {

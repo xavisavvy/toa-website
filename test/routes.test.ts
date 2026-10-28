@@ -206,6 +206,47 @@ describe('API Routes', () => {
 
       expect(response.body.error).toBe('Invalid URL format');
     });
+
+    it('should reject look-alike domains that merely end with an allowed domain', async () => {
+      const response = await request(app)
+        .get('/api/podcast/audio-proxy?url=https://evilapple.com/audio.mp3')
+        .expect(403);
+
+      expect(response.body.error).toBe('Audio URL from unauthorized domain');
+    });
+
+    it('should follow validated redirects and redirect the client to the final URL', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(new Response(null, { status: 302, headers: { location: 'https://cdn.libsyn.com/ep.mp3' } }))
+        .mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+      try {
+        const response = await request(app)
+          .get('/api/podcast/audio-proxy?url=https://anchor.fm/ep.mp3')
+          .expect(302);
+
+        expect(response.headers.location).toBe('https://cdn.libsyn.com/ep.mp3');
+        expect(fetchSpy).toHaveBeenCalledTimes(2);
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
+
+    it('should not request a redirect target that points at an internal host', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/latest/meta-data/' } }));
+
+      try {
+        await request(app)
+          .get('/api/podcast/audio-proxy?url=https://anchor.fm/ep.mp3')
+          .expect(400);
+
+        // Only the original, validated URL was fetched; the internal hop never was.
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
   });
 
   describe('GET /api/etsy/shop/:shopId/listings', () => {
