@@ -124,16 +124,39 @@ export async function getPodcastFeed(feedUrl: string, limit: number = 10): Promi
 }
 
 /**
- * Returns the audio URL of the cached feed episode whose audioUrl equals
- * `url`, or undefined if no cached episode matches. The returned string is
- * the feed's own copy, so callers proxying audio never request or redirect
- * to a caller-supplied URL — only to episodes already in the feed.
+ * Returns the canonical audio URL for an episode already in the configured
+ * podcast feed. This validates the URL against the server-pinned feed on each
+ * call rather than relying on the pod-local cache file, which is not shared
+ * across replicas and can go cold on a different pod.
  */
-export function findCachedEpisodeAudioUrl(url: string): string | undefined {
+async function findEpisodeAudioUrlInFeed(feedUrl: string, url: string): Promise<string | undefined> {
+  try {
+    const feedEpisodes = await getPodcastFeed(feedUrl, 200);
+    return feedEpisodes.find(episode => episode.audioUrl === url)?.audioUrl;
+  } catch (error) {
+    console.error(`Error validating audio URL against podcast feed (${feedUrl}):`, error);
+    return undefined;
+  }
+}
+
+export async function findCachedEpisodeAudioUrl(url: string): Promise<string | undefined> {
+  const configuredFeedUrls = [
+    process.env.PODCAST_FEED_URL,
+    process.env.VITE_PODCAST_FEED_URL,
+  ].filter((feedUrl): feedUrl is string => Boolean(feedUrl && feedUrl.trim().length > 0));
+
+  for (const feedUrl of configuredFeedUrls) {
+    const episodeUrl = await findEpisodeAudioUrlInFeed(feedUrl, url);
+    if (episodeUrl) {
+      return episodeUrl;
+    }
+  }
+
   try {
     if (!fs.existsSync(CACHE_FILE)) {
       return undefined;
     }
+
     const cachedData: CachedPodcastData = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
     return cachedData.episodes.find(episode => episode.audioUrl === url)?.audioUrl;
   } catch (error) {

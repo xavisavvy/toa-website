@@ -876,9 +876,9 @@ export function registerRoutes(app: Express): Server {
         return res.status(urlCheck.status).json({ error: urlCheck.error });
       }
 
-      // Only proxy episodes that are in our cached podcast feed, and use the
-      // feed's copy of the URL rather than the query string from here on.
-      const episodeAudioUrl = findCachedEpisodeAudioUrl(decodedUrl);
+      // Only proxy episodes that are in the server-pinned podcast feed, and
+      // use the feed's copy of the URL rather than the query string from here on.
+      const episodeAudioUrl = await findCachedEpisodeAudioUrl(decodedUrl);
       if (!episodeAudioUrl) {
         logSecurityEvent('AUDIO_PROXY_UNKNOWN_EPISODE', { url: decodedUrl, ip: req.ip });
         return res.status(404).json({ error: 'Audio URL is not a known podcast episode' });
