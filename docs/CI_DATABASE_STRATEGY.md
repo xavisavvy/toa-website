@@ -27,7 +27,7 @@ services:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
     ports:
-      - "5432:5432"
+      - "55432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test_user -d toa_test"]
       interval: 5s
@@ -39,7 +39,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "56379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -82,7 +82,7 @@ jobs:
       - name: Run database migrations
         run: npm run db:migrate
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
           
       - name: TypeScript type checking
         run: npm run check
@@ -96,18 +96,18 @@ jobs:
       - name: Run E2E tests
         run: npm run test:e2e
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
           NODE_ENV: test
         
       - name: Run contract tests
         run: npm run test:contract
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
         
       - name: Run visual regression tests
         run: npm run test:visual
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
         
       - name: Cleanup
         if: always()
@@ -142,7 +142,7 @@ Developers can use the same setup:
 docker-compose -f docker-compose.test.yml up -d
 
 # Run tests
-export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/toa_test
+export DATABASE_URL=postgresql://test_user:test_password@localhost:55432/toa_test
 npm run test:e2e
 
 # Cleanup
