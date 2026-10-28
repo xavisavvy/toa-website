@@ -697,11 +697,20 @@
       "images": [
         {
           "id": "1",
-          "caption": "Jax Xerowraith - Character Portrait",
+          "url": "/characters/jax-xerowraith.webp",
+          "caption": "Jax Xerowraith - HeroForge 3D model",
           "type": "portrait",
           "isFeatured": true,
+          "isAiGenerated": false,
+          "source": "official"
+        },
+        {
+          "id": "2",
+          "caption": "Jax Xerowraith - Character Portrait",
+          "type": "portrait",
+          "isFeatured": false,
           "source": "official",
-          "url": "/characters/jax-xerowraith.webp",
+          "url": "/characters/jax-xerowraith-portrait.webp",
           "isAiGenerated": true
         }
       ],
