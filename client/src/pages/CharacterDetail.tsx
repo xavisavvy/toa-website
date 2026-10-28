@@ -336,19 +336,23 @@ export default function CharacterDetail() {
                               itemProp="image"
                             />
                             {image.isAiGenerated && (
-                              <Badge
-                                variant="secondary"
-                                role="img"
-                                aria-label="AI-generated image"
-                                className="absolute top-2 right-2 z-10 bg-amber-700 text-white border-amber-800 shadow-md gap-1"
-                                data-testid={`badge-ai-${image.id}`}
-                              >
-                                <Sparkles
-                                  className="h-3 w-3"
-                                  aria-hidden="true"
-                                />
-                                AI
-                              </Badge>
+                              // Positioned wrapper: Badge's hover-elevate forces
+                              // position:relative, so absolute on the Badge itself is ignored.
+                              <div className="absolute top-2 right-2 z-10">
+                                <Badge
+                                  variant="secondary"
+                                  role="img"
+                                  aria-label="AI-generated image"
+                                  className="bg-amber-700 text-white border-amber-800 shadow-md gap-1"
+                                  data-testid={`badge-ai-${image.id}`}
+                                >
+                                  <Sparkles
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                  />
+                                  AI
+                                </Badge>
+                              </div>
                             )}
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
                               <p className="text-white text-sm font-medium mb-1">
