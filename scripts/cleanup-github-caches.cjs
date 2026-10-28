@@ -34,7 +34,7 @@
  *   - GITHUB_TOKEN environment variable set
  */
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const { exit } = require('process');
 
 // Parse command line arguments
@@ -62,7 +62,7 @@ console.log('Options:', options, '\n');
 // Check if GitHub CLI is available
 let useGhCli = false;
 try {
-  execSync('gh --version', { stdio: 'ignore' });
+  execFileSync('gh', ['--version'], { stdio: 'ignore' });
   useGhCli = true;
   console.log('✅ Using GitHub CLI (gh)\n');
 } catch {
@@ -84,7 +84,7 @@ try {
 // Get repository info
 let owner, repo;
 try {
-  const remoteUrl = execSync('git config --get remote.origin.url', { 
+  const remoteUrl = execFileSync('git', ['config', '--get', 'remote.origin.url'], { 
     encoding: 'utf8' 
   }).trim();
   
@@ -113,9 +113,12 @@ function fetchCachesWithCLI() {
   
   while (true) {
     try {
-      const output = execSync(
-        `gh api "repos/${owner}/${repo}/actions/caches?per_page=${perPage}&page=${page}"`,
-        { encoding: 'utf8', shell: 'powershell.exe' }
+      // execFileSync passes arguments directly to gh with no shell, so
+      // owner/repo (parsed from the git remote) can't inject commands.
+      const output = execFileSync(
+        'gh',
+        ['api', `repos/${owner}/${repo}/actions/caches?per_page=${perPage}&page=${page}`],
+        { encoding: 'utf8' }
       );
       
       const data = JSON.parse(output);
@@ -198,8 +201,9 @@ function deleteCacheWithCLI(cacheId) {
     return false;
   }
   try {
-    execSync(
-      `gh api --method DELETE repos/${owner}/${repo}/actions/caches/${cacheId}`,
+    execFileSync(
+      'gh',
+      ['api', '--method', 'DELETE', `repos/${owner}/${repo}/actions/caches/${cacheId}`],
       { stdio: 'ignore' }
     );
     return true;
