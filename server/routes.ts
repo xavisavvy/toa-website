@@ -17,7 +17,7 @@ import { safeLog, maskEmail } from "./log-sanitizer";
 import { metrics } from "./monitoring";
 import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
 import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId } from "./order-service";
-import { getPodcastFeed } from "./podcast";
+import { findCachedEpisodeAudioUrl, getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
 import { apiLimiter, expensiveLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
@@ -740,6 +740,59 @@ export function registerRoutes(app: Express): Server {
     return { ok: true };
   }
 
+  // Follows redirects from startUrl to the final audio URL. Redirects are
+  // followed manually so every hop is validated *before* the server requests
+  // it; `redirect: 'follow'` would let an allowed host bounce the server to
+  // an internal address before we ever saw the final URL. On a network error
+  // or timeout it returns the last validated URL and leaves any remaining
+  // redirects to the browser.
+  async function resolveAudioRedirects(
+    startUrl: string,
+    allowedDomains: string[],
+    context: { originalUrl: string; ip: string | undefined }
+  ): Promise<{ ok: true; url: string } | { ok: false; status: number; error: string }> {
+    const MAX_REDIRECTS = 5;
+    const controller = new globalThis.AbortController();
+    const timeout = globalThis.setTimeout(() => controller.abort(), 15000);
+    let currentUrl = startUrl;
+
+    try {
+      for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+        const response = await fetch(currentUrl, {
+          method: 'HEAD',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          redirect: 'manual',
+          signal: controller.signal,
+        });
+
+        const location = response.headers.get('location');
+        if (response.status < 300 || response.status >= 400 || !location) {
+          break;
+        }
+
+        const nextUrl = new URL(location, currentUrl).toString();
+        const hopCheck = checkAudioUrlSafety(
+          nextUrl,
+          allowedDomains,
+          { invalidUrl: 'SSRF_ATTEMPT_FINAL_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FINAL' },
+          { ...context, finalUrl: nextUrl }
+        );
+        if (!hopCheck.ok) {
+          return hopCheck;
+        }
+        currentUrl = nextUrl;
+      }
+    } catch {
+      // Fall through with the last validated URL.
+    } finally {
+      globalThis.clearTimeout(timeout);
+    }
+
+    return { ok: true, url: currentUrl };
+  }
+
   // Audio proxy endpoint to bypass CORS restrictions
   // Uses redirect approach for better production reliability
   app.get("/api/podcast/audio-proxy", async (req, res) => {
@@ -775,53 +828,22 @@ export function registerRoutes(app: Express): Server {
         return res.status(urlCheck.status).json({ error: urlCheck.error });
       }
 
-      // Follow redirects to get the final audio URL. Redirects are followed
-      // manually so every hop is validated *before* the server requests it;
-      // `redirect: 'follow'` would let an allowed host bounce the server to
-      // an internal address before we ever saw the final URL.
-      const MAX_REDIRECTS = 5;
-      const controller = new globalThis.AbortController();
-      const timeout = globalThis.setTimeout(() => controller.abort(), 15000);
-      let currentUrl = decodedUrl;
-
-      try {
-        for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-          const response = await fetch(currentUrl, {
-            method: 'HEAD',
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            },
-            redirect: 'manual',
-            signal: controller.signal,
-          });
-
-          const location = response.headers.get('location');
-          if (response.status < 300 || response.status >= 400 || !location) {
-            break;
-          }
-
-          const nextUrl = new URL(location, currentUrl).toString();
-          const hopCheck = checkAudioUrlSafety(
-            nextUrl,
-            allowedDomains,
-            { invalidUrl: 'SSRF_ATTEMPT_FINAL_URL', unauthorizedDomain: 'UNAUTHORIZED_AUDIO_DOMAIN_FINAL' },
-            { originalUrl: decodedUrl, finalUrl: nextUrl, ip: req.ip }
-          );
-          if (!hopCheck.ok) {
-            globalThis.clearTimeout(timeout);
-            return res.status(hopCheck.status).json({ error: hopCheck.error });
-          }
-          currentUrl = nextUrl;
-        }
-      } catch {
-        // Network failure or timeout: fall back to the last validated URL
-        // and let the browser follow any remaining redirects itself.
+      // Only proxy episodes that are in our cached podcast feed, and use the
+      // feed's copy of the URL rather than the query string from here on.
+      const episodeAudioUrl = findCachedEpisodeAudioUrl(decodedUrl);
+      if (!episodeAudioUrl) {
+        logSecurityEvent('AUDIO_PROXY_UNKNOWN_EPISODE', { url: decodedUrl, ip: req.ip });
+        return res.status(404).json({ error: 'Audio URL is not a known podcast episode' });
       }
-      globalThis.clearTimeout(timeout);
 
-      // currentUrl is either the validated original URL or a hop that passed
-      // the same SSRF + allowlist check above.
-      res.redirect(302, currentUrl);
+      const resolved = await resolveAudioRedirects(episodeAudioUrl, allowedDomains, { originalUrl: decodedUrl, ip: req.ip });
+      if (!resolved.ok) {
+        return res.status(resolved.status).json({ error: resolved.error });
+      }
+
+      // resolved.url is either the feed's episode URL or a hop that passed
+      // the same SSRF + allowlist check.
+      res.redirect(302, resolved.url);
     } catch (error) {
       console.error('Error proxying audio:', error instanceof Error ? error.message : error);
       if (!res.headersSent) {
