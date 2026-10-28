@@ -2,6 +2,7 @@ import { createServer, type Server } from "http";
 
 import { eq, desc, gte } from 'drizzle-orm';
 import express, { type Express } from "express";
+import { z } from "zod";
 
 import { orders, orderItems, orderEvents, auditLogs , loginSchema } from "../shared/schema";
 import type { User } from "../shared/schema";
@@ -671,41 +672,78 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // A10: SSRF Prevention - Validate and sanitize podcast feed URL
+  // The feed URL is pinned server-side. getPodcastFeed() writes one shared
+  // cache file that every visitor is served (and that the audio proxy trusts
+  // via findCachedEpisodeAudioUrl), so a caller-supplied URL must never be
+  // fetched. PODCAST_FEED_URL wins; VITE_PODCAST_FEED_URL is the fallback
+  // because existing deployments already set it for the client build.
+  function getConfiguredPodcastFeedUrl(): string | undefined {
+    const configured = (process.env.PODCAST_FEED_URL || process.env.VITE_PODCAST_FEED_URL || '').trim();
+    return configured || undefined;
+  }
+
+  function normalizeFeedUrl(urlStr: string): string {
+    try {
+      return new URL(urlStr).href;
+    } catch {
+      return urlStr;
+    }
+  }
+
+  // feedUrl is optional and only accepted when it matches the pinned URL, so
+  // clients built before the body field was dropped keep working.
+  // limit upper bound must stay >= the limit client/src/pages/Podcast.tsx
+  // requests for its full-archive list, or that page 400s. The feed is ~151
+  // episodes today; 200 leaves headroom without letting an arbitrary caller
+  // ask us to parse an unbounded feed.
+  const podcastFeedRequestSchema = z.object({
+    feedUrl: z.string().max(2048).optional(),
+    limit: z.coerce.number().int().min(1).max(200).optional(),
+  });
+
   app.post("/api/podcast/feed", expensiveLimiter, async (req, res) => {
     try {
-      const { feedUrl, limit } = req.body;
-      
-      if (!feedUrl) {
-        return res.status(400).json({ error: 'feedUrl is required' });
+      const parsed = podcastFeedRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        logSecurityEvent('INVALID_PODCAST_FEED_REQUEST', {
+          ip: req.ip,
+          errors: parsed.error.issues,
+        });
+        return res.status(400).json({ success: false, error: 'Invalid request' });
       }
 
-      // A10: SSRF Protection - Validate URL to prevent attacks
+      const feedUrl = getConfiguredPodcastFeedUrl();
+      if (!feedUrl) {
+        return res.status(503).json({ success: false, error: 'Podcast feed not configured' });
+      }
+
+      const requestedFeedUrl = parsed.data.feedUrl;
+      if (requestedFeedUrl !== undefined && normalizeFeedUrl(requestedFeedUrl) !== normalizeFeedUrl(feedUrl)) {
+        logSecurityEvent('PODCAST_FEED_URL_MISMATCH', {
+          feedUrl: requestedFeedUrl.slice(0, 200),
+          ip: req.ip,
+        });
+        return res.status(400).json({ success: false, error: 'feedUrl does not match the configured podcast feed' });
+      }
+
+      // A10: Defense in depth - the configured URL still goes through the SSRF check
       const urlValidation = validateUrl(feedUrl);
       if (!urlValidation.valid) {
-        logSecurityEvent('SSRF_ATTEMPT', { 
-          feedUrl, 
+        logSecurityEvent('PODCAST_FEED_CONFIG_INVALID', {
           ip: req.ip,
-          error: urlValidation.error 
+          error: urlValidation.error,
         });
-        return res.status(400).json({ error: urlValidation.error });
+        return res.status(503).json({ success: false, error: 'Podcast feed not configured' });
       }
 
-      // A03: Validate limit parameter
-      // Upper bound must stay >= the limit client/src/pages/Podcast.tsx
-      // requests for its full-archive list, or that page 400s. The feed
-      // is ~151 episodes today; 200 leaves headroom without letting an
-      // arbitrary caller ask us to parse an unbounded feed.
-      const limitValidation = validateNumber(limit || 10, 1, 200);
-      if (!limitValidation.valid) {
-        return res.status(400).json({ error: limitValidation.error });
-      }
-      
-      const episodes = await getPodcastFeed(feedUrl, limitValidation.value);
+      const episodes = await getPodcastFeed(feedUrl, parsed.data.limit ?? 10);
+      // Bare array (not { success, data }) because PodcastSection and the
+      // /podcast page consume this response shape directly.
       res.json(episodes);
     } catch (error) {
       console.error('Error fetching podcast feed:', error);
-      res.status(500).json({ error: 'Failed to fetch podcast feed' });
+      logSecurityEvent('PODCAST_FEED_FETCH_FAILED', { ip: req.ip });
+      res.status(500).json({ success: false, error: 'Failed to fetch podcast feed' });
     }
   });
 

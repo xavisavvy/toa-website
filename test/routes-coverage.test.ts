@@ -1,7 +1,7 @@
 import express from 'express';
 import session from 'express-session';
 import request from 'supertest';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { registerRoutes } from '../server/routes';
 
@@ -63,17 +63,37 @@ describe('Routes Coverage', () => {
   });
 
   describe('Podcast Routes', () => {
-    it('should require feedUrl for podcast feed', async () => {
-      const response = await request(app).post('/api/podcast/feed').send({});
-      expect(response.status).toBe(400);
-      expect(response.body.error).toContain('feedUrl is required');
+    it('should return 503 when no podcast feed is configured', async () => {
+      vi.stubEnv('PODCAST_FEED_URL', '');
+      vi.stubEnv('VITE_PODCAST_FEED_URL', '');
+      try {
+        const response = await request(app).post('/api/podcast/feed').send({});
+        expect(response.status).toBe(503);
+        expect(response.body.error).toBe('Podcast feed not configured');
+      } finally {
+        vi.unstubAllEnvs();
+      }
     });
 
-    it('should validate podcast feed URL', async () => {
+    it('should reject a feedUrl that does not match the configured feed', async () => {
+      vi.stubEnv('PODCAST_FEED_URL', 'https://anchor.fm/s/pinned/podcast/rss');
+      try {
+        const response = await request(app)
+          .post('/api/podcast/feed')
+          .send({ feedUrl: 'https://attacker.example.com/rss' });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toContain('does not match');
+      } finally {
+        vi.unstubAllEnvs();
+      }
+    });
+
+    it('should reject an invalid podcast feed request body', async () => {
       const response = await request(app)
         .post('/api/podcast/feed')
-        .send({ feedUrl: 'invalid-url' });
+        .send({ limit: 0 });
       expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Invalid request');
     });
 
     it('should require url parameter for audio proxy', async () => {

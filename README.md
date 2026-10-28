@@ -305,9 +305,9 @@ Fetches short-form videos (< 60 seconds) from configured shorts playlist.
 ### Podcast Feed
 ```
 POST /api/podcast/feed
-Body: { feedUrl: string, limit?: number }
+Body: { limit?: number, feedUrl?: string }
 ```
-Parses an RSS podcast feed and returns episode information.
+Parses the server-configured podcast feed (`PODCAST_FEED_URL`, falling back to `VITE_PODCAST_FEED_URL`) and returns episode information. `feedUrl` is optional and rejected with 400 unless it matches the configured feed.
 
 ### Printful Products
 ```
