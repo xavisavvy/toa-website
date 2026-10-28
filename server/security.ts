@@ -51,7 +51,7 @@ export function configureSecurity(app: Express) {
           mediaSrc: [
             "'self'",
             "https://anchor.fm",
-            "https://*.cloudfront.net",
+            "https://d3ctxlq1ktw2nl.cloudfront.net", // Anchor podcast audio CDN
             "https://*.spotify.com",
             "https://*.apple.com",
             ...(isDevelopment ? ["http://localhost:*", "http://127.0.0.1:*"] : []),

@@ -250,6 +250,30 @@ describe('API Routes', () => {
       }
     });
 
+    it('should reject CloudFront hosts other than the Anchor audio distribution', async () => {
+      const response = await request(app)
+        .get('/api/podcast/audio-proxy?url=https://dattacker123.cloudfront.net/ep.mp3')
+        .expect(403);
+
+      expect(response.body.error).toBe('Audio URL from unauthorized domain');
+    });
+
+    it('should follow a redirect to the Anchor audio distribution', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(new Response(null, { status: 302, headers: { location: 'https://d3ctxlq1ktw2nl.cloudfront.net/staging/ep.m4a' } }))
+        .mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+      try {
+        const response = await request(app)
+          .get('/api/podcast/audio-proxy?url=https://anchor.fm/ep.mp3')
+          .expect(302);
+
+        expect(response.headers.location).toBe('https://d3ctxlq1ktw2nl.cloudfront.net/staging/ep.m4a');
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
+
     it('should not request a redirect target that points at an internal host', async () => {
       const fetchSpy = vi.spyOn(globalThis, 'fetch')
         .mockResolvedValueOnce(new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/latest/meta-data/' } }));
