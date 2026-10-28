@@ -3,15 +3,16 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: toa-test-db
     environment:
       POSTGRES_DB: toa_test
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
+    # No container_name and overridable host ports, so several stacks (one
+    # per CI job, each with its own compose project) can share a Docker host.
+    # The defaults are non-standard so tests can run alongside the dev stack
+    # (docker-compose.yml binds 5432/6379) on the same machine.
     ports:
-      # Non-default host ports so tests can run alongside the dev stack
-      # (docker-compose.yml binds 5432/6379) on the same machine.
-      - "55432:5432"
+      - "${TEST_POSTGRES_PORT:-55432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test_user -d toa_test"]
       interval: 5s
@@ -22,9 +23,8 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: toa-test-redis
     ports:
-      - "56379:6379"
+      - "${TEST_REDIS_PORT:-56379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
