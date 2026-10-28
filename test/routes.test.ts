@@ -19,6 +19,9 @@ vi.mock('../server/youtube', () => ({
 }));
 
 vi.mock('../server/podcast', () => ({
+  findCachedEpisodeAudioUrl: vi.fn((url: string) =>
+    url === 'https://anchor.fm/ep.mp3' ? 'https://anchor.fm/ep.mp3' : undefined
+  ),
   getPodcastFeed: vi.fn().mockResolvedValue([
     {
       id: 'episode-1',
@@ -213,6 +216,21 @@ describe('API Routes', () => {
         .expect(403);
 
       expect(response.body.error).toBe('Audio URL from unauthorized domain');
+    });
+
+    it('should reject allowed-domain URLs that are not episodes in the cached feed', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+      try {
+        const response = await request(app)
+          .get('/api/podcast/audio-proxy?url=https://anchor.fm/not-our-episode.mp3')
+          .expect(404);
+
+        expect(response.body.error).toBe('Audio URL is not a known podcast episode');
+        expect(fetchSpy).not.toHaveBeenCalled();
+      } finally {
+        fetchSpy.mockRestore();
+      }
     });
 
     it('should follow validated redirects and redirect the client to the final URL', async () => {

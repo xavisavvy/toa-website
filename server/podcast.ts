@@ -122,3 +122,22 @@ export async function getPodcastFeed(feedUrl: string, limit: number = 10): Promi
     throw error;
   }
 }
+
+/**
+ * Returns the audio URL of the cached feed episode whose audioUrl equals
+ * `url`, or undefined if no cached episode matches. The returned string is
+ * the feed's own copy, so callers proxying audio never request or redirect
+ * to a caller-supplied URL — only to episodes already in the feed.
+ */
+export function findCachedEpisodeAudioUrl(url: string): string | undefined {
+  try {
+    if (!fs.existsSync(CACHE_FILE)) {
+      return undefined;
+    }
+    const cachedData: CachedPodcastData = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+    return cachedData.episodes.find(episode => episode.audioUrl === url)?.audioUrl;
+  } catch (error) {
+    console.error('Error reading podcast cache:', error);
+    return undefined;
+  }
+}
