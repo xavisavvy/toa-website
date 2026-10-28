@@ -34,17 +34,6 @@ vi.mock('../server/podcast', () => ({
   ]),
 }));
 
-// expensiveLimiter allows 10 requests/hour per IP with a module-level store,
-// so this file's podcast tests would trip it. Rate limiting itself is covered
-// in test/integration/rate-limiter.test.ts.
-vi.mock('../server/rate-limiter', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../server/rate-limiter')>();
-  return {
-    ...actual,
-    expensiveLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
-  };
-});
-
 vi.mock('../server/etsy', () => ({
   getShopListings: vi.fn().mockResolvedValue([
     {
