@@ -709,6 +709,9 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Anchor (Spotify for Creators) episode URLs redirect to this distribution.
+  const ANCHOR_AUDIO_CLOUDFRONT_HOST = 'd3ctxlq1ktw2nl.cloudfront.net';
+
   // Shared by the redirect-hop checks in the audio proxy below.
   function isAllowedAudioDomain(hostname: string, allowedDomains: string[]): boolean {
     // Match the domain itself or a true subdomain of it. A bare endsWith()
@@ -814,8 +817,10 @@ export function registerRoutes(app: Express): Server {
         // If decoding fails, use original
       }
 
-      // Only allow audio from known podcast hosting domains
-      const allowedDomains = ['anchor.fm', 'cloudfront.net', 'spotify.com', 'apple.com', 'spreaker.com', 'buzzsprout.com', 'libsyn.com', 'podbean.com', 'simplecast.com', 'transistor.fm', 'captivate.fm', 'megaphone.fm', 'omny.fm', 'acast.com'];
+      // Only allow audio from known podcast hosting domains. CloudFront is
+      // pinned to Anchor's audio distribution: any AWS customer can serve
+      // content from a *.cloudfront.net host, so the bare domain is too broad.
+      const allowedDomains = ['anchor.fm', ANCHOR_AUDIO_CLOUDFRONT_HOST, 'spotify.com', 'apple.com', 'spreaker.com', 'buzzsprout.com', 'libsyn.com', 'podbean.com', 'simplecast.com', 'transistor.fm', 'captivate.fm', 'megaphone.fm', 'omny.fm', 'acast.com'];
 
       // Validate URL (SSRF) and confirm it's on an allowed audio domain
       const urlCheck = checkAudioUrlSafety(
