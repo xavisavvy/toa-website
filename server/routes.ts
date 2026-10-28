@@ -20,7 +20,7 @@ import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert }
 import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId } from "./order-service";
 import { getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
-import { apiLimiter, expensiveLimiter } from "./rate-limiter";
+import { apiLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
@@ -701,7 +701,12 @@ export function registerRoutes(app: Express): Server {
     limit: z.coerce.number().int().min(1).max(200).optional(),
   });
 
-  app.post("/api/podcast/feed", expensiveLimiter, async (req, res) => {
+  // Rate limited by the global apiLimiter plus strictLimiter on /api/podcast/
+  // (server/security.ts). Not expensiveLimiter: that allows 10 requests/hour
+  // per IP, and both the home page and /podcast call this route on every
+  // load. With the URL pinned, a request costs at most one upstream fetch
+  // per podcast.ts cache period, whoever sends it.
+  app.post("/api/podcast/feed", async (req, res) => {
     try {
       const parsed = podcastFeedRequestSchema.safeParse(req.body);
       if (!parsed.success) {

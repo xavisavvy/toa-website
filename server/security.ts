@@ -131,10 +131,17 @@ export function configureSecurity(app: Express) {
   // Note: General API rate limiting is applied in routes.ts using rate-limiter.ts
   // This includes health check endpoint exceptions for Kubernetes probes
   
-  // Stricter rate limiting for potentially expensive operations
+  // Stricter rate limiting for potentially expensive operations.
+  // One counter is shared by every path below, and a single home page load
+  // makes 6-10 of these calls (channel videos, shorts, stats, campaign
+  // playlists, podcast feed, shop), plus one audio-proxy call per episode
+  // played. At 30 that left a visitor about three page loads per 15 minutes
+  // before every section 429'd. Upstream quota is protected by the
+  // server-side caches in youtube.ts/podcast.ts/etsy.ts; this only needs to
+  // stop a single IP from hammering cache misses.
   const strictLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 30, // Limit each IP to 30 requests per windowMs
+    max: 150, // Limit each IP to 150 requests per windowMs
     message: 'Too many requests, please slow down.',
      
     skip: () => process.env.NODE_ENV === 'development',
