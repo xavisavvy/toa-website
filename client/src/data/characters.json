@@ -600,8 +600,6 @@
       ],
       "backstory": "A hero from the Pterrordale Halloween special campaign, Mabel Crosscore faced supernatural horrors.",
       "personality": "A brave adventurer who ventured into the mysterious realm of Pterrordale.",
-      "dndbeyond": "https://www.dndbeyond.com/characters/111107998",
-      "dndbeyondId": "111107998",
       "status": "inactive",
       "featuredImage": "https://www.dndbeyond.com/avatars/37668/838/1581111423-111107998.jpeg?width=150&height=150&fit=crop&quality=95&auto=webp"
     },
@@ -657,9 +655,208 @@
       ],
       "backstory": "A brave hero from the Pterrordale Halloween special campaign who faced supernatural horrors in the cursed town.",
       "personality": "Kind hearted, The world is scary but I can be kind.",
+      "status": "inactive"
+    },
+    {
+      "id": "derek-gizmo-grimes",
+      "name": "Derek \"Gizmo\" Grimes",
+      "player": "Ian",
+      "playerId": "ian",
+      "campaign": "Pterrordale",
+      "race": "Variant Human",
+      "class": "Artificer",
+      "level": 7,
+      "alignment": "Chaotic Good",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Derek \"Gizmo\" Grimes - Character Portrait",
+          "type": "portrait",
+          "isFeatured": true,
+          "source": "official",
+          "url": "/characters/derek-gizmo-grimes.webp"
+        }
+      ],
+      "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Derek \"Gizmo\" Grimes is about to find out what happens when you look at the screen.",
+      "personality": "A newcomer to the unfortunate town of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/172203093",
+      "dndbeyondId": "172203093",
+      "status": "active",
+      "featuredImage": "/characters/derek-gizmo-grimes.webp"
+    },
+    {
+      "id": "jax-xerowraith",
+      "name": "Jax Xerowraith",
+      "player": "Dallin",
+      "playerId": "dallin-rogers",
+      "campaign": "Pterrordale",
+      "race": "Variant Human",
+      "class": "Wizard",
+      "level": 7,
+      "alignment": "Neutral Good",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Jax Xerowraith - Character Portrait",
+          "type": "portrait",
+          "isFeatured": true,
+          "source": "official",
+          "url": "/characters/jax-xerowraith.webp",
+          "isAiGenerated": true
+        }
+      ],
+      "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Jax Xerowraith is about to find out what happens when you look at the screen.",
+      "personality": "The best way to get me to do something is to tell me I can't do it. Living in my VR world is better than my real life — I'm chronically online.",
       "dndbeyond": "https://www.dndbeyond.com/characters/134997127",
       "dndbeyondId": "134997127",
-      "status": "inactive"
+      "status": "active",
+      "featuredImage": "/characters/jax-xerowraith.webp",
+      "motivations": "Charity. I steal from the wealthy so that I can help people in need, and my ill-gotten gains go to support my family."
+    },
+    {
+      "id": "jessica-m",
+      "name": "Jessica M.",
+      "player": "Jake",
+      "playerId": "jake",
+      "campaign": "Pterrordale",
+      "race": "Human",
+      "class": "Fighter",
+      "level": 7,
+      "alignment": "Unknown",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Jessica M. - Character Portrait",
+          "type": "portrait",
+          "isFeatured": true,
+          "source": "official",
+          "url": "/characters/jessica-m.webp"
+        }
+      ],
+      "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Jessica M. is about to find out what happens when you look at the screen.",
+      "personality": "A newcomer to the unfortunate town of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/171731788",
+      "dndbeyondId": "171731788",
+      "status": "active",
+      "featuredImage": "/characters/jessica-m.webp"
+    },
+    {
+      "id": "kevin-kambridge",
+      "name": "Kevin Kambridge",
+      "player": "Cory",
+      "playerId": "cory-avis",
+      "campaign": "Pterrordale",
+      "race": "Human",
+      "class": "Warlock",
+      "level": 7,
+      "alignment": "Unknown",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Kevin Kambridge - Character Portrait",
+          "type": "portrait",
+          "isFeatured": true,
+          "source": "official"
+        }
+      ],
+      "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Kevin Kambridge is about to find out what happens when you look at the screen.",
+      "personality": "A newcomer to the unfortunate town of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/169422765",
+      "dndbeyondId": "169422765",
+      "status": "active"
+    },
+    {
+      "id": "nastia-skorbina",
+      "name": "Nastia Skorbina",
+      "player": "Torrey",
+      "playerId": "torrey-woolsey",
+      "campaign": "Pterrordale",
+      "race": "Reborn",
+      "class": "Cleric",
+      "level": 7,
+      "alignment": "Unknown",
+      "images": [
+        {
+          "id": "1",
+          "caption": "Nastia Skorbina - Character Portrait",
+          "type": "portrait",
+          "isFeatured": true,
+          "source": "official",
+          "url": "/characters/nastia-skorbina.webp",
+          "isAiGenerated": true
+        }
+      ],
+      "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Nastia Skorbina is about to find out what happens when you look at the screen.",
+      "personality": "A newcomer to the unfortunate town of Pterrordale.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/111107998",
+      "dndbeyondId": "111107998",
+      "status": "active",
+      "featuredImage": "/characters/nastia-skorbina.webp"
+    },
+    {
+      "id": "trevor-calderon-de-las-vegas",
+      "name": "Trevor Calderón de las Vegas",
+      "player": "Preston",
+      "playerId": "preston-farr",
+      "campaign": "Pterrordale",
+      "race": "Human",
+      "class": "Bard / Warlock",
+      "level": 7,
+      "alignment": "Neutral Good",
+      "images": [
+        {
+          "id": "1",
+          "url": "/characters/trevor-calderon-de-las-vegas.webp",
+          "caption": "Trevor Calderón de las Vegas - HeroForge 3D model",
+          "type": "portrait",
+          "isFeatured": true,
+          "isAiGenerated": false,
+          "source": "official"
+        },
+        {
+          "id": "2",
+          "url": "/characters/trevor-calderon-de-las-vegas-pterror-high.webp",
+          "caption": "Trevor outside Pterror High",
+          "type": "portrait",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        },
+        {
+          "id": "3",
+          "url": "/characters/trevor-calderon-de-las-vegas-selfie.webp",
+          "caption": "Trevor with Nastia and Jax at Pterror High",
+          "type": "portrait",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        },
+        {
+          "id": "4",
+          "url": "/characters/trevor-calderon-de-las-vegas-rapier.webp",
+          "caption": "The Calderón family rapier",
+          "type": "item",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        },
+        {
+          "id": "5",
+          "url": "/characters/trevor-calderon-de-las-vegas-whip.webp",
+          "caption": "The fiend-bound whip Damián entrusted to Trevor",
+          "type": "item",
+          "isFeatured": false,
+          "isAiGenerated": true,
+          "source": "official"
+        }
+      ],
+      "backstory": "Trevor, 17, grew up in Toledo, Spain, in a close family that investigates supernatural threats. His father Rafael trained him with the rapier, while his grandmother Serafina's side of the family kept records and translations. His older brother Damián infiltrated a suspected Compact front and was later assigned to guard a fiend-bound whip. Believing its power was being misused, Damián stole it, entrusted it to Trevor, and disappeared. The captive fiend later offered Trevor a pact to help protect Damián; Trevor accepted without knowing its price and hides it from his family. A binding mark matching one from a stolen object Serafina had sworn to guard led the family to Pterrordale, where Trevor now attends Pterror High as an exchange student and searches for his brother.",
+      "personality": "I meet trouble with a grin and a flourish. When someone proposes a bargain, I listen to every word.",
+      "dndbeyond": "https://www.dndbeyond.com/characters/171629978",
+      "dndbeyondId": "171629978",
+      "status": "active",
+      "featuredImage": "/characters/trevor-calderon-de-las-vegas.webp",
+      "motivations": "No one should be trapped by a promise they weren't allowed to understand. Damián trusted me with the whip — I'll keep it safe and find him."
     },
     {
       "id": "holiday-special-1",
