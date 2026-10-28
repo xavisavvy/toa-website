@@ -11,10 +11,22 @@ permissions:
   # security-events: write  # Only needed for CodeQL/Advanced Security (paid feature)
   pull-requests: write
 
+# A newer push to the same PR supersedes its older CI run. Pushes to
+# main/develop are never cancelled.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     name: Tests & Coverage
     runs-on: [self-hosted, Linux, X64]
+    # The self-hosted runners share one Docker host, and docker-compose.test.yml
+    # binds fixed host ports (55432, 56379) and container names. Overlapping test
+    # jobs would fail with "address already in use", so run them one at a time.
+    concurrency:
+      group: test-services
+      cancel-in-progress: false
     # Skip CI for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
     
@@ -34,29 +46,29 @@ jobs:
           HUSKY: 0  # Disable Husky in CI
       
       - name: Start test services (PostgreSQL + Redis)
-        run: docker compose -f docker-compose.test.yml up -d
+        run: docker compose -p toa-website-test -f docker-compose.test.yml up -d
       
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "⏳ Waiting for PostgreSQL to be healthy..."
-          timeout 30 bash -c 'until docker compose -f docker-compose.test.yml exec -T postgres pg_isready -U test_user -d toa_test; do sleep 1; done'
+          timeout 30 bash -c 'until docker compose -p toa-website-test -f docker-compose.test.yml exec -T postgres pg_isready -U test_user -d toa_test; do sleep 1; done'
           echo "✅ PostgreSQL is ready"
       
       - name: Wait for Redis to be ready
         run: |
           echo "⏳ Waiting for Redis to be healthy..."
-          timeout 30 bash -c 'until docker compose -f docker-compose.test.yml exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
+          timeout 30 bash -c 'until docker compose -p toa-website-test -f docker-compose.test.yml exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
           echo "✅ Redis is ready"
       
       - name: Run database migrations
         run: npm run db:push
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
           
       - name: Seed E2E test database
         run: npm run db:seed:e2e
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
           ADMIN_EMAIL: admin@talesofaneria.com
           ADMIN_PASSWORD: ChangeMe123!
           TEST_ADMIN_PASSWORD: testpassword
@@ -84,7 +96,7 @@ jobs:
             echo "✅ DATABASE_URL configured - E2E tests will run"
           fi
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
         
       - name: Run E2E tests
         if: steps.check_e2e.outputs.skip == 'false'
@@ -98,8 +110,8 @@ jobs:
         # see PR #41. Remove this once the two gaps above are resolved.
         continue-on-error: true
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
-          REDIS_URL: redis://localhost:6379
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
+          REDIS_URL: redis://localhost:56379
           NODE_ENV: test
           # Matches printful-webhook.spec.ts's own fallback default — lets
           # that suite actually exercise HMAC signature verification instead
@@ -131,8 +143,8 @@ jobs:
         # install step (separate, unrelated runner-config issue).
         continue-on-error: true
         env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/toa_test
-          REDIS_URL: redis://localhost:6379
+          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
+          REDIS_URL: redis://localhost:56379
           E2E_DISABLE_RATE_LIMIT: 'true'
 
       - name: Skip visual tests
@@ -141,7 +153,7 @@ jobs:
         
       - name: Cleanup test services
         if: always()
-        run: docker compose -f docker-compose.test.yml down -v
+        run: docker compose -p toa-website-test -f docker-compose.test.yml down -v
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
