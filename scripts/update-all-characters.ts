@@ -29,11 +29,17 @@ const CAMPAIGN_CHARACTER_IDS = {
     '52932329',  // Zevander Draven
   ],
   'Pterrordale': [
-    '58907127',  // Daevor
-    '58917752',  // Lucian
-    '111107998', // Moira
-    '111110601', // Sylas Dreadmoor
-    '134997127', // Thorne Blackwood
+    '58907127',  // Ahri Flowers
+    '58917752',  // Alan McMichaelson
+    '111110601', // Melly
+    // 2026 one-shot. Jax and Nastia reuse the sheets previously linked to
+    // Buck Calhoun and Mabel Crosscore, which no longer carry a dndbeyondId.
+    '172203093', // Derek "Gizmo" Grimes
+    '134997127', // Jax Xerowraith
+    '171731788', // Jessica M.
+    '169422765', // Kevin Kambridge
+    '111107998', // Nastia Skorbina
+    '171629978', // Trevor Calderón de las Vegas
   ],
 };
 
@@ -63,8 +69,10 @@ async function fetchCharacterData(characterId: string) {
     const character = json.data;
 
     // Extract class and level information
-    const primaryClass = character.classes[0];
-    const className = primaryClass?.definition?.name || 'Unknown';
+    const className = character.classes
+      .map((c: { definition?: { name?: string } }) => c.definition?.name)
+      .filter(Boolean)
+      .join(' / ') || 'Unknown';
     const totalLevel = character.classes.reduce((sum: number, c: { level: number }) => sum + c.level, 0);
 
     // Get alignment
