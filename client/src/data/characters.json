@@ -670,11 +670,20 @@
       "images": [
         {
           "id": "1",
-          "caption": "Derek \"Gizmo\" Grimes - Character Portrait",
+          "url": "/characters/derek-gizmo-grimes.webp",
+          "caption": "Derek \"Gizmo\" Grimes - HeroForge 3D model",
           "type": "portrait",
           "isFeatured": true,
+          "isAiGenerated": false,
+          "source": "official"
+        },
+        {
+          "id": "2",
+          "caption": "Derek \"Gizmo\" Grimes - Character Portrait",
+          "type": "portrait",
+          "isFeatured": false,
           "source": "official",
-          "url": "/characters/derek-gizmo-grimes.webp"
+          "url": "/characters/derek-gizmo-grimes-portrait.webp"
         }
       ],
       "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Derek \"Gizmo\" Grimes is about to find out what happens when you look at the screen.",
@@ -735,11 +744,12 @@
       "images": [
         {
           "id": "1",
-          "caption": "Jessica M. - Character Portrait",
+          "url": "/characters/jessica-m.webp",
+          "caption": "Jessica M. - HeroForge 3D model",
           "type": "portrait",
           "isFeatured": true,
-          "source": "official",
-          "url": "/characters/jessica-m.webp"
+          "isAiGenerated": false,
+          "source": "official"
         }
       ],
       "backstory": "One of the heroes of the 2026 Pterrordale Halloween one-shot, Jessica M. is about to find out what happens when you look at the screen.",
