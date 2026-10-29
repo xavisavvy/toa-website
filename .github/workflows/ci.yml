@@ -314,12 +314,18 @@ jobs:
       
       # Optional: Snyk (requires SNYK_TOKEN secret)
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@11b673cfb4b0dc0d860a1323caa199d54950dcce # master as of 2026-10-28; was unpinned
+        # Runs the image snyk/actions/node wraps, pinned by digest: the action
+        # itself pulls the mutable snyk/snyk:node tag and receives SNYK_TOKEN.
+        # Digest of snyk/snyk:node as of 2026-10-29; bump it deliberately.
+        uses: docker://snyk/snyk@sha256:f905f99880ae071a1c54c6039c6627fdce4f0abc96cab9a867992a5cf884eed8
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          FORCE_COLOR: 2
+          SNYK_INTEGRATION_NAME: GITHUB_ACTIONS
+          SNYK_INTEGRATION_VERSION: node
         with:
-          args: --severity-threshold=high --json-file-output=snyk-results.json
+          args: snyk test --severity-threshold=high --json-file-output=snyk-results.json
       
       - name: Upload Snyk results
         uses: actions/upload-artifact@v6
