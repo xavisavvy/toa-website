@@ -5,7 +5,7 @@
 ### CI/CD Pipeline
 [![CI Pipeline](https://github.com/xavisavvy/toa-website/actions/workflows/ci.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/ci.yml)
 [![Deploy](https://github.com/xavisavvy/toa-website/actions/workflows/deploy.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/deploy.yml)
-[![Versioning](https://github.com/xavisavvy/toa-website/actions/workflows/version.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/version.yml)
+[![Release](https://github.com/xavisavvy/toa-website/actions/workflows/release.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/release.yml)
 
 ### Security & Compliance
 [![SBOM Generation](https://github.com/xavisavvy/toa-website/actions/workflows/sbom.yml/badge.svg)](https://github.com/xavisavvy/toa-website/actions/workflows/sbom.yml)
@@ -389,38 +389,20 @@ BREAKING CHANGE: Navigation component API has changed
 
 This will bump the major version (1.0.0 → 2.0.0).
 
-### Automatic Versioning
+### Releases
 
-When you push commits to the `main` branch:
-1. GitHub Actions automatically analyzes your commit messages
-2. Bumps the version in `package.json` based on commit types
-3. Generates/updates `CHANGELOG.md` with your changes
-4. Creates a git tag for the new version
-5. Pushes the changes back to the repository
+Releases go through a pull request, so they follow the same review and CI rules as any other change:
+
+1. Each push to `main` runs the **Release** workflow ([release-please](https://github.com/googleapis/release-please)).
+2. It opens or updates one PR titled `chore(release): x.y.z` with the version bump in `package.json` and the new `CHANGELOG.md` section.
+3. Merging that PR creates the `vX.Y.Z` tag and a GitHub Release.
 
 **Version Bump Rules:**
 - `fix:` commits → Patch version (1.0.0 → 1.0.1)
 - `feat:` commits → Minor version (1.0.0 → 1.1.0)
 - `BREAKING CHANGE:` → Major version (1.0.0 → 2.0.0)
 
-### Manual Versioning
-
-You can also manually trigger versioning:
-
-```bash
-# Automatic version bump based on commits
-npm run release
-
-# Force a specific version bump
-npm run release:patch  # 1.0.0 → 1.0.1
-npm run release:minor  # 1.0.0 → 1.1.0
-npm run release:major  # 1.0.0 → 2.0.0
-```
-
-Then push with tags:
-```bash
-git push --follow-tags origin main
-```
+To force a specific version, add `Release-As: x.y.z` to a commit body. Setup details (including the `GH_PAT` secret) are in [docs/VERSION_WORKFLOW_SETUP.md](docs/VERSION_WORKFLOW_SETUP.md).
 
 ## Design System
 
@@ -559,13 +541,13 @@ This project implements enterprise-grade CI/CD practices with comprehensive test
 
 ### Versioning & Releases
 
-**Workflow:** `.github/workflows/version.yml`  
+**Workflow:** `.github/workflows/release.yml`  
 **Trigger:** Push to `main`
 
-- 🏷️ Automatic semantic versioning
-- 📝 Changelog generation
-- 🔖 Git tag creation
-- 📦 Release artifact publishing
+- 🏷️ Semantic versioning from Conventional Commits (release-please)
+- 📝 Changelog generation in a `chore(release): x.y.z` pull request
+- 🔖 Tag and GitHub Release created only when that PR is merged
+- 🛡️ Fails if the newest tag is not on `main` or does not match `package.json`
 
 ### SBOM Generation
 

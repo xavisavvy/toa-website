@@ -78,4 +78,5 @@ hero-*.png
 *.jpeg
 *.gif
 .npmrc
-.versionrc.json
+release-please-config.json
+.release-please-manifest.json
