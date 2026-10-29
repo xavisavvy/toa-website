@@ -3,7 +3,12 @@
 /**
  * Create Admin User - Direct PostgreSQL Connection
  * Works with local PostgreSQL (not Neon serverless)
+ *
+ * Usage: ADMIN_PASSWORD=... [ADMIN_EMAIL=...] npx tsx scripts/create-admin-direct.ts
+ * Without ADMIN_PASSWORD a random password is generated and printed once.
  */
+
+import { randomBytes } from 'crypto';
 
 import bcrypt from 'bcryptjs';
 import pkg from 'pg';
@@ -12,8 +17,15 @@ const { Client } = pkg;
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/toa_website';
 
 async function main() {
-  const email = 'admin@talesofaneria.com';
-  const password = 'X8w79LuizWuXj2DP8AX!';
+  const email = process.env.ADMIN_EMAIL || 'admin@talesofaneria.com';
+  // Never hard-code this: the repository is public. Take it from the
+  // environment, or generate a one-off password and print it once.
+  const generated = !process.env.ADMIN_PASSWORD;
+  const password = process.env.ADMIN_PASSWORD || randomBytes(18).toString('base64url');
+  if (password.length < 12) {
+    console.error('❌ ADMIN_PASSWORD must be at least 12 characters');
+    process.exit(1);
+  }
   const role = 'admin';
 
   console.info('🔐 Creating Admin User...\n');
@@ -46,6 +58,9 @@ async function main() {
     console.info(`   Role: ${user.role}`);
     console.info(`   ID: ${user.id}`);
     console.info(`   Created: ${user.created_at}\n`);
+    if (generated) {
+      console.info(`   Generated password (shown once): ${password}\n`);
+    }
 
     await client.end();
     process.exit(0);

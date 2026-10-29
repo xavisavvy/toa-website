@@ -248,7 +248,7 @@ export default function ProductDetailModal({
                 min="1"
                 max="10"
                 value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) => setQuantity(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
               />
             </div>
 

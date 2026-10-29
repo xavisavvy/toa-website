@@ -98,6 +98,23 @@ function writeCache(shopId: string, products: Product[]): void {
   }
 }
 
+// The cache holds a single shop and is reused for every limit, so always
+// fetch the most any caller may ask for and slice per request. Fetching only
+// the requested limit let one ?limit=1 request shrink the shop for everyone.
+export const MAX_SHOP_LISTINGS = 50;
+
+/**
+ * Shops the public API will query (the site's own shop, matching
+ * client/src/data/social-links.json). Other shop IDs would overwrite the
+ * single cache entry and wipe the stale-cache fallback. Override with a
+ * comma-separated ETSY_ALLOWED_SHOPS.
+ */
+export function isAllowedShop(shopId: string): boolean {
+  const allowed = (process.env.ETSY_ALLOWED_SHOPS || 'talesofaneria')
+    .split(',').map(shop => shop.trim().toLowerCase()).filter(Boolean);
+  return allowed.includes(shopId.toLowerCase());
+}
+
 export async function getShopListings(shopId: string, limit: number = 8): Promise<Product[]> {
   // Check cache first
   const cachedProducts = readCache(shopId);
@@ -118,7 +135,7 @@ export async function getShopListings(shopId: string, limit: number = 8): Promis
   
   const params = new URLSearchParams({
     state: 'active',
-    limit: limit.toString(),
+    limit: MAX_SHOP_LISTINGS.toString(),
     includes: 'Images',
   });
 

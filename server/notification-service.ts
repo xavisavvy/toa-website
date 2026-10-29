@@ -1,4 +1,5 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import validator from 'validator';
 
 import type { Order } from '../shared/schema';
 
@@ -12,6 +13,11 @@ export interface EmailParams {
 }
 
 const DEFAULT_BUSINESS_NAME = 'Tales of Aneria';
+
+// Names and addresses are typed by the payer on Stripe Checkout, and the
+// payer also chooses the recipient address, so every interpolated value in
+// an HTML email is escaped to stop HTML or link injection.
+const escapeHtml = (value: unknown): string => validator.escape(String(value ?? ''));
 
 // Initialize AWS SES client
 const sesClient = process.env.AWS_SES_ACCESS_KEY_ID 
@@ -103,7 +109,8 @@ Best regards,
 ${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}
   `.trim();
 
-  const CUSTOMER_NAME = order.customerName || 'Customer';
+  const CUSTOMER_NAME = escapeHtml(order.customerName || 'Customer');
+  const address = order.shippingAddress;
   const htmlBody = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>Thank you for your order!</h2>
@@ -111,22 +118,22 @@ ${process.env.BUSINESS_NAME || DEFAULT_BUSINESS_NAME}
       <p>We've received your payment and are processing your order.</p>
       
       <h3>Order Details</h3>
-      <p><strong>Order ID:</strong> ${order.id}<br>
-      <strong>Total:</strong> $${order.totalAmount} ${order.currency.toUpperCase()}</p>
+      <p><strong>Order ID:</strong> ${escapeHtml(order.id)}<br>
+      <strong>Total:</strong> $${escapeHtml(order.totalAmount)} ${escapeHtml(order.currency.toUpperCase())}</p>
       
       <h3>Items</h3>
       <ul>
-        ${items.map(item => `<li>${item.name} (x${item.quantity}) - $${item.price}</li>`).join('')}
+        ${items.map(item => `<li>${escapeHtml(item.name)} (x${escapeHtml(item.quantity)}) - $${escapeHtml(item.price)}</li>`).join('')}
       </ul>
       
-      ${order.shippingAddress ? `
+      ${address ? `
         <h3>Shipping Address</h3>
         <p>
-          ${order.shippingAddress.name}<br>
-          ${order.shippingAddress.line1}<br>
-          ${order.shippingAddress.line2 ? `${order.shippingAddress.line2  }<br>` : ''}
-          ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}<br>
-          ${order.shippingAddress.country}
+          ${escapeHtml(address.name)}<br>
+          ${escapeHtml(address.line1)}<br>
+          ${address.line2 ? `${escapeHtml(address.line2)}<br>` : ''}
+          ${escapeHtml(address.city)}, ${escapeHtml(address.state)} ${escapeHtml(address.postal_code)}<br>
+          ${escapeHtml(address.country)}
         </p>
       ` : ''}
       

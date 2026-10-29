@@ -276,7 +276,8 @@ export default function AdminOrderDetail() {
                       <div className="text-sm font-medium text-muted-foreground mb-1">Tracking Number</div>
                       <p className="font-mono text-sm">{order.trackingNumber}</p>
                     </div>
-                    {order.trackingUrl && (
+                    {/* Only http(s) links: React does not block javascript: hrefs */}
+                    {order.trackingUrl && /^https?:\/\//i.test(order.trackingUrl) && (
                       <div>
                         <div className="text-sm font-medium text-muted-foreground mb-1">Track Package</div>
                         <a

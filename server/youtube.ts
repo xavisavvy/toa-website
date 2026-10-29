@@ -32,6 +32,37 @@ function isSafeCacheKey(key: string): boolean {
   return !UNSAFE_OBJECT_KEYS.has(key);
 }
 
+// Every cached playlist/channel shares one JSON file that is read and
+// rewritten synchronously, so both its entry count and each entry's size
+// are bounded. Public endpoints accept arbitrary playlist IDs.
+const MAX_CACHE_ENTRIES = 50;
+const MAX_PLAYLIST_ITEMS = 2000;
+
+// Channel listings are cached per size bucket. Caching under the bare channel
+// ID let a single ?maxResults=1 request replace the full list for everyone
+// until the cache expired.
+const CHANNEL_RESULT_BUCKETS = [50, 200, 500];
+export const MAX_CHANNEL_RESULTS = CHANNEL_RESULT_BUCKETS[CHANNEL_RESULT_BUCKETS.length - 1];
+
+function channelResultBucket(maxResults: number): number {
+  return CHANNEL_RESULT_BUCKETS.find(bucket => maxResults <= bucket) ?? MAX_CHANNEL_RESULTS;
+}
+
+/**
+ * Channels the public API will query. Channel listings use search.list
+ * (100 quota units per page), so serving arbitrary channels would let anyone
+ * spend the site's daily YouTube quota. Override with a comma-separated
+ * YOUTUBE_ALLOWED_CHANNEL_IDS.
+ */
+export function isAllowedChannel(channelId: string): boolean {
+  const configured = process.env.YOUTUBE_ALLOWED_CHANNEL_IDS
+    ?.split(',').map(id => id.trim()).filter(Boolean);
+  const allowed = configured?.length
+    ? configured
+    : ['UC7PTdudxJ43HMLJVv2QxVoQ', process.env.VITE_YOUTUBE_CHANNEL_ID].filter(Boolean);
+  return allowed.includes(channelId);
+}
+
 async function getAccessToken() {
   if (connectionSettings && connectionSettings.settings.expires_at && new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
     return connectionSettings.settings.access_token;
@@ -191,6 +222,17 @@ function writeCache(playlistId: string, videos: VideoItem[]): void {
       timestamp: Date.now(),
     };
 
+    // Evict the oldest entries beyond the cap
+    const keys = Object.keys(cachedData);
+    if (keys.length > MAX_CACHE_ENTRIES) {
+      keys
+        // eslint-disable-next-line security/detect-object-injection -- keys come from the cache object itself
+        .sort((a, b) => cachedData[a].timestamp - cachedData[b].timestamp)
+        .slice(0, keys.length - MAX_CACHE_ENTRIES)
+        // eslint-disable-next-line security/detect-object-injection -- keys come from the cache object itself
+        .forEach(key => { delete cachedData[key]; });
+    }
+
     fs.writeFileSync(CACHE_FILE, JSON.stringify(cachedData, null, 2), 'utf-8');
     console.info(`YouTube data cached successfully for playlist ${playlistId}`);
   } catch (error) {
@@ -297,7 +339,7 @@ async function fetchPlaylistItemVideoIds(playlistId: string, apiKey: string): Pr
     allVideoIds.push(...videoIds);
     nextPageToken = data.nextPageToken;
 
-  } while (nextPageToken);
+  } while (nextPageToken && allVideoIds.length < MAX_PLAYLIST_ITEMS);
 
   return allVideoIds;
 }
@@ -386,7 +428,7 @@ async function fetchPlaylistVideosViaClient(playlistId: string): Promise<VideoIt
     allVideoIds.push(...videoIds);
     nextPageToken = response.data.nextPageToken as string | undefined;
 
-  } while (nextPageToken);
+  } while (nextPageToken && allVideoIds.length < MAX_PLAYLIST_ITEMS);
 
   if (allVideoIds.length === 0) {
     return [];
@@ -565,10 +607,14 @@ async function fetchChannelVideoIds(channelId: string, apiKey: string, maxResult
 }
 
 export async function getChannelVideos(channelId: string, maxResults: number = 50): Promise<VideoItem[]> {
-  // Check cache first (use channelId as cache key)
-  const cachedVideos = readCache(channelId);
+  // Fetch and cache a fixed-size bucket, then slice for this caller
+  const bucket = channelResultBucket(maxResults);
+  const cacheKey = `${channelId}:${bucket}`;
+
+  // Check cache first
+  const cachedVideos = readCache(cacheKey);
   if (cachedVideos !== null) {
-    return cachedVideos;
+    return cachedVideos.slice(0, maxResults);
   }
 
   // Cache miss or expired, fetch from API
@@ -580,7 +626,7 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
       return [];
     }
 
-    const allVideoIds = await fetchChannelVideoIds(channelId, apiKey, maxResults);
+    const allVideoIds = await fetchChannelVideoIds(channelId, apiKey, bucket);
 
     if (allVideoIds.length === 0) {
       console.info(`No videos found for channel ${channelId}`);
@@ -596,24 +642,24 @@ export async function getChannelVideos(channelId: string, maxResults: number = 5
     sortVideosByPublishedDateDesc(allVideos);
 
     // Cache the fetched data
-    writeCache(channelId, allVideos);
+    writeCache(cacheKey, allVideos);
 
     console.info(`Cached ${allVideos.length} videos for channel ${channelId}`);
-    return allVideos;
+    return allVideos.slice(0, maxResults);
 
   } catch (error) {
     console.error('Error fetching channel videos:', error);
 
     // Try to return stale cache if available
     try {
-      if (fs.existsSync(CACHE_FILE) && isSafeCacheKey(channelId)) {
+      if (fs.existsSync(CACHE_FILE) && isSafeCacheKey(cacheKey)) {
         const cacheContent = fs.readFileSync(CACHE_FILE, 'utf-8');
         const cachedData: CachedChannelData = JSON.parse(cacheContent);
         // eslint-disable-next-line security/detect-object-injection -- channelId must match /^UC[a-zA-Z0-9_-]+$/ before reaching here (see server/routes.ts) and is checked against UNSAFE_OBJECT_KEYS above
-        const cacheEntry = cachedData[channelId];
+        const cacheEntry = cachedData[cacheKey];
         if (cacheEntry && cacheEntry.videos) {
           console.warn(`Returning stale cache for channel ${channelId} due to API error`);
-          return cacheEntry.videos;
+          return cacheEntry.videos.slice(0, maxResults);
         }
       }
     } catch {

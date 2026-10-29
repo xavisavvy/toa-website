@@ -29,10 +29,9 @@ describe('Routes Coverage', () => {
   });
 
   describe('Metrics Route', () => {
-    it('should return metrics from /api/metrics', async () => {
+    it('should require an admin session for /api/metrics', async () => {
       const response = await request(app).get('/api/metrics');
-      expect(response.status).toBe(200);
-      expect(response.body).toBeDefined();
+      expect(response.status).toBe(401);
     });
   });
 

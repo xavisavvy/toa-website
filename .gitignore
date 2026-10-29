@@ -14,6 +14,11 @@ vite.config.ts.*
 
 # Test artifacts
 coverage/
+coverage-report.json
+lint-output.json
+lint-output.txt
+# curl cookie jars (docs/ADMIN_DASHBOARD.md) hold live session cookies
+cookies.txt
 test-results/
 playwright-report/
 playwright/.cache/

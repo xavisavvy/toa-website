@@ -3,12 +3,18 @@ import session from 'express-session';
 import request from 'supertest';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
+import { WEBHOOK_PATHS } from '../../server/app';
 import { registerRoutes } from '../../server/routes';
+import { originCsrfProtection } from '../../server/security';
 
 describe('Auth Routes - Comprehensive Coverage', () => {
   let app: express.Application;
 
   beforeEach(() => {
+    // The login limiters allow only a handful of failures per IP; these tests
+    // make many failed logins from 127.0.0.1. Enforcement is tested separately.
+    process.env.E2E_DISABLE_RATE_LIMIT = 'true';
+
     app = express();
     app.use(express.json());
     app.use(
@@ -19,18 +25,57 @@ describe('Auth Routes - Comprehensive Coverage', () => {
         cookie: { secure: true, httpOnly: true },
       })
     );
-    // CSRF protection: skip token validation in test environment but keep
-    // the middleware in place so the route graph satisfies security analysis
-    app.use((req: express.Request, _res: express.Response, next: express.NextFunction) => {
-      (req.session as any)._csrf = 'test-csrf-token';
-      next();
-    });
+    // Same CSRF middleware as production (server/app.ts)
+    app.use(originCsrfProtection(WEBHOOK_PATHS));
 
     registerRoutes(app);
   });
 
   afterEach(() => {
+    delete process.env.E2E_DISABLE_RATE_LIMIT;
     vi.clearAllMocks();
+  });
+
+  describe('POST /api/auth/login rate limiting', () => {
+    it('should block an IP after 5 failed attempts', async () => {
+      delete process.env.E2E_DISABLE_RATE_LIMIT;
+
+      for (let i = 0; i < 5; i++) {
+        const response = await request(app).post('/api/auth/login').send({});
+        expect(response.status).toBe(400);
+      }
+
+      const blocked = await request(app).post('/api/auth/login').send({});
+      expect(blocked.status).toBe(429);
+    });
+  });
+
+  describe('CSRF origin check', () => {
+    it('should reject a cross-site login POST', async () => {
+      const response = await request(app)
+        .post('/api/auth/login')
+        .set('Origin', 'https://evil.example')
+        .send({ email: 'admin@test.com', password: 'whatever' });
+
+      expect(response.status).toBe(403);
+    });
+
+    it('should reject when Sec-Fetch-Site is cross-site', async () => {
+      const response = await request(app)
+        .post('/api/auth/logout')
+        .set('Sec-Fetch-Site', 'cross-site');
+
+      expect(response.status).toBe(403);
+    });
+
+    it('should allow a same-origin POST', async () => {
+      const response = await request(app)
+        .post('/api/auth/logout')
+        .set('Host', 'talesofaneria.com')
+        .set('Origin', 'https://talesofaneria.com');
+
+      expect(response.status).toBe(200);
+    });
   });
 
   describe('POST /api/auth/login', () => {

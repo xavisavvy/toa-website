@@ -104,10 +104,37 @@ export const authLimiter = rateLimit({
   skipSuccessfulRequests: true, // Don't count successful requests
   message: 'Too many authentication attempts from this IP, please try again later.',
   validate: { trustProxy: process.env.NODE_ENV === 'production' || !!process.env.REPLIT_DEPLOYMENT },
+  // Same opt-in, production-gated E2E bypass as apiLimiter
+  skip: () => process.env.E2E_DISABLE_RATE_LIMIT === 'true' && !isProductionLike,
   handler: (req: Request, res: Response) => {
     res.status(429).json({
       error: 'Too many authentication attempts',
       message: 'You have exceeded the authentication rate limit. Please try again later.',
+      retryAfter: res.getHeader('Retry-After'),
+    });
+  },
+});
+
+// Per-account limiter for login: authLimiter is per IP, so a password-guessing
+// run spread across many IPs would otherwise be unlimited for one account.
+// Only failed attempts count. 10 failures locks that email out for 15 minutes.
+export const loginAccountLimiter = rateLimit({
+  store: createRedisStore('rl:login-account:'),
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  validate: false, // keyed on the account, not the IP
+  keyGenerator: (req: Request) => {
+    const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    return `account:${email}`;
+  },
+  skip: () => process.env.E2E_DISABLE_RATE_LIMIT === 'true' && !isProductionLike,
+  handler: (req: Request, res: Response) => {
+    res.status(429).json({
+      error: 'Too many authentication attempts',
+      message: 'Too many failed sign-in attempts for this account. Please try again later.',
       retryAfter: res.getHeader('Retry-After'),
     });
   },

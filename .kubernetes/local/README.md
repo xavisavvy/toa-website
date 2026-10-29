@@ -43,7 +43,8 @@ DATABASE_URL="postgresql://postgres:devpassword123@localhost:5432/toa_dev" npm r
 
 ### 5. Create Admin User
 ```bash
-# With postgres port-forwarded
+# With postgres port-forwarded. Set ADMIN_PASSWORD to choose the password;
+# otherwise a random one is generated and printed once.
 DATABASE_URL="postgresql://postgres:devpassword123@localhost:5432/toa_dev" npx tsx scripts/create-admin-direct.ts
 ```
 

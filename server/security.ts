@@ -1,8 +1,78 @@
 import cors from 'cors';
-import type { Express } from 'express';
+import type { Express, NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import validator from 'validator';
+
+import { maskEmail } from './log-sanitizer';
+
+export function getAllowedOrigins(): string[] {
+  return process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim()).filter(Boolean)
+    : ['http://localhost:5000', 'http://127.0.0.1:5000'];
+}
+
+function originOf(value: string | undefined): string | null {
+  if (!value) {return null;}
+  try {
+    return new URL(value).origin;
+  } catch {
+    return 'invalid';
+  }
+}
+
+/**
+ * A01: CSRF protection for cookie-authenticated, state-changing requests.
+ *
+ * Browsers always attach Origin (or at least Referer) and Sec-Fetch-Site to
+ * cross-site POSTs, so a request is rejected when those headers show it came
+ * from another site. Requests carrying neither header are not from a browser
+ * page and cannot ride a victim's cookies, so they pass. This needs no token
+ * in the client and no session for anonymous visitors. It complements the
+ * sameSite: 'lax' session cookie.
+ */
+export function originCsrfProtection(exemptPaths: string[]) {
+  const stateChanging = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!stateChanging.has(req.method) || exemptPaths.includes(req.path)) {
+      return next();
+    }
+
+    const reject = (reason: string) => {
+      logSecurityEvent('CSRF_REQUEST_BLOCKED', {
+        ip: req.ip,
+        resource: req.path,
+        reason,
+        origin: req.get('origin'),
+      });
+      return res.status(403).json({ error: 'Cross-site request blocked' });
+    };
+
+    if (req.get('sec-fetch-site') === 'cross-site') {
+      return reject('sec-fetch-site: cross-site');
+    }
+
+    const source = originOf(req.get('origin')) ?? originOf(req.get('referer'));
+    if (!source) {
+      return next();
+    }
+
+    const sameHost = (() => {
+      try {
+        return new URL(source).host === req.get('host');
+      } catch {
+        return false;
+      }
+    })();
+
+    if (sameHost || getAllowedOrigins().includes(source)) {
+      return next();
+    }
+
+    return reject('origin not allowed');
+  };
+}
 
 /**
  * Configure security middleware for the Express application
@@ -20,8 +90,10 @@ export function configureSecurity(app: Express) {
           defaultSrc: ["'self'"],
           scriptSrc: [
             "'self'",
-            "'unsafe-inline'", // Required for Vite in development
-            "'unsafe-eval'", // Required for Vite in development
+            // Vite's dev server injects inline and eval'd scripts (HMR, React
+            // refresh). The production build has no inline scripts, so these
+            // stay out of production where they would void the XSS protection.
+            ...(isDevelopment ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
             "https://www.youtube.com",
             "https://www.google.com",
             "https://www.googletagmanager.com", // Google Analytics & Tag Manager
@@ -34,19 +106,22 @@ export function configureSecurity(app: Express) {
           imgSrc: [
             "'self'",
             "data:",
-            "https:",
-            "http:", // For external images from YouTube, Etsy, D&D Beyond
+            "https:", // External images from YouTube, Etsy, D&D Beyond, Printful
+            ...(isDevelopment ? ["http:"] : []),
           ],
           connectSrc: [
             "'self'",
             "https://www.googleapis.com",
             "https://www.google-analytics.com", // Google Analytics data collection
+            "https://*.google-analytics.com", // GA4 regional collection endpoints
             "https://analytics.google.com", // Google Analytics 4
+            "https://*.analytics.google.com",
+            "https://www.googletagmanager.com",
             "https://openapi.etsy.com",
             "https://character-service.dndbeyond.com",
             "https://api.stripe.com", // Stripe API
             "https://api.printful.com", // Printful API
-            "wss:", // For WebSocket connections in development
+            ...(isDevelopment ? ["ws:", "wss:"] : []), // Vite HMR websocket
           ],
           mediaSrc: [
             "'self'",
@@ -93,9 +168,7 @@ export function configureSecurity(app: Express) {
   );
 
   // A05: Security Misconfiguration - CORS Configuration
-  const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:5000', 'http://127.0.0.1:5000'];
+  const allowedOrigins = getAllowedOrigins();
 
   app.use(
     cors({
@@ -151,6 +224,7 @@ export function configureSecurity(app: Express) {
   app.use('/api/youtube/', strictLimiter);
   app.use('/api/etsy/', strictLimiter);
   app.use('/api/podcast/', strictLimiter);
+  app.use('/api/dndbeyond/', strictLimiter);
 }
 
 /**
@@ -278,8 +352,11 @@ export async function logSecurityEvent(event: string, details: Record<string, un
     ...details,
   };
 
-  // Console logging
-  console.warn('[SECURITY]', JSON.stringify(logEntry));
+  // Console logging - mask the email; the full value only goes to the audit table
+  const consoleEntry = typeof details.email === 'string'
+    ? { ...logEntry, email: maskEmail(details.email) }
+    : logEntry;
+  console.warn('[SECURITY]', JSON.stringify(consoleEntry));
   
   // Database logging (async, don't await to avoid blocking)
   try {

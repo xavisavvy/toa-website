@@ -35,6 +35,8 @@ vi.mock('../server/podcast', () => ({
 }));
 
 vi.mock('../server/etsy', () => ({
+  MAX_SHOP_LISTINGS: 50,
+  isAllowedShop: vi.fn((shopId: string) => shopId.toLowerCase() === 'testshop123'),
   getShopListings: vi.fn().mockResolvedValue([
     {
       id: '123',
@@ -69,17 +71,13 @@ describe('API Routes', () => {
   });
 
   describe('GET /api/metrics', () => {
-    it('should return application metrics', async () => {
+    // The metrics payload itself is covered in test/monitoring.test.ts
+    it('should require an admin session', async () => {
       const response = await request(app)
         .get('/api/metrics')
-        .expect(200);
+        .expect(401);
 
-      expect(response.body).toHaveProperty('uptime');
-      expect(response.body).toHaveProperty('requests');
-      expect(response.body).toHaveProperty('cache');
-      expect(response.body).toHaveProperty('errors');
-      expect(response.body.requests).toHaveProperty('total');
-      expect(response.body.cache).toHaveProperty('hitRate');
+      expect(response.body).not.toHaveProperty('requests');
     });
   });
 
@@ -375,6 +373,17 @@ describe('API Routes', () => {
         .expect(400);
 
       expect(response.body.error).toBe('Invalid shop ID format');
+    });
+
+    it('should not query shops other than the configured one', async () => {
+      const { getShopListings } = await import('../server/etsy');
+      vi.mocked(getShopListings).mockClear();
+
+      await request(app)
+        .get('/api/etsy/shop/SomeOtherShop/listings')
+        .expect(404);
+
+      expect(getShopListings).not.toHaveBeenCalled();
     });
 
     it('should validate limit parameter', async () => {

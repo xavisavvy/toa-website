@@ -9,12 +9,13 @@ describe('Health Check Endpoint', () => {
 
   beforeAll(() => {
     app = express();
-    registerHealthRoutes(app);
+    // These tests cover the detailed report; skip the admin guard here
+    registerHealthRoutes(app, { detailsAuth: (_req, _res, next) => next() });
   });
 
   describe('Basic Health Check', () => {
     it('should return 200 OK with healthy status', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -27,20 +28,20 @@ describe('Health Check Endpoint', () => {
     });
 
     it('should include service name and environment', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.body).toHaveProperty('environment');
       expect(response.body).toHaveProperty('version');
     });
 
     it('should return uptime greater than 0', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.body.uptime).toBeGreaterThan(0);
     });
 
     it('should include version information', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.body).toHaveProperty('version');
       expect(typeof response.body.version).toBe('string');
@@ -49,7 +50,7 @@ describe('Health Check Endpoint', () => {
 
   describe('Detailed Health Check', () => {
     it('should return detailed checks', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('checks');
@@ -57,7 +58,7 @@ describe('Health Check Endpoint', () => {
     });
 
     it('should include memory usage in check', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.body.checks).toHaveProperty('memory');
       expect(response.body.checks.memory).toMatchObject({
@@ -68,7 +69,7 @@ describe('Health Check Endpoint', () => {
     });
 
     it('should include storage connectivity check', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.body.checks).toHaveProperty('storage');
       expect(response.body.checks.storage).toMatchObject({
@@ -77,7 +78,7 @@ describe('Health Check Endpoint', () => {
     });
 
     it('should include cache status check', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.body.checks).toHaveProperty('cache');
       expect(response.body.checks.cache).toMatchObject({
@@ -97,7 +98,7 @@ describe('Health Check Endpoint', () => {
         arrayBuffers: 10 * 1024 * 1024,
       });
 
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       // Should be degraded or unhealthy
       expect(['degraded', 'unhealthy']).toContain(response.body.checks.memory.status);
@@ -107,7 +108,7 @@ describe('Health Check Endpoint', () => {
     });
 
     it('should return 200 or 503 based on overall health', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       // Should return 200 for healthy/degraded, 503 for unhealthy
       expect([200, 503]).toContain(response.status);
@@ -120,7 +121,7 @@ describe('Health Check Endpoint', () => {
   describe('Performance', () => {
     it('should respond in less than 100ms', async () => {
       const start = Date.now();
-      await request(app).get('/api/health');
+      await request(app).get('/api/admin/health');
       const duration = Date.now() - start;
 
       expect(duration).toBeLessThan(500); // Increased from 100ms for system load variance
@@ -129,7 +130,7 @@ describe('Health Check Endpoint', () => {
     it('should handle concurrent requests', async () => {
       const requests = Array(10)
         .fill(null)
-        .map(() => request(app).get('/api/health'));
+        .map(() => request(app).get('/api/admin/health'));
 
       const responses = await Promise.all(requests);
 
@@ -142,7 +143,7 @@ describe('Health Check Endpoint', () => {
 
   describe('Response Headers', () => {
     it('should return JSON content type', async () => {
-      const response = await request(app).get('/api/health');
+      const response = await request(app).get('/api/admin/health');
 
       expect(response.headers['content-type']).toMatch(/application\/json/);
     });

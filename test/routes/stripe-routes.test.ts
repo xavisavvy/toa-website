@@ -34,10 +34,12 @@ vi.mock('../../server/stripe', () => ({
       sessions: {
         create: vi.fn(() => Promise.resolve({
           id: 'cs_test_123',
+          payment_status: 'paid',
           url: 'https://checkout.stripe.com/test'
         })),
         retrieve: vi.fn(() => Promise.resolve({
           id: 'cs_test_123',
+          payment_status: 'paid',
           shipping_details: {
             name: 'Test Customer',
             address: {
@@ -61,10 +63,12 @@ vi.mock('../../server/stripe', () => ({
   },
   createCheckoutSession: vi.fn(() => Promise.resolve({
     id: 'cs_test_123',
+    payment_status: 'paid',
     url: 'https://checkout.stripe.com/test'
   })),
   getCheckoutSession: vi.fn(() => Promise.resolve({
     id: 'cs_test_123',
+    payment_status: 'paid',
     shipping_details: {
       name: 'Test Customer',
       address: {
@@ -91,6 +95,7 @@ vi.mock('../../server/stripe', () => ({
       data: {
         object: {
           id: 'cs_test_123',
+          payment_status: 'paid',
           amount_total: 2999,
           currency: 'usd',
           customer_details: { email: 'test@example.com' }
@@ -98,6 +103,7 @@ vi.mock('../../server/stripe', () => ({
       }
     };
   }),
+  getPaidQuantity: vi.fn(() => 1),
   createPrintfulOrderFromSession: vi.fn(() => ({
     recipient: {
       name: 'Test Customer',

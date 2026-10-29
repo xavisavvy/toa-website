@@ -105,7 +105,7 @@ RUN --mount=type=cache,target=/app/.vite \
 FROM builder AS sbom
 
 # Install CycloneDX for SBOM generation
-RUN npm install -g @cyclonedx/cyclonedx-npm
+RUN npm install -g @cyclonedx/cyclonedx-npm@6.0.1
 
 # Generate SBOM in both JSON and XML formats
 # --ignore-npm-errors: package.json pins `esbuild: ^0.25.12` as a security

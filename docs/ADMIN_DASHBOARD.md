@@ -96,8 +96,7 @@ Built a complete admin dashboard and customer order tracking system with **secur
 
 ### Scripts
 13. **`scripts/create-admin.ts`** - Interactive admin creation
-14. **`scripts/create-admin-direct.ts`** - Direct PostgreSQL admin creation
-15. **`scripts/create-admin-quick.ts`** - Non-interactive admin creation
+14. **`scripts/create-admin-direct.ts`** - Direct PostgreSQL admin creation (password from `ADMIN_PASSWORD`, or generated and printed once)
 
 ### Documentation
 16. **`docs/AUTHENTICATION_SECURITY.md`** - Security documentation
@@ -267,8 +266,8 @@ CREATE INDEX user_role_idx ON users(role);
 # Interactive (password hidden)
 npm run create-admin
 
-# OR direct (for scripting)
-npx tsx scripts/create-admin-direct.ts
+# OR direct (for scripting) - never commit or hard-code the password
+ADMIN_PASSWORD='<at least 12 chars>' npx tsx scripts/create-admin-direct.ts
 ```
 
 ### Access Admin Dashboard

@@ -146,7 +146,12 @@ export function metricsMiddleware(req: Request, res: Response, next: NextFunctio
   
   res.on('finish', () => {
     const duration = performance.now() - start;
-    const endpoint = `${req.method} ${req.path}`;
+    // Key on the matched route pattern (e.g. /api/youtube/playlist/:playlistId),
+    // not the raw path: raw paths are attacker-chosen and would grow the
+    // metrics map without bound
+    const endpoint = req.route?.path
+      ? `${req.method} ${req.baseUrl}${req.route.path}`
+      : `${req.method} (unmatched)`;
     const status = res.statusCode >= 400 ? 'error' : 'success';
     
     metrics.trackApiCall(endpoint, duration, status);

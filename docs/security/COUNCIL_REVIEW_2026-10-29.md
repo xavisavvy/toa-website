@@ -110,3 +110,49 @@ push/main/deploy. Replace the poller token with a fine-grained PAT (Actions: rea
 1. Today: #1 (disable or fix checkout pricing), #4 (rotate/disable that admin account), #2 (crash).
 2. This week: #3 + #10 + #9 + #18 together (shared `createApp`), #5, #6, #7/#8.
 3. Then: CSP, health/metrics exposure, cache keys/allowlists, CI hardening (#15–#17, #26–#28), Lows.
+
+## Remediation status (2026-10-29)
+
+Fixed in code on branch `claude/council-security-review-1fa4ed`:
+
+| # | Fix |
+|---|-----|
+| 1 | Checkout takes only `productId`/`variantId`/`quantity`/`zipCode`; price, name, image, shipping and tax come from Printful server-side |
+| 2 | Logout and `/api/auth/me` guard missing sessions; prod entry logs unhandled rejections instead of exiting |
+| 3, 10, 18 | `server/app.ts` `configureApp()` is shared by both entries: sessions (Postgres store in prod), CSRF, env validation, webhook raw bodies. Login regenerates the session ID. Missing/short `SESSION_SECRET` in prod disables sessions (login → 503) instead of using a known fallback |
+| 4 | `create-admin-quick.ts` deleted; `create-admin-direct.ts` reads `ADMIN_PASSWORD` or generates one; seeding a non-local DB requires `ADMIN_PASSWORD` |
+| 5 | Raw body for the Printful webhook, constant-time HMAC compare, fail closed; unsigned webhooks rejected in prod |
+| 6 | CI and Lighthouse `pull_request` jobs run on `ubuntu-latest`; self-hosted only for pushes |
+| 7 | Order insert on the unique `stripe_session_id` is the idempotency lock; unpaid sessions wait for `async_payment_succeeded`, which is also idempotent |
+| 8 | Product charged per unit, shipping+tax once (Stripe shipping rate); Printful gets the paid quantity |
+| 9 | `authLimiter` (per IP) and a new per-account `loginAccountLimiter` on login |
+| 11 | `unsafe-inline`/`unsafe-eval`, `http:` images and `ws:`/`wss:` only in development |
+| 12 | Public `/api/health` returns status + timestamp only, results cached 10s; details at admin-only `/api/admin/health` |
+| 13, 14 | YouTube channel lists cached per size bucket and limited to allowed channels; playlist fetches capped at 2000 items; cache file capped at 50 entries; Etsy always fetches 50 and only serves allowed shops |
+| 15 | `appleboy/ssh-action` pinned by SHA; `fingerprint` read from `VPS_HOST_FINGERPRINT` |
+| 16, 26 | `version.yml`: no persisted credentials, `npm ci --ignore-scripts`, token only on the push; runs only for push events from this repo |
+| 19 | `requireAdmin` re-reads the user on every request |
+| 20 | Confirmation and sponsor emails HTML-escape all customer input |
+| 21 | Recipient details removed from Printful/Stripe logs; failed-login emails masked in console |
+| 22 | `/api/metrics` admin-only; metrics keyed by route pattern (bounded) |
+| 23 | Session lookup masks the customer email |
+| 24 | Zod schemas on shipping estimates, sponsor form and admin list filters |
+| 25 | D&D Beyond avatar proxy: `strictLimiter`, 2 MB cap |
+| 28 | Third-party actions pinned by SHA; SBOM uses the pinned Trivy action instead of `curl \| sh` and an unverified binary; CycloneDX and LHCI versions pinned |
+| 29 | Tracked artefacts removed and ignored |
+| 30 | Admin tracking link only rendered for `http(s)` URLs |
+
+Needs action outside the code (before or right after merging):
+
+- **#4:** check whether `admin@talesofaneria.com` exists in the production database; if so, change its password or deactivate it. The old password is in public git history.
+- **#3:** set `SESSION_SECRET` (32+ chars) in `/opt/toa-website/.env.production`. Without it the site runs but admin login answers 503. `connect-pg-simple` creates a `session` table in `toa_website` on first use, which needs CREATE on the `public` schema for the `toa` role.
+- **#5:** set `PRINTFUL_WEBHOOK_SECRET` in production and in the Printful dashboard. Without it, Printful webhooks now get 503 in production instead of being accepted unsigned.
+- **#3:** the production entry now runs `validateEnvironment()`, which exits if Stripe keys are partially configured or mis-prefixed. Confirm `STRIPE_PUBLISHABLE_KEY`/`STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` are all set.
+- **#15:** add the `VPS_HOST_FINGERPRINT` repository secret.
+- **#17, #27:** GitHub settings - remove the Replit Signin app from the main ruleset's bypass list (and uninstall it), and consider a required reviewer on the `production` environment.
+
+Not changed:
+
+- Two workflows still push to the same GHCR image (Low/Info, sbom.yml).
+- Pre-existing: cart checkout (multiple items) sends `items[]`, which `/api/stripe/create-checkout` has never accepted, so it returns 400. Single-product "Buy now" works.
+- Local docker-compose files still publish Postgres/Redis on all interfaces with default passwords (local only, #31).
