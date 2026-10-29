@@ -37,12 +37,10 @@ jobs:
         run: npm install -g @cyclonedx/cyclonedx-npm
       
       - name: Generate SBOM (JSON)
-        # --ignore-npm-errors: `npm ls` exits non-zero here because
-        # package.json deliberately overrides esbuild to ^0.25.12 (a security
-        # pin) which npm reports as "invalid" under tsx and vite, and because
-        # sharp's optional platform binaries show as "extraneous". Both are the
-        # intended state of the tree; cyclonedx treats the non-zero exit as
-        # fatal and the SBOM is complete either way.
+        # --ignore-npm-errors: `npm ls` exits non-zero here because sharp's
+        # optional platform binaries show as "extraneous". That is the intended
+        # state of the tree; cyclonedx treats the non-zero exit as fatal and the
+        # SBOM is complete either way.
         run: cyclonedx-npm --ignore-npm-errors --output-file sbom.json
       
       - name: Generate SBOM (XML)
@@ -110,21 +108,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      - name: Install Trivy
-        shell: bash
-        run: |
-          # Install pinned Trivy version for deterministic builds
-          TRIVY_VERSION="0.61.0"
-          mkdir -p ~/.local/bin
-          curl -sfL "https://raw.githubusercontent.com/aquasecurity/trivy/v${TRIVY_VERSION}/contrib/install.sh" | sh -s -- -b ~/.local/bin "v${TRIVY_VERSION}"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          ~/.local/bin/trivy --version
-      
+      # Uses the same pinned trivy-action as ci.yml's Container Security Scan.
+      # The previous install.sh download of Trivy v0.61.0 started failing after
+      # that release's assets were pulled (see the CVE-2026-33634 note in ci.yml).
       - name: Generate vulnerability report from SBOM
-        run: |
-          trivy sbom sbom.json \
-            --format json \
-            --output sbom-vulnerabilities.json
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.35.0 (pinned per CVE-2026-33634 advisory)
+        with:
+          scan-type: 'sbom'
+          scan-ref: 'sbom.json'
+          format: 'json'
+          output: 'sbom-vulnerabilities.json'
+          exit-code: '0'
         continue-on-error: true
       
       - name: Upload vulnerability report
