@@ -68,6 +68,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
       - name: Check latest tag
         run: |
           git fetch --force --tags origin
