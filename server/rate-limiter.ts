@@ -9,6 +9,9 @@ let redis: Redis | null = null;
 try {
   if (process.env.REDIS_URL) {
     redis = new Redis(process.env.REDIS_URL, {
+      // ioredis 6 defaults to RESP3; keep RESP2, the protocol rate-limit-redis
+      // replies were written against under ioredis 5.
+      protocol: 2,
       maxRetriesPerRequest: 3,
       retryStrategy: (times) => {
         if (times > 3) {return null;}
