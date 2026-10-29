@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  # security-events: write  # Only needed for CodeQL/Advanced Security (paid feature)
+  # security-events: write  # Only needed to upload SARIF (e.g. the Trivy step below)
   pull-requests: write
 
 # A newer push to the same PR supersedes its older CI run. Pushes to
@@ -269,38 +269,10 @@ jobs:
           name: trivy-results
           path: trivy-results.json
 
-  # CodeQL SAST disabled - requires GitHub Advanced Security (paid feature)
-  # Uncomment when you have access to GitHub Advanced Security
-  # codeql:
-  #   name: CodeQL SAST Analysis
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     security-events: write
-  #     actions: read
-  #     contents: read
-  #   
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       language: ['javascript']
-  #   
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v7
-  #     
-  #     - name: Initialize CodeQL
-  #       uses: github/codeql-action/init@v3
-  #       with:
-  #         languages: ${{ matrix.language }}
-  #         queries: +security-and-quality
-  #     
-  #     - name: Autobuild
-  #       uses: github/codeql-action/autobuild@v3
-  #     
-  #     - name: Perform CodeQL Analysis
-  #       uses: github/codeql-action/analyze@v3
-  #       with:
-  #         category: "/language:${{ matrix.language }}"
+  # CodeQL (SAST) runs through GitHub's code scanning "default setup", not
+  # this workflow; its check is "Analyze (javascript-typescript)". Don't add a
+  # CodeQL job here: with default setup enabled, GitHub rejects CodeQL results
+  # uploaded from a workflow.
 
   # 2. Dependency Scanning with multiple tools
   dependency-scan:
