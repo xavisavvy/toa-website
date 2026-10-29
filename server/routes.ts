@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { createServer, type Server } from "http";
 
 import { eq, desc, gte } from 'drizzle-orm';
@@ -19,7 +20,7 @@ import { metrics } from "./monitoring";
 import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
 import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId } from "./order-service";
 import { findCachedEpisodeAudioUrl, getPodcastFeed } from "./podcast";
-import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate } from "./printful";
+import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate, getSyncVariantForCheckout } from "./printful";
 import { apiLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
 import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
@@ -35,6 +36,18 @@ declare module 'express-session' {
 }
 
 const DATABASE_NOT_AVAILABLE_ERROR = 'Database not available';
+
+// Only identifiers come from the client at checkout; extra fields such as
+// price, shipping or tax are stripped and recomputed server-side.
+const checkoutRequestSchema = z.object({
+  productId: z.string().regex(/^\d{1,20}$/),
+  variantId: z.string().regex(/^\d{1,20}$/),
+  quantity: z.number().int().min(1).max(10).default(1),
+  // Only US ZIPs get a live estimate; anything else uses the default estimate
+  zipCode: z.string().max(10).optional()
+    // eslint-disable-next-line security/detect-unsafe-regex -- bounded by max(10), no nested quantifiers
+    .transform(zip => (zip && /^\d{5}(?:-\d{4})?$/.test(zip.trim()) ? zip.trim() : undefined)),
+});
 
 export function registerRoutes(app: Express): Server {
   // Apply API rate limiting to all /api routes
@@ -116,36 +129,49 @@ export function registerRoutes(app: Express): Server {
 
   // Logout endpoint
   app.post("/api/auth/logout", async (req, res) => {
-    const user = req.session.user;
-    const userEmail = user?.email;
-    const userId = user?.id;
-    
-    // Audit: Log logout before destroying session
-    if (user) {
-      await AuditService.logAuth(
-        AuditAction.LOGOUT,
-        "success",
-        req,
-        userEmail,
-        userId
-      );
+    try {
+      // No session middleware or no session yet: nothing to log out of
+      if (!req.session) {
+        return res.json({ success: true });
+      }
+
+      const user = req.session.user;
+      const userEmail = user?.email;
+      const userId = user?.id;
+
+      // Audit: Log logout before destroying session
+      if (user) {
+        await AuditService.logAuth(
+          AuditAction.LOGOUT,
+          "success",
+          req,
+          userEmail,
+          userId
+        );
+      }
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Logout error:', err);
+          return res.status(500).json({
+            error: 'Server error',
+            message: 'Failed to logout',
+          });
+        }
+
+        if (userEmail) {
+          safeLog.info(`User logged out: ${maskEmail(userEmail)}`);
+        }
+
+        res.json({ success: true });
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({
+        error: 'Server error',
+        message: 'Failed to logout',
+      });
     }
-    
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Logout error:', err);
-        return res.status(500).json({ 
-          error: 'Server error',
-          message: 'Failed to logout',
-        });
-      }
-
-      if (userEmail) {
-        safeLog.info(`User logged out: ${maskEmail(userEmail)}`);
-      }
-
-      res.json({ success: true });
-    });
   });
 
   // Get current user endpoint
@@ -158,11 +184,17 @@ export function registerRoutes(app: Express): Server {
     }
 
     // Refresh user data from database
-    const currentUser = await getUserById(req.user.id);
+    let currentUser;
+    try {
+      currentUser = await getUserById(req.user.id);
+    } catch (error) {
+      console.error('Error loading current user:', error);
+      return res.status(500).json({ error: 'Server error', user: null });
+    }
 
     if (!currentUser || currentUser.isActive !== 1) {
       req.session.destroy(() => {});
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Session invalid',
         user: null,
       });
@@ -1161,41 +1193,54 @@ export function registerRoutes(app: Express): Server {
   // Stripe Checkout: Create checkout session
   app.post("/api/stripe/create-checkout", async (req, res) => {
     try {
-      const { productId, variantId, productName, price, quantity, imageUrl, shipping } = req.body;
+      // Price, name, image, shipping and tax are never taken from the client:
+      // they are looked up server-side so a crafted request can't set its own price.
+      const parsed = checkoutRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        logSecurityEvent('CHECKOUT_INVALID_INPUT', {
+          ip: req.ip,
+          issues: parsed.error.issues.map(i => i.path.join('.')),
+        });
+        return res.status(400).json({ error: 'Invalid checkout request' });
+      }
+      const { productId, variantId, quantity, zipCode } = parsed.data;
 
-      // Validate inputs
-      if (!productId || !variantId || !productName || !price) {
-        return res.status(400).json({ error: 'Missing required fields' });
+      const variant = await getSyncVariantForCheckout(productId, variantId);
+      if (!variant) {
+        logSecurityEvent('CHECKOUT_UNKNOWN_VARIANT', { ip: req.ip, productId, variantId });
+        return res.status(400).json({ error: 'Product is not available' });
       }
 
-      if (!/^\d+$/.test(productId) || !/^\d+$/.test(variantId)) {
-        return res.status(400).json({ error: 'Invalid product or variant ID' });
-      }
-
-      const priceInCents = Math.round(parseFloat(price) * 100);
-      if (isNaN(priceInCents) || priceInCents <= 0) {
-        return res.status(400).json({ error: 'Invalid price' });
-      }
-
-      // Parse shipping estimate if provided
-      let shippingEstimate;
-      if (shipping && typeof shipping.shipping === 'number' && typeof shipping.tax === 'number') {
-        shippingEstimate = {
-          shipping: shipping.shipping,
-          tax: shipping.tax,
-        };
+      // Recompute Printful's shipping estimate server-side when a zip is given;
+      // otherwise createCheckoutSession falls back to its default estimate.
+      let shippingEstimate: { shipping: number; tax: number } | undefined;
+      if (zipCode) {
+        const estimate = await getPrintfulShippingEstimate({
+          recipient: {
+            address1: '123 Main St', // Placeholder - not used for rate calculation
+            address2: null,
+            city: 'Any City', // Placeholder - not used for rate calculation
+            state_code: 'US',
+            country_code: 'US',
+            zip: zipCode.slice(0, 5),
+          },
+          items: [{ sync_variant_id: parseInt(variantId), quantity }],
+        });
+        if (estimate && estimate.shipping >= 0 && estimate.tax >= 0) {
+          shippingEstimate = { shipping: estimate.shipping, tax: estimate.tax };
+        }
       }
 
       const session = await createCheckoutSession({
         productId,
         variantId,
-        productName,
-        price: priceInCents,
-        quantity: quantity || 1,
-        imageUrl,
-        shippingEstimate,  // Pass Printful's exact costs if available
+        productName: `${variant.productName} - ${variant.variantName}`,
+        price: variant.retailPriceCents,
+        quantity,
+        imageUrl: variant.image || undefined,
+        shippingEstimate,
         metadata: {
-          product_image_url: imageUrl || '', // Store image URL in metadata
+          product_image_url: variant.image || '',
         },
       });
 
@@ -1583,32 +1628,42 @@ export function registerRoutes(app: Express): Server {
   // Printful webhook handler - receives notifications from Printful
   app.post("/api/webhooks/printful", express.raw({ type: 'application/json' }), async (req, res) => {
     try {
-      const signature = req.headers['x-printful-signature'] as string;
+      const signature = req.headers['x-printful-signature'];
       const webhookSecret = process.env.PRINTFUL_WEBHOOK_SECRET;
+      // Prod mounts express.raw for this path (Buffer body); dev keeps a copy in rawBody
+      const rawBody = (req as any).rawBody || req.body;
 
-      // Verify webhook signature for security
-      if (webhookSecret && signature) {
-        const crypto = await import('crypto');
-        const hmac = crypto.createHmac('sha256', webhookSecret);
-        // Use raw body for signature verification
-        const rawBody = (req as any).rawBody || req.body;
-        const digest = hmac.update(rawBody).digest('hex');
-        
-        if (digest !== signature) {
+      if (webhookSecret) {
+        if (typeof signature !== 'string' || signature.length === 0) {
+          logSecurityEvent('PRINTFUL_WEBHOOK_MISSING_SIGNATURE', {});
+          return res.status(401).json({ error: 'Missing signature' });
+        }
+
+        // The HMAC must be computed over the exact bytes Printful sent. A body
+        // that was already parsed into an object can't be verified, so fail closed.
+        if (!Buffer.isBuffer(rawBody) && typeof rawBody !== 'string') {
+          logSecurityEvent('PRINTFUL_WEBHOOK_RAW_BODY_UNAVAILABLE', {});
+          return res.status(500).json({ error: 'Webhook verification unavailable' });
+        }
+
+        const digest = createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
+        const expected = Buffer.from(digest, 'utf8');
+        const received = Buffer.from(signature, 'utf8');
+
+        if (expected.length !== received.length || !timingSafeEqual(expected, received)) {
           logSecurityEvent('PRINTFUL_WEBHOOK_INVALID_SIGNATURE', {
-            receivedSignature: `${signature?.substring(0, 10)  }...`,
+            receivedSignature: `${signature.substring(0, 10)}...`,
           });
           return res.status(401).json({ error: 'Invalid signature' });
         }
-      } else if (webhookSecret) {
-        // Secret is set but no signature provided
-        logSecurityEvent('PRINTFUL_WEBHOOK_MISSING_SIGNATURE', {});
-        return res.status(401).json({ error: 'Missing signature' });
+      } else if (process.env.NODE_ENV === 'production') {
+        // Never accept unsigned webhooks in production
+        logSecurityEvent('PRINTFUL_WEBHOOK_SECRET_NOT_CONFIGURED', {});
+        return res.status(503).json({ error: 'Webhook not configured' });
       }
-      // If no secret is set, allow webhook (dev mode)
+      // No secret outside production: allow unsigned webhooks (dev mode)
 
       // Parse the webhook payload
-      const rawBody = (req as any).rawBody || req.body;
       let payload;
       if (Buffer.isBuffer(rawBody)) {
         payload = JSON.parse(rawBody.toString());

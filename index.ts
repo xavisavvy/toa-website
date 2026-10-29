@@ -18,8 +18,10 @@ app.set('trust proxy', 1);
 // A05: Security Misconfiguration - Apply security middleware FIRST
 configureSecurity(app);
 
-// Stripe webhook must receive raw body for signature verification
+// Webhooks must receive the raw body for signature verification, so these
+// parsers have to run before the global express.json() below
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+app.use('/api/webhooks/printful', express.raw({ type: 'application/json', limit: '1mb' }));
 
 // Body parsing middleware (with size limits) - applied to all OTHER routes
 app.use(express.json({ limit: '1mb' }));
@@ -63,6 +65,18 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+// Express 4 does not catch rejected promises from async handlers, and Node
+// exits on an unhandled rejection by default. Log it instead so one bad
+// request can't take the whole site down.
+process.on('unhandledRejection', (reason) => {
+  const error = reason as { message?: string; stack?: string } | undefined;
+  console.error('[UNHANDLED REJECTION]', {
+    timestamp: new Date().toISOString(),
+    message: error?.message ?? String(reason),
+    stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
+  });
 });
 
 // Register API routes and start server

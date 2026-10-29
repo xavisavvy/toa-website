@@ -173,7 +173,7 @@ describe('Routes Coverage', () => {
     it('should require all fields for checkout session', async () => {
       const response = await request(app).post('/api/stripe/create-checkout').send({});
       expect(response.status).toBe(400);
-      expect(response.body.error).toContain('Missing required fields');
+      expect(response.body.error).toContain('Invalid checkout request');
     });
 
     it('should validate product and variant IDs', async () => {
@@ -181,7 +181,7 @@ describe('Routes Coverage', () => {
         .post('/api/stripe/create-checkout')
         .send({ productId: 'abc', variantId: 'xyz', productName: 'Test', price: '10.00' });
       expect(response.status).toBe(400);
-      expect(response.body.error).toContain('Invalid product or variant ID');
+      expect(response.body.error).toContain('Invalid checkout request');
     });
 
     it('should validate session ID format', async () => {
