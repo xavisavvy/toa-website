@@ -772,9 +772,11 @@
       "images": [
         {
           "id": "1",
-          "caption": "Kevin Kambridge - Character Portrait",
+          "url": "/characters/kevin-kambridge.webp",
+          "caption": "Kevin Kambridge - HeroForge 3D model",
           "type": "portrait",
           "isFeatured": true,
+          "isAiGenerated": false,
           "source": "official"
         }
       ],
@@ -782,7 +784,8 @@
       "personality": "A newcomer to the unfortunate town of Pterrordale.",
       "dndbeyond": "https://www.dndbeyond.com/characters/169422765",
       "dndbeyondId": "169422765",
-      "status": "active"
+      "status": "active",
+      "featuredImage": "/characters/kevin-kambridge.webp"
     },
     {
       "id": "nastia-skorbina",
