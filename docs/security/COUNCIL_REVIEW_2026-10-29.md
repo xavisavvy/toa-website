@@ -130,7 +130,7 @@ Fixed in code on branch `claude/council-security-review-1fa4ed`:
 | 12 | Public `/api/health` returns status + timestamp only, results cached 10s; details at admin-only `/api/admin/health` |
 | 13, 14 | YouTube channel lists cached per size bucket and limited to allowed channels; playlist fetches capped at 2000 items; cache file capped at 50 entries; Etsy always fetches 50 and only serves allowed shops |
 | 15 | `appleboy/ssh-action` pinned by SHA; `fingerprint` read from `VPS_HOST_FINGERPRINT` |
-| 16, 26 | `version.yml`: no persisted credentials, `npm ci --ignore-scripts`, token only on the push; runs only for push events from this repo |
+| 16, 26 | Resolved on `main` independently: `version.yml` was replaced by `release.yml` (release-please, SHA-pinned, `push` to main only, no dependency install with the token) |
 | 19 | `requireAdmin` re-reads the user on every request |
 | 20 | Confirmation and sponsor emails HTML-escape all customer input |
 | 21 | Recipient details removed from Printful/Stripe logs; failed-login emails masked in console |
