@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { useCart } from '@/hooks/useCart';
 import * as analytics from '@/lib/analytics';
@@ -36,12 +36,25 @@ describe('useCart Hook', () => {
   };
 
   beforeEach(() => {
+    // useCart clears its "updating" flag in a 100ms setTimeout. With real
+    // timers that callback can fire after the test environment is torn
+    // down, and React then throws "window is not defined" as an unhandled
+    // error, which fails the run even though every assertion passed.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     vi.clearAllMocks();
     (cartLib.loadCart as any).mockReturnValue(mockEmptyCart);
     (cartLib.isCartExpired as any).mockReturnValue(false);
     (cartLib.createEmptyCart as any).mockReturnValue(mockEmptyCart);
     (cartLib.calculateCartTotal as any).mockReturnValue(0);
     (cartLib.getTotalItemCount as any).mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    // Flush the hook's pending timers while the component is still mounted.
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+    vi.useRealTimers();
   });
 
   it('should initialize with loaded cart', () => {
