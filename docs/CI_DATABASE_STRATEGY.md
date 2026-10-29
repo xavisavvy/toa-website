@@ -1,265 +1,85 @@
-# CI/CD Database Strategy Recommendation
+# CI/CD Database Strategy
 
-## Current Problem
-E2E tests fail when `DATABASE_URL` not configured. Tests need a real database for authentication.
+The **Tests & Coverage** job in `.github/workflows/ci.yml` runs against a real
+PostgreSQL and Redis, started with Docker Compose from `docker-compose.test.yml`.
+The same file is used for local E2E testing.
 
-## Recommended Solution: Docker Compose in CI
+## How it works in CI
 
-### Why Docker Compose?
-✅ **Fast**: 10-20 second startup  
-✅ **Simple**: Same config locally and in CI  
-✅ **Cheap**: Minimal CI minutes consumed  
-✅ **Debuggable**: Exact replication of CI environment locally  
-✅ **Industry Standard**: Used by most Node.js projects  
+The CI runners are self-hosted (`[self-hosted, Linux, X64]`) and share one
+Docker host, so several test jobs can be running at once. Each run gets its own
+isolated stack:
 
-### Implementation
+1. **Pick test service ports.** A step asks the OS for two free ports and
+   writes them to `GITHUB_ENV` with a run-specific compose project name:
 
-#### 1. Create `docker-compose.test.yml`
+   | Variable | Example |
+   |---|---|
+   | `TEST_COMPOSE_PROJECT` | `toa-website-test-<run_id>-<run_attempt>` |
+   | `TEST_POSTGRES_PORT` / `TEST_REDIS_PORT` | free host ports, e.g. `34671` / `42833` |
+   | `TEST_DATABASE_URL` | `postgresql://test_user:test_password@localhost:<pg port>/toa_test` |
+   | `TEST_REDIS_URL` | `redis://localhost:<redis port>` |
 
-```yaml
-version: '3.8'
+2. **Start services.** `docker compose -p "$TEST_COMPOSE_PROJECT" -f docker-compose.test.yml up -d`,
+   then wait for `pg_isready` and `redis-cli ping`.
+3. **Prepare the database.** `npm run db:push` then `npm run db:seed:e2e`, with
+   `DATABASE_URL: ${{ env.TEST_DATABASE_URL }}`.
+4. **Run tests.** Type check, build, `npm run test:coverage`, then E2E and visual
+   tests with `DATABASE_URL`/`REDIS_URL` set from the `TEST_*` variables.
+   Unit tests do not get `DATABASE_URL`; only the steps that need the database do.
+5. **Clean up.** `docker compose -p "$TEST_COMPOSE_PROJECT" ... down -v` runs with
+   `if: always()`, including on cancellation and timeout.
 
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: toa_test
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
-    ports:
-      - "55432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test_user -d toa_test"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    tmpfs:
-      - /var/lib/postgresql/data  # In-memory for speed
+Postgres keeps its data on `tmpfs`, so every run starts from an empty database.
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "56379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-```
+### Why per-run stacks instead of a shared one
 
-#### 2. Update `.github/workflows/ci.yml`
+The test stack used to bind fixed ports (55432/56379) and fixed container names,
+so test jobs were serialised with a repo-wide concurrency group. GitHub keeps
+only one *pending* job per concurrency group and cancels the rest, so most
+queued CI runs ended up cancelled. Unique project names and ports let jobs
+overlap safely, and that group is gone.
 
-```yaml
-jobs:
-  test:
-    name: Tests & Coverage
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        env:
-          HUSKY: 0
-          
-      - name: Start test services
-        run: docker-compose -f docker-compose.test.yml up -d
-        
-      - name: Wait for services to be healthy
-        run: |
-          echo "Waiting for PostgreSQL..."
-          timeout 30 bash -c 'until docker-compose -f docker-compose.test.yml exec -T postgres pg_isready -U test_user; do sleep 1; done'
-          echo "✅ PostgreSQL ready"
-          
-      - name: Run database migrations
-        run: npm run db:migrate
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
-          
-      - name: TypeScript type checking
-        run: npm run check
-        
-      - name: Build application
-        run: npm run build
-        
-      - name: Run unit tests with coverage
-        run: npm run test:coverage
-        
-      - name: Run E2E tests
-        run: npm run test:e2e
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
-          NODE_ENV: test
-        
-      - name: Run contract tests
-        run: npm run test:contract
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
-        
-      - name: Run visual regression tests
-        run: npm run test:visual
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:55432/toa_test
-        
-      - name: Cleanup
-        if: always()
-        run: docker-compose -f docker-compose.test.yml down -v
-        
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            coverage/
-            playwright-report/
-            reports/
-```
+### Caveats
 
-### Benefits
+- **Port race:** the port picker releases the ports before Docker binds them, so
+  another process could take one in between. That fails fast with "address
+  already in use"; re-run the job.
+- **Leftover stacks:** if a runner dies mid-job, its stack may be left running.
+  List them with `docker compose ls` and remove one with
+  `docker compose -p <name> down -v`.
+- **Memory:** up to one stack per runner can run at once. Watch memory on the
+  Docker host if more runners are added.
 
-✅ **Real database** - Tests run against actual PostgreSQL  
-✅ **Fast** - In-memory tmpfs for speed  
-✅ **Clean state** - Fresh database per CI run  
-✅ **No external dependencies** - Self-contained  
-✅ **Cost-effective** - Minimal CI minutes  
-✅ **Debuggable** - Run same setup locally  
+## Local usage
 
-### Local Testing
-
-Developers can use the same setup:
+`docker-compose.test.yml` defaults to host ports **55432** (Postgres) and
+**56379** (Redis), so it can run alongside the dev stack from
+`docker-compose.yml` (5432/6379).
 
 ```bash
-# Start test environment
-docker-compose -f docker-compose.test.yml up -d
+npm run test:e2e:setup       # docker-compose up + db:push
+```
 
-# Run tests
+```bash
 export DATABASE_URL=postgresql://test_user:test_password@localhost:55432/toa_test
+```
+
+```bash
 npm run test:e2e
-
-# Cleanup
-docker-compose -f docker-compose.test.yml down -v
 ```
 
-## Alternative: GitHub Services (Simpler)
-
-If you want even simpler, use GitHub's built-in service containers:
-
-```yaml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: toa_test
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+```bash
+npm run test:e2e:teardown    # docker-compose down -v
 ```
 
-**Pros:**
-- ✅ Simplest to set up
-- ✅ Managed by GitHub
-- ✅ Fast startup
+To use different ports locally, set `TEST_POSTGRES_PORT` / `TEST_REDIS_PORT`
+before starting the stack, and point `DATABASE_URL`/`REDIS_URL` at them.
 
-**Cons:**
-- ❌ Can't replicate locally (not Docker Compose)
-- ❌ Less control over configuration
+## Alternatives considered
 
-## When to Use Kubernetes
-
-Use Kubernetes **only if**:
-- ✅ Running **integration tests** against full production-like environment
-- ✅ Testing **multi-service dependencies** (10+ services)
-- ✅ Testing **Kubernetes-specific features** (deployments, services, ingress)
-- ✅ Running **performance tests** at scale
-- ✅ Have **dedicated K8s cluster** for testing (expensive)
-
-**For your project**: NOT needed. Docker Compose is perfect.
-
-## Recommended Implementation Order
-
-1. **Phase 1 (Now)**: Use GitHub Services
-   - Simplest
-   - Gets E2E tests working immediately
-   - Zero local setup needed
-
-2. **Phase 2 (Later)**: Add Docker Compose
-   - When developers need local E2E testing
-   - Better control and replicability
-   - Easy migration from GitHub Services
-
-3. **Phase 3 (Maybe Never)**: Kubernetes
-   - Only if scaling to 50+ microservices
-   - Only if testing K8s-specific features
-   - Requires dedicated infrastructure
-
-## Cost Analysis (GitHub Actions Minutes)
-
-**Docker Compose approach:**
-- Spin up: ~15 seconds
-- Tests: ~3 minutes
-- Cleanup: ~5 seconds
-- **Total: ~3.5 minutes per run**
-
-**Kubernetes approach:**
-- Spin up K8s: ~60 seconds
-- Deploy services: ~30 seconds
-- Tests: ~3 minutes
-- Cleanup: ~20 seconds
-- **Total: ~5 minutes per run**
-
-**Savings**: 40% faster with Docker Compose  
-**Annual**: ~100 CI runs/month × 1.5 min savings = **150 minutes/month saved**
-
-## Final Recommendation
-
-### ✅ Use Docker Compose (Recommended)
-
-**Best for:**
-- Your current project size
-- Fast CI execution
-- Local development parity
-- Cost efficiency
-- Debugging ease
-
-**Implementation:**
-- Create `docker-compose.test.yml` (see above)
-- Update CI workflow to use it
-- Document for team
-
-### ❌ Skip Kubernetes (For Now)
-
-**Unless:**
-- You're testing K8s-specific features
-- You have 50+ microservices
-- You need production-like orchestration testing
-
-**Remember:** YAGNI (You Aren't Gonna Need It)
-- Start simple (Docker Compose)
-- Add complexity only when necessary
-- Kubernetes is for production orchestration, not test environments
-
----
-
-**Status**: Recommendation complete  
-**Suggested Next Step**: Implement Docker Compose test environment  
-**Estimated Work**: 1-2 hours  
-**Benefit**: All E2E tests run with real database in CI ✅
+- **GitHub service containers** (`services:` in the job): simplest on hosted
+  runners, but can't be reproduced locally with the same file, and fixed host
+  ports would collide on our shared self-hosted Docker host.
+- **Kubernetes:** unnecessary for two backing services; slower to start and
+  needs a dedicated cluster.
