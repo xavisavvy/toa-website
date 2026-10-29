@@ -57,12 +57,16 @@ overlap safely, and that group is gone.
 **56379** (Redis), so it can run alongside the dev stack from
 `docker-compose.yml` (5432/6379).
 
-```bash
-npm run test:e2e:setup       # docker-compose up + db:push
-```
+Export `DATABASE_URL` first: `test:e2e:setup` runs `db:push`, and
+`drizzle.config.ts` throws if `DATABASE_URL` is unset. Pointing it at port
+55432 also keeps the schema push off the dev database on 5432.
 
 ```bash
 export DATABASE_URL=postgresql://test_user:test_password@localhost:55432/toa_test
+```
+
+```bash
+npm run test:e2e:setup       # docker-compose up + db:push
 ```
 
 ```bash
