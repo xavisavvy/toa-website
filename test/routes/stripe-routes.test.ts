@@ -184,7 +184,10 @@ describe('Stripe Routes', () => {
         .send({ productId: '123', variantId: '456', zipCode: '84015' })
         .expect(200);
 
-      expect(getPrintfulShippingEstimate).toHaveBeenCalled();
+      // Printful rejects a recipient whose state_code is the country code
+      expect(getPrintfulShippingEstimate).toHaveBeenCalledWith(expect.objectContaining({
+        recipient: expect.objectContaining({ state_code: 'NY', country_code: 'US', zip: '84015' }),
+      }));
       const params = vi.mocked(createCheckoutSession).mock.calls[0][0];
       expect(params.shippingEstimate).toEqual({ shipping: 4.39, tax: 0.17 });
     });
