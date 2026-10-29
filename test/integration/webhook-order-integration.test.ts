@@ -573,6 +573,32 @@ describe('Stripe Webhook Integration with Order Service', async () => {
       expect(mockSendAdminAlert).toHaveBeenCalled();
     });
 
+    it('emails the paid quantity at its per-unit price', async () => {
+      const session = {
+        ...paidSession('cs_test_multi'),
+        amount_total: 8039, // 3 x $25.00 + shipping and tax
+        line_items: { data: [{ description: 'Test Product', quantity: 3, amount_total: 7500 }] },
+      };
+      const order = { id: 'order-multi', customerEmail: 'customer@example.com' };
+      mockVerifyWebhook.mockReturnValue(eventFor('cs_test_multi') as any);
+      mockGetCheckoutSession.mockResolvedValue(session as any);
+      mockCreateOrder.mockResolvedValue(order as any);
+      mockGetCatalogVariantId.mockResolvedValue(9876 as any);
+      mockCreatePrintfulOrderFromSession.mockReturnValue({ recipient: {}, items: [{ sync_variant_id: 12345, quantity: 3 }] } as any);
+      mockCreatePrintfulOrder.mockResolvedValue({ success: true, orderId: 2 });
+      mockGetOrderByStripeSessionId.mockResolvedValue(order as any);
+
+      await request(app)
+        .post('/api/stripe/webhook')
+        .set('stripe-signature', 'sig')
+        .send(Buffer.from(JSON.stringify(eventFor('cs_test_multi'))))
+        .expect(200);
+
+      expect(mockSendOrderConfirmation).toHaveBeenCalledWith(order, [
+        { name: 'Tales of Aneria Merchandise', quantity: 3, price: '25.00' },
+      ]);
+    });
+
     it('does not fulfil a completed session that is not paid yet', async () => {
       mockVerifyWebhook.mockReturnValue(eventFor('cs_test_unpaid') as any);
       mockGetCheckoutSession.mockResolvedValue(paidSession('cs_test_unpaid', 'unpaid') as any);

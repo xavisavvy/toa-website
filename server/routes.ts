@@ -24,7 +24,7 @@ import { findCachedEpisodeAudioUrl, getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate, getSyncVariantForCheckout } from "./printful";
 import { apiLimiter, authLimiter, loginAccountLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
-import { createCheckoutSession, getCheckoutSession, getPaidQuantity, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
+import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
 import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats, isAllowedChannel, MAX_CHANNEL_RESULTS } from "./youtube";
 
 
@@ -102,6 +102,24 @@ const sponsorInquirySchema = z.object({
   interest: z.string().trim().max(200).optional(),
   message: z.string().trim().min(1).max(5000),
 });
+
+/**
+ * The product line for the order confirmation email: the paid quantity at
+ * its per-unit price. The order total, which also covers shipping and tax,
+ * is shown separately in the email. Without expanded line items, fall back
+ * to a single line carrying the order total.
+ */
+function confirmationEmailItems(session: {
+  amount_total?: number | null;
+  line_items?: { data: Array<{ quantity?: number | null; amount_total?: number | null }> } | null;
+}): Array<{ name: string; quantity: number; price: string }> {
+  const name = 'Tales of Aneria Merchandise';
+  const line = session.line_items?.data[0];
+  if (line?.quantity && typeof line.amount_total === 'number') {
+    return [{ name, quantity: line.quantity, price: (line.amount_total / line.quantity / 100).toFixed(2) }];
+  }
+  return [{ name, quantity: 1, price: ((session.amount_total || 0) / 100).toFixed(2) }];
+}
 
 // Only identifiers come from the client at checkout; extra fields such as
 // price, shipping or tax are stripped and recomputed server-side.
@@ -1282,7 +1300,7 @@ export function registerRoutes(app: Express): Server {
           address1: '123 Main St', // Placeholder - not used for rate calculation
           address2: null,
           city: 'Any City', // Placeholder - not used for rate calculation
-          state_code: zipCode.length >= 5 ? 'US' : 'US', // Could parse state from zip if needed
+          state_code: 'NY', // Placeholder US state; Printful rejects the country code 'US' here
           country_code: 'US',
           zip: zipCode.slice(0, 5), // Use only 5-digit zip
         },
@@ -1346,7 +1364,9 @@ export function registerRoutes(app: Express): Server {
             address1: '123 Main St', // Placeholder - not used for rate calculation
             address2: null,
             city: 'Any City', // Placeholder - not used for rate calculation
-            state_code: 'US',
+            // Must be a real US state code; Printful rejects 'US'. Same
+            // placeholder as /api/printful/shipping/estimate.
+            state_code: 'NY',
             country_code: 'US',
             zip: zipCode.slice(0, 5),
           },
@@ -1610,11 +1630,7 @@ export function registerRoutes(app: Express): Server {
                   await updateOrderWithPrintfulId(order.id, String(result.orderId));
                   
                   // Send confirmation email to customer
-                  const items = [{
-                    name: 'Tales of Aneria Merchandise',
-                    quantity: getPaidQuantity(fullSession),
-                    price: ((fullSession.amount_total || 0) / 100).toFixed(2),
-                  }];
+                  const items = confirmationEmailItems(fullSession);
                   
                   await sendOrderConfirmation(order, items);
                   safeLog.info(`✅ Order confirmation email sent to ${maskEmail(order.customerEmail)}`);
@@ -1698,11 +1714,7 @@ export function registerRoutes(app: Express): Server {
                 if (order) {
                   await updateOrderWithPrintfulId(order.id, String(result.orderId));
                   
-                  const items = [{
-                    name: 'Tales of Aneria Merchandise',
-                    quantity: getPaidQuantity(asyncSession),
-                    price: ((asyncSession.amount_total || 0) / 100).toFixed(2),
-                  }];
+                  const items = confirmationEmailItems(asyncSession);
                   
                   await sendOrderConfirmation(order, items);
                 }
