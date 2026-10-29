@@ -389,8 +389,9 @@ export function registerRoutes(app: Express): Server {
       const { id } = req.params;
       const user = req.user;
 
-      // Order IDs are UUIDs; anything else would only produce a database error
-      if (!z.string().uuid().safeParse(id).success) {
+      // orders.id is a varchar (UUID by default, but not enforced), so only
+      // bound the length; the lookup itself is parameterised
+      if (id.length > 100) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
