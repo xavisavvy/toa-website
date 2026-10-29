@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 import type { User } from '../shared/schema';
 
-import { isValidSessionUser } from './auth';
+import { getUserById, isValidSessionUser } from './auth';
 import { logSecurityEvent } from './security';
 
 // Extend Express Request to include user
@@ -109,9 +109,35 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
     return;
   }
 
-  // Attach user to request
-  req.user = req.session.user;
-  next();
+  // The session holds a copy of the user taken at login, which can be up to
+  // 7 days old. Re-read it so deactivating or demoting an admin takes effect
+  // on their next request rather than when the cookie expires.
+  const sessionUserId = req.session.user.id;
+  getUserById(sessionUserId)
+    .then((currentUser) => {
+      if (!currentUser || currentUser.isActive !== 1 || currentUser.role !== 'admin') {
+        logSecurityEvent('ADMIN_SESSION_REVOKED', {
+          ip: req.ip,
+          userId: sessionUserId,
+          path: req.path,
+          reason: currentUser ? 'inactive or no longer admin' : 'user not found',
+        });
+        req.session.destroy(() => {});
+        res.status(401).json({
+          error: 'Session invalid',
+          message: 'Please sign in again',
+        });
+        return;
+      }
+
+      // Attach the fresh user record to the request
+      req.user = currentUser;
+      next();
+    })
+    .catch((error: unknown) => {
+      console.error('Error re-validating admin session:', error);
+      res.status(500).json({ error: 'Server error' });
+    });
 }
 
 /**

@@ -34,7 +34,7 @@ jobs:
           HUSKY: 0  # Disable Husky in CI
       
       - name: Install CycloneDX
-        run: npm install -g @cyclonedx/cyclonedx-npm
+        run: npm install -g @cyclonedx/cyclonedx-npm@6.0.1
       
       - name: Generate SBOM (JSON)
         # --ignore-npm-errors: `npm ls` exits non-zero here because sharp's
@@ -47,12 +47,14 @@ jobs:
         run: cyclonedx-npm --ignore-npm-errors --output-format XML --output-file sbom.xml
       
       - name: Generate SBOM (SPDX)
-        run: |
-          # Install spdx-sbom-generator from GitHub releases
-          curl -Lo spdx-sbom-generator.tar.gz https://github.com/opensbom-generator/spdx-sbom-generator/releases/download/v0.0.15/spdx-sbom-generator-v0.0.15-linux-amd64.tar.gz
-          tar -xzf spdx-sbom-generator.tar.gz
-          chmod +x spdx-sbom-generator
-          ./spdx-sbom-generator -o sbom.spdx.json
+        # Uses the same commit-pinned Trivy action as ci.yml rather than
+        # downloading and executing an unverified release binary
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.35.0 (pinned per CVE-2026-33634 advisory)
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'spdx-json'
+          output: 'sbom.spdx.json'
         continue-on-error: true
       
       - name: Upload SBOM as artifact
@@ -67,7 +69,7 @@ jobs:
       
       - name: Attach SBOM to release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           files: |
             sbom.json

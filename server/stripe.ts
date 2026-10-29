@@ -29,9 +29,9 @@ export const STRIPE_CONFIG = {
  * Create a Stripe Checkout session for a Printful product
  * 
  * NOTE: Price calculation includes:
- * - Retail price (product cost)
- * - Estimated shipping ($4.50)
- * - Estimated tax (7%)
+ * - Retail price (product cost) × quantity
+ * - Shipping, once per order (Printful estimate, or $4.50 fallback)
+ * - Tax, once per order (Printful estimate, or 7% fallback)
  */
 export async function createCheckoutSession(params: {
   productId: string;
@@ -76,14 +76,14 @@ export async function createCheckoutSession(params: {
   } else {
     // Fallback to estimated rates
     shippingCents = 450;  // $4.50 estimated US shipping
-    const subtotal = retailPrice + shippingCents;
+    const subtotal = retailPrice * quantity + shippingCents;
     taxCents = Math.ceil(subtotal * 0.07);  // 7% estimated tax
     console.log('💰 Using fallback shipping estimate');
   }
-  
-  const subtotal = retailPrice * quantity + shippingCents;
-  const totalAmount = subtotal + taxCents;
-  
+
+  const productTotal = retailPrice * quantity;
+  const totalAmount = productTotal + shippingCents + taxCents;
+
   console.log(`💰 Checkout Price Calculation:
     Product: $${(retailPrice / 100).toFixed(2)} × ${quantity}
     Shipping: $${(shippingCents / 100).toFixed(2)}
@@ -95,34 +95,48 @@ export async function createCheckoutSession(params: {
   try {
     return await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      // The product is charged per unit; shipping and tax are charged once per
+      // order as the shipping rate. (Folding them into unit_amount used to
+      // multiply them by the quantity on top of an already-multiplied price.)
       line_items: [
         {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `${productName} (includes shipping & tax)`,
-              description: `Shipping: $${(shippingCents / 100).toFixed(2)} | Tax: $${(taxCents / 100).toFixed(2)}`,
+              name: productName,
               images: imageUrl ? [imageUrl] : [],
               metadata: {
                 printful_product_id: productId,
                 printful_variant_id: variantId,
                 retail_price_cents: retailPrice.toString(),
-                shipping_cents: shippingCents.toString(),
-                tax_cents: taxCents.toString(),
               },
             },
-            unit_amount: totalAmount,  // Total including shipping & tax
+            unit_amount: retailPrice,
           },
           quantity,
+        },
+      ],
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            display_name: 'Shipping (includes estimated tax)',
+            fixed_amount: { amount: shippingCents + taxCents, currency: 'usd' },
+            metadata: {
+              shipping_cents: shippingCents.toString(),
+              tax_cents: taxCents.toString(),
+            },
+          },
         },
       ],
       mode: 'payment',
       success_url: successUrl || `${process.env.BASE_URL || 'http://localhost:5000'}${STRIPE_CONFIG.successUrl}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${process.env.BASE_URL || 'http://localhost:5000'}${STRIPE_CONFIG.cancelUrl}`,
       metadata: {
+        ...metadata,
         printful_product_id: productId,
         printful_variant_id: variantId,
-        ...metadata,
+        quantity: quantity.toString(),
       },
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'AU'], // Adjust based on where Printful ships
@@ -202,6 +216,18 @@ export interface PrintfulOrderData {
   }>;
 }
 
+/**
+ * How many units the customer actually paid for: the product line item's
+ * quantity when line_items is expanded, otherwise the quantity the server
+ * stored in session metadata at checkout. Bounded to the checkout limits.
+ */
+export function getPaidQuantity(session: Stripe.Checkout.Session): number {
+  const fromLineItem = session.line_items?.data[0]?.quantity;
+  const fromMetadata = parseInt(session.metadata?.quantity ?? '', 10);
+  const quantity = fromLineItem ?? (Number.isFinite(fromMetadata) ? fromMetadata : 1);
+  return Math.min(Math.max(Math.trunc(quantity), 1), 10);
+}
+
 export function createPrintfulOrderFromSession(
   session: Stripe.Checkout.Session
 ): PrintfulOrderData | null {
@@ -247,7 +273,7 @@ export function createPrintfulOrderFromSession(
     items: [
       {
         sync_variant_id: parseInt(variantId), // Use sync_variant_id for synced products
-        quantity: 1, // Get from line items if needed
+        quantity: getPaidQuantity(session),
       },
     ],
   };
@@ -268,7 +294,8 @@ export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise
 
   try {
     console.log('🚀 Submitting order to Printful API...');
-    console.log('Order data:', JSON.stringify(orderData, null, 2));
+    // Recipient details stay out of the logs
+    console.log('Order items:', JSON.stringify(orderData.items));
     
     const response = await fetch('https://api.printful.com/orders', {
       method: 'POST',
@@ -281,7 +308,6 @@ export async function createPrintfulOrder(orderData: PrintfulOrderData): Promise
 
     const responseText = await response.text();
     console.log(`Printful API response status: ${response.status}`);
-    console.log(`Printful API response body: ${responseText}`);
 
     if (!response.ok) {
       console.error('Printful order creation failed:', response.status, responseText);

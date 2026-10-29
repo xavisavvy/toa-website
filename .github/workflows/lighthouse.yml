@@ -13,7 +13,9 @@ permissions:
 
 jobs:
   lighthouse:
-    runs-on: [self-hosted, Linux, X64]
+    # Pull requests run on GitHub-hosted runners: PR code must not execute on
+    # the persistent self-hosted machines (see ci.yml)
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -40,9 +42,9 @@ jobs:
         uses: ./.github/actions/setup-chromium
 
       - name: Run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun
+        # The lockfile-pinned devDependency, not an unversioned global install
+        # that would persist on the runner between jobs
+        run: npx --no-install lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 

@@ -9,6 +9,18 @@ import { users, orders, orderItems } from '../shared/schema.ts';
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://toa_user:toa_password@localhost:5432/toa_dev';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@talesofaneria.com';
+const IS_LOCAL_DATABASE = (() => {
+  try {
+    return ['localhost', '127.0.0.1', 'postgres'].includes(new URL(DATABASE_URL).hostname);
+  } catch {
+    return false;
+  }
+})();
+// The well-known fallback password is only acceptable for a local dev database
+if (!process.env.ADMIN_PASSWORD && !IS_LOCAL_DATABASE) {
+  console.error('❌ ADMIN_PASSWORD must be set when seeding a non-local database');
+  process.exit(1);
+}
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
 
 async function waitForDatabase(client: typeof Client.prototype, maxRetries = 30, delay = 2000) {
@@ -115,7 +127,7 @@ async function seedDatabase() {
     logger.info('\n✅ Database seeding complete!\n');
     logger.info('📋 Test credentials:');
     logger.info(`   Admin Email: ${ADMIN_EMAIL}`);
-    logger.info(`   Admin Password: ${ADMIN_PASSWORD}`);
+    logger.info(`   Admin Password: ${process.env.ADMIN_PASSWORD ? '(from ADMIN_PASSWORD)' : ADMIN_PASSWORD}`);
     logger.info(`   Test Order ID: test-order-12345678`);
     logger.info(`   Test Order Email: test@example.com`);
     

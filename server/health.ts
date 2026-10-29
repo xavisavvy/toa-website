@@ -1,8 +1,9 @@
 import fs from "fs/promises";
 import os from "os";
 
-import { type Express } from "express";
+import { type Express, type RequestHandler } from "express";
 
+import { requireAdmin } from "./auth-middleware";
 import { metrics } from "./monitoring";
 import { storage } from "./storage";
 
@@ -320,15 +321,55 @@ export async function getHealthStatus(): Promise<HealthCheckResponse> {
   };
 }
 
-export function registerHealthRoutes(app: Express): void {
-  // Comprehensive health check - returns detailed status
+// Each health check queries the database and writes a file to disk. The
+// public probe is exempt from rate limiting (for container healthchecks), so
+// results are shared for a few seconds instead of re-run on every request.
+const HEALTH_CACHE_MS = 10_000;
+let cachedHealth: { at: number; result: Promise<HealthCheckResponse> } | null = null;
+
+function getCachedHealthStatus(): Promise<HealthCheckResponse> {
+  const now = Date.now();
+  if (!cachedHealth || now - cachedHealth.at > HEALTH_CACHE_MS) {
+    const result = getHealthStatus();
+    cachedHealth = { at: now, result };
+    // Don't keep serving a failed check for the whole window
+    result.catch(() => { cachedHealth = null; });
+  }
+  return cachedHealth.result;
+}
+
+export function registerHealthRoutes(
+  app: Express,
+  options: { detailsAuth?: RequestHandler } = {}
+): void {
+  // The detailed report (memory, CPU, load, uptime, environment, check
+  // messages) helps fingerprint the server, so it is admin-only. It is
+  // registered before routes.ts mounts requireAdmin on /api/admin, so the
+  // guard has to be attached here explicitly.
+  const detailsAuth = options.detailsAuth ?? requireAdmin;
+
+  // Public health check (Docker HEALTHCHECK, deploy verification): status only
   app.get("/api/health", async (req, res) => {
     try {
-      const health = await getHealthStatus();
+      const health = await getCachedHealthStatus();
       
       // Return 503 if unhealthy, 200 otherwise
       const statusCode = health.status === "unhealthy" ? 503 : 200;
       
+      res.status(statusCode).json({ status: health.status, timestamp: health.timestamp });
+    } catch {
+      res.status(503).json({
+        status: "unhealthy",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+
+  // Comprehensive health check - returns detailed status (admin only)
+  app.get("/api/admin/health", detailsAuth, async (req, res) => {
+    try {
+      const health = await getHealthStatus();
+      const statusCode = health.status === "unhealthy" ? 503 : 200;
       res.status(statusCode).json(health);
     } catch (error) {
       res.status(503).json({
@@ -362,11 +403,10 @@ export function registerHealthRoutes(app: Express): void {
           }
         });
       }
-    } catch (error) {
+    } catch {
       res.status(503).json({ 
         ready: false,
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : "Readiness check failed"
       });
     }
   });
@@ -401,11 +441,10 @@ export function registerHealthRoutes(app: Express): void {
           message: "Application still initializing"
         });
       }
-    } catch (error) {
+    } catch {
       res.status(503).json({ 
         started: false,
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : "Startup check failed"
       });
     }
   });

@@ -3,7 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { sendOrderConfirmation, sendAdminAlert } from '../../server/notification-service';
-import { createOrder, getOrderByStripeSessionId } from '../../server/order-service';
+import { createOrder, getOrderByStripeSessionId, isUniqueViolation } from '../../server/order-service';
 
 // Mock dependencies
 vi.mock('../../server/order-service');
@@ -69,6 +69,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
             },
             amount_total: 9999,
             currency: 'usd',
+            payment_status: 'paid',
             payment_intent: 'pi_123',
           },
         },
@@ -82,6 +83,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         },
         amount_total: 9999,
         currency: 'usd',
+        payment_status: 'paid',
         payment_intent: 'pi_123',
         metadata: {
           printful_variant_id: '12345',
@@ -105,6 +107,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         customerName: 'John Doe',
         totalAmount: '99.99',
         currency: 'usd',
+        payment_status: 'paid',
         status: 'pending',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -166,6 +169,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
             },
             amount_total: 9999,
             currency: 'usd',
+            payment_status: 'paid',
           },
         },
       };
@@ -177,6 +181,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         },
         amount_total: 9999,
         currency: 'usd',
+        payment_status: 'paid',
         metadata: {
           printful_variant_id: '12345',
         },
@@ -215,6 +220,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
             },
             amount_total: 9999,
             currency: 'usd',
+            payment_status: 'paid',
           },
         },
       };
@@ -227,6 +233,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         },
         amount_total: 9999,
         currency: 'usd',
+        payment_status: 'paid',
         metadata: {
           printful_variant_id: '12345',
           printful_product_id: 'prod_123',
@@ -303,6 +310,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
             },
             amount_total: 9999,
             currency: 'usd',
+            payment_status: 'paid',
           },
         },
       };
@@ -314,6 +322,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         },
         amount_total: 9999,
         currency: 'usd',
+        payment_status: 'paid',
         metadata: {
           printful_variant_id: '12345',
         },
@@ -423,6 +432,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
             },
             amount_total: 9999,
             currency: 'usd',
+            payment_status: 'paid',
           },
         },
       };
@@ -436,6 +446,7 @@ describe('Stripe Webhook Integration with Order Service', async () => {
         },
         amount_total: 9999,
         currency: 'usd',
+        payment_status: 'paid',
         metadata: {
           printful_variant_id: '12345',
           printful_product_id: 'prod_123',
@@ -497,6 +508,84 @@ describe('Stripe Webhook Integration with Order Service', async () => {
       // The webhook should detect this as a duplicate based on session ID
       expect(response.body).toHaveProperty('received', true);
       expect(response.body).toHaveProperty('duplicate', true);
+    });
+  });
+  describe('database-backed idempotency', () => {
+    const paidSession = (id: string, paymentStatus = 'paid') => ({
+      id,
+      payment_status: paymentStatus,
+      customer_details: { email: 'customer@example.com', name: 'Test Customer' },
+      amount_total: 2999,
+      currency: 'usd',
+      metadata: { printful_variant_id: '12345', printful_product_id: 'prod_123', quantity: '1' },
+      shipping_details: {
+        name: 'Test Customer',
+        address: { line1: '1 St', city: 'City', state: 'CA', postal_code: '12345', country: 'US' },
+      },
+      line_items: { data: [{ description: 'Test Product', quantity: 1, amount_total: 2999 }] },
+    });
+
+    const eventFor = (id: string) => ({
+      type: 'checkout.session.completed',
+      data: { object: { id, customer_details: { email: 'customer@example.com' }, amount_total: 2999, currency: 'usd' } },
+    });
+
+    beforeEach(async () => {
+      // order-service is auto-mocked; use the real constraint check
+      const actual = await vi.importActual<typeof import('../../server/order-service')>('../../server/order-service');
+      vi.mocked(isUniqueViolation).mockImplementation(actual.isUniqueViolation);
+    });
+
+    it('skips fulfilment when the order row already exists (redelivery after restart)', async () => {
+      // A fresh process has an empty in-memory set; the unique
+      // stripe_session_id constraint is what must stop the second shipment
+      mockVerifyWebhook.mockReturnValue(eventFor('cs_test_redelivered') as any);
+      mockGetCheckoutSession.mockResolvedValue(paidSession('cs_test_redelivered') as any);
+      mockCreateOrder.mockRejectedValue(Object.assign(new Error('duplicate key'), { code: '23505' }));
+
+      const response = await request(app)
+        .post('/api/stripe/webhook')
+        .set('stripe-signature', 'sig')
+        .send(Buffer.from(JSON.stringify(eventFor('cs_test_redelivered'))));
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ received: true, duplicate: true });
+      expect(mockCreatePrintfulOrder).not.toHaveBeenCalled();
+      expect(mockSendOrderConfirmation).not.toHaveBeenCalled();
+    });
+
+    it('still fulfils a paid order when the database insert fails for another reason', async () => {
+      mockVerifyWebhook.mockReturnValue(eventFor('cs_test_db_down') as any);
+      mockGetCheckoutSession.mockResolvedValue(paidSession('cs_test_db_down') as any);
+      mockCreateOrder.mockRejectedValue(new Error('connection refused'));
+      mockGetCatalogVariantId.mockResolvedValue(9876 as any);
+      mockCreatePrintfulOrderFromSession.mockReturnValue({ recipient: {}, items: [{ sync_variant_id: 12345, quantity: 1 }] } as any);
+      mockCreatePrintfulOrder.mockResolvedValue({ success: true, orderId: 1 });
+      mockGetOrderByStripeSessionId.mockResolvedValue(null as any);
+
+      await request(app)
+        .post('/api/stripe/webhook')
+        .set('stripe-signature', 'sig')
+        .send(Buffer.from(JSON.stringify(eventFor('cs_test_db_down'))))
+        .expect(200);
+
+      expect(mockCreatePrintfulOrder).toHaveBeenCalledTimes(1);
+      expect(mockSendAdminAlert).toHaveBeenCalled();
+    });
+
+    it('does not fulfil a completed session that is not paid yet', async () => {
+      mockVerifyWebhook.mockReturnValue(eventFor('cs_test_unpaid') as any);
+      mockGetCheckoutSession.mockResolvedValue(paidSession('cs_test_unpaid', 'unpaid') as any);
+      mockCreateOrder.mockResolvedValue({ id: 'order-unpaid' } as any);
+
+      await request(app)
+        .post('/api/stripe/webhook')
+        .set('stripe-signature', 'sig')
+        .send(Buffer.from(JSON.stringify(eventFor('cs_test_unpaid'))))
+        .expect(200);
+
+      expect(mockCreateOrder).toHaveBeenCalled();
+      expect(mockCreatePrintfulOrder).not.toHaveBeenCalled();
     });
   });
 });

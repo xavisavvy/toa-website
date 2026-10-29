@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 
 import { eq, desc, gte } from 'drizzle-orm';
 import express, { type Express } from "express";
+import validator from "validator";
 import { z } from "zod";
 
 import { orders, orderItems, orderEvents, auditLogs , loginSchema } from "../shared/schema";
@@ -13,18 +14,18 @@ import { authenticateUser, getUserById } from "./auth";
 import { requireAdmin, optionalAuth } from "./auth-middleware";
 import { db } from "./db";
 import { getCharacterData } from "./dndbeyond";
-import { getShopListings } from "./etsy";
+import { getShopListings, isAllowedShop, MAX_SHOP_LISTINGS } from "./etsy";
 import { registerHealthRoutes } from "./health";
 import { safeLog, maskEmail } from "./log-sanitizer";
 import { metrics } from "./monitoring";
 import { sendOrderConfirmation, sendPaymentFailureNotification, sendAdminAlert } from "./notification-service";
-import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId } from "./order-service";
+import { createOrder, updateOrderWithPrintfulId, logFailedOrder, getOrderByStripeSessionId, isUniqueViolation } from "./order-service";
 import { findCachedEpisodeAudioUrl, getPodcastFeed } from "./podcast";
 import { getPrintfulSyncProducts, getPrintfulProductDetails, getCatalogVariantId as resolveCatalogVariantId, getPrintfulShippingEstimate, getSyncVariantForCheckout } from "./printful";
-import { apiLimiter } from "./rate-limiter";
+import { apiLimiter, authLimiter, loginAccountLimiter } from "./rate-limiter";
 import { validateUrl, validateNumber, logSecurityEvent } from "./security";
-import { createCheckoutSession, getCheckoutSession, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
-import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats } from "./youtube";
+import { createCheckoutSession, getCheckoutSession, getPaidQuantity, verifyWebhookSignature, createPrintfulOrderFromSession, createPrintfulOrder, STRIPE_CONFIG } from "./stripe";
+import { getPlaylistVideos, getChannelVideos, getChannelShorts, getChannelStats, isAllowedChannel, MAX_CHANNEL_RESULTS } from "./youtube";
 
 
 
@@ -36,6 +37,71 @@ declare module 'express-session' {
 }
 
 const DATABASE_NOT_AVAILABLE_ERROR = 'Database not available';
+const SERVER_ERROR = 'Server error';
+
+// Admin list filters. Express's query parser can turn ?a[b]=c into an object,
+// so every field is a bounded scalar.
+const adminFilterSchema = z.string().max(100).optional();
+const adminDateSchema = z.coerce.date().refine(date => !isNaN(date.getTime())).optional();
+const adminOrdersQuerySchema = z.object({
+  status: z.string().max(50).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  offset: z.coerce.number().int().min(0).max(1_000_000).default(0),
+});
+const adminAuditLogsQuerySchema = z.object({
+  category: adminFilterSchema,
+  severity: adminFilterSchema,
+  action: adminFilterSchema,
+  userId: adminFilterSchema,
+  startDate: adminDateSchema,
+  endDate: adminDateSchema,
+  limit: z.coerce.number().int().min(1).max(1000).default(100),
+  page: z.coerce.number().int().min(1).max(100_000).default(1),
+});
+
+// Shipping estimates forward items to the Printful API, so bound every field
+const variantIdSchema = z.union([
+  z.string().regex(/^\d{1,20}$/),
+  z.number().int().positive(),
+]).transform(String);
+// Estimates only (nothing is charged), so allow larger carts than checkout does
+const shippingQuantitySchema = z.number().int().min(1).max(100).default(1);
+const shippingItemSchema = z.object({
+  variantId: variantIdSchema,
+  quantity: shippingQuantitySchema,
+  basePrice: z.number().min(0).max(10000).optional(),
+});
+const singleShippingEstimateSchema = z.object({
+  variantId: variantIdSchema,
+  zipCode: z.string().trim().min(5).max(10),
+  quantity: shippingQuantitySchema,
+  basePrice: z.union([z.string().max(20), z.number().min(0).max(10000)]).optional(),
+});
+const legacyShippingEstimateSchema = z.object({
+  variantId: variantIdSchema.optional(),
+  quantity: shippingQuantitySchema,
+  recipient: z.object({
+    address1: z.string().min(1).max(200),
+    address2: z.string().max(200).nullish(),
+    city: z.string().min(1).max(100),
+    state_code: z.string().min(1).max(10),
+    country_code: z.string().length(2),
+    zip: z.string().min(1).max(20),
+  }),
+  items: z.array(shippingItemSchema).max(20).optional(),
+});
+const cartShippingEstimateSchema = z.object({
+  items: z.array(shippingItemSchema).min(1).max(20),
+  zipCode: z.string().max(10),
+});
+
+const sponsorInquirySchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  email: z.string().trim().max(254).email(),
+  company: z.string().trim().max(200).optional(),
+  interest: z.string().trim().max(200).optional(),
+  message: z.string().trim().min(1).max(5000),
+});
 
 // Only identifiers come from the client at checkout; extra fields such as
 // price, shipping or tax are stripped and recomputed server-side.
@@ -61,8 +127,18 @@ export function registerRoutes(app: Express): Server {
   // ============================================
   
   // Login endpoint
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", authLimiter, loginAccountLimiter, async (req, res) => {
     try {
+      // Sessions are disabled when SESSION_SECRET is missing in production
+      // (see server/app.ts). Fail before checking the password so a login
+      // attempt can't be used to test credentials.
+      if (!req.session) {
+        return res.status(503).json({
+          error: 'Login unavailable',
+          message: 'Sign-in is not configured on this server',
+        });
+      }
+
       // Validate request body
       const result = loginSchema.safeParse(req.body);
       
@@ -94,34 +170,43 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
-      // Store user in session
-      req.session.user = user;
-
-      // Security: Regenerate session ID to prevent fixation attacks
-      req.session.save((err) => {
-        if (err) {
-          console.error('Session save error:', err);
-          return res.status(500).json({ 
-            error: 'Server error',
+      // Security: Regenerate session ID to prevent fixation attacks, then
+      // store the user in the new session
+      req.session.regenerate((regenerateErr) => {
+        if (regenerateErr) {
+          console.error('Session regenerate error:', regenerateErr);
+          return res.status(500).json({
+            error: SERVER_ERROR,
             message: 'Failed to create session',
           });
         }
 
-        safeLog.info(`User logged in: ${maskEmail(user.email)} (${user.role})`);
+        req.session.user = user;
+        req.session.save((err) => {
+          if (err) {
+            console.error('Session save error:', err);
+            return res.status(500).json({
+              error: SERVER_ERROR,
+              message: 'Failed to create session',
+            });
+          }
 
-        res.json({ 
-          success: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-          },
+          safeLog.info(`User logged in: ${maskEmail(user.email)} (${user.role})`);
+
+          res.json({
+            success: true,
+            user: {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+            },
+          });
         });
       });
     } catch (error) {
       console.error('Login error:', error);
       res.status(500).json({ 
-        error: 'Server error',
+        error: SERVER_ERROR,
         message: 'An error occurred during login',
       });
     }
@@ -154,7 +239,7 @@ export function registerRoutes(app: Express): Server {
         if (err) {
           console.error('Logout error:', err);
           return res.status(500).json({
-            error: 'Server error',
+            error: SERVER_ERROR,
             message: 'Failed to logout',
           });
         }
@@ -168,7 +253,7 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('Logout error:', error);
       res.status(500).json({
-        error: 'Server error',
+        error: SERVER_ERROR,
         message: 'Failed to logout',
       });
     }
@@ -189,7 +274,7 @@ export function registerRoutes(app: Express): Server {
       currentUser = await getUserById(req.user.id);
     } catch (error) {
       console.error('Error loading current user:', error);
-      return res.status(500).json({ error: 'Server error', user: null });
+      return res.status(500).json({ error: SERVER_ERROR, user: null });
     }
 
     if (!currentUser || currentUser.isActive !== 1) {
@@ -251,19 +336,19 @@ export function registerRoutes(app: Express): Server {
         return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
-      const { status, limit = '50', offset = '0' } = req.query;
-      
+      const parsedQuery = adminOrdersQuerySchema.safeParse(req.query);
+      if (!parsedQuery.success) {
+        return res.status(400).json({ error: 'Invalid query parameters' });
+      }
+      const { status, limit: limitNum, offset: offsetNum } = parsedQuery.data;
+
       let query = db.select().from(orders);
-      
+
       // Filter by status if provided
-      if (status && typeof status === 'string') {
+      if (status) {
         query = query.where(eq(orders.status, status));
       }
-      
-      // Add pagination (cast to number with proper validation)
-      const limitNum = Math.min(parseInt(limit as string) || 50, 100);
-      const offsetNum = parseInt(offset as string) || 0;
-      
+
       const results = await query
         .orderBy(desc(orders.createdAt))
         .limit(limitNum)
@@ -285,6 +370,11 @@ export function registerRoutes(app: Express): Server {
 
       const { id } = req.params;
       const user = req.user;
+
+      // Order IDs are UUIDs; anything else would only produce a database error
+      if (!z.string().uuid().safeParse(id).success) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
 
       const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
       
@@ -320,16 +410,20 @@ export function registerRoutes(app: Express): Server {
         return res.status(503).json({ error: DATABASE_NOT_AVAILABLE_ERROR });
       }
 
-      const { 
-        category, 
-        severity, 
+      const parsedQuery = adminAuditLogsQuerySchema.safeParse(req.query);
+      if (!parsedQuery.success) {
+        return res.status(400).json({ error: 'Invalid query parameters' });
+      }
+      const {
+        category,
+        severity,
         action,
         userId,
-        startDate, 
+        startDate,
         endDate,
-        limit = '100',
-        page = '1'
-      } = req.query;
+        limit: limitNum,
+        page: pageNum,
+      } = parsedQuery.data;
 
       const user = req.user;
 
@@ -349,8 +443,6 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
-      const limitNum = Math.min(parseInt(limit as string) || 100, 1000);
-      const pageNum = Math.max(parseInt(page as string) || 1, 1);
       const offset = (pageNum - 1) * limitNum;
 
       // Build query dynamically based on filters
@@ -359,12 +451,12 @@ export function registerRoutes(app: Express): Server {
       
       const conditions = [];
       
-      if (category) {conditions.push(eqOp(auditLogs.category, category as string));}
-      if (severity) {conditions.push(eqOp(auditLogs.severity, severity as string));}
-      if (action) {conditions.push(eqOp(auditLogs.action, action as string));}
-      if (userId) {conditions.push(eqOp(auditLogs.userId, userId as string));}
-      if (startDate) {conditions.push(gteOp(auditLogs.createdAt, new Date(startDate as string)));}
-      if (endDate) {conditions.push(lteOp(auditLogs.createdAt, new Date(endDate as string)));}
+      if (category) {conditions.push(eqOp(auditLogs.category, category));}
+      if (severity) {conditions.push(eqOp(auditLogs.severity, severity));}
+      if (action) {conditions.push(eqOp(auditLogs.action, action));}
+      if (userId) {conditions.push(eqOp(auditLogs.userId, userId));}
+      if (startDate) {conditions.push(gteOp(auditLogs.createdAt, startDate));}
+      if (endDate) {conditions.push(lteOp(auditLogs.createdAt, endDate));}
 
       const logs = await db.select().from(auditLogs)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
@@ -595,7 +687,8 @@ export function registerRoutes(app: Express): Server {
 
   
   // Metrics endpoint
-  app.get("/api/metrics", (req, res) => {
+  // Per-endpoint latency, error and cache stats - admin only
+  app.get("/api/metrics", requireAdmin, (req, res) => {
     res.json(metrics.getMetrics());
   });
   // A03: Injection Prevention - Validate YouTube playlist ID
@@ -636,6 +729,11 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Invalid channel ID format. Channel IDs must start with UC' });
       }
 
+      // Only the site's own channel(s): each uncached lookup spends YouTube quota
+      if (!isAllowedChannel(channelId)) {
+        return res.status(404).json({ error: 'Channel not found' });
+      }
+
       // A03: Validate maxResults parameter
       const maxResultsInput = req.query.maxResults as string;
       const validation = validateNumber(maxResultsInput || '50', 1, 10000);
@@ -644,7 +742,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: validation.error });
       }
 
-      const videos = await getChannelVideos(channelId, validation.value);
+      const videos = await getChannelVideos(channelId, Math.min(validation.value, MAX_CHANNEL_RESULTS));
       res.json(videos);
     } catch (error) {
       console.error('Error fetching channel videos:', error);
@@ -661,6 +759,11 @@ export function registerRoutes(app: Express): Server {
       if (!/^UC[a-zA-Z0-9_-]+$/.test(channelId)) {
         logSecurityEvent('INVALID_CHANNEL_ID', { channelId, ip: req.ip });
         return res.status(400).json({ error: 'Invalid channel ID format. Channel IDs must start with UC' });
+      }
+
+      // Only the site's own channel(s): each uncached lookup spends YouTube quota
+      if (!isAllowedChannel(channelId)) {
+        return res.status(404).json({ error: 'Channel not found' });
       }
 
       // A03: Validate maxResults parameter
@@ -688,6 +791,11 @@ export function registerRoutes(app: Express): Server {
       if (!/^UC[a-zA-Z0-9_-]+$/.test(channelId)) {
         logSecurityEvent('INVALID_CHANNEL_ID', { channelId, ip: req.ip });
         return res.status(400).json({ error: 'Invalid channel ID format. Channel IDs must start with UC' });
+      }
+
+      // Only the site's own channel(s): each uncached lookup spends YouTube quota
+      if (!isAllowedChannel(channelId)) {
+        return res.status(404).json({ error: 'Channel not found' });
       }
 
       const stats = await getChannelStats(channelId);
@@ -943,9 +1051,13 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Invalid shop ID format' });
       }
 
+      if (!isAllowedShop(shopId)) {
+        return res.status(404).json({ error: 'Shop not found' });
+      }
+
       // A03: Validate limit parameter
       const limitInput = req.query.limit as string;
-      const validation = validateNumber(limitInput || '8', 1, 50);
+      const validation = validateNumber(limitInput || '8', 1, MAX_SHOP_LISTINGS);
       
       if (!validation.valid) {
         return res.status(400).json({ error: validation.error });
@@ -1005,18 +1117,22 @@ export function registerRoutes(app: Express): Server {
   // Printful: Calculate shipping estimate (simple zip code-based)
   app.post("/api/printful/shipping/estimate", async (req, res) => {
     try {
-      const { variantId, zipCode, quantity } = req.body;
-
       // Validate inputs
-      if (!variantId || !zipCode) {
+      if (!req.body?.variantId || !req.body?.zipCode) {
         return res.status(400).json({ error: 'Missing required fields: variantId, zipCode' });
       }
 
-      // Basic zip code validation (US/CA) - simplified to avoid regex issues
-      const zipTrimmed = zipCode.trim();
-      if (zipTrimmed.length < 5 || zipTrimmed.length > 10) {
+      // Basic zip code validation (US/CA)
+      const rawZip = req.body.zipCode;
+      if (typeof rawZip !== 'string' || rawZip.trim().length < 5 || rawZip.trim().length > 10) {
         return res.status(400).json({ error: 'Invalid zip/postal code format' });
       }
+
+      const parsed = singleShippingEstimateSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: 'Invalid shipping estimate request' });
+      }
+      const { variantId, zipCode, quantity } = parsed.data;
 
       // Parse US zip code to get state info (rough estimate)
       const zip = zipCode.substring(0, 5);
@@ -1035,7 +1151,7 @@ export function registerRoutes(app: Express): Server {
         recipient,
         items: [{
           sync_variant_id: parseInt(variantId),
-          quantity: quantity || 1,
+          quantity,
         }],
       });
 
@@ -1044,8 +1160,8 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Calculate total
-      const basePrice = parseFloat(req.body.basePrice || '0');
-      const subtotal = basePrice * (quantity || 1);
+      const basePrice = parseFloat(String(parsed.data.basePrice ?? '0')) || 0;
+      const subtotal = basePrice * quantity;
       const total = subtotal + estimate.shipping + estimate.tax;
 
       res.json({
@@ -1070,30 +1186,36 @@ export function registerRoutes(app: Express): Server {
   // Backward compatibility: old shipping estimate endpoint
   app.post("/api/printful/shipping-estimate", async (req, res) => {
     try {
-      const { variantId, quantity, recipient, items } = req.body;
+      const { recipient: rawRecipient } = req.body ?? {};
 
       // Validate inputs - support both single item (legacy) and multi-item (cart)
-      if (!recipient) {
+      if (!rawRecipient) {
         return res.status(400).json({ error: 'Missing required field: recipient' });
       }
 
-      if (!recipient.address1 || !recipient.city || !recipient.state_code || !recipient.country_code || !recipient.zip) {
+      if (!rawRecipient.address1 || !rawRecipient.city || !rawRecipient.state_code || !rawRecipient.country_code || !rawRecipient.zip) {
         return res.status(400).json({ error: 'Missing required recipient fields' });
       }
 
+      const parsed = legacyShippingEstimateSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: 'Invalid shipping estimate request' });
+      }
+      const { variantId, quantity, recipient, items } = parsed.data;
+
       // Build items array - support both formats
       let itemsToEstimate;
-      if (items && Array.isArray(items) && items.length > 0) {
+      if (items && items.length > 0) {
         // Multi-item cart format
         itemsToEstimate = items.map(item => ({
           sync_variant_id: parseInt(item.variantId),
-          quantity: item.quantity || 1,
+          quantity: item.quantity,
         }));
       } else if (variantId) {
         // Single item format (legacy)
         itemsToEstimate = [{
           sync_variant_id: parseInt(variantId),
-          quantity: quantity || 1,
+          quantity,
         }];
       } else {
         return res.status(400).json({ error: 'Missing required field: variantId or items' });
@@ -1131,22 +1253,26 @@ export function registerRoutes(app: Express): Server {
   // Simplified endpoint for cart checkout flow
   app.post("/api/printful/shipping/estimate-cart", async (req, res) => {
     try {
-      const { items, zipCode } = req.body;
-
       // Validate inputs
-      if (!items || !Array.isArray(items) || items.length === 0) {
+      if (!Array.isArray(req.body?.items) || req.body.items.length === 0) {
         return res.status(400).json({ error: 'Missing required field: items' });
       }
 
       // eslint-disable-next-line security/detect-unsafe-regex
-      if (!zipCode || !/^\d{5}(?:-\d{4})?$/.test(zipCode)) {
+      if (typeof req.body.zipCode !== 'string' || !/^\d{5}(?:-\d{4})?$/.test(req.body.zipCode)) {
         return res.status(400).json({ error: 'Invalid zip code format' });
       }
+
+      const parsed = cartShippingEstimateSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: 'Invalid shipping estimate request' });
+      }
+      const { items, zipCode } = parsed.data;
 
       // Convert items to Printful format
       const itemsToEstimate = items.map(item => ({
         sync_variant_id: parseInt(item.variantId),
-        quantity: item.quantity || 1,
+        quantity: item.quantity,
       }));
 
       // Use a default US address with the provided zip code
@@ -1168,7 +1294,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Calculate totals
-      const subtotal = items.reduce((sum, item) => sum + (item.basePrice * item.quantity), 0);
+      const subtotal = items.reduce((sum, item) => sum + ((item.basePrice ?? 0) * item.quantity), 0);
       const total = subtotal + estimate.shipping + estimate.tax;
 
       res.json({
@@ -1270,11 +1396,14 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ error: 'Session not found' });
       }
 
+      // The session ID sits in the success URL (browser history, Referer), so
+      // anyone holding it gets this response: mask the customer's email
+      const customerEmail = session.customer_details?.email;
       res.json({
         id: session.id,
         status: session.status,
         payment_status: session.payment_status,
-        customer_email: session.customer_details?.email,
+        customer_email: customerEmail ? maskEmail(customerEmail) : undefined,
         amount_total: session.amount_total,
       });
     } catch (error) {
@@ -1337,7 +1466,10 @@ export function registerRoutes(app: Express): Server {
             break;
           }
 
-          // Create order record in database
+          // Create order record in database. The unique stripe_session_id
+          // makes this insert the idempotency lock: only the delivery that
+          // creates the row goes on to fulfil, so a redelivered or concurrent
+          // webhook can't ship the order twice.
           try {
             const orderData = {
               stripeSessionId: sessionId,
@@ -1369,6 +1501,12 @@ export function registerRoutes(app: Express): Server {
             const order = await createOrder(orderData);
             console.log(`✅ Order created in database: ${order.id}`);
           } catch (dbError) {
+            if (isUniqueViolation(dbError)) {
+              console.log(`⚠️  Order for session ${sessionId} already exists, skipping duplicate webhook`);
+              processedSessions.add(sessionId);
+              return res.json({ received: true, duplicate: true });
+            }
+            // Any other DB failure: still fulfil (the customer has paid) and alert
             console.error('❌ Failed to create order in database:', dbError);
             await sendAdminAlert(
               'Database Error: Failed to create order',
@@ -1376,7 +1514,14 @@ export function registerRoutes(app: Express): Server {
               { sessionId, error: String(dbError) }
             );
           }
-          
+
+          // Delayed payment methods complete the session before the money
+          // arrives; those are fulfilled on async_payment_succeeded instead
+          if (fullSession.payment_status !== 'paid') {
+            console.log(`⏳ Session ${sessionId} not paid yet (${fullSession.payment_status}); waiting for async payment`);
+            break;
+          }
+
           // Get sync variant ID from metadata
           const syncVariantId = fullSession.metadata?.printful_variant_id;
           if (!syncVariantId) {
@@ -1435,7 +1580,8 @@ export function registerRoutes(app: Express): Server {
           const orderData = createPrintfulOrderFromSession(fullSession);
           if (orderData) {
             // Order data already uses sync_variant_id from createPrintfulOrderFromSession
-            console.log('Recipient:', orderData.recipient.name, orderData.recipient.email);
+            // Recipient name, address and email stay out of the logs
+            console.log('Recipient country:', orderData.recipient.country_code);
             console.log('Items:', orderData.items.map(i => ({ 
               sync_variant_id: i.sync_variant_id,
               quantity: i.quantity
@@ -1466,7 +1612,7 @@ export function registerRoutes(app: Express): Server {
                   // Send confirmation email to customer
                   const items = [{
                     name: 'Tales of Aneria Merchandise',
-                    quantity: 1,
+                    quantity: getPaidQuantity(fullSession),
                     price: ((fullSession.amount_total || 0) / 100).toFixed(2),
                   }];
                   
@@ -1485,7 +1631,7 @@ export function registerRoutes(app: Express): Server {
               }
             } else {
               console.error(`❌ Failed to create Printful order: ${result.error}`);
-              console.error('Order data:', JSON.stringify(orderData, null, 2));
+              console.error('Order items:', JSON.stringify(orderData.items));
               
               // Store failed order in database
               await logFailedOrder(
@@ -1531,8 +1677,17 @@ export function registerRoutes(app: Express): Server {
         case 'checkout.session.async_payment_succeeded': {
           console.log('✅ Async payment succeeded');
           const asyncEventSession = event.data.object as any;
+
+          // Idempotency: skip if this session was already sent to Printful
+          const existingOrder = await getOrderByStripeSessionId(asyncEventSession.id);
+          if (processedSessions.has(asyncEventSession.id) || existingOrder?.printfulOrderId) {
+            console.log(`⚠️  Session ${asyncEventSession.id} already fulfilled, skipping duplicate webhook`);
+            return res.json({ received: true, duplicate: true });
+          }
+          processedSessions.add(asyncEventSession.id);
+
           const asyncSession = await getCheckoutSession(asyncEventSession.id);
-          
+
           if (asyncSession) {
             const asyncOrderData = createPrintfulOrderFromSession(asyncSession);
             if (asyncOrderData) {
@@ -1545,7 +1700,7 @@ export function registerRoutes(app: Express): Server {
                   
                   const items = [{
                     name: 'Tales of Aneria Merchandise',
-                    quantity: 1,
+                    quantity: getPaidQuantity(asyncSession),
                     price: ((asyncSession.amount_total || 0) / 100).toFixed(2),
                   }];
                   
@@ -1630,7 +1785,7 @@ export function registerRoutes(app: Express): Server {
     try {
       const signature = req.headers['x-printful-signature'];
       const webhookSecret = process.env.PRINTFUL_WEBHOOK_SECRET;
-      // Prod mounts express.raw for this path (Buffer body); dev keeps a copy in rawBody
+      // configureApp (server/app.ts) mounts express.raw for this path, so the body is a Buffer
       const rawBody = (req as any).rawBody || req.body;
 
       if (webhookSecret) {
@@ -1676,7 +1831,8 @@ export function registerRoutes(app: Express): Server {
       const { type, data } = payload;
 
       console.log('[Printful Webhook] Event received:', type);
-      console.log('[Printful Webhook] Data:', JSON.stringify(data, null, 2));
+      // The payload carries the recipient's name and address; log the order id only
+      console.log('[Printful Webhook] Order:', data?.order?.id ?? data?.id);
 
       // Validate required fields
       if (!data) {
@@ -1917,9 +2073,19 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
+      // Avatars are small; refuse anything large rather than buffer it in memory
+      const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+      const declaredLength = Number(response.headers.get('content-length') ?? 0);
+      if (declaredLength > MAX_AVATAR_BYTES) {
+        return res.status(502).json({ error: 'Avatar too large' });
+      }
+
       // Get the image buffer
       const imageBuffer = await response.arrayBuffer();
-      
+      if (imageBuffer.byteLength > MAX_AVATAR_BYTES) {
+        return res.status(502).json({ error: 'Avatar too large' });
+      }
+
       // Set appropriate headers
       res.setHeader('Content-Type', 'image/jpeg');
       res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
@@ -1936,23 +2102,19 @@ export function registerRoutes(app: Express): Server {
   // Sponsorship contact form endpoint
   app.post("/api/contact/sponsor", (req, res) => {
     try {
-      const { name, email, company, interest, message } = req.body;
-
-      // Basic validation
-      if (!name || !email || !message) {
-        return res.status(400).json({ error: 'Name, email, and message are required' });
+      const parsed = sponsorInquirySchema.safeParse(req.body);
+      if (!parsed.success) {
+        const emailInvalid = parsed.error.issues.some(issue => issue.path[0] === 'email')
+          && typeof req.body?.email === 'string' && req.body.email.length > 0;
+        return res.status(400).json({
+          error: emailInvalid ? 'Invalid email format' : 'Name, email, and message are required',
+        });
       }
-
-      // Email validation (linear-time regex: one @ required, no consecutive dots, proper TLD)
-      const emailRegex = /^[^\s@]+@[^\s@.][^\s@]*\.[^\s@.]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Invalid email format' });
-      }
+      const { name, email, company, interest, message } = parsed.data;
 
       // Log the sponsorship inquiry
-      console.log('📧 Sponsorship Inquiry Received:', {
-        name,
-        email,
+      safeLog.info('📧 Sponsorship Inquiry Received:', {
+        email: maskEmail(email),
         company: company || 'N/A',
         interest: interest || 'N/A',
         timestamp: new Date().toISOString(),
@@ -1964,24 +2126,27 @@ export function registerRoutes(app: Express): Server {
       // 2. Store inquiry in database
       // 3. Send auto-reply to inquirer
       
-      // Simulate email sending (replace with actual email service)
+      // Simulate email sending (replace with actual email service).
+      // Every field is visitor-supplied, so it is HTML-escaped before it
+      // goes into the template.
+      const escapeHtml = (value: string) => validator.escape(value);
       const emailData = {
         to: 'sponsors@talesofaneria.com',
         from: 'noreply@talesofaneria.com',
-        subject: `New Sponsorship Inquiry from ${company || name}`,
+        subject: `New Sponsorship Inquiry from ${(company || name).replace(/[\r\n]+/g, ' ')}`,
         html: `
           <h2>New Sponsorship Inquiry</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Company:</strong> ${company || 'Not provided'}</p>
-          <p><strong>Interest:</strong> ${interest || 'Not specified'}</p>
+          <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Company:</strong> ${company ? escapeHtml(company) : 'Not provided'}</p>
+          <p><strong>Interest:</strong> ${interest ? escapeHtml(interest) : 'Not specified'}</p>
           <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, '<br>')}</p>
+          <p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>
           <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
         `,
       };
 
-      safeLog.info('📧 Email would be sent:', emailData);
+      safeLog.info('📧 Email would be sent:', { to: emailData.to, subject: emailData.subject });
 
       // Return success
       res.json({

@@ -1,156 +1,24 @@
-import crypto from 'crypto';
-import type { IncomingMessage } from 'http';
-
 import 'dotenv/config';
-import express, { type Request, Response, NextFunction } from "express";
-import session from 'express-session';
+import express from "express";
 
+import { configureApp, registerErrorHandler } from "./app";
 import { validateEnvironment } from "./env-validator";
-import { metricsMiddleware } from "./monitoring";
 import { registerRoutes } from "./routes";
-import { configureSecurity } from "./security";
 import { setupVite, serveStatic, log } from "./vite";
-
-// Extend Express Session to include the CSRF token (merges with the
-// `user` augmentation declared in ./routes.ts).
-declare module 'express-session' {
-  interface SessionData {
-    _csrf?: string;
-  }
-}
 
 // Validate environment variables before starting
 validateEnvironment();
 
-// CSRF protection middleware (synchronizer token pattern)
-// Works alongside the sameSite: 'lax' cookie setting for defence-in-depth
-function csrfProtection(req: Request, res: Response, next: NextFunction) {
-  const stateChanging = ['POST', 'PUT', 'PATCH', 'DELETE'];
-
-  // Exempt webhook endpoints that use signature verification instead
-  const exempted = ['/api/stripe/webhook', '/api/webhooks/printful'];
-  if (exempted.includes(req.path)) {
-    return next();
-  }
-
-  if (stateChanging.includes(req.method)) {
-    // Reject if no token exists in session or if provided token doesn't match
-    const expected = req.session._csrf;
-    const provided = (req.headers['x-csrf-token'] as string) || req.body?._csrf;
-    if (!expected || !provided || provided !== expected) {
-      res.status(403).json({ error: 'Invalid or missing CSRF token' });
-      return;
-    }
-  } else {
-    // For safe methods, ensure a token is available in the session for later use
-    if (!req.session._csrf) {
-      req.session._csrf = crypto.randomBytes(24).toString('hex');
-    }
-  }
-  next();
-}
-
 const app = express();
 
-// A05: Trust proxy for production environments (Replit, cloud platforms)
-// This is required for rate limiting and security features to work correctly
-if (process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT) {
-  app.set('trust proxy', 1); // Trust first proxy
-  log('Trust proxy enabled for production environment');
-}
-
-// A05: Security Misconfiguration - Apply security middleware FIRST
-configureSecurity(app);
-
-// Session middleware (BEFORE routes)
-// Security: HTTP-only cookies, secure in production, SameSite protection
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true, // Prevent XSS
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-    sameSite: 'lax', // CSRF protection
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  },
-}));
-
-// Add metrics middleware
-app.use(metricsMiddleware);
-
-// Body parsing middleware (with size limits)
-// Use verify callback to preserve raw body for webhook routes
-app.use(express.json({
-  limit: '1mb',
-  verify: (req: IncomingMessage & { rawBody?: Buffer }, _res, buf) => {
-    // Store raw body for webhook signature verification
-    if (req.url === '/api/stripe/webhook' || req.url === '/api/webhooks/printful') {
-      req.rawBody = buf;
-    }
-  }
-}));
-app.use(express.urlencoded({ extended: false, limit: '1mb' }));
-
-// A01: CSRF protection - synchronizer token pattern for state-changing requests
-// Combined with sameSite: 'lax' for defence-in-depth
-app.use(csrfProtection);
-
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = `${logLine.slice(0, 79)  }…`;
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
-});
+// Security headers, CORS, webhook raw bodies, sessions, body parsing, CSRF and
+// request logging - shared with the production entry (root index.ts)
+configureApp(app, { log });
 
 (async () => {
   const server = await registerRoutes(app);
 
-  // A07: Enhanced error handling - Don't leak sensitive information
-  app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
-    const error = err as { status?: number; statusCode?: number; message?: string; stack?: string };
-    const status = error.status || error.statusCode || 500;
-
-    // A09: Security Logging - Log errors for monitoring
-    console.error('[ERROR]', {
-      timestamp: new Date().toISOString(),
-      method: req.method,
-      path: req.path,
-      status,
-      message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-    });
-
-    // A07: Don't expose internal error details in production
-    const message = status === 500 && process.env.NODE_ENV === 'production'
-      ? 'Internal Server Error'
-      : error.message || 'Internal Server Error';
-
-    res.status(status).json({ error: message });
-  });
+  registerErrorHandler(app);
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

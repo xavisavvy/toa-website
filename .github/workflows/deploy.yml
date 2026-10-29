@@ -54,11 +54,17 @@ jobs:
 
     steps:
       - name: Pull image, migrate, and roll the container
-        uses: appleboy/ssh-action@v1
+        # Pinned by commit: this action is handed the production SSH key
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
         with:
           host: ${{ env.REMOTE_HOST }}
           username: ${{ env.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # SHA256 fingerprint of the VPS host key. Without it the action
+          # trusts whatever host answers, so set the secret (value from
+          # `ssh-keyscan -t ed25519 <host> | ssh-keygen -lf -`, without the
+          # "SHA256:" prefix). While the secret is empty no check is made.
+          fingerprint: ${{ secrets.VPS_HOST_FINGERPRINT }}
           # The box is RAM-pressured; pulling a ~300MB image while swapping
           # can take several minutes. The 10m action default is too tight.
           command_timeout: 25m

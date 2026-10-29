@@ -14,47 +14,21 @@ describe('Health Check Endpoints', () => {
   });
 
   describe('GET /api/health', () => {
-    it('returns comprehensive health status', async () => {
+    it('returns only status and timestamp publicly', async () => {
       const response = await request(app).get('/api/health');
-      
+
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('status');
-      expect(response.body).toHaveProperty('timestamp');
-      expect(response.body).toHaveProperty('uptime');
-      expect(response.body).toHaveProperty('version');
-      expect(response.body).toHaveProperty('environment');
-      expect(response.body).toHaveProperty('checks');
+      expect(Object.keys(response.body).sort()).toEqual(['status', 'timestamp']);
+      expect(['healthy', 'degraded', 'unhealthy']).toContain(response.body.status);
     });
+  });
 
-    it('includes all component checks', async () => {
-      const response = await request(app).get('/api/health');
-      
-      expect(response.body.checks).toHaveProperty('storage');
-      expect(response.body.checks).toHaveProperty('cache');
-      expect(response.body.checks).toHaveProperty('memory');
-      expect(response.body.checks).toHaveProperty('disk');
-      expect(response.body.checks).toHaveProperty('cpu');
-    });
+  describe('GET /api/admin/health', () => {
+    it('requires an admin session for the detailed report', async () => {
+      const response = await request(app).get('/api/admin/health');
 
-    it('each check has required fields', async () => {
-      const response = await request(app).get('/api/health');
-      
-      Object.values(response.body.checks).forEach((check: any) => {
-        expect(check).toHaveProperty('status');
-        expect(check).toHaveProperty('message');
-        expect(check).toHaveProperty('responseTime');
-        expect(typeof check.responseTime).toBe('number');
-      });
-    });
-
-    it('returns valid status values', async () => {
-      const response = await request(app).get('/api/health');
-      const validStatuses = ['healthy', 'degraded', 'unhealthy'];
-      
-      expect(validStatuses).toContain(response.body.status);
-      Object.values(response.body.checks).forEach((check: any) => {
-        expect(validStatuses).toContain(check.status);
-      });
+      expect(response.status).toBe(401);
+      expect(response.body).not.toHaveProperty('checks');
     });
   });
 

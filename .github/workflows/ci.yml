@@ -9,7 +9,13 @@ on:
 permissions:
   contents: read
   # security-events: write  # Only needed to upload SARIF (e.g. the Trivy step below)
-  pull-requests: write
+  pull-requests: read  # gitleaks lists PR commits; nothing here comments on PRs
+
+# Pull requests run on GitHub-hosted runners. This repo is public, and the
+# self-hosted runners are persistent machines that also hold the deploy
+# credentials and other repos' runners, so code from a PR (including
+# Dependabot's freshly bumped packages and their install scripts) must not
+# run there. Pushes to main/develop keep using the self-hosted fleet.
 
 # A newer push to the same PR supersedes its older CI run. Pushes to
 # main/develop get a group per commit: GitHub keeps only one *pending* run
@@ -22,7 +28,7 @@ concurrency:
 jobs:
   test:
     name: Tests & Coverage
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 60
     # The self-hosted runners share one Docker host. Each run gets its own
     # compose project and free host ports (see "Pick test service ports"), so
@@ -181,7 +187,7 @@ jobs:
         run: docker compose -p "$TEST_COMPOSE_PROJECT" -f docker-compose.test.yml down -v
         
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         if: always()
         with:
           files: ./coverage/coverage-final.json
@@ -200,7 +206,7 @@ jobs:
   # 1. Container Security Scanning with Trivy
   container-security:
     name: Container Security Scan
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 30
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
@@ -277,7 +283,7 @@ jobs:
   # 2. Dependency Scanning with multiple tools
   dependency-scan:
     name: Dependency Security Scan
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 20
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
@@ -337,7 +343,7 @@ jobs:
   # 3. Secret Scanning with Gitleaks
   secret-scan:
     name: Secret Scanning
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 10
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
@@ -359,14 +365,14 @@ jobs:
         run: rm -f /tmp/gitleaks.tmp
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   security:
     name: Security Audit
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 20
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
@@ -396,7 +402,7 @@ jobs:
   # 9. License Compliance Scanning
   license-compliance:
     name: License Compliance
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 15
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
@@ -429,7 +435,7 @@ jobs:
   # 8. Performance Testing in CI
   performance:
     name: Performance Testing
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 30
     needs: [test]
     # Skip for version bump commits
@@ -473,7 +479,7 @@ jobs:
 
   mutation:
     name: Mutation Testing
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     # Backstop: without this the job inherits GitHub's 360-minute default and
     # monopolises a self-hosted runner for 6h before being cancelled.
     timeout-minutes: 30
@@ -513,7 +519,7 @@ jobs:
           
   lint:
     name: Code Quality
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || fromJSON('["self-hosted","Linux","X64"]') }}
     timeout-minutes: 20
     # Skip for version bump commits
     if: "!contains(github.event.head_commit.message, 'chore(release):')"
