@@ -204,7 +204,7 @@
     "axe-core": "^4.11.0",
     "axios": "^1.20.0",
     "cross-env": "^10.1.0",
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.2",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -242,7 +242,7 @@
     "@stryker-mutator/core": {
       "ajv": "^8.20.0"
     },
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.28.2",
     "typed-rest-client": "^3.1.2",
     "hyperid": "^4.0.0",
     "uuid": "^11.1.1",
