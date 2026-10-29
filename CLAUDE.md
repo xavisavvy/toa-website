@@ -127,7 +127,7 @@ Touch carefully — these are security-critical and warrant extra review:
 
 ## Commit Messages
 
-Conventional Commits (drives `standard-version` automatic versioning):
+Conventional Commits (release-please builds the release PR and changelog from them; see `docs/VERSION_WORKFLOW_SETUP.md`):
 - `feat:` minor bump · `fix:` patch · `feat!:` major
 - `docs:` `test:` `refactor:` `perf:` `chore:`
 

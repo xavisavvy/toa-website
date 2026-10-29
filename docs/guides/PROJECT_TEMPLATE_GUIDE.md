@@ -247,7 +247,7 @@ See [GitHub Secrets Guide](../ci-cd/GITHUB_SECRETS_GUIDE.md) for detailed setup.
 **CI/CD:**
 - ✅ `.github/workflows/ci.yml` - Core CI pipeline
 - ✅ `.github/workflows/deploy.yml` - Deployment automation
-- ✅ `.github/workflows/version.yml` - Semantic versioning
+- ✅ `.github/workflows/release.yml` - Semantic versioning (release-please)
 - ✅ `.github/workflows/sbom.yml` - Security bill of materials
 
 **Quality & Security:**

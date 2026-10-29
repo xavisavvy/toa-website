@@ -14,7 +14,7 @@ This document summarizes the test infrastructure improvements implemented to sup
 **Files Modified**:
 - `.github/workflows/ci.yml` - Enhanced with contract tests
 - `.github/workflows/deploy.yml` - Existing deployment automation
-- `.github/workflows/version.yml` - Existing version automation
+- `.github/workflows/release.yml` - Release automation (release-please)
 - `.husky/pre-commit` - Pre-commit hooks with lint-staged
 
 **Capabilities**:
@@ -24,7 +24,7 @@ This document summarizes the test infrastructure improvements implemented to sup
 - ✅ Mutation testing on PRs (incremental)
 - ✅ Visual regression testing
 - ✅ Pre-commit hooks with related test runs
-- ✅ Automated versioning with standard-version
+- ✅ Automated versioning with release-please
 
 ### Phase #2: Contract Testing ✅
 **Status**: **NEWLY IMPLEMENTED**  
@@ -152,7 +152,7 @@ toa-website/
 │   └── workflows/
 │       ├── ci.yml                    # Enhanced with chaos tests
 │       ├── deploy.yml
-│       └── version.yml
+│       └── release.yml
 ├── test/
 │   ├── contract/                     # ✨ Phase 2
 │   │   ├── api.contract.test.ts

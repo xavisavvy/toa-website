@@ -1,0 +1,87 @@
+name: Release
+
+# Releases go through a pull request, never a direct push to main.
+#
+# On every push to main, release-please keeps one release PR open
+# ("chore(release): x.y.z") that bumps package.json/package-lock.json and
+# updates CHANGELOG.md from the Conventional Commits since the last release.
+# The tag and GitHub Release are only created when that PR is merged, so a
+# version tag always points at a commit that is on main.
+#
+# The previous workflow (standard-version + `git push --follow-tags`) was
+# rejected by the main ruleset after it had already pushed the tag, which
+# left v2.3.0 pointing at a commit that never reached main.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release PR / tag
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 10
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          # A PR opened with GITHUB_TOKEN does not trigger other workflows, so
+          # the required CI checks would never run on the release PR. GH_PAT
+          # (fine-grained: contents + pull requests read/write on this repo)
+          # avoids that and lets the "release: published" event start sbom.yml.
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Release Please"
+            echo "- Release created: ${{ steps.release.outputs.release_created || 'false' }}"
+            echo "- Tag: ${{ steps.release.outputs.tag_name || 'n/a' }}"
+            echo "- Release PR: ${{ steps.release.outputs.pr && format('#{0}', fromJSON(steps.release.outputs.pr).number) || 'none opened or updated' }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Safeguard: the newest v* tag must be on main and match package.json.
+  # Catches a tag pushed without its release commit (what happened to v2.3.0)
+  # and a version bump that landed without its tag.
+  verify-release-tag:
+    name: Verify latest tag is on main
+    needs: release-please
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check latest tag
+        run: |
+          git fetch --force --tags origin
+          latest=$(git tag -l 'v[0-9]*' --sort=-v:refname | head -n1)
+          version=$(node -p "require('./package.json').version")
+          echo "Latest tag: ${latest:-none}  package.json: $version"
+
+          status=0
+          if [ -n "$latest" ] && ! git merge-base --is-ancestor "$latest" origin/main; then
+            echo "::error::Tag $latest points at $(git rev-parse --short "$latest^{commit}"), which is not on main. Delete the tag and let the release PR recreate it."
+            status=1
+          fi
+          if [ "$latest" != "v$version" ]; then
+            echo "::error::package.json is $version but the newest tag is ${latest:-none}."
+            status=1
+          fi
+          exit $status

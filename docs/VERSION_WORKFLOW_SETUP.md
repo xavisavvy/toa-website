@@ -1,108 +1,67 @@
-# Version Workflow Setup
+# Release Workflow Setup
 
-## Issue
+Releases are cut by [release-please](https://github.com/googleapis/release-please)
+through a pull request. Nothing pushes directly to `main`.
 
-The version workflow fails to push due to branch protection rules:
+**Workflow:** `.github/workflows/release.yml`
+**Config:** `release-please-config.json`, `.release-please-manifest.json`
 
-```
-remote: error: GH013: Repository rule violations found for refs/heads/main
-remote: - Cannot update this protected ref
-remote: - Missing successful active Production deployment
-remote: - Changes must be made through a pull request
-remote: - 5 of 5 required status checks are expected
-```
+## How a release happens
 
-## Root Cause
+1. A Conventional Commit (`feat:`, `fix:`, `perf:` …) lands on `main`.
+2. The **Release** workflow runs release-please, which opens or updates a single
+   PR titled `chore(release): x.y.z`. The PR bumps `package.json`,
+   `package-lock.json` and `.release-please-manifest.json`, and adds the new
+   section to `CHANGELOG.md`.
+3. The release PR goes through the same required checks and code-owner review
+   as any other PR. Leave it open to batch more changes into the release; it
+   updates itself on every push to `main`.
+4. When the release PR is merged, the next Release run creates the `vX.Y.Z` tag
+   on that merge commit and publishes a GitHub Release. The `release: published`
+   event then runs `sbom.yml`, which attaches the SBOM files to the release.
 
-`GITHUB_TOKEN` provided by GitHub Actions **cannot bypass branch protection rules**. The version workflow needs to push commits and tags directly to the protected `main` branch.
+Version bumps follow Conventional Commits: `fix:` → patch, `feat:` → minor,
+`feat!:` or a `BREAKING CHANGE:` footer → major. To force a version, add a
+commit with `Release-As: x.y.z` in its body.
 
-## Solution
+## Safeguards
 
-Use a Personal Access Token (PAT) with bypass permissions.
+- **The tag only exists after the commit is on `main`.** release-please creates
+  the tag from the merged release PR, so a rejected push can no longer leave a
+  tag behind (what happened to `v2.3.0`: the old workflow pushed the tag, then
+  the ruleset rejected the release commit).
+- **Verify latest tag is on main** (second job in `release.yml`) fails if the
+  newest `v*` tag is not an ancestor of `main`, or does not equal
+  `v<package.json version>`.
 
-### Option 1: Create a Personal Access Token (Recommended)
+## One-time setup
 
-1. **Create PAT**:
-   - Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
-   - Click "Generate new token (classic)"
-   - Name: `GH_PAT_VERSION_WORKFLOW`
-   - Expiration: Choose appropriate duration
-   - Scopes required:
-     - ✅ `repo` (Full control of private repositories)
-     - ✅ `workflow` (Update GitHub Action workflows)
+### `GH_PAT` secret
 
-2. **Add to Repository Secrets**:
-   - Go to Repository Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `GH_PAT`
-   - Value: Paste the token
-   - Click "Add secret"
+A PR opened with the default `GITHUB_TOKEN` does not trigger other workflows, so
+CI would never run on the release PR and its required checks would stay pending.
+The workflow therefore uses `secrets.GH_PAT` when it is set.
 
-3. **Verify Workflow**:
-   - The workflow already checks for `secrets.GH_PAT` and falls back to `secrets.GITHUB_TOKEN`
-   - Once PAT is added, it will be used automatically
-   - Version commits/tags will bypass protection rules
+Create a fine-grained personal access token:
 
-### Option 2: Adjust Branch Protection Rules
+- **Repository access:** only `xavisavvy/toa-website`
+- **Permissions:** Contents: Read and write; Pull requests: Read and write
+- Save it as the repository secret **`GH_PAT`**
+  (Settings → Secrets and variables → Actions)
 
-If you don't want to use a PAT, adjust branch protection:
+Without `GH_PAT`, the workflow falls back to `GITHUB_TOKEN`. That also needs
+Settings → Actions → General → "Allow GitHub Actions to create and approve pull
+requests" enabled, and the release PR's checks will not start on their own.
 
-1. Go to Repository Settings → Rules → Rulesets
-2. Edit the ruleset for `main` branch
-3. Add bypass for:
-   - `github-actions[bot]` user
-   OR
-   - Specific workflow: `Versioning`
+### Remove a tag that is not on `main`
 
-**Note**: This is less secure as it allows the bot to bypass all rules.
-
-### Option 3: Disable Auto-Versioning (Not Recommended)
-
-Disable `.github/workflows/version.yml` and version manually:
+If **Verify latest tag is on main** fails because a tag points outside `main`,
+delete it so release-please can recreate it on the real release commit:
 
 ```bash
-npm run release
-git push --follow-tags origin main
+git push origin --delete v2.3.0
 ```
 
-**Cons**: Requires manual intervention, defeats CI/CD automation.
-
-## Current Workflow Changes
-
-Updated `version.yml`:
-
-```yaml
-- name: Checkout code
-  uses: actions/checkout@v4
-  with:
-    fetch-depth: 0
-    token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}  # Uses PAT if available
-
-- name: Push changes
-  run: git push --follow-tags origin main
-  env:
-    GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+```bash
+git tag -d v2.3.0
 ```
-
-## Verification
-
-After adding `GH_PAT` secret, the next push to main should:
-
-1. ✅ Detect version-worthy commits
-2. ✅ Run `standard-version`
-3. ✅ Create version commit (e.g., `chore(release): 2.1.0`)
-4. ✅ Create git tag (e.g., `v2.1.0`)
-5. ✅ Push commit and tag to main (bypassing protection)
-
-## Recommended: Option 1 (PAT)
-
-This is the cleanest solution:
-- Secure (token can be rotated)
-- Explicit (clearly shows version bot has special permissions)
-- Minimal changes to branch protection
-- Industry standard practice
-
----
-
-**Status**: Workflow updated to use `GH_PAT` when available.  
-**Action Required**: Add `GH_PAT` secret with `repo` and `workflow` scopes.
