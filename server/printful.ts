@@ -339,6 +339,68 @@ export async function getPrintfulProductDetails(productId: string): Promise<Prin
   }
 }
 
+export interface CheckoutVariant {
+  productName: string;
+  variantName: string;
+  retailPriceCents: number;
+  image: string;
+}
+
+/**
+ * Look up the authoritative retail price for a sync variant at checkout.
+ * Returns null unless the variant belongs to the product and is purchasable,
+ * so the client can never dictate what a customer is charged.
+ */
+export async function getSyncVariantForCheckout(
+  productId: string,
+  variantId: string
+): Promise<CheckoutVariant | null> {
+  const apiKey = process.env.PRINTFUL_API_KEY;
+
+  if (!apiKey) {
+    console.log('Printful API key not configured');
+    return null;
+  }
+
+  try {
+    const response = await fetch(`https://api.printful.com/store/products/${productId}`, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch product ${productId} for checkout`);
+      return null;
+    }
+
+    const data = await response.json();
+    const product: PrintfulSyncProduct | undefined = data.result?.sync_product;
+    const syncVariants: PrintfulSyncVariant[] = data.result?.sync_variants || [];
+    const variant = syncVariants.find(v => v.id.toString() === variantId);
+
+    if (!product || !variant || variant.is_ignored || !variant.synced) {
+      return null;
+    }
+
+    const retailPriceCents = Math.round(parseFloat(variant.retail_price) * 100);
+    if (!Number.isFinite(retailPriceCents) || retailPriceCents <= 0) {
+      return null;
+    }
+
+    return {
+      productName: product.name,
+      variantName: variant.name,
+      retailPriceCents,
+      image: product.thumbnail_url,
+    };
+  } catch {
+    console.error(`Error fetching product ${productId} for checkout`);
+    return null;
+  }
+}
+
 /**
  * Get files (mockup images) for a sync variant
  */

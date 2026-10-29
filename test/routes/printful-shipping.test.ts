@@ -15,6 +15,12 @@ vi.mock('../../server/printful', async () => {
   const actual = await vi.importActual('../../server/printful');
   return {
     ...actual,
+    getSyncVariantForCheckout: vi.fn(() => Promise.resolve({
+      productName: 'Test Sticker',
+      variantName: '3x3',
+      retailPriceCents: 300,
+      image: 'https://files.printful.com/sticker.jpg',
+    })),
     getPrintfulShippingEstimate: vi.fn((params: {recipient: {zip: string}}) => {
       // Mock successful response
       if (params.recipient.zip === '84015') {
@@ -208,13 +214,8 @@ describe('Printful Shipping Estimate API', () => {
       .send({
         productId: '123',
         variantId: '5130270457',
-        productName: 'Test Sticker',
-        price: '3.00',
         quantity: 1,
-        shipping: {
-          shipping: 4.39,  // From Printful API
-          tax: 0.17,       // From Printful API
-        },
+        zipCode: '84015', // Shipping is recomputed server-side from Printful
       });
 
     expect(response.status).toBe(200);

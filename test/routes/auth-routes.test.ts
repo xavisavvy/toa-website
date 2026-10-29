@@ -113,6 +113,22 @@ describe('Auth Routes - Comprehensive Coverage', () => {
     });
   });
 
+  describe('POST /api/auth/logout without session middleware', () => {
+    // Root index.ts (the production entry) mounts no session middleware, so
+    // req.session is undefined. This used to throw inside an async handler
+    // and take the whole process down.
+    it('should respond instead of crashing when req.session is undefined', async () => {
+      const bareApp = express();
+      bareApp.use(express.json());
+      registerRoutes(bareApp);
+
+      const response = await request(bareApp).post('/api/auth/logout');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ success: true });
+    });
+  });
+
   describe('Auth Input Validation', () => {
     it('should reject empty email', async () => {
       const response = await request(app)

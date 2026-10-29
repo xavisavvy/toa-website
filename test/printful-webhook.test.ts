@@ -69,7 +69,8 @@ describe('Printful Webhook', () => {
     app = express.default();
 
     // Body parsing with raw body preserved for signature verification,
-    // matching production.
+    // matching the dev entry (server/index.ts). The production entry's
+    // middleware order is covered separately below.
     app.use(express.default.json({
       verify: (req: any, _res, buf) => {
         if (req.url === '/api/webhooks/printful') {
@@ -79,7 +80,9 @@ describe('Printful Webhook', () => {
     }));
 
     registerRoutes(app);
-  });
+  // The cold import of ../server/routes can exceed the 10s default hook
+  // timeout when the whole suite runs in parallel.
+  }, 30_000);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -280,6 +283,95 @@ describe('Printful Webhook', () => {
 
       // Restore secret
       process.env.PRINTFUL_WEBHOOK_SECRET = originalSecret;
+    });
+
+    it('should reject unsigned webhooks in production when no secret is set', async () => {
+      const originalSecret = process.env.PRINTFUL_WEBHOOK_SECRET;
+      const originalEnv = process.env.NODE_ENV;
+      delete process.env.PRINTFUL_WEBHOOK_SECRET;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const response = await request(app)
+          .post('/api/webhooks/printful')
+          .set('Content-Type', 'application/json')
+          .send(JSON.stringify({ type: 'order_canceled', data: { order: { id: mockPrintfulOrderId } } }));
+
+        expect(response.status).toBe(503);
+        expect(mockDb.update).not.toHaveBeenCalled();
+      } finally {
+        process.env.PRINTFUL_WEBHOOK_SECRET = originalSecret;
+        process.env.NODE_ENV = originalEnv;
+      }
+    });
+  });
+
+  // Root index.ts (the production entry) mounts express.raw for this path
+  // before the global express.json(), and sets no rawBody. These tests use the
+  // same middleware order so a regression there can't hide behind the dev setup.
+  describe('production middleware order', () => {
+    let prodApp: Express;
+
+    beforeAll(async () => {
+      const { registerRoutes } = await import('../server/routes');
+      const express = await import('express');
+      prodApp = express.default();
+      prodApp.use('/api/webhooks/printful', express.default.raw({ type: 'application/json' }));
+      prodApp.use(express.default.json());
+      registerRoutes(prodApp);
+    });
+
+    it('should accept a correctly signed webhook', async () => {
+      const payloadStr = JSON.stringify({
+        type: 'package_shipped',
+        data: {
+          order: { id: mockPrintfulOrderId },
+          shipment: { tracking_number: 'T1', tracking_url: 'https://www.ups.com/track', carrier: 'UPS', service: 'Ground' },
+        },
+      });
+
+      const response = await request(prodApp)
+        .post('/api/webhooks/printful')
+        .set('X-Printful-Signature', createSignature(payloadStr))
+        .set('Content-Type', 'application/json')
+        .send(payloadStr);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ received: true });
+    });
+
+    it('should reject a signature computed over different bytes', async () => {
+      const payloadStr = JSON.stringify({ type: 'order_canceled', data: { order: { id: mockPrintfulOrderId } } });
+
+      const response = await request(prodApp)
+        .post('/api/webhooks/printful')
+        .set('X-Printful-Signature', createSignature(`${payloadStr} `))
+        .set('Content-Type', 'application/json')
+        .send(payloadStr);
+
+      expect(response.status).toBe(401);
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('unverifiable body', () => {
+    it('should fail closed when the body was already parsed and no raw copy exists', async () => {
+      const { registerRoutes } = await import('../server/routes');
+      const express = await import('express');
+      const parsedApp = express.default();
+      parsedApp.use(express.default.json());
+      registerRoutes(parsedApp);
+
+      const payloadStr = JSON.stringify({ type: 'order_canceled', data: { order: { id: mockPrintfulOrderId } } });
+
+      const response = await request(parsedApp)
+        .post('/api/webhooks/printful')
+        .set('X-Printful-Signature', createSignature(payloadStr))
+        .set('Content-Type', 'application/json')
+        .send(payloadStr);
+
+      expect(response.status).toBe(500);
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
   });
 
