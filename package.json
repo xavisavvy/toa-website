@@ -234,6 +234,10 @@
     "tmp": "^0.2.4",
     "minimatch": "^11.0.1",
     "brace-expansion": "^5.0.5",
+    "glob@7": {
+      "minimatch": "^3.1.5",
+      "brace-expansion": "^1.1.21"
+    },
     "@stryker-mutator/core": {
       "ajv": "^8.20.0"
     },
