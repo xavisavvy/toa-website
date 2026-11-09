@@ -194,7 +194,7 @@ jobs:
           flags: unittests
           
       - name: Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results
@@ -269,7 +269,7 @@ jobs:
       #     category: 'container-security'
       
       - name: Upload Trivy JSON results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: trivy-results
@@ -312,7 +312,7 @@ jobs:
         continue-on-error: true
       
       - name: Upload npm audit results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: npm-audit-results
@@ -334,7 +334,7 @@ jobs:
           args: snyk test --severity-threshold=high --json-file-output=snyk-results.json
       
       - name: Upload Snyk results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: snyk-results
@@ -426,7 +426,7 @@ jobs:
         run: npm run license:check
       
       - name: Upload license report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: license-compliance-report
@@ -469,7 +469,7 @@ jobs:
         continue-on-error: true
       
       - name: Upload performance results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: performance-results
@@ -511,7 +511,7 @@ jobs:
         continue-on-error: true
           
       - name: Upload mutation report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: mutation-report
