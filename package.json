@@ -163,7 +163,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@lhci/cli": "^0.15.1",
+    "@lhci/cli": "^0.16.0",
     "@pact-foundation/pact": "^16.0.4",
     "@playwright/test": "^1.57.0",
     "@replit/vite-plugin-cartographer": "^0.3.2",
@@ -232,7 +232,7 @@
   },
   "overrides": {
     "tmp": "^0.2.4",
-    "minimatch": "^10.2.5",
+    "minimatch": "^11.0.1",
     "brace-expansion": "^5.0.5",
     "@stryker-mutator/core": {
       "ajv": "^8.20.0"
