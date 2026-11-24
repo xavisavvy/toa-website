@@ -136,3 +136,6 @@ Conventional Commits (release-please builds the release PR and changelog from th
 - `.github/copilot-instructions.md` — full coding standards, code samples, and trigger-word patterns. Most "how to write a route / component / test" details live there; this file is the higher-level orientation.
 - `.ai/architecture.md` — system design overview
 - `docs/ci-cd/`, `docs/testing/`, `docs/security/`, `docs/deployment/`, `docs/features/`
+- `docs/ci-cd/SELF_HOSTED_RUNNERS.md` — **read before touching workflows**: jobs on `[self-hosted, Linux, X64]` run on a
+  shared, hardened WSL pool that also deploys lfg-app to production. PRs (forks, Dependabot) run on GitHub-hosted, and
+  the pool has no Windows interop and no `/mnt/c`.
