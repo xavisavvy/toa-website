@@ -358,7 +358,7 @@ rm -rf reports coverage playwright-report
 ### SonarQube Integration
 ```yaml
 - name: SonarQube Scan
-  uses: sonarsource/sonarqube-scan-action@master
+  uses: SonarSource/sonarqube-scan-action@70bad232163b09d998ea0707ee80c0ec80798c16 # v8.5.1
   with:
     args: >
       -Dsonar.coverage.lcov.reportPaths=coverage/lcov.info
