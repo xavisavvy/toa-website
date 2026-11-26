@@ -348,7 +348,7 @@ rm -rf reports coverage playwright-report
 ```yaml
 # .github/workflows/test.yml
 - name: Upload to Codecov
-  uses: codecov/codecov-action@v3
+  uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
   with:
     files: ./coverage/lcov.info
     flags: unittests

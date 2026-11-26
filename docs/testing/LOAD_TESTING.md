@@ -279,7 +279,7 @@ jobs:
   load-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
       - name: Install dependencies
         run: npm ci
@@ -295,7 +295,7 @@ jobs:
         
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: load-test-results
           path: test-results/

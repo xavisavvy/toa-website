@@ -127,7 +127,7 @@ If you want SAST scanning without CodeQL, consider:
 ### 2. Semgrep (Free)
 ```yaml
 - name: Semgrep Security Scan
-  uses: returntocorp/semgrep-action@v1
+  uses: returntocorp/semgrep-action@713efdd345f3035192eaa63f56867b88e63e4e5d # v1
   with:
     config: >-
       p/security-audit
@@ -216,7 +216,7 @@ When you have GitHub Advanced Security:
    ```yaml
    # In container-security job
    - name: Upload Trivy results to GitHub Security
-     uses: github/codeql-action/upload-sarif@v3
+     uses: github/codeql-action/upload-sarif@74c1aea9df7c0f02e9b7bfe4a8935abf2e5e3aa6 # v3
      # ... rest of config
    ```
 

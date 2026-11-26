@@ -756,14 +756,14 @@ psql -d database -f migrations/down/001_rollback.sql
 ```yaml
 # Add to .github/workflows/ci.yml
 - name: Login to GitHub Container Registry
-  uses: docker/login-action@v3
+  uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4
   with:
     registry: ghcr.io
     username: ${{ github.actor }}
     password: ${{ secrets.GITHUB_TOKEN }}
 
 - name: Build and push
-  uses: docker/build-push-action@v5
+  uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
   with:
     context: .
     push: true
@@ -1288,7 +1288,7 @@ sonarqube:
   name: SonarQube Analysis
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
         fetch-depth: 0
     
@@ -1430,7 +1430,7 @@ on:
 
 steps:
   - name: Checkout code
-    uses: actions/checkout@v4
+    uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     with:
       ref: ${{ github.event.inputs.rollback_to || github.sha }}
 ```
@@ -1671,7 +1671,7 @@ jobs:
     
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -1852,10 +1852,10 @@ jobs:
     name: Run Chaos Experiments
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
       - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8 # v3
       
       - name: Run pod failure experiment
         run: |

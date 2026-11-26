@@ -45,7 +45,7 @@ Run only affected tests based on changed files:
 ```yaml
 - name: Get changed files
   id: changed-files
-  uses: tj-actions/changed-files@v41
+  uses: tj-actions/changed-files@716b1e13042866565e00e85fd4ec490e186c4a2f # v41
   
 - name: Run affected unit tests only
   if: steps.changed-files.outputs.any_changed == 'true'
@@ -57,7 +57,7 @@ Run only affected tests based on changed files:
 ### 3. **Dependency Caching** (Already implemented ✅)
 
 ```yaml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
   with:
     cache: 'npm'  # ✅ Already doing this
 ```
@@ -68,7 +68,7 @@ Cache the build output between runs:
 
 ```yaml
 - name: Cache build
-  uses: actions/cache@v4
+  uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
   with:
     path: dist/
     key: build-${{ hashFiles('client/**', 'server/**') }}
@@ -86,7 +86,7 @@ Cache Playwright browsers (they're large ~300MB):
 
 ```yaml
 - name: Cache Playwright browsers
-  uses: actions/cache@v4
+  uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
   with:
     path: ~/.cache/ms-playwright
     key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
@@ -191,9 +191,9 @@ jobs:
     name: Quick Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '20'
           cache: 'npm'
@@ -210,9 +210,9 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '20'
           cache: 'npm'
@@ -222,7 +222,7 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:coverage
       
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
         if: always()
         with:
           files: ./coverage/coverage-final.json
@@ -235,15 +235,15 @@ jobs:
       matrix:
         shard: [1, 2]  # Split into 2 shards
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '20'
           cache: 'npm'
       
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -253,7 +253,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       
       - name: Cache build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: dist/
           key: build-${{ hashFiles('client/**', 'server/**', 'package-lock.json') }}
@@ -265,7 +265,7 @@ jobs:
       - name: Run E2E tests (sharded)
         run: npx playwright test --shard=${{ matrix.shard }}/2
       
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: playwright-report-${{ matrix.shard }}
@@ -276,9 +276,9 @@ jobs:
     name: Security Scans
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '20'
           cache: 'npm'
