@@ -311,7 +311,7 @@ export type NewTableName = typeof tableName.$inferInsert;
 **Creates:** GitHub Actions workflow with quality gates
 
 > The repo requires every action to be pinned to a full commit SHA, with the tag in a trailing comment
-> (`uses: owner/action@<40-char sha> # vN`). A workflow that uses a bare tag like `@v4` is refused.
+> (`uses: owner/action@<40-char sha> # vN`). A workflow that uses a tag or branch (`@v4`, `@main`, `@master`) is refused.
 > Copy the SHAs already used in `.github/workflows/`; Dependabot keeps them current.
 
 ```yaml
