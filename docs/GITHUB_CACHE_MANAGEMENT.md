@@ -182,13 +182,13 @@ In `.github/workflows/*.yml`, ensure cache keys are specific:
 
 ```yaml
 # Good - includes hash of lock file
-- uses: actions/cache@v4
+- uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
   with:
     path: node_modules
     key: node-modules-${{ hashFiles('package-lock.json') }}
     
 # Bad - too generic, creates many redundant caches
-- uses: actions/cache@v4
+- uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
   with:
     path: node_modules
     key: node-modules-${{ github.run_id }}
@@ -211,7 +211,7 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
       - name: Cleanup old caches
         env:

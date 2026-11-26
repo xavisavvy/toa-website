@@ -163,7 +163,7 @@ DOCKER_BUILDKIT=1 docker build -t toa-website:latest .
 ```yaml
 # GitHub Actions
 - name: Cache dependencies
-  uses: actions/cache@v4
+  uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
   with:
     path: |
       ~/.npm
@@ -171,7 +171,7 @@ DOCKER_BUILDKIT=1 docker build -t toa-website:latest .
     key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
 - name: Cache Docker layers
-  uses: docker/build-push-action@v5
+  uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
   with:
     cache-from: type=gha
     cache-to: type=gha,mode=max
