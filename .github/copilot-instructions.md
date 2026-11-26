@@ -310,6 +310,10 @@ export type NewTableName = typeof tableName.$inferInsert;
 ### 🚀 "ci pipeline"
 **Creates:** GitHub Actions workflow with quality gates
 
+> The repo requires every action to be pinned to a full commit SHA, with the tag in a trailing comment
+> (`uses: owner/action@<40-char sha> # vN`). A workflow that uses a bare tag like `@v4` is refused.
+> Copy the SHAs already used in `.github/workflows/`; Dependabot keeps them current.
+
 ```yaml
 name: CI Pipeline
 
@@ -323,10 +327,10 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '20'
           cache: 'npm'
